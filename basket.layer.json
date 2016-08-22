@@ -1,0 +1,8 @@
+{
+	"onlyclient":true,
+	"css":"*cart/catalog.css",
+	"js":"*cart/catalog.js",
+	"tpl":"*cart/cart.div.tpl",
+	"global":"cat_basket",
+	"json":"*cart/order.php?id="
+}
