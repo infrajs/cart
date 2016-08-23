@@ -1,4 +1,5 @@
 {
 	"external":"external",
-	"ordersdir":"~.Заявки/"
+	"ordersdir":"~.Заявки/",
+	"js":["cart.js","catalog.js"]
 }

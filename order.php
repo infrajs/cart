@@ -1,37 +1,46 @@
 <?php
-@define('ROOT','../../../');
-require_once(ROOT.'infra/plugins/infra/infra.php');
-//sleep(1);
-infra_require('*cart/cart.inc.php');
+use infrajs\cart\Cart;
+use infrajs\nostore\Nostore;
+use infrajs\router\Router;
+use infrajs\ans\Ans;
+use infrajs\each\Each;
+use infrajs\load\Load;
+use infrajs\access\Access;
+use infrajs\session\Session;
 
-$id=$_REQUEST['id'];
-$ans=array('id'=>$id);
-$place=$_REQUEST['place'];
-$safe=infra_session_get('safe');
-if(!Cart::loadOrder($id))return infra_err($ans,'Заявка не найдена!');
-if(!infra_session_get('safe.manager')&&!cart_isMy($id))return infra_err($ans,'Заявки нет в списке ваших заявок!');
-if(!infra_session_get('safe.manager')&&$place=='admin')return infra_err($ans,'У вас нет доступа к этому разделу!');
-if(!cart_canI($id))return infra_err($ans,'Действие не разрешено!');
+if (!is_file('vendor/autoload.php')) {
+	chdir('../../../');
+	require_once('vendor/autload.php');
+	Router::init();
+}
+
+$id = $_REQUEST['id'];
+$ans = array('id'=>$id);
+$place = $_REQUEST['place'];
+$safe = Session::get('safe');
+if (!Cart::loadOrder($id)) return Ans::err($ans,'Заявка не найдена!');
+if (!Session::get('safe.manager') && !Cart::isMy($id)) return Ans::err($ans,'Заявки нет в списке ваших заявок!');
+if (!Session::get('safe.manager') && $place=='admin') return Ans::err($ans,'У вас нет доступа к этому разделу!');
+if (!Cart::canI($id)) return Ans::err($ans,'Действие не разрешено!');
 
 //Заява либо моя либо это менеджер
-if(isset($_GET['easy'])){
-	$order=Cart::loadOrder($id);
+if (isset($_GET['easy'])){
+	$order = Cart::loadOrder($id);
 }else{
-	$order=Cart::getGoodOrder($id);
+	$order = Cart::getGoodOrder($id);
 	$order['place']=$place;
-	$order['user']=Load::loadJSON('*cart/user.php');
-	//if($id&&$order['status']=='active'){
-		$order['ismy']=cart_isMy($id);
-		//return infra_err($order,'Активная заявка {id} редактируется пользователем {email}');
+	$order['user']=Load::loadJSON('-cart/user.php');
+	//if ($id&&$order['status']=='active'){
+		$order['ismy'] = Cart::isMy($id);
+		//return Ans::err($order,'Активная заявка {id} редактируется пользователем {email}');
 	//}
-	//if($id&&$order['status']=='active'){
-	//	$order=array(
+	//if ($id&&$order['status']=='active'){
+	//	$order = array(
 	//		"id"=>$id,
 	//		"email"=>$order["email"],
-	//		"activebutton"=>cart_isMy($id)
+	//		"activebutton"=>Cart::isMy($id)
 	//	);
-	//	return infra_err($order,'Активная заявка {id} редактируется пользователем {email}');
+	//	return Ans::err($order,'Активная заявка {id} редактируется пользователем {email}');
 	//}
 }
-return infra_ret($order,'Ваша заявка');
-?>
+return Ans::ret($order,'Ваша заявка');

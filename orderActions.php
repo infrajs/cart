@@ -23,7 +23,7 @@ if(infra_session_get('safe.manager')||$order['rule']['edit']['orders']){ //Place
 //Заявка принадлежит тому человеку, который первым изменил её статус с активного на какой-то
 //Передать заявку может и можно, но сумма по заявке будет всегда принадлежать первому человеку
 
-if(!cart_canI($id,$action))return infra_err($ans,'У вас нет доступа к заявке {id}<br>на совершение действия {action}!');
+if(!Cart::canI($id,$action))return infra_err($ans,'У вас нет доступа к заявке {id}<br>на совершение действия {action}!');
 
 if(!$order)return infra_err($ans,'Заявка {id} не найдена');
 $status=$order['status'];

@@ -12,8 +12,8 @@
 	$order=Cart::getGoodOrder($id);
 
 	if(!$order)return infra_err($ans,'Заявка не найдена!');
-	if(!cart_isMy($id))return infra_err($ans,'Заявки нет в списке ваших заявок!');
-	if(!cart_canI($id,$action))return infra_err($ans,'С заявкой нельзя выполнить действие '.$action.'.');//действие paycard есть правда со ссылкой а не с обработкой
+	if(!Cart::isMy($id))return infra_err($ans,'Заявки нет в списке ваших заявок!');
+	if(!Cart::canI($id,$action))return infra_err($ans,'С заявкой нельзя выполнить действие '.$action.'.');//действие paycard есть правда со ссылкой а не с обработкой
 	
 	$conf = Config::get('access');
 	$email = $conf['email'];
