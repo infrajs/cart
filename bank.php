@@ -22,7 +22,7 @@
 		return infra_err($ans);
 	}
 
-	$order=cart_loadOrder($ba['ORDER']);
+	$order=Cart::loadOrder($ba['ORDER']);
 	if(!$order){
 		$ans['msg']='Заявка не найдена ORDER';
 		infra_mail_toSupport($_SERVER['HTTP_HOST'].' '.$ans['msg'],'noreplay@'.$_SERVER['HTTP_HOST'],print_r($ba,true));

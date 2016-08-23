@@ -8,7 +8,7 @@ if(!infra_session_get('safe.manager'))return infra_err($ans,'У вас нет д
 if(isset($_REQUEST['id'])){
 	$id=$_REQUEST['id'];
 	$ans['id']=$id;
-	$order=cart_getGoodOrder($id);
+	$order=Cart::getGoodOrder($id);
 	if(!$order)return infra_err($ans,'Заявка {id} не найдена');
 	$order['place']=$place;	
 	$ans['order']=$order;
@@ -23,7 +23,7 @@ if(isset($_REQUEST['id'])){
 		$f=infra_srcinfo($file);
 		if($f['ext']!=='json')continue;
 		$id=$f['name'];
-		$order=cart_getGoodOrder($id);
+		$order=Cart::getGoodOrder($id);
 		$order['place']=$place;
 		//if($order['status']=='active')continue;
 		$orders[]=$order;

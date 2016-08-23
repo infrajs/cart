@@ -10,19 +10,19 @@ $ans['id']=$id;
 if($id){
 	if(!$id){
 		// работаем с активной заявкой
-		$order=cart_getGoodOrder();
+		$order=Cart::getGoodOrder();
 		$ans['order']=$order;
 		return infra_ret($ans);
 	}else{
 		// работаем с сохранённой заявкой
-		$order=cart_getGoodOrder($id);
+		$order=Cart::getGoodOrder($id);
 		if(!$order)return infra_err($ans,'Заявка не найдена!');
 		if(!infra_session_get('safe.manager')&&!cart_isMy($id))return infra_err($ans,'Заявки нет в списке ваших заявок!');
 		return infra_ret($order);
 	}
 }else{
 	$ans = array();	
-	$ans['order']=cart_getGoodOrder();
+	$ans['order']=Cart::getGoodOrder();
 	$ans['list']=cart_getMyOrders();
 	
 	return infra_ret($ans);

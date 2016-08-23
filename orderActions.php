@@ -10,13 +10,13 @@ $place=$_REQUEST['place'];
 if($action=='wholesaleDelete'){	
 	if(!infra_session_get('safe.manager'))return infra_err($ans, 'У вас нет доступа!');
 	$email=$_REQUEST['id'];
-	$data=infra_loadJSON('*merchants.json');
+	$data=Load::loadJSON('*merchants.json');
 	unset($data['merchants'][$email]);
 	file_put_contents(ROOT.'infra/data/merchants.json', infra_json_encode($data));
 	return infra_ret($ans);
 }
 
-$order = cart_loadOrder($id);
+$order = Cart::loadOrder($id);
 if(infra_session_get('safe.manager')||$order['rule']['edit']['orders']){ //Place - orders admin wholesale
 	cart_mergeOrder($order,$place);
 }
@@ -40,7 +40,7 @@ if(!in_array($action,array('realdel','clear'))){
 	if(is_string($msg))return infra_err($ans,$msg);
 }
 
-$ogood=cart_getGoodOrder($id);
+$ogood=Cart::getGoodOrder($id);
 if(!in_array($action,array('realdel','active','clear','saved','dismiss'))&&$ogood['rule']['edit'][$place]){
 	if(!$order['basket'])return infra_err($ans,'Заявк пустая! Добавьте товар!');
 	$page='';
@@ -91,7 +91,7 @@ if($action=='saved'){
 	if($place=='admin'&&!infra_session_get('safe.manager'))return infra_err($ans, 'У вас нет доступа!');
 	infra_session_set($place.$id);
 }elseif($action=='refresh'){//Обновить данные из каталога
-	infra_foro($order['basket'],function(&$pos){
+	Each::foro($order['basket'],function(&$pos){
 		unset($pos['article']);//Если нет артикула данные при сохранении обновятся
 	});
 	cart_saveOrder($order,$place);
@@ -117,7 +117,7 @@ if($action=='saved'){
 	}
 }elseif($action=='active'){
 	
-	$noworder = cart_loadOrder();
+	$noworder = Cart::loadOrder();
 	if($noworder['basket']){
 		return infra_err($ans,
 			'У вас уже есть <a onclick="cart.goTop(); popup.close()" href="?office/orders/my">активная непустая заявка</a>.<br>
@@ -128,7 +128,7 @@ if($action=='saved'){
 	cart_saveOrder($order,$place);
 }elseif($action=='copy'){
 
-	$noworder = cart_loadOrder();
+	$noworder = Cart::loadOrder();
 	if($noworder['basket']){
 		return infra_err($ans,
 			'У вас уже есть <a onclick="cart.goTop(); popup.close()" href="?office/orders/my">активная непустая заявка</a>.<br>
@@ -150,7 +150,7 @@ if($action=='saved'){
 	infra_forr($myorders,function($id) use($order){
 		if($order['id']==$id)return new infra_Fix('del',true);
 	});
-	$path=cart_getPath($id);
+	$path=Cart::getPath($id);
 	$src=infra_theme($path);
 	if($src)unlink(ROOT.$src);
 
@@ -188,9 +188,9 @@ if($action=='saved'){
 }elseif($action=='editcart'){
 	
 	if(!$id)return infra_err($ans,'Нельзя активную заявку сделать активной');
-	$ans=infra_loadJSON('*cart/orderActions.php?place='.$place.'&id='.$id.'&action=active');
+	$ans=Load::loadJSON('*cart/orderActions.php?place='.$place.'&id='.$id.'&action=active');
 	if(!$ans['result'])return infra_ans($ans);
-	$order=cart_loadOrder();//Активную заявку сделать активной нельзя... был id а тут его нет
+	$order=Cart::loadOrder();//Активную заявку сделать активной нельзя... был id а тут его нет
 
 }else{
 	return infra_err($ans,'Действие {action} не найдено!');

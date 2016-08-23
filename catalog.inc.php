@@ -43,7 +43,7 @@
 						if(!$dir)return;
 
 						$pos['time']=filemtime(ROOT.$dir);
-						$list=infra_loadJSON('-pages/list.php?src='.infra_toutf($dir).'&onlyname=1');
+						$list=Load::loadJSON('-pages/list.php?src='.infra_toutf($dir).'&onlyname=1');
 						throw new Exception('fixme');
 
 						foreach($list as $f){

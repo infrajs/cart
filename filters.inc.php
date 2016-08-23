@@ -86,7 +86,7 @@
 						if(!$dir)return;
 
 						$pos['time']=filemtime(ROOT.$dir);
-						$list=infra_loadJSON('*pages/list.php?src='.infra_toutf($dir).'&onlyname=1');
+						$list=Load::loadJSON('*pages/list.php?src='.infra_toutf($dir).'&onlyname=1');
 						foreach($list as $f){
 							$t=$dir.infra_tofs($f);
 							$t=filemtime(ROOT.$t);

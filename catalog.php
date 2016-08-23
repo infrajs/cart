@@ -21,7 +21,7 @@
 		}
 		$ans=array('result'=>1);
 		$dir='infra/data/';
-		$data=infra_loadJSON($dir.'catalog_stat.json');
+		$data=Load::loadJSON($dir.'catalog_stat.json');
 		if($submit){
 			if(!$val)return infra_echo($ans);
 			infra_cache_no();
@@ -57,7 +57,7 @@
 				}
 			}
 			$user['list']=array_values($user['list']);
-			$search=infra_loadJSON('-cart/search.php?val='.$val);
+			$search=Load::loadJSON('-cart/search.php?val='.$val);
 			$count=sizeof($search['list']);
 			array_unshift($user['list'],array('val'=>$val,'time'=>time(),'count'=>$count));
 
@@ -160,12 +160,12 @@
 				seo_pageResearch($page,$v);
 				$ans['items']=array($v);
 			}else if($val=='search'){
-				$list=infra_loadJSON('-pages/list.php?src='.CATDIR.'&f=0&d=1&onlyname=1&obj=1');//Каждая папка это производитель
+				$list=Load::loadJSON('-pages/list.php?src='.CATDIR.'&f=0&d=1&onlyname=1&obj=1');//Каждая папка это производитель
 				$list=$list['obj'];
 
 				foreach($list as $name=>&$vvv){
 					$vvv=seo_createItem($list,$name);//Создали из папок
-					$pages=infra_loadJSON('-pages/list.php?src='.CATDIR.$name.'/'.'&f=1&d=0&onlyname=1&e=docx,mht,tpl');//Каждая папка это производитель
+					$pages=Load::loadJSON('-pages/list.php?src='.CATDIR.$name.'/'.'&f=1&d=0&onlyname=1&e=docx,mht,tpl');//Каждая папка это производитель
 					if(isset($pages[0])){
 						$page=infra_loadTEXT('-pages/get.php?'.CATDIR.$name.'/'.$pages[0]);
 						seo_pageResearch($page,$vvv);
@@ -203,7 +203,7 @@
 				});
 
 				//==========
-				$l=infra_loadJSON('-pages/list.php?src='.CATDIR.'&f=1&d=0&onlyname=1&e=mht,docx,tpl');//Каждый файл это страница
+				$l=Load::loadJSON('-pages/list.php?src='.CATDIR.'&f=1&d=0&onlyname=1&e=mht,docx,tpl');//Каждый файл это страница
 				foreach($l as $name){
 					$fdata=infra_nameinfo($name);
 					$v=&seo_createItem($list,$fdata['name']);//Создали из mht docx файлов
@@ -276,7 +276,7 @@
 			$ans['text']=infra_loadTEXT('-files/files.php?type=texts&id=Каталог&show');;
 		}
 		if($type=='pos'){
-			$ans['phone']=infra_loadJSON('-Телефон.json');
+			$ans['phone']=Load::loadJSON('-Телефон.json');
 			$conf=infra_config();
 			if($ans['pos']){
 				$pos=$ans['pos'];

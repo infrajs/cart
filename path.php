@@ -17,7 +17,7 @@
 		}
 
 		
-		$search=infra_loadJSON('*cart/search.php?val='.$val);
+		$search=Load::loadJSON('*cart/search.php?val='.$val);
 
 		if($art!=""){
 			$type="pos";

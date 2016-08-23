@@ -7,7 +7,7 @@ infra_require('*session/session.php');
 
 if(!infra_session_get('safe.manager'))return infra_err($ans, 'Нет доступа к этому действию');
 
-$data=infra_loadJSON('*merchants.json');
+$data=Load::loadJSON('*merchants.json');
 $ans=array();
 
 if($_REQUEST['change']){

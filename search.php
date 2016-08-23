@@ -199,7 +199,7 @@ $ans=infra_cache($cond,'cart_search_php_page',function($val,$check,$sort,$revers
 		$name=$ans['name'];
 		$ans['title']='Производитель '.$name;
 		$ans['descr']=@$prod['Описание группы'];
-		$list=infra_loadJSON('*pages/list.php?onlyname=1&e=mht,docx,tpl&src='.$conf['cart']['dir'].$name.'/');
+		$list=Load::loadJSON('*pages/list.php?onlyname=1&e=mht,docx,tpl&src='.$conf['cart']['dir'].$name.'/');
 		if(isset($list[0])){
 			$ans['text']='*pages/get.php?'.$conf['cart']['dir'].$name.'/'.$list[0];
 		}

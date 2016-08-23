@@ -306,13 +306,13 @@
 		},
 		"paycard":{
 			"omit":"{paymenttype!:card?:yes}",
-			"link":"?office/orders/{id}/paycard",
+			"link":"/office/orders/{id}/paycard",
 			"title":"Перейти к оплате картой",
 			"confirm":"Перейти к оплате заявки?"
 		},
 		
 		"cart":{
-			"link":"?office/cart",
+			"link":"/office/cart",
 			"title":"Редактировать товары",
 			"confirm":"Перейти к корзину?"
 		},
@@ -326,7 +326,7 @@
 			"result":"Данные обновлены!"
 		},
 		"refunds":{
-			"link":"?office/orders/{id}/refunds",
+			"link":"/office/orders/{id}/refunds",
 			"title":"Перейти к возврату оплаты",
 			"confirm":"Перейти к возврату оплаты?"
 		},

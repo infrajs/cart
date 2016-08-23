@@ -1,31 +1,44 @@
 <?php
-	@define('ROOT','../../../');
-	require_once(ROOT.'infra/plugins/infra/infra.php');
-	infra_require('*cart/cart.inc.php');
-	infra_cache_no();
-	if($_REQUEST['submit']){
-		$ans=array('msg'=>'','result'=>0);
+	use infrajs\cart\Cart;
+	use infrajs\nostore\Nostore;
+	use infrajs\router\Router;
+	use infrajs\ans\Ans;
+	use infrajs\each\Each;
+	use infrajs\load\Load;
+	use infrajs\access\Access;
+	use infrajs\session\Session;
+
+	if (!is_file('vendor/autoload.php')) {
+		chdir('../../../');
+		require_once('vendor/autload.php');
+		Router::init();
+	}
+
+	Nostore::on();
+	if ($_REQUEST['submit']) {
+		$ans = array('msg'=>'','result'=>0);
 		
-		if(infra_admin()&&infra_session_getEmail()){
+		if (Access::admin() && Session::getEmail()) {
 			if($_REQUEST['IAmManager'])
-				infra_session_set('safe.manager',true);
+				Session::set('safe.manager',true);
 			else
-				infra_session_set('safe.manager',false);
-			return infra_echo($ans,'ok',1);
+				Session::set('safe.manager',false);
+			return Ans::ret($ans);
 		}else{
-			return infra_echo($ans,'У вас не достаточно прав!',0);
+			return Ans::err($ans,'У вас недостаточно прав!');
 		}
 	}
 
 
 
-	$orders=cart_getMyOrders();
-	$order=cart_getGoodOrder();
+	$orders = Cart::getMyOrders();
+	$order = Cart::getGoodOrder();
+
 	$ans['order']=$order;
 	
 
 	$list=array();
-	infra_forr($orders,function($order) use(&$list){
+	Each::forr($orders,function($order) use(&$list){
 		$status=$order['status'];
 		if(!$list[$status])$list[$status]=array();
 		$list[$status][]=array(
@@ -33,11 +46,11 @@
 			'time'=>$order['time']
 		);
 	});
-	$ans['rules']=infra_loadJSON('*cart/rules.json');
+	$ans['rules']=Load::loadJSON('*cart/rules.json');
 	$ans['list']=$list;
-	$ans['admin']=infra_admin();
-	$ans['email']=infra_session_getEmail();
-	$ans['manager']=infra_session_get('safe.manager');
+	$ans['admin']=Access::admin();
+	$ans['email']=Session::getEmail();
+	$ans['manager']=Session::get('safe.manager');
 	
-	return infra_ret($ans);
+	return Ans::ret($ans);
 ?>

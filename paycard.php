@@ -9,14 +9,15 @@
 	$id=(int)$_GET['id'];
 	$action=$_GET['action'];
 	$ans=array('id'=>$id);
-	$order=cart_getGoodOrder($id);
+	$order=Cart::getGoodOrder($id);
 
 	if(!$order)return infra_err($ans,'Заявка не найдена!');
 	if(!cart_isMy($id))return infra_err($ans,'Заявки нет в списке ваших заявок!');
 	if(!cart_canI($id,$action))return infra_err($ans,'С заявкой нельзя выполнить действие '.$action.'.');//действие paycard есть правда со ссылкой а не с обработкой
 	
-	$conf=infra_config();
-	$email=$conf['admin']['email'];
+	$conf = Config::get('access');
+	$email = $conf['email'];
+	$conf = Config::get('cart');
 	$p=explode(',',$email);
 	$email=$p[0];
 	
@@ -35,8 +36,8 @@
 			"INT_REF" => $order['manage']['bankpaid']['INT_REF'],
 			"macData"=>'',
 			"trType" => 22,
-			"merchantTerminal" => $conf['cart']['terminal'],
-			"backref" => $conf['cart']['backref'],
+			"merchantTerminal" => $conf['terminal'],
+			"backref" => $conf['backref'],
 			"email" => $email,
 			"timestamp" => gmdate("omdHis",time()),
 			"nonce" => dechex(mt_rand(0x1000, 0xFFFFFFF)).dechex(mt_rand(0x1000, 0xFFFFFFF)).dechex(mt_rand(0x1000, 0xFFFFFFF)).dechex(mt_rand(0x1000, 0xFFFFFFF))
@@ -63,26 +64,23 @@
 				$ans['macData'].='-';
 			}
 		}
-		$key = $conf['cart']['key'];
+		$key = $conf['key'];
 		$hmac = hash_hmac('sha1',$ans['macData'],pack('H*', $key));
 		$ans['sign'] = strtoupper($hmac);
-		$ans['bankurl'] = $conf['cart']['bankurl'];
+		$ans['bankurl'] = $conf['bankurl'];
 		file_put_contents(ROOT.'infra/data/.lastbankref.json',infra_json_encode($ans));
 		return infra_echo($ans,'',1);
 	}elseif($action=='paycard'){
 		if($order['manage']['bankpaid'])return infra_err($ans,'По заявке уже зафиксирована оплата');
 		
 
-		$descr=array();
-		infra_foro($order['basket'],function($pos,$prodart) use(&$descr){
+		$descr = array();
+		Each::foro($order['basket'],function($pos,$prodart) use(&$descr){
 			$descr[]=$prodart.' - '.$pos['count'];
 		});
 		$descr=implode(',',$descr);
 		
-		$conf=infra_config();
-		$email=$conf['admin']['email'];
-		$p=explode(',',$email);
-		$email=$p[0];
+		
 
 		$ans = array(
 			"delivery"=>$order['manage']['deliverycost'],
@@ -93,16 +91,16 @@
 			"currency" => "RUB",
 			"orderNumber" => $id,
 			"description" => $descr,
-			"merchantTerminal" => $conf['cart']['terminal'],
+			"merchantTerminal" => $conf['terminal'],
 			"trType" => 1,
-			"key" => $conf['cart']['key'],
+			"key" => $conf['key'],
 			"macData" => "",
-			"merchantName" => $conf['cart']['merch_name'],
-			"merchant" => $conf['cart']['merchant'],
+			"merchantName" => $conf['merch_name'],
+			"merchant" => $conf['merchant'],
 			"email" => $email,
 			"timestamp" => gmdate("omdHis",time()),
 			"nonce" => dechex(mt_rand(0x1000, 0xFFFFFFF)).dechex(mt_rand(0x1000, 0xFFFFFFF)).dechex(mt_rand(0x1000, 0xFFFFFFF)).dechex(mt_rand(0x1000, 0xFFFFFFF)),
-			"backref" => $conf['cart']['backref'],
+			"backref" => $conf['backref'],
 			"sign" => "",
 			"lang" => "",
 			"service" => ""
@@ -116,7 +114,7 @@
 			"trType" => '1',
 			"key" => "C50E41160302E0F5D6D59F1AA3925C45",
 			"macData" => "",
-			"merchantName" => $conf['cart']['merch_name'],
+			"merchantName" => $conf['merch_name'],
 			"merchant" => "790367686219999",
 			"email" => 'lakhtin@psbank.ru',
 			"timestamp" => '20140728104402',
@@ -151,7 +149,7 @@
 		
 		$hmac = hash_hmac('sha1',$ans['macData'],pack('H*', $ans['key']));
 		$ans['sign'] = strtoupper ($hmac);
-		$ans['bankurl'] = $conf['cart']['bankurl'];
+		$ans['bankurl'] = $conf['bankurl'];
 		file_put_contents(ROOT.'infra/data/.lastbankpay.json',infra_json_encode($ans));
 		return infra_echo($ans,'',1);
 	}
