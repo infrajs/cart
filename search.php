@@ -1,8 +1,20 @@
 <?php
-@define('ROOT','../../../');
-require_once(ROOT.'infra/plugins/infra/infra.php');
-infra_require('*cart/catalog.inc.php');
-infra_require('*session/session.php');
+use infrajs\cart\Cart;
+use infrajs\nostore\Nostore;
+use infrajs\router\Router;
+use infrajs\ans\Ans;
+use infrajs\each\Each;
+use infrajs\config\Config;
+use infrajs\load\Load;
+use infrajs\access\Access;
+use infrajs\ans\Ans;
+use infrajs\session\Session;
+
+if (!is_file('vendor/autoload.php')) {
+	chdir('../../../');
+	require_once('vendor/autoload.php');
+	Router::init();
+}
 
 
 /*
@@ -21,7 +33,7 @@ $cond=array($conf['cart']['dir'],$conf['cart']['1c'],$conf['cart']['prod']);
 
 $count=8;
 
-$check=infra_session_get('filtersadmit',array());
+$check=Session::get('filtersadmit',array());
 
 
 $val=strip_tags(@$_GET['val']);

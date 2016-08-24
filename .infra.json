@@ -1,5 +1,5 @@
 {
 	"external":"external",
 	"ordersdir":"~.Заявки/",
-	"js":["cart.js","catalog.js"]
+	"js":["Cart.js","catalog.js"]
 }

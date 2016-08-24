@@ -10,7 +10,7 @@ use infrajs\session\Session;
 
 if (!is_file('vendor/autoload.php')) {
 	chdir('../../../');
-	require_once('vendor/autload.php');
+	require_once('vendor/autoload.php');
 	Router::init();
 }
 

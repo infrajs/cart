@@ -14,7 +14,7 @@ use infrajs\each\Fix;
 
 if (!is_file('vendor/autoload.php')) {
 	chdir('../../../');
-	require_once('vendor/autload.php');
+	require_once('vendor/autoload.php');
 	Router::init();
 }
 class Cart {
@@ -123,7 +123,7 @@ class Cart {
 			//total цена всех товаров с учётом цены указанной менеджером, тобишь со скидкой
 			//
 			$merch=Load::loadJSON('~merchants.json');
-			//$order['email']=infra_session_getEmail();
+			//$order['email']=Session::getEmail();
 			$order['level']=$merch['level'];
 			if ($order['email']&&$merch['merchants'][$order['email']]){
 				$order['merch']=true;
@@ -170,9 +170,9 @@ class Cart {
 		$ar=Session::get('safe.orders', array());
 		return in_array($id, $ar);
 	}
-	public static function canI($id,$action=true){//action true совпадёт с любой строчкой
-		if (infra_isphp()) return true;
-		if (infra_session_get('safe.manager')) return true;
+	public static function canI($id, $action = true){ //action true совпадёт с любой строчкой
+		if (Load::isphp()) return true;
+		if (Session::get('safe.manager')) return true;
 		if (!Cart::isMy($id)) return false;
 		$order=Cart::getGoodOrder($id);
 		if ($order['rule']['user']['buttons'][$action]) return true;
@@ -187,7 +187,7 @@ class Cart {
 			if ($id) {
 				$order = Load::loadJSON(Cart::getPath($id));
 				if (!$order) return false;//Нет такой заявки с таким id
-				//$email=infra_session_getEmail();
+				//$email=Session::getEmail();
 				
 
 				//У хранящейся Активной заявки есть id, но если мы по id обращаемся значит не нужно применять ту что в сессии user
@@ -226,12 +226,12 @@ function cart_getOrderById($id=''){
 }
 function cart_mergeOrder(&$order,$place){
 	if (!$order['id']) return;
-	$actualdata=infra_session_get($place.$order['id'], array());
+	$actualdata=Session::get($place.$order['id'], array());
 	Each::foro($actualdata,function(&$val,$name){
 		if (!is_string($val)) return;
 		$val=trim(strip_tags($val));
 	});
-	if (!infra_session_get('safe.manager')||$place!='admin'){
+	if (!Session::get('safe.manager')||$place!='admin'){
 		unset($actualdata['manage']);//Только админ на странице admin может менять manage
 	}
 	if ($actualdata['manage']&&$order['manage'])$actualdata['manage']=array_merge($order['manage'],$actualdata['manage']);
@@ -252,7 +252,7 @@ function cart_saveOrder(&$order,$place=false){
 				$id++;
 				$src=Cart::getPath($id);
 			}
-			$myorders=infra_session_get('safe.orders',array());
+			$myorders=Session::get('safe.orders',array());
 			$myorders[]=$id;
 			$myorders=array_values($myorders);//depricated fix old errors in session
 			Session::set('safe.orders',$myorders);
@@ -384,9 +384,9 @@ function cart_checkData($str, $type='value'){
 function cart_checkReg($email,$password=false){//Сессия остаётся текущей
 	$email=trim(strip_tags($email));
 	if (!cart_checkData($email, 'email')) return 'Необходимо указать крректный email';
-	$myemail = infra_session_getEmail();
+	$myemail = Session::getEmail();
 	if (!$myemail){//Значит пользователь не зарегистрирован
-		$userData = infra_session_getUser($email);// еще надо проверить есть ли уже такой эмаил
+		$userData = Session::getUser($email);// еще надо проверить есть ли уже такой эмаил
 		if ($userData['session_id']){
 			return 'На указанный email на сайте есть регистрация, необходимо <a onclick="cart.goTop()" href="?office/signin">авторизоваться</a>';
 		}else{
@@ -405,7 +405,7 @@ function cart_ret($order,$action){
 		'id'=>$order['id'],
 		'msg'=>Template::parse(array($rule['result']),$order)
 	);
-	if (!infra_session_get('dontNofify'))cart_mail('user',$order['email'],$rule['usermail'],$order);
+	if (!Session::get('dontNofify'))cart_mail('user',$order['email'],$rule['usermail'],$order);
 	cart_mail('manager',$order['email'],$rule['mangmail'],$order);
 	return infra_ans($ans);
 }
@@ -416,9 +416,9 @@ function cart_mail($to,$email,$mailroot, $data=array()){
 
 	$data['host']=infra_view_getHost();
 	$data['path']=infra_view_getRoot(ROOT);
-	$data['link']=infra_session_getLink($email);
+	$data['link']=Session::getLink($email);
 	$data['email']=$email;
-	$data['user']=infra_session_getUser($email);
+	$data['user']=Session::getUser($email);
 	$data['time']=time();
 	$data["site"]=$data['host'].'/'.$data['path'];
 

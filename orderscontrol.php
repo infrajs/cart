@@ -1,10 +1,24 @@
 <?php
-@define('ROOT','../../../');
-require_once(ROOT.'infra/plugins/infra/infra.php');
-infra_require('*cart/cart.inc.php');
+use infrajs\cart\Cart;
+use infrajs\nostore\Nostore;
+use infrajs\router\Router;
+use infrajs\ans\Ans;
+use infrajs\each\Each;
+use infrajs\load\Load;
+use infrajs\access\Access;
+use infrajs\ans\Ans;
+use infrajs\session\Session;
+
+if (!is_file('vendor/autoload.php')) {
+	chdir('../../../');
+	require_once('vendor/autoload.php');
+	Router::init();
+}
+
+
 $ans=array();
 $place=$_REQUEST['place'];
-if(!infra_session_get('safe.manager'))return infra_err($ans,'У вас нет доступа к этому разделу. Вы не являетесь Менеджером.');
+if(!Session::get('safe.manager'))return infra_err($ans,'У вас нет доступа к этому разделу. Вы не являетесь Менеджером.');
 if(isset($_REQUEST['id'])){
 	$id=$_REQUEST['id'];
 	$ans['id']=$id;

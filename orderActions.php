@@ -1,14 +1,27 @@
 <?php
-@define('ROOT','../../../');
-require_once(ROOT.'infra/plugins/infra/infra.php');
-infra_require('*cart/cart.inc.php');
+use infrajs\cart\Cart;
+use infrajs\nostore\Nostore;
+use infrajs\router\Router;
+use infrajs\ans\Ans;
+use infrajs\each\Each;
+use infrajs\load\Load;
+use infrajs\access\Access;
+use infrajs\ans\Ans;
+use infrajs\session\Session;
+
+if (!is_file('vendor/autoload.php')) {
+	chdir('../../../');
+	require_once('vendor/autoload.php');
+	Router::init();
+}
+
 $id=(int)$_REQUEST['id'];
 $action=$_REQUEST['action'];
 $ans=array('id'=>$id,'action'=>$action);
 $place=$_REQUEST['place'];
 //sleep(5);
 if($action=='wholesaleDelete'){	
-	if(!infra_session_get('safe.manager'))return infra_err($ans, 'У вас нет доступа!');
+	if(!Session::get('safe.manager'))return infra_err($ans, 'У вас нет доступа!');
 	$email=$_REQUEST['id'];
 	$data=Load::loadJSON('*merchants.json');
 	unset($data['merchants'][$email]);
@@ -17,7 +30,7 @@ if($action=='wholesaleDelete'){
 }
 
 $order = Cart::loadOrder($id);
-if(infra_session_get('safe.manager')||$order['rule']['edit']['orders']){ //Place - orders admin wholesale
+if(Session::get('safe.manager')||$order['rule']['edit']['orders']){ //Place - orders admin wholesale
 	cart_mergeOrder($order,$place);
 }
 //Заявка принадлежит тому человеку, который первым изменил её статус с активного на какой-то
@@ -88,7 +101,7 @@ if($action=='saved'){
 	if($order['status']=='active')return infra_err($ans,'У активной заявки нельзя отменить изменения');
 	//Если я user нужно удалить user{id} сессию иначе надо удалить manager{id} сессию 
 	//Нужно знать с какого места осуществлён вызов чтобы определит что делать
-	if($place=='admin'&&!infra_session_get('safe.manager'))return infra_err($ans, 'У вас нет доступа!');
+	if($place=='admin'&&!Session::get('safe.manager'))return infra_err($ans, 'У вас нет доступа!');
 	infra_session_set($place.$id);
 }elseif($action=='refresh'){//Обновить данные из каталога
 	Each::foro($order['basket'],function(&$pos){
@@ -146,7 +159,7 @@ if($action=='saved'){
 
 }elseif($action=='realdel'){
 	
-	$myorders=infra_session_get('safe.orders',array());
+	$myorders=Session::get('safe.orders',array());
 	infra_forr($myorders,function($id) use($order){
 		if($order['id']==$id)return new infra_Fix('del',true);
 	});

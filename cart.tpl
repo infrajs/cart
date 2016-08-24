@@ -1,22 +1,52 @@
 {root:}
-<div class="client">
-	<style>
-		.client label {
+	<div class="cart">
+		<div id="cartmenu"></div>
+		<div id="cartbody"></div>
+	</div>
+{ORDER:}
+	<div>
+		<div id="ORDERCART"></div>
+		
+		<script>
+			domready(function(){
+				Event.one('Controller.onshow', function () {
+					var layer = Controller.ids['{id}'];
+					var div = $('#'+layer.div);
+					var counter = {counter};
+					Event.handler('Layer.onsubmit', function (layer) {
+						if (!layer.showed || counter != layer.counter) return;
+						var ans = layer.config.ans;
+						Controller.global.set(['cat_basket', 'order']);
+						Cart.goTop();
+					}, '', layer);
+				});
+			});
+		</script>
+	</div>
+{carttime:}
+	<div style="margin-bottom:5px">
+	Последний раз заявка отправлялась<br>{~date(:j F Y,data.carttime)} в {~date(:H:i,data.carttime)}<br>
+	</div>
+{cartanswer:}
+	<pre>{mail}</pre>
+{ORDERCART:}
+	<style scoped>
+		.usercart label {
 			margin-top:5px;
 			text-align: left;
 			font-size: 14px;
 			padding-top: 5px;
 		}
-		.client label span {
+		.usercart label span {
 			color:red;
 		}
-		.client form {
+		.usercart form {
 			padding-bottom: 5px;
 		}
-		.client .answer {
+		.usercart .answer {
 			width: 290px;
 		}
-		.cartcontacts input {
+		.usercart .cartcontacts input {
 			width: 290px;
 			height: 18px;
 			padding-top: 2px;
@@ -25,47 +55,16 @@
 			margin-bottom:10px;
 			margin-top:2px;
 		}
-		.cartcontacts textarea {
+		.usercart .cartcontacts textarea {
 			width: 290px;
 			height:102px;
 			border: 1px solid #7f9db9;
 		}
-		.client .submit {
+		.usercart .submit {
 			margin-top:20px;			
 			font-size:14px;
 			padding: 5px 10px;
 		}
-	</style>
-	<div id="usermenu"></div>
-	<!--<div class="answer">
-		<b class="alert">{config.ans.msg}</b>
-	</div>-->
-	<div id="cart">
-	</div>
-	
-	<script>
-		infra.when(infrajs,'onshow',function(){
-			var layer=infrajs.getUnickLayer('{unick}');
-			var div=$('#'+layer.div);
-			var counter={counter};
-			infra.require('-cart/cart.js');
-			infra.listen(layer,'onsubmit',function(layer){
-				if(!layer.showed||counter!=layer.counter)return;
-				var ans=layer.config.ans;
-				infrajs.global.set(['cat_basket','order']);
-				cart.goTop();
-			});
-		});
-	</script>
-</div>
-{carttime:}
-	<div style="margin-bottom:5px">
-	Последний раз заявка отправлялась<br>{~date(:j F Y,data.carttime)} в {~date(:H:i,data.carttime)}<br>
-	</div>
-{cartanswer:}
-	<pre>{mail}</pre>
-{cart:}
-	<style>
 		.usercart input {
 			width:50px;
 			padding:1px 5px;
@@ -90,22 +89,22 @@
 		{data.count?:cartlist?:cartmsg}
 	</div>
 	<script>
-		infra.when(infrajs,'onshow',function(){
-			var layer=infrajs.getUnickLayer('{unick}');
-			var div=$('#'+layer.div);
+		domready(function(){
+			Event.when('Controller.onshow', function () {
+				var layer = Controller.ids['{id}'];
+				var div = $('#'+layer.div);
+				Cart.calc(div);
+				div.find('[type=number]').change( function () {
+					cart.calc(div);
+				});
 
-			infra.require('-cart/cart.js');
-			cart.calc(div);
-			div.find('[type=number]').change(function(){
-				cart.calc(div);
-			});
-
-			div.find('.posremove').click(function(){
-				var prodart=$(this).data('producer')+' '+$(this).data('article');
-				infra.session.set(['user','basket',prodart]);
-				infrajs.global.set('cat_basket');
-				infra.session.syncNow();
-				infrajs.check();
+				div.find('.posremove').click( function () {
+					var prodart=$(this).data('producer')+' '+$(this).data('article');
+					Session.set(['user','basket',prodart]);
+					Controller.global.set('cat_basket');
+					Session.syncNow();
+					Controller.check();
+				});
 			});
 		});
 	</script>
@@ -210,16 +209,16 @@
 		В <a href="?Каталог/Корзина">корзине</a>
 		<!--<span class="bold_basket">{data.allcount}</span> {~words(data.allcount,:позиция,:позиции,:позиций)}<br> Сумма <span class="bold_basket">{~cost(data.allsum)} руб.</span>-->
 	</div>
-{office:}
+{OFFICE:}
 	<div id="usermenu"></div>
-	<h1>Личный кабинет <button type="button" class="btn btn-default pull-right" onclick="cart.refresh()"><span class="glyphicon glyphicon-refresh"></span></button></h1>
+	<h1>Корзина каталога <button type="button" class="btn btn-default pull-right" onclick="cart.refresh()"><span class="glyphicon glyphicon-refresh"></span></button></h1>
 	{data.email?:account?:noaccount}
 	
 	<p>{~length(data.list)?:showinfo?:Для вас нет важных сообщений.}</p>
 	
 	
 	<p>
-		В <a onclick="cart.goTop();" href="/office/cart">корзине</a> {data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)}.
+		В <a onclick="cart.goTop();" href="/cart/cart">корзине</a> {data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)}.
 	</p>
 	
 	{data.admin?:adminControl?(data.manager?:youAreManager)}
@@ -230,58 +229,117 @@
 		</table>
 	{stinfo:}
 		<tr class="{data.rules.rules[~key].notice}"><td>{data.rules.rules[~key].caption}</td><td>{::prorder}</td></tr>
-		{prorder:}{~key?:comma}<a onclick="cart.goTop()" href="/office/orders/{id}">{id}</a>
-{comma:}, 
+		{prorder:}{~key?:comma}<a onclick="cart.goTop()" href="/cart/orders/{id}">{id}</a>
+	{comma:}, 
 
-{noaccount:}
-	<p>
-		<b><a onclick="cart.goTop()" href="/office/signin">Вход</a> не выполнен!</b>
-	</p>
-{account:}
-	<p>
-		Пользователь <b>{data.email}.</b>
-	</p>
-{youAreManager:}
-	<div class="alert alert-success" role="alert">
-		<b>Вы являетесь менеджером</b>
-	</div>
-{adminControl:}
-	<div class="alert alert-{data.manager?:success?:danger}" role="alert">
-		{data.email?:adminForm?:allertForAdmin}
+	{noaccount:}
+		<p>
+			<b><a onclick="Cart.goTop()" href="/user">Вход</a> не выполнен!</b>
+		</p>
+	{account:}
+		<p>
+			Пользователь <a href="/user"><b>{data.email}.</b></a>
+		</p>
+	{youAreManager:}
+		<div class="alert alert-success" role="alert">
+			<b>Вы являетесь менеджером</b>
+		</div>
+	{adminControl:}
+		<div class="alert alert-{data.manager?:success?:danger}" role="alert">
+			{data.email?:adminForm?:allertForAdmin}
 
-	</div>
-	{adminForm:}
-			<p>Введён логин и пароль администратора сайта</p>
-			<p>Вы можете изменить свой статус</p>
-			<p style="font-weight:bold">Вы {data.manager?:менеджер?:обычный пользователь}</p>
-			<form style="margin-top:10px" class="managerForm" action="/-cart/office.php?submit=1" method="post">
-				 <div style="display:none" class="checkbox">
-					<label>
-						<input name="IAmManager" type="checkbox" {data.manager??:checked}>
-					</label>
-				</div>
-				<div class="input-group">
-					<input type="submit" class="btn btn-{data.manager?:success?:danger}" value="{data.manager?:Сделать меня обычным пользователем?:Сделать меня менеджером}">
-				</div>
-			</form>
-		
+		</div>
+		{adminForm:}
+				<p>Введён логин и пароль администратора сайта</p>
+				<p>Вы можете изменить свой статус</p>
+				<p style="font-weight:bold">Вы {data.manager?:менеджер?:обычный пользователь}</p>
+				<form style="margin-top:10px" class="managerForm" action="/-cart/?type=office&amp;submit=1" method="post">
+					 <div style="display:none" class="checkbox">
+						<label>
+							<input name="IAmManager" type="checkbox" {data.manager??:checked}>
+						</label>
+					</div>
+					<div class="input-group">
+						<input type="submit" class="btn btn-{data.manager?:success?:danger}" value="{data.manager?:Сделать меня обычным пользователем?:Сделать меня менеджером}">
+					</div>
+				</form>
+			
+			<script>
+				domready( function () {
+					Once.exec('layer{id}', function () {
+						var layer = Controller.ids['{id}'];
+						Event.handler('Controller.onsubmit', function (layer) {
+							if (!layer.showed) return;
+							var ans = layer.config.ans;
+							Controller.global.set(["sign",'cat_basket']);
+						});
+					});
+				})
+			</script>
+		{allertForAdmin:}
+			<div class="mesage">Необходимо <a onclick="Cart.goTop()" href="/cart/signup">зарегистрироваться</a>, чтобы получить права менеджера</div>
+{MENU:}
+	<style scoped>
+		table.userMenu td {
+			text-align: center;
+			vertical-align: middle;
+			padding:10px; 
+		}
+		table.userMenu {
+			margin-top:25px;
+			width:100%;
+			border-top:3px solid #ccc;
+		}
+		table.userMenu {
+			background-color: #f0f0f0;
+		}
+		table.userMenu .active {
+			font-weight:bold;
+		}
+	</style>
+	<script>
+		domready( function () {
+			Event.one('Controller.onshow', function () {
+				cart.init();
+			});
+		});
+	</script>
+	<table class="userMenu table">
+	 	<tr>
+	 		<td class="info"><a class="{state.child??:active}" onclick="cart.goTop()" href="/cart">Личный кабинет</a></td>
+	 		<td class="info"><a class="{state.child.name=:cart?:active}" onclick="cart.goTop()" href="/cart/order">Корзина</a></td>
+	 		<td class="info"><a class="{state.child.name=:orders?:active}" onclick="cart.goTop()" href="/cart/orders">Мои заявки</a></td>
+	 		{data.email?:signed?:unsigned}
+	 	</tr>
+	</table>
+	<!--
+	<h2 style="color:red;">Тестовая версия личного кабинет</h2>
+	<p>Оплата картой и оформление заявки тестируется. Для подтверждения заказа необходимо звонить по телефону 8482 51-75-70</p>
+	<hr>
+	-->	
+{signed:}
+	
+	{data.manager?:youAreManager}
+	<td class="danger"><a class="signout" href="/cart/signout">Выход</a>
 		<script>
-			infra.when(infrajs,'onshow',function(){
-				
-				var layer=infrajs.getUnickLayer('{unick}');
-				var div=$('#'+layer.div);
-				var counter={counter};
-				console.log(layer.data);
-				infra.listen(layer,'onsubmit',function(layer){
-					if(counter!=layer.counter||!layer.showed)return;
-					var ans=layer.config.ans;
-					console.log(ans);
+			$('.signout').click(function(){
+				infra.session.logout();
+				infrajs.global.set(['cat_basket',"sign"]);
+				infra.session.syncNow();
+				cart.goTop();
 
-					infrajs.global.set(["sign",'cat_basket']);
-				});
 			});
 		</script>
-	{allertForAdmin:}
-		<div class="mesage">Необходимо <a onclick="cart.goTop()" href="/office/signup">зарегистрироваться</a>, чтобы получить права менеджера</div>
-	
-	
+	</td>
+
+{unsigned:}
+	<td class="warning"><a class="{state.child.name=:signin?:active}" 
+		onclick="cart.goTop()" href="/cart/signin">Вход</a></td>
+	<td class="warning"><a class="{state.child.name=:signup?:active}" 
+		onclick="cart.goTop()" href="/cart/signup">Регистрация</a></td>
+	<td class="warning"><a class="{state.child.name=:resendpass?:active}" 
+		onclick="cart.goTop()" href="/cart/resendpass">Напомнить пароль</a></td>
+
+{youAreManager:}
+	<td class="success"><a class="{state.child.name=:admin?:active}" onclick="cart.goTop()" href="/cart/admin">Управление заявками</a></td>
+	<td class="success"><a class="{state.child.name=:wholesale?:active}" onclick="cart.goTop()" href="/cart/wholesale">Оптовики</a></td>

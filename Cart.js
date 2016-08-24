@@ -1,7 +1,7 @@
 //infra.listen(infrajs,'onshow',function(){
 //	cart.init();
 //});
-window.cart={
+window.cart = window.Cart= {
 	blockform: function(layer){
 		var form=$("#"+layer.div).find('form');
 		form.find("input,button,textarea,select").attr("disabled","disabled");

@@ -5,6 +5,11 @@
     "require":{
         "infrajs/catalog":"~1",
         "infrajs/user":"~1",
+        "infrajs/ans":"~1",
+        "infrajs/access":"~1",
+        "infrajs/event":"~1",
+        "infrajs/controller":"~1",
+
 
     	"infrajs/doc":"~1",
     	"infrajs/excel":"~1",
@@ -13,12 +18,15 @@
         "infrajs/path":"~1",
         "ded/domready":"~1",
         "infrajs/ascroll":"~1",
+        "infrajs/layer-global":"~1",
         "infrajs/layer-seojson":"~1",
         "infrajs/layer-config":"~1",
         "infrajs/layer-autosave":"~1",
         "infrajs/layer-onsubmit":"~1",
         "infrajs/autoedit":"~1",
-        "infrajs/rubrics":"~1"
+        "infrajs/rubrics":"~1",
+        "ded/domready":"~1",
+        "grimmlink/pixeden-stroke-7-icon":"~1"
     },
     "autoload":{
         "psr-4":{
