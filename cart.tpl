@@ -144,7 +144,7 @@
 		</table>
 		<div>Итого: <span class="cartsum"></span> <del title="Розничная цена" style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel"></del></div>
 		<div style="margin-top:10px">
-			<a onclick="cart.goTop();" href="?office/orders/my" style="text-decoration:none" class="btn btn-success">Перейти к оформлению заявки</a>
+			<a onclick="Cart.goTop();" href="?office/orders/my" style="text-decoration:none" class="btn btn-success">Перейти к оформлению заявки</a>
 		</div>
 	{cartpos:}
 		<tr class="active">
@@ -218,7 +218,7 @@
 	
 	
 	<p>
-		В <a onclick="cart.goTop();" href="/cart/cart">корзине</a> {data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)}.
+		В <a onclick="Cart.goTop();" href="/cart/cart">корзине</a> {data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)}.
 	</p>
 	
 	{data.admin?:adminControl?(data.manager?:youAreManager)}
@@ -229,7 +229,7 @@
 		</table>
 	{stinfo:}
 		<tr class="{data.rules.rules[~key].notice}"><td>{data.rules.rules[~key].caption}</td><td>{::prorder}</td></tr>
-		{prorder:}{~key?:comma}<a onclick="cart.goTop()" href="/cart/orders/{id}">{id}</a>
+		{prorder:}{~key?:comma}<a onclick="Cart.goTop()" href="/cart/orders/{id}">{id}</a>
 	{comma:}, 
 
 	{noaccount:}
@@ -306,9 +306,9 @@
 	</script>
 	<table class="userMenu table">
 	 	<tr>
-	 		<td class="info"><a class="{state.child??:active}" onclick="cart.goTop()" href="/cart">Личный кабинет</a></td>
-	 		<td class="info"><a class="{state.child.name=:cart?:active}" onclick="cart.goTop()" href="/cart/order">Корзина</a></td>
-	 		<td class="info"><a class="{state.child.name=:orders?:active}" onclick="cart.goTop()" href="/cart/orders">Мои заявки</a></td>
+	 		<td class="info"><a class="{state.child??:active}" onclick="Cart.goTop()" href="/cart">Личный кабинет</a></td>
+	 		<td class="info"><a class="{state.child.name=:cart?:active}" onclick="Cart.goTop()" href="/cart/order">Корзина</a></td>
+	 		<td class="info"><a class="{state.child.name=:orders?:active}" onclick="Cart.goTop()" href="/cart/orders">Мои заявки</a></td>
 	 		{data.email?:signed?:unsigned}
 	 	</tr>
 	</table>
@@ -322,24 +322,26 @@
 	{data.manager?:youAreManager}
 	<td class="danger"><a class="signout" href="/cart/signout">Выход</a>
 		<script>
-			$('.signout').click(function(){
-				infra.session.logout();
-				infrajs.global.set(['cat_basket',"sign"]);
-				infra.session.syncNow();
-				cart.goTop();
+			domready(function(){
+				$('.signout').click(function(){
+					Session.logout();
+					Controller.global.set(['cat_basket',"sign"]);
+					Session.syncNow();
+					Cart.goTop();
 
+				});
 			});
 		</script>
 	</td>
 
 {unsigned:}
 	<td class="warning"><a class="{state.child.name=:signin?:active}" 
-		onclick="cart.goTop()" href="/cart/signin">Вход</a></td>
+		onclick="Cart.goTop()" href="/cart/signin">Вход</a></td>
 	<td class="warning"><a class="{state.child.name=:signup?:active}" 
-		onclick="cart.goTop()" href="/cart/signup">Регистрация</a></td>
+		onclick="Cart.goTop()" href="/cart/signup">Регистрация</a></td>
 	<td class="warning"><a class="{state.child.name=:resendpass?:active}" 
-		onclick="cart.goTop()" href="/cart/resendpass">Напомнить пароль</a></td>
+		onclick="Cart.goTop()" href="/cart/resendpass">Напомнить пароль</a></td>
 
 {youAreManager:}
-	<td class="success"><a class="{state.child.name=:admin?:active}" onclick="cart.goTop()" href="/cart/admin">Управление заявками</a></td>
-	<td class="success"><a class="{state.child.name=:wholesale?:active}" onclick="cart.goTop()" href="/cart/wholesale">Оптовики</a></td>
+	<td class="success"><a class="{state.child.name=:admin?:active}" onclick="Cart.goTop()" href="/cart/admin">Управление заявками</a></td>
+	<td class="success"><a class="{state.child.name=:wholesale?:active}" onclick="Cart.goTop()" href="/cart/wholesale">Оптовики</a></td>
