@@ -1,5 +1,11 @@
 {
 	"external":"external",
 	"ordersdir":"~.Заявки/",
-	"js":["Cart.js","catalog.js"]
+	"js":["Cart.js","catalog.js"],
+	"clutch":{
+		"pixeden-stroke-7-icon":[
+			"vendor/grimmlink/",
+			"vendor/infrajs/cart/"
+		]
+	}
 }

@@ -211,7 +211,9 @@
 	</div>
 {OFFICE:}
 	<div id="usermenu"></div>
-	<h1>Корзина каталога <button type="button" class="btn btn-default pull-right" onclick="cart.refresh()"><span class="glyphicon glyphicon-refresh"></span></button></h1>
+	<h1>Корзина каталога <button type="button" class="btn btn-default pull-right" onclick="cart.refresh()">
+		<span class="pe-7s-refresh"></span>
+		</button></h1>
 	{data.email?:account?:noaccount}
 	
 	<p>{~length(data.list)?:showinfo?:Для вас нет важных сообщений.}</p>
