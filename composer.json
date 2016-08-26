@@ -16,6 +16,7 @@
         "infrajs/imager":"~1",
         "infrajs/session":"~1",
         "infrajs/path":"~1",
+        "infrajs/activelink":"~1",
         "ded/domready":"~1",
         "infrajs/ascroll":"~1",
         "infrajs/layer-global":"~1",

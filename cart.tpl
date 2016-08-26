@@ -1,6 +1,6 @@
 {root:}
 	<div class="cart">
-		<div id="cartmenu"></div>
+		<div id="CARTMENU"></div>
 		<div id="cartbody"></div>
 	</div>
 {ORDER:}
@@ -144,7 +144,7 @@
 		</table>
 		<div>Итого: <span class="cartsum"></span> <del title="Розничная цена" style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel"></del></div>
 		<div style="margin-top:10px">
-			<a onclick="Cart.goTop();" href="?office/orders/my" style="text-decoration:none" class="btn btn-success">Перейти к оформлению заявки</a>
+			<a onclick="Cart.goTop();" href="/office/orders/my" style="text-decoration:none" class="btn btn-success">Перейти к оформлению заявки</a>
 		</div>
 	{cartpos:}
 		<tr class="active">
@@ -152,7 +152,7 @@
 			<td style="vertical-align:middle">
 				<div class="title">
 					
-					<a href="?Каталог/{Производитель}/{article}"><nobr>{Производитель}</nobr> <nobr>{Артикул}</nobr></a>
+					<a href="/catalog/{producer}/{article}"><nobr>{Производитель}</nobr> <nobr>{Артикул}</nobr></a>
 
 				</div>
 			</td>
@@ -170,7 +170,7 @@
 		<tr>
 			<td rowspan="3"></td>
 			<td rowspan="3" style="width:1px">
-				<a href="?Каталог/{Производитель}/{article}">
+				<a href="/catalog/{producer}/{article}">
 					<img src="infra/plugins/imager/imager.php?h=90&src={infra.conf.catalog.dir}{Производитель}/{article}/&or=*imager/empty">
 				</a>
 			</td>
@@ -200,18 +200,35 @@
 		</p>
 		<p>Чтобы добавить позицию нужно кликнуть по иконке корзины рядом с ценой.</p>
 		<div style="margin-top:10px">
-			<a href="?Каталог/Каталог" style="text-decoration:none" class="btn btn-success">Открыть каталог</a>
+			<a href="/catalog" style="text-decoration:none" class="btn btn-success">Открыть каталог</a>
 		</div>
 {itemcost:}{~cost(.)} <small>руб.</small>
-{itemnocost:}<a style="color:white" href="?Контакты менеджеров">Уточнить</a>
+{itemnocost:}<a style="color:white" href="/contacts">Уточнить</a>
 {basket:}
 	<div id="basket_text">
-		В <a href="?Каталог/Корзина">корзине</a>
+		В <a href="/cart/order">корзине</a>
 		<!--<span class="bold_basket">{data.allcount}</span> {~words(data.allcount,:позиция,:позиции,:позиций)}<br> Сумма <span class="bold_basket">{~cost(data.allsum)} руб.</span>-->
 	</div>
+{breadcrumb:}
+	<ol class="breadcrumb activelink">
+		<li><a href="/">Главная</a></li>
+		<li><a href="/catalog">Каталог</a></li>
+		<li class="active">Сообщения <span class="label label-info">42</span></li>
+		{data.email?:breaduser?:breadguest}
+	</ol>
+	{breaduser:}
+		<li><a href="/cart/list">Корзина</a></li>
+		<li><a href="/cart/order">Активная заявка</a></li>
+		<li><a href="/cart/orders">Все заявки</a></li>
+		<li><a class="text text-danger" href="/user/logout">Выход</a></li>
+		<span class="btn btn-default btn-xs pull-right"><span class="pe-7s-refresh"></span></span>
+	{breadguest:}
+		<li><a href="/user/signin">Вход</a></li>
+		<li><a href="/user/signup">Регистрация</a></li>
+		<li><a href="/user/remind">Напомнить пароль</a></li>
 {OFFICE:}
-	<div id="usermenu"></div>
-	<h1>Корзина каталога <button type="button" class="btn btn-default pull-right" onclick="cart.refresh()">
+	{:breadcrumb}
+	<h1>Сообщения <button type="button" class="btn btn-default pull-right" onclick="Cart.refresh()">
 		<span class="pe-7s-refresh"></span>
 		</button></h1>
 	{data.email?:account?:noaccount}
@@ -220,7 +237,7 @@
 	
 	
 	<p>
-		В <a onclick="Cart.goTop();" href="/cart/cart">корзине</a> {data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)}.
+		В <a onclick="Cart.goTop();" href="/cart/list">корзине</a> {data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)}.
 	</p>
 	
 	{data.admin?:adminControl?(data.manager?:youAreManager)}
@@ -280,7 +297,7 @@
 			</script>
 		{allertForAdmin:}
 			<div class="mesage">Необходимо <a onclick="Cart.goTop()" href="/cart/signup">зарегистрироваться</a>, чтобы получить права менеджера</div>
-{MENU:}
+{CARTMENU:}
 	<style scoped>
 		table.userMenu td {
 			text-align: center;
