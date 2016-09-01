@@ -7,12 +7,12 @@
 	"global":["sign", "cat_basket"],
 	"onsubmit":true,
 	"childs":{
-		"order":{
+		"list":{
 			"tpl":"-cart/cart.tpl",
 			"tplroot":"ORDER",
 			"css":"-cart/catalog.css",
 			"global":["sign", "cat_basket"],
-			"json":"-cart/order.php",
+			"json":"-cart/?type=list",
 			"onsubmit":true,
 			"divs":{
 				"ORDERCART":{

@@ -1,8 +1,3 @@
-{root:}
-	<div class="cart">
-		<div id="CARTMENU"></div>
-		<div id="cartbody"></div>
-	</div>
 {ORDER:}
 	<div>
 		<div id="ORDERCART"></div>
@@ -213,14 +208,15 @@
 	<ol class="breadcrumb activelink">
 		<li><a href="/">Главная</a></li>
 		<li><a href="/catalog">Каталог</a></li>
+		<li><a class="text text-warning" href="/user">{data.email|:Профиль}</a></li>
+		
 		<li class="active">Сообщения <span class="label label-info">42</span></li>
 		{data.email?:breaduser?:breadguest}
 	</ol>
 	{breaduser:}
 		<li><a href="/cart/list">Корзина</a></li>
-		<li><a href="/cart/order">Активная заявка</a></li>
+		<li><a href="/cart/orders/my">Активная заявка</a></li>
 		<li><a href="/cart/orders">Все заявки</a></li>
-		<li><a class="text text-danger" href="/user/logout">Выход</a></li>
 		<span class="btn btn-default btn-xs pull-right"><span class="pe-7s-refresh"></span></span>
 	{breadguest:}
 		<li><a href="/user/signin">Вход</a></li>

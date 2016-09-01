@@ -24,7 +24,7 @@ if ($type = 'user') {
 	$ans = User::get();
 	$ans['manager'] = Session::get('safe.manager');
 	return Ans::ret($ans);
-} 
+}
 
 if ($type == 'office') {
 	if ($_REQUEST['submit']) {
@@ -66,5 +66,26 @@ if ($type == 'office') {
 
 	return Ans::ret($ans);
 }
+if ($type = 'list') {
 
+	$id = $_REQUEST['id'];
+	$ans = array('id'=>$id);
+	$place = $_REQUEST['place'];
+	$safe = Session::get('safe');
+	if (!Cart::loadOrder($id)) return Ans::err($ans,'Заявка не найдена!');
+	if (!Session::get('safe.manager') && !Cart::isMy($id)) return Ans::err($ans,'Заявки нет в списке ваших заявок!');
+	if (!Session::get('safe.manager') && $place=='admin') return Ans::err($ans,'У вас нет доступа к этому разделу!');
+	if (!Cart::canI($id)) return Ans::err($ans,'Действие не разрешено!');
+
+	//Заява либо моя либо это менеджер
+	if (isset($_GET['easy'])){
+		$order = Cart::loadOrder($id);
+	} else {
+		$order = Cart::getGoodOrder($id);
+		$order['place']=$place;
+		$order['user']=Load::loadJSON('-cart/?type=user');
+		$order['ismy'] = Cart::isMy($id);
+	}
+	return Ans::ret($order,'Ваша заявка');
+}
 return Ans::err($ans,'Передан незарегистрированный type');
