@@ -20,13 +20,11 @@ Nostore::on();
 $type = Ans::GET('type', 'string', false);
 if (!$type) return Ans::err($ans, 'Требуется параметр type');
 
-if ($type = 'user') {
+if ($type == 'user') {
 	$ans = User::get();
 	$ans['manager'] = Session::get('safe.manager');
 	return Ans::ret($ans);
-}
-
-if ($type == 'office') {
+} else if ($type == 'cart') {
 	if ($_REQUEST['submit']) {
 		$ans = array('msg'=>'','result'=>0);
 		
@@ -40,15 +38,9 @@ if ($type == 'office') {
 			return Ans::err($ans,'У вас недостаточно прав!');
 		}
 	}
-
-
-
 	$orders = Cart::getMyOrders();
 	$order = Cart::getGoodOrder();
-
 	$ans['order']=$order;
-
-
 	$list=array();
 	Each::forr($orders,function($order) use(&$list){
 		$status=$order['status'];
@@ -65,16 +57,40 @@ if ($type == 'office') {
 	$ans['manager']=Session::get('safe.manager');
 
 	return Ans::ret($ans);
-}
-if ($type = 'list') {
+} else if ($type == 'orders') {
+	
+	$ans = array();
+	$ans['id'] = $id = Ans::REQ('id','int');
+	if ($id) {
+		if (!$id) {
+			// работаем с активной заявкой
+			$order = Cart::getGoodOrder();
+			$ans['order'] = $order;
+			return Ans::ret($ans);
+		}else{
+			//работаем с сохранённой заявкой
+			$order = Cart::getGoodOrder($id);
+			if (!$order) return Ans::err($ans, 'Заявка не найдена!');
+			if (!Session::get('safe.manager') && !Cart::isMy($id)) return Ans::err($ans, 'Заявки нет в списке ваших заявок!');
+			return Ans::ret($order);
+		}
+	}
+	$ans = array();	
+	$ans['order'] = Cart::getGoodOrder();
+	$ans['list'] = Cart::getMyOrders();
+	
+	return Ans::ret($ans);
+} else if ($type == 'list') {
 
-	$id = $_REQUEST['id'];
-	$ans = array('id'=>$id);
-	$place = $_REQUEST['place'];
-	$safe = Session::get('safe');
+	$ans = array();
+	$id = Ans::REQ('id');
+	$ans['id'] = $id;
+	$place = Ans::REQ('place',['orders', 'admin']);
+	$ans['place'] = $place;
+	
 	if (!Cart::loadOrder($id)) return Ans::err($ans,'Заявка не найдена!');
 	if (!Session::get('safe.manager') && !Cart::isMy($id)) return Ans::err($ans,'Заявки нет в списке ваших заявок!');
-	if (!Session::get('safe.manager') && $place=='admin') return Ans::err($ans,'У вас нет доступа к этому разделу!');
+	if (!Session::get('safe.manager') && $place == 'admin') return Ans::err($ans,'У вас нет доступа к этому разделу!');
 	if (!Cart::canI($id)) return Ans::err($ans,'Действие не разрешено!');
 
 	//Заява либо моя либо это менеджер
@@ -82,10 +98,10 @@ if ($type = 'list') {
 		$order = Cart::loadOrder($id);
 	} else {
 		$order = Cart::getGoodOrder($id);
-		$order['place']=$place;
-		$order['user']=Load::loadJSON('-cart/?type=user');
+		$order['place'] = $place;
+		$order['user'] = Load::loadJSON('-cart/?type=user');
 		$order['ismy'] = Cart::isMy($id);
 	}
-	return Ans::ret($order,'Ваша заявка');
+	return Ans::ret($order, 'Ваша заявка');
 }
-return Ans::err($ans,'Передан незарегистрированный type');
+return Ans::err($ans, 'Передан незарегистрированный type');

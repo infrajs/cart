@@ -7,8 +7,14 @@
         "infrajs/user":"~1",
         "infrajs/ans":"~1",
         "infrajs/access":"~1",
+        "infrajs/mail":"~1",
+        "infrajs/nostore":"~1",
+        "infrajs/router":"~1",
+        "infrajs/session":"~1",
         "infrajs/event":"~1",
         "infrajs/controller":"~1",
+        "infrajs/ascroll":"~1",
+        "christianbach/tablesorter":"~1",
 
 
     	"infrajs/doc":"~1",
@@ -19,6 +25,7 @@
         "infrajs/activelink":"~1",
         "infrajs/ascroll":"~1",
         "infrajs/layer-global":"~1",
+        "akiyatkin/layer-conf":"~1",
         "infrajs/layer-seojson":"~1",
         "infrajs/layer-config":"~1",
         "infrajs/layer-autosave":"~1",

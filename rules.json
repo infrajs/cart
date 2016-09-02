@@ -250,8 +250,8 @@
 	"actions":{
 		"check":{
 			"go":{
-				"orders":"?office",
-				"admin":"?office/admin"
+				"orders":"/cart",
+				"admin":"/cart/admin"
 			},
 			"title":"Отправить заявку на проверку",
 			"confirm":"Отправить заявку на проверку?",
@@ -262,7 +262,7 @@
 		"setPaid":{
 			"omit":"{(paymenttype=:card|manage.paid)?:yes}",
 			"go":{
-				"admin":"?office/{place}/{id}"
+				"admin":"/cart/{place}/{id}"
 			},
 			"title":"Отметить оплату заявки",
 			"confirm":"Оплачено {~cost(total)} руб.?",
@@ -271,8 +271,8 @@
 		},
 		"saved":{
 			"go":{
-				"orders":"?office",
-				"admin":"?office/admin"
+				"orders":"/cart",
+				"admin":"/cart/admin"
 			},
 			"title":"Сохранить заявку",
 			"confirm":"Заявка будет сохранена, продолжить?",
@@ -280,7 +280,7 @@
 		},
 		"active":{
 			"go":{
-				"orders":"?office/orders/my"
+				"orders":"/cart/orders/my"
 			},
 			"title":"Сделать заявку активной",
 			"confirm":"Заявка {id} будет сделана активной.",
@@ -288,8 +288,8 @@
 		},
 		"removechanges":{
 			"go":{
-				"orders":"?office/{place}/{id}",
-				"admin":"?office/{place}/{id}"
+				"orders":"/cart/{place}/{id}",
+				"admin":"/cart/{place}/{id}"
 			},
 			"title":"Отменить несохраённые измнения",
 			"confirm":"Оменить сделанные изменения в полях для ввода?",
@@ -297,8 +297,8 @@
 		},
 		"savechanges":{
 			"go":{
-				"orders":"?office/{place}/{id}",
-				"admin":"?office/{place}/{id}"
+				"orders":"/cart/{place}/{id}",
+				"admin":"/cart/{place}/{id}"
 			},
 			"title":"Сохранить изменения",
 			"confirm":"Сделанные вами изменения станут доступными всем у кого есть доступ к заявке",
@@ -306,34 +306,34 @@
 		},
 		"paycard":{
 			"omit":"{paymenttype!:card?:yes}",
-			"link":"/office/orders/{id}/paycard",
+			"link":"/cart/orders/{id}/paycard",
 			"title":"Перейти к оплате картой",
 			"confirm":"Перейти к оплате заявки?"
 		},
 		
 		"cart":{
-			"link":"/office/cart",
+			"link":"/cart/orders/my/list",
 			"title":"Редактировать товары",
 			"confirm":"Перейти к корзину?"
 		},
 		"refresh":{
 			"omit":"{basket|:yes}",
 			"go":{
-				"admin":"?office/admin/{id}"
+				"admin":"/cart/admin/{id}"
 			},
 			"title":"Обновить данные из каталога",
 			"confirm":"Обновить данные?",
 			"result":"Данные обновлены!"
 		},
 		"refunds":{
-			"link":"/office/orders/{id}/refunds",
+			"link":"/cart/orders/{id}/refunds",
 			"title":"Перейти к возврату оплаты",
 			"confirm":"Перейти к возврату оплаты?"
 		},
 		"refuseable":{
 			"omit":"{(paymenttype!:card|manage.paid)??:yes}",
 			"go":{
-				"admin":"?office/admin"
+				"admin":"/cart/admin"
 			},
 			"title":"Разрешить возврат оплаты",
 			"confirm":"Разрешить возврат оплаты?",
@@ -343,8 +343,8 @@
 		"clear":{
 			"omit":"{basket?(manage.paid?:yes)?:yes}",
 			"go":{
-				"orders":"?office/{place}/{id}",
-				"admin":"?office/{place}/{id}"
+				"orders":"/cart/{place}/{id}",
+				"admin":"/cart/{place}/{id}"
 			},
 			"title":"Очистить корзину в заявке",
 			"confirm":"Очистить заявку?",
@@ -354,15 +354,15 @@
 			"omit":"{manage.paid?:yes}",
 			"title":"Удалить заявку",
 			"go":{
-				"orders":"?office",
-				"admin":"?office/admin"
+				"orders":"/cart",
+				"admin":"/cart/admin"
 			},
 			"confirm":"Удалить заявку {id}?",
 			"result":"Заявка {id} удалена"
 		},
 		"wholesaleDelete":{
 			"go":{
-				"wholesale":"?office/wholesale"
+				"wholesale":"/cart/wholesale"
 			},
 			"title":"Удалить запись об оптовике",
 			"confirm":"Удалить запись об оптовике?",
@@ -370,16 +370,16 @@
 		},
 		"copy":{
 			"go":{
-				"orders":"?office"
+				"orders":"/cart"
 			},
 			"title":"Сделать копию заявки",
 			"confirm":"Копировать заявку {id}?",
-			"result":"Заявка <a onclick='cart.goTop()' href='?office/orders/{copyid}'>{copyid}</a> скопирована в активную заявку"
+			"result":"Заявка <a onclick='cart.goTop()' href='/cart/orders/{copyid}'>{copyid}</a> скопирована в активную заявку"
 		},
 		"ready":{
 			"omit":"{paymenttype!:card?:yes}",
 			"go":{
-				"admin":"?office/admin"
+				"admin":"/cart/admin"
 			},
 			"title":"Заявка готова к оплате",
 			"confirm":"Заявка готова к оплате?",
@@ -388,16 +388,16 @@
 		},
 		"editcart":{
 			"go":{
-				"orders":"?office/cart"
+				"orders":"/cart/orders/my/list"
 			},
 			"title":"Редактировать товары в заявке",
 			"confirm":"Сделать заявку активной?",
-			"result":"Заявка сделана активной, в <a onclick='cart.goTop()' href='?office/cart'>корзине</a> возможно изменить выбранные товары."
+			"result":"Заявка сделана активной, в <a onclick='cart.goTop()' href='/cart/orders/my/list'>корзине</a> возможно изменить выбранные товары."
 		},
 		"dismiss":{
 			"omit":"{manage.paid?:yes}",
 			"go":{
-				"admin":"?office/admin"
+				"admin":"/cart/admin"
 			},
 			"title":"Отклонить заявку",
 			"confirm":"Отклонить заявку?",
@@ -407,7 +407,7 @@
 		"delivery":{
 			"omit":"{delivery!:delivery?:yes}",
 			"go":{
-				"admin":"?office/admin"
+				"admin":"/cart/admin"
 			},
 			"title":"Заявка доставлется",
 			"confirm":"Заявка доставляеся?",
@@ -416,7 +416,7 @@
 		},
 		"complete":{
 			"go":{
-				"admin":"?office/admin"
+				"admin":"/cart/admin"
 			},
 			"title":"Заявка выполнена",
 			"confirm":"Заявка выполнена?",
@@ -426,7 +426,7 @@
 		"execution":{
 			"omit":"{manage.paid??(paymenttype=:card?:yes)}",
 			"go":{
-				"admin":"?office/admin"
+				"admin":"/cart/admin"
 			},
 			"title":"Заявка в исполнении",
 			"confirm":"Заявка исполняется?",
@@ -435,7 +435,7 @@
 		},
 		"picked":{
 			"go":{
-				"admin":"?office/admin"
+				"admin":"/cart/admin"
 			},
 			"title":"Заявка укоплектована",
 			"confirm":"Заявка упомплектована?",

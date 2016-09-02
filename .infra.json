@@ -1,7 +1,10 @@
 {
+	"pub":["opt"],
+	"opt":true,
 	"external":"external",
 	"ordersdir":"~.Заявки/",
 	"js":["Cart.js","catalog.js"],
+	"update":"update.php",
 	"clutch":{
 		"pixeden-stroke-7-icon":[
 			"vendor/grimmlink/",

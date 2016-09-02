@@ -10,6 +10,8 @@ use infrajs\once\Once;
 use infrajs\load\Load;
 use infrajs\template\Template;
 use infrajs\each\Each;
+use infrajs\mail\Mail;
+use infrajs\path\Path;
 use infrajs\each\Fix;
 
 if (!is_file('vendor/autoload.php')) {
@@ -20,12 +22,7 @@ if (!is_file('vendor/autoload.php')) {
 class Cart {
 	public static function getPath($id = '') 
 	{
-		Once::exec(__FILE__.'-getPath', function () {
-			Path::mkdir('~.Заявки/');
-		});
-
-		if (!$id) return '~.Заявки/';
-		
+		if (!$id) return '~.Заявки/';	
 		return '~.Заявки/'.$id.'.json';
 	}
 	public static function getMyOrders()
@@ -52,13 +49,12 @@ class Cart {
 			if (!$order) return false;//Нет заявки с таким $id
 			$order['id'] = $id;
 
-			cart_initRule($order);
-		
+			Cart::initRule($order);
 			
-			$order['email']=trim($order['email']);
-			$order['sumopt']=0;
-			$order['sumroz']=0;
-			$order['count']=0;
+			$order['email'] = trim($order['email']);
+			$order['sumopt'] = 0;
+			$order['sumroz'] = 0;
+			$order['count'] = 0;
 			$num=0;
 
 			Each::foro($order['basket'],function(&$pos,$prodart) use(&$order,&$num){
@@ -186,6 +182,7 @@ class Cart {
 		return Once::exec(__FILE__.'-cart_getOrderById', function ($id) {
 			if ($id) {
 				$order = Load::loadJSON(Cart::getPath($id));
+
 				if (!$order) return false;//Нет такой заявки с таким id
 				//$email=Session::getEmail();
 				
@@ -217,6 +214,71 @@ class Cart {
 			if (!$order['manage']) $order['manage'] = array();
 			return $order;
 		},array($id));
+	}
+	public static function initRule(&$order){
+		$rules = Load::loadJSON('-cart/rules.json');
+		foreach ($rules as $i => $act) {
+			if ($rules[$i]['link']) $rules[$i]['link'] = Template::parse(array($rules[$i]['link']), $order);
+		}
+		$order['rule'] = $rules['rules'][$order['status']];
+
+		$list = array(&$order['rule']['manager'],&$order['rule']['user']);
+
+		Each::forr($list,function(&$ar) use($rules,&$order){
+			/*Each::foro($ar['others'],function($other,$istpl) use(&$order,&$ar){
+				$is=Template::parse(array($istpl),$order);
+
+				if ($is){
+					if (isset($other['buttons']))$ar['buttons']=$other['buttons'];
+					if (isset($other['actions']))$ar['actions']=$other['actions'];
+					return true;
+				}	
+			});
+			*/
+
+			Each::foro($ar['buttons'],function(&$cls,$act) use($rules,&$order,&$ar){
+				$index=array_search($act, $ar['actions']);
+				if ($index!==false){
+					array_splice($ar['actions'],$index,1);
+				}
+				if (!$rules['actions'][$act]){
+					$cls=array(
+						'cls'=>$cls,
+						'act'=>$act
+					);
+				}else{
+					$t=$cls;
+					$cls=$rules['actions'][$act];
+					$cls['act']=$act;
+					$cls['cls']=$t;
+				}
+				if ($cls['omit']){
+					$omit=Template::parse(array($cls['omit']),$order);
+					if ($omit) return new infra_Fix('del');
+				}
+				
+			});
+			Each::fora($ar['actions'], function (&$act) use ($rules, &$order) {
+				if (!$rules['actions'][$act]){
+					$cls=array(
+						'act'=>$act
+					);
+				}else{
+					$cls=$rules['actions'][$act];
+					$cls['act']=$act;
+				}
+
+				if ($cls['omit']){
+					$omit=Template::parse(array($cls['omit']),$order);
+					if ($omit) return new Fix('del');
+					
+				}
+				$act=$cls;
+			});
+
+
+		});
+
 	}
 }
 
@@ -305,71 +367,7 @@ function cart_saveOrder(&$order,$place=false){
 
 
 
-function cart_initRule(&$order){
-	$rules=Load::loadJSON('-cart/rules.json');
-	Each::foro($rules['actions'],function(&$act) use($order){
-		if ($act['link'])$act['link']=Template::parse(array($act['link']),$order);
-	});
-	$order['rule']=$rules['rules'][$order['status']];
 
-	$list = array(&$order['rule']['manager'],&$order['rule']['user']);
-
-	Each::forr($list,function(&$ar) use($rules,&$order){
-		/*Each::foro($ar['others'],function($other,$istpl) use(&$order,&$ar){
-			$is=Template::parse(array($istpl),$order);
-
-			if ($is){
-				if (isset($other['buttons']))$ar['buttons']=$other['buttons'];
-				if (isset($other['actions']))$ar['actions']=$other['actions'];
-				return true;
-			}	
-		});
-		*/
-
-		Each::foro($ar['buttons'],function(&$cls,$act) use($rules,&$order,&$ar){
-			$index=array_search($act,$ar['actions']);
-			if ($index!==false){
-				array_splice($ar['actions'],$index,1);
-			}
-			if (!$rules['actions'][$act]){
-				$cls=array(
-					'cls'=>$cls,
-					'act'=>$act
-				);
-			}else{
-				$t=$cls;
-				$cls=$rules['actions'][$act];
-				$cls['act']=$act;
-				$cls['cls']=$t;
-			}
-			if ($cls['omit']){
-				$omit=Template::parse(array($cls['omit']),$order);
-				if ($omit) return new infra_Fix('del');
-			}
-			
-		});
-		Each::fora($ar['actions'], function (&$act) use ($rules, &$order) {
-			if (!$rules['actions'][$act]){
-				$cls=array(
-					'act'=>$act
-				);
-			}else{
-				$cls=$rules['actions'][$act];
-				$cls['act']=$act;
-			}
-
-			if ($cls['omit']){
-				$omit=Template::parse(array($cls['omit']),$order);
-				if ($omit) return new Fix('del');
-				
-			}
-			$act=$cls;
-		});
-
-
-	});
-
-}
 function cart_getPosHash($pos){
 	return md5($pos['Цена оптовая'].':'.$pos['Цена розничная']);
 }
@@ -407,15 +405,15 @@ function cart_ret($order,$action){
 	);
 	if (!Session::get('dontNofify'))cart_mail('user',$order['email'],$rule['usermail'],$order);
 	cart_mail('manager',$order['email'],$rule['mangmail'],$order);
-	return infra_ans($ans);
+	return Ans::ans($ans);
 }
 function cart_mail($to,$email,$mailroot, $data=array()){
 	if (!$email)$email='noreplay@'.$_SERVER['HTTP_HOST'];
 	if (!$mailroot) return;//Когда не указаний в конфиге... ничего такого...
 	$rules=Load::loadJSON('-cart/rules.json');
 
-	$data['host']=infra_view_getHost();
-	$data['path']=infra_view_getRoot(ROOT);
+	$data['host']=View::getHost();
+	$data['path']=View::getRoot();
 	$data['link']=Session::getLink($email);
 	$data['email']=$email;
 	$data['user']=Session::getUser($email);
@@ -424,7 +422,7 @@ function cart_mail($to,$email,$mailroot, $data=array()){
 
 	$subject = Template::parse(array($rules['mails'][$mailroot]),$data);
 	$body = Template::parse('-cart/cart.mail.tpl',$data,$mailroot);
-	if ($to=='user') return infra_mail_fromAdmin($subject,$email,$body);
-	if ($to=='manager') return infra_mail_toAdmin($subject,$email,$body);
+	if ($to=='user') return Mail::fromAdmin($subject,$email,$body);
+	if ($to=='manager') return Mail::toAdmin($subject,$email,$body);
 }
 ?>

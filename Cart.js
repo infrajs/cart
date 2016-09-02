@@ -193,7 +193,7 @@ window.cart = window.Cart= {
 	getGoodOrder:function(id){
 		if(!id)id='';
 		//генерирует объект описывающий все цены... передаётся basket на случай если count актуальный именно в basket
-		var path='-cart/order.php?id='+id;
+		var path='-cart/?type=order&id='+id;
 		infrajs.global.unload('order',path);
 		infra.unload(path);
 		infra.session.syncNow();
