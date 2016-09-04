@@ -10,13 +10,8 @@
         "infrajs/mail":"~1",
         "infrajs/nostore":"~1",
         "infrajs/router":"~1",
-        "infrajs/session":"~1",
         "infrajs/event":"~1",
         "infrajs/controller":"~1",
-        "infrajs/ascroll":"~1",
-        "christianbach/tablesorter":"~1",
-
-
     	"infrajs/doc":"~1",
     	"infrajs/excel":"~1",
         "infrajs/imager":"~1",

@@ -24,7 +24,7 @@
 				"childs":{
 					"list":{
 						"tpl":"-cart/cart.tpl",
-						"tplroot":"ORDER",
+						"tplroot":"LIST",
 						"global":["sign", "cat_basket"],
 						"json":"-cart/?type=list",
 						"onsubmit":true,

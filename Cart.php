@@ -10,8 +10,10 @@ use infrajs\once\Once;
 use infrajs\load\Load;
 use infrajs\template\Template;
 use infrajs\each\Each;
+use infrajs\catalog\Catalog;
 use infrajs\mail\Mail;
 use infrajs\path\Path;
+use infrajs\excel\Xlsx;
 use infrajs\each\Fix;
 
 if (!is_file('vendor/autoload.php')) {
@@ -42,6 +44,14 @@ class Cart {
 			return $list;
 		});
 	}
+	public static function getByProdart($prodart){
+		$data = Catalog::init();
+		$pos = Xlsx::runPoss($data, function ($pos) use ($prodart){
+		    $realprodart=$pos['producer'].' '.$pos['article'];
+		    if ($realprodart == $prodart) return $pos;
+		});
+		return $pos;
+	}
 	public static function getGoodOrder($id = '')
 	{
 		return Once::exec(__FILE__.'-getGoodOrder', function ($id) {
@@ -62,14 +72,14 @@ class Cart {
 				if ($count<1) return new infra_Fix('del');
 
 				if (!$order['rule']['freeze']){
-					$pos=cat_getByProdart($prodart);
+					$pos=Cart::getByProdart($prodart);
 					if (!$pos) return new infra_Fix('del');
 				}else{
-					$p=cat_getByProdart($prodart);
+					$p=Cart::getByProdart($prodart);
 					
 					if (!$pos['article']){//Такое может быть со старыми заявками... deprcated удалить потом.
 						//Значит позиция некорректно заморожена
-						$pos=cat_getByProdart($prodart);
+						$pos=Cart::getByProdart($prodart);
 						if (!$pos) return new infra_Fix('del');
 					}else{
 						$hash=cart_getPosHash($p);
@@ -329,7 +339,7 @@ function cart_saveOrder(&$order,$place=false){
 	if ($rules['rules'][$order['status']]['freeze']){//Текущий статус должен замораживать позиции
 		Each::foro($order['basket'],function(&$pos,$prodart){
 			if ($pos['article']) return;
-			$p=cat_getByProdart($prodart);
+			$p=Cart::getByProdart($prodart);
 			if ($p){//Товар найден в каталоге
 				$pos=array_merge($p,array('count'=>$pos['count']));
 				$pos['hash']=cart_getPosHash($p);//Метка версии замороженной позиции

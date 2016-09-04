@@ -4,7 +4,7 @@
 	</div>
 {cartanswer:}
 	<pre>{mail}</pre>
-{ORDER:}
+{LIST:}
 	<style scoped>
 		.usercart label {
 			margin-top:5px;
@@ -72,7 +72,9 @@
 		{data.count?:cartlist?:cartmsg}
 	</div>
 	<script>
+
 		domready(function(){
+			return;
 			Event.one('Controller.onshow', function () {
 				var layer = Controller.ids['{id}'];
 				var div = $('#'+layer.div);
@@ -93,6 +95,7 @@
 	</script>
 	<script>
 		domready(function(){
+			return;
 			Event.one('Controller.onshow', function () {
 				var layer = Controller.ids['{id}'];
 				var div = $('#'+layer.div);
@@ -149,19 +152,17 @@
 			<td style="color:gray; vertical-align:middle">{num}</td>
 			<td style="vertical-align:middle">
 				<div class="title">
-					
 					<a href="/catalog/{producer}/{article}"><nobr>{Производитель}</nobr> <nobr>{Артикул}</nobr></a>
-
 				</div>
 			</td>
 			<td colspan="4" style="vertical-align:middle">
 				{Наименование} 
 			</td>
-			<td style="padding:2px; vertical-align:middle;">
-				<div style="float:right;">
-					<span title="Удалить из корзины"  data-article="{article}" data-producer="{Производитель}" class="btn btn-sm btn-hover btn-danger posremove">
-						<span class="glyphicon glyphicon-remove"></span>
-					</span>
+			<td style="vertical-align:middle;">
+				<div style="float:right; margin-right:10px" class="cart">
+					<a class="abasket" data-producer="{producer}" data-article="{article}" href="/cart/orders/my/list/add/{producer} {article}">
+						<span class="pe-7s-close-circle"></span>
+					</a>
 				</div>
 			</td>
 		</tr>
@@ -178,7 +179,7 @@
 			<td></td>
 			<td style="white-space:nowrap;">
 				<span class="myprice" data-article="{article}" data-producer="{Производитель}">
-					{Цена розничная?Цена розничная:itemcost?:itemnocost}
+					{Цена?Цена:itemcost?:itemnocost}
 				</span>
 			</td>
 			<td style="width:100%"></td><td></td>

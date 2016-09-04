@@ -9,9 +9,9 @@ window.Cart = {
 	refresh:function(){
 		infra.loader.show();
 		setTimeout(function(){
-			infrajs.global.set(['order','cat_basket','sign']);
+			Controller.global.set(['order','cat_basket','sign']);
 			Session.syncNow();
-			infrajs.check();
+			Controller.check();
 			Cart.goTop();
 		},100);
 	},
@@ -47,14 +47,14 @@ window.Cart = {
 		}
 		var path='-cart/orderActions.php?id='+id+'&action='+name+'&place='+place;
 		Cart.getJSON(infra.theme(path), function(ans){
-			infrajs.global.set(['order','cat_basket','sign']);
+			Controller.global.set(['order','cat_basket','sign']);
 			Session.syncNow();
 			cb(ans);
 		});
 	},
 	init:function(){
 		var rules=infra.loadJSON('-cart/rules.json');
-		var layer=infrajs.getUnickLayer('order');
+		var layer=Controller.getUnickLayer('order');
 		infra.foro(rules.actions,function(act,name){
 			$(".act-"+name).not('[cartinit]').attr('cartinit',1).click(function(){
 				var place=$(this).parents('.myactions').data('place');
@@ -192,7 +192,7 @@ window.Cart = {
 		if(!id)id='';
 		//генерирует объект описывающий все цены... передаётся basket на случай если count актуальный именно в basket
 		var path='-cart/?type=order&id='+id;
-		infrajs.global.unload('order',path);
+		Controller.global.unload('order',path);
 		infra.unload(path);
 		Session.syncNow();
 		var order=infra.loadJSON(path);//GoodOrder серверная версия
@@ -202,10 +202,15 @@ window.Cart = {
 	toggle: function (id, callback) {
 		var name='user.basket.'+id;
 		var r = Session.get(name);
+		var fn = function(){
+			Controller.global.set(['cat_basket']);
+			infrajs.check();
+			if (callback) callback();
+		}
 		if (r) {
-			Session.set(name,null,true,callback);
+			Session.set(name, null, true, fn);
 		}else{
-			Session.set(name,{ count:1 },true,callback);
+			Session.set(name, { count: 1 }, true, fn);
 		}
 		return !r;
 	},
@@ -223,8 +228,8 @@ window.Cart = {
 			}
 		});
 		var callback=function(){
-			infrajs.global.set('cat_basket');
-			infrajs.check();
+			Controller.global.set('cat_basket');
+			Controller.check();
 		}
 		div.find('.cat_item .basket_img').click(function(){
 			var cart=$(this);
