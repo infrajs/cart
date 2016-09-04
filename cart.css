@@ -1,23 +1,18 @@
-/*.cart .basket {
-	cursor:pointer;
-	border-bottom: 1px solid rgba(0,0,0,0);
-}
-.cart .basket:hover{
-	border-bottom: 1px solid #F7662C;
-}*/
-
-.cart .actionbasket span {
+.cart .abasket span {
 	display:inline-block; 
 	padding:5px;
-	background-color:rgba(70, 136, 71, 0.3);
-	transition: 0.5s;
+	background-color:rgba(70, 136, 71, 0.8);
+	color:white;
+	transition: 0.3s;
+}
+.cart .abasket:hover span {
+	background-color:rgba(70, 136, 71, 1);
 }
 
-.cart .actionbasket span.active {
-	background-color:rgba(70, 136, 71, 1);
+.cart .abasket.selected span {
+	background-color: rgba(247, 102, 44, 0.8);
 	color:white;
 }
-
-.cart .actionbasket span:hover {
-	background-color:rgba(70, 136, 71, 0.8);
+.cart .abasket.selected:hover span {
+	background-color: rgba(247, 102, 44, 1);
 }

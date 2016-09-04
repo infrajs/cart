@@ -1,7 +1,7 @@
 //infra.listen(infrajs,'onshow',function(){
 //	cart.init();
 //});
-window.Cart = window.cart = {
+window.Cart = {
 	blockform: function(layer){
 		var form=$("#"+layer.div).find('form');
 		form.find("input,button,textarea,select").attr("disabled","disabled");
@@ -10,9 +10,9 @@ window.Cart = window.cart = {
 		infra.loader.show();
 		setTimeout(function(){
 			infrajs.global.set(['order','cat_basket','sign']);
-			infra.session.syncNow();
+			Session.syncNow();
 			infrajs.check();
-			cart.goTop();
+			Cart.goTop();
 		},100);
 	},
 	unblockform: function(layer){
@@ -24,12 +24,12 @@ window.Cart = window.cart = {
 	},
 	getLink: function(order,place){
 		if(place=='admin'){
-			var link='<a onclick="cart.goTop()" href="?office/'+place+'/{id}">{id}</a>';
+			var link='<a onclick="Cart.goTop()" href="?office/'+place+'/{id}">{id}</a>';
 		}else{//place=='orders'
 			if(!order.id){
-				var link='<a onclick="cart.goTop()" href="?office/'+place+'/my">Активная заявка</a>';
+				var link='<a onclick="Cart.goTop()" href="?office/'+place+'/my">Активная заявка</a>';
 			}else{
-				var link='<a onclick="cart.goTop()" href="?office/'+place+'/{id}">{id}</a>';
+				var link='<a onclick="Cart.goTop()" href="?office/'+place+'/{id}">{id}</a>';
 			}			
 		}
 		link=infra.template.parse([link],order);
@@ -37,18 +37,18 @@ window.Cart = window.cart = {
 	},
 	act:function(place,name,id,cb){
 		if(!cb)cb=function(){};
-		var rules=infra.loadJSON('-cart/rules.json');
+		var rules=Load.loadJSON('-cart/rules.json');
 		var act=rules.actions[name];
-		var order=cart.getGoodOrder(id);
+		var order=Cart.getGoodOrder(id);
 		order.place=place;
 		if(act.link){
 			infra.State.go(infra.template.parse([act.link],order));
 			return cb({result:1});	
 		}
 		var path='-cart/orderActions.php?id='+id+'&action='+name+'&place='+place;
-		cart.getJSON(infra.theme(path), function(ans){
+		Cart.getJSON(infra.theme(path), function(ans){
 			infrajs.global.set(['order','cat_basket','sign']);
-			infra.session.syncNow();
+			Session.syncNow();
 			cb(ans);
 		});
 	},
@@ -61,40 +61,40 @@ window.Cart = window.cart = {
 				var id=$(this).data('id');
 
 				
-				var order=cart.getGoodOrder(id);
+				var order=Cart.getGoodOrder(id);
 				order.place=place;
 
 				if(!act.link&&!act.go[place])alert('Ошибка. Действие невозможно выполнить с этой страницы!');
 			
-				var link=cart.getLink(order,place);
+				var link=Cart.getLink(order,place);
 				var ask=infra.template.parse([act.confirm],order);
 				ask='<div style="width:300px">'+link+'<br>'+ask+'</div>';
 				popup.confirm(ask,function(){ 
-					if(!act.link)cart.blockform(layer);
+					if(!act.link)Cart.blockform(layer);
 					infra.loader.show();
 
-					cart.act(place,name,id,function(ans){
-						cart.goTop(function(){
-							var order=cart.getGoodOrder(ans.id);
+					Cart.act(place,name,id,function(ans){
+						Cart.goTop(function(){
+							var order=Cart.getGoodOrder(ans.id);
 							if(order){
 								order.place=place;
 								
 								if(act.link){
 									if(act.result){
 										var msg=infra.template.parse([act.result],order);
-										var link=cart.getLink(order,place);
+										var link=Cart.getLink(order,place);
 										popup.alert('<div style="width:300px">'+link+'<br>'+msg+'</div>');
 									}
 									return;
 								}
-								cart.unblockform(layer);
+								Cart.unblockform(layer);
 
 
 								
 								if(ans.result)infra.State.go(infra.template.parse([act.go[place]],order));
 								if(ans.msg){
 									
-									var link=cart.getLink(order,place);
+									var link=Cart.getLink(order,place);
 									popup.alert('<div style="width:300px">'+link+'<br>'+ans.msg+'</div>');
 								}
 							}else{//Заявка удалена
@@ -126,7 +126,7 @@ window.Cart = window.cart = {
 	},
 	calc:function(div){
 		
-		var order=cart.getGoodOrder();
+		var order=Cart.getGoodOrder();
 		var tplcost=function(val){
 			return infra.template.parse('-cart/cart.tpl',val,'itemcost')
 		}
@@ -181,7 +181,7 @@ window.Cart = window.cart = {
 		Ascroll.go();
 	},
 	canI:function(id,action){//action true совпадёт с любой строчкой
-		var order=cart.getGoodOrder(id);
+		var order=Cart.getGoodOrder(id);
 		if(!order)return false;
 		if(infra.seq.get(order,['rule','user','buttons',action]))return true;
 		return infra.forr(infra.seq.get(order,['rule','user','actions']),function(r){
@@ -194,17 +194,27 @@ window.Cart = window.cart = {
 		var path='-cart/?type=order&id='+id;
 		infrajs.global.unload('order',path);
 		infra.unload(path);
-		infra.session.syncNow();
+		Session.syncNow();
 		var order=infra.loadJSON(path);//GoodOrder серверная версия
 		if(!order.result)return false;
 		return order;
 	},
-	initPrice:function(div){
+	toggle: function (id, callback) {
+		var name='user.basket.'+id;
+		var r = Session.get(name);
+		if (r) {
+			Session.set(name,null,true,callback);
+		}else{
+			Session.set(name,{ count:1 },true,callback);
+		}
+		return !r;
+	},
+	initPrice: function (div) {
 		div.find('.cat_item').each(function(){
 			var cart=$(this).find('.basket_img');
 
 			var id=cart.data('producer')+' '+cart.data('article');
-			if(infra.session.get('user.basket.'+id)){
+			if(Session.get('user.basket.'+id)){
 				$(this).find('.posbasket').show();
 				cart.addClass('basket_img_sel');
 				cart.attr('title','Удалить из корзины');
@@ -220,19 +230,19 @@ window.Cart = window.cart = {
 			var cart=$(this);
 			var id=cart.data('producer')+' '+cart.data('article');
 			var name='user.basket.'+id;
-			var r=infra.session.get(name);
+			var r=Session.get(name);
 			infra.loader.show();
 			if(r){
 				$(this).removeClass('basket_img_over');
 				$(this).removeClass('basket_img_sel');
 				$(this).parents('.cat_item').find('.posbasket').hide();
-				infra.session.set(name,null,true,callback);
+				Session.set(name,null,true,callback);
 				cart.attr('title','Добавить в корзину');
 			}else{
 				
 				$(this).addClass('basket_img_sel');
 				$(this).parents('.cat_item').find('.posbasket').show();
-				infra.session.set(name,{ count:1 },true,callback);
+				Session.set(name,{ count:1 },true,callback);
 				cart.attr('title','Удалить из корзины');
 
 			}

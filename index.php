@@ -85,6 +85,7 @@ if ($type == 'user') {
 	$ans = array();
 	$id = Ans::REQ('id');
 	$ans['id'] = $id;
+	if ($id == 'my') $id = null;
 	$place = Ans::REQ('place',['orders', 'admin']);
 	$ans['place'] = $place;
 	
