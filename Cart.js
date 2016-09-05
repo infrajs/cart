@@ -203,9 +203,8 @@ window.Cart = {
 		var name='user.basket.'+id;
 		var r = Session.get(name);
 		var fn = function(){
-			Controller.global.set(['cat_basket']);
-			infrajs.check();
 			if (callback) callback();
+			Global.check(['cat_basket']);
 		}
 		if (r) {
 			Session.set(name, null, true, fn);

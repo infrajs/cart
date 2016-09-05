@@ -160,7 +160,7 @@
 			</td>
 			<td style="vertical-align:middle;">
 				<div style="float:right; margin-right:10px" class="cart">
-					<a class="abasket" data-producer="{producer}" data-article="{article}" href="/cart/orders/my/list/add/{producer} {article}">
+					<a class="abasket bg-danger" data-producer="{producer}" data-article="{article}" href="/cart/orders/my/list/add/{producer} {article}">
 						<span class="pe-7s-close-circle"></span>
 					</a>
 				</div>

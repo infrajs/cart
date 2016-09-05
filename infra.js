@@ -2,13 +2,12 @@ Event.handler('Controller.onshow', function () {
 	var activate = function (a, id) {
 		var name = 'user.basket.'+id;
 		var r = Session.get(name);
-		console.log('activate', name, r);
 		if (r) {
-			a.next().slideDown();
+			a.next().stop().slideDown();
 			a.addClass('selected');
 			a.attr('title','Удалить из корзины');
 		} else {
-			a.next().slideUp();	
+			a.next().stop().slideUp();	
 			a.removeClass('selected');
 			a.attr('title','Добавить в корзину');
 		}
