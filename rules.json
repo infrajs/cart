@@ -221,7 +221,7 @@
 					"editcart":"default",
 					"check":"success"
 				},
-				"actions":["check","active","copy","clear","realdel"]
+				"actions":["cart-edit", "check","active","copy","clear","realdel"]
 			},
 			"manager":{
 				"actions":["check","execution","saved","ready","dismiss","picked","complete","realdel","removechanges","savechanges","clear"]
@@ -310,9 +310,8 @@
 			"title":"Перейти к оплате картой",
 			"confirm":"Перейти к оплате заявки?"
 		},
-		
 		"cart":{
-			"link":"/cart/orders/my/list",
+			"link":"/cart/orders/{id|:my}/list",
 			"title":"Редактировать товары",
 			"confirm":"Перейти к корзину?"
 		},
@@ -447,6 +446,11 @@
 			"result":"Действие для банка! Возврат денег.",
 			"usermail":"bankrefunds",
 			"mangmail":"AdmBankrefunds"
+		},
+		"cart-edit":{
+			"confirm":"Вы хотите внести изменения в корзину?",
+			"title":"Изменения корзины",
+			"result":"Корзина скорректирована"
 		},
 		"bankpaid":{
 			"title":"Отметка об оплате заявки",

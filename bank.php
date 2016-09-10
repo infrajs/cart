@@ -32,7 +32,7 @@
 
 	if(!$order['manage']['lastbank'])$order['manage']['lastbank']=array();
 	$order['manage']['lastbank'][]=$ba;
-	cart_saveOrder($order,false);
+	Cart::saveOrder($order,false);
 	
 	if(isset($ba['RESULT'])&&$ba['RESULT']==0){//нет ошибок
 		if($ba['TRTYPE']==1){//Оплата
@@ -91,7 +91,7 @@
 				$order['manage']['paidtime']=time();
 				$order['manage']['paidtype']='bank';
 				
-				cart_saveOrder($order,false);
+				Cart::saveOrder($order,false);
 				$ans['msg']='Всё ок';
 				file_put_contents(ROOT.'infra/data/.lastbank.json',infra_json_encode($ans));
 				
@@ -146,7 +146,7 @@
 					$order['status']='canceled';
 				}
 
-				cart_saveOrder($order,false);
+				Cart::saveOrder($order,false);
 				
 
 				$ans['msg']='Всё ок';

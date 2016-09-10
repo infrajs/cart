@@ -58,70 +58,49 @@
 		}
 	</style>
 	<ol class="breadcrumb">
+		<li><a href="/">Главная</a></li>
 		<li><a href="/catalog">Каталог</a></li>
-		<li><a href="/user">{data.email|:Профиль}</a></li>
-		
-		<li><a href="/cart">Сообщения</a> <span class="label label-default">42</span></li>
-		<li><a href="/cart/orders">Мои заявки</a> <span class="label label-info">2</span></li>
-		<li><a href="/cart/orders">Заявка Активая</a></li>
-		<li class="active">Корзина <span class="label label-default">2</span></li>
+		<li><a href="/cart">Сообщения</a></li>
+		<li><a href="/cart/orders">Мои заявки</a></li>
+		<li><a href="/{crumb.parent}">Заявка {crumb.parent.name=:my?:Активная?crumb.parent.name}</a></li>
+		<li class="active">Корзина</li>
 	</ol>
-	<h1>Корзина</h1>
-	{conf.opt?(data.merch?:infoopt?:inforoz)}
+	<h1>Корзина {crumb.parent.name=:my|crumb.parent.name}</h1>
+	{~conf.cart.opt?(data.order.merch?:infoopt?:inforoz)}
 	<div class="usercart" style="margin-top:15px;">		
-		{data.count?:cartlist?:cartmsg}
+		{data.order.count?data.order:cartlist?:cartmsg}
 	</div>
 	<script>
 
 		domready(function(){
-			return;
-			Event.one('Controller.onshow', function () {
-				var layer = Controller.ids['{id}'];
-				var div = $('#'+layer.div);
-				Cart.calc(div);
-				div.find('[type=number]').change( function () {
-					Cart.calc(div);
-				});
-
-				div.find('.posremove').click( function () {
-					var prodart=$(this).data('producer')+' '+$(this).data('article');
-					Session.set(['user','basket',prodart]);
-					Controller.global.set('cat_basket');
-					Session.syncNow();
-					Controller.check();
+			Once.exec('layer{id}', function () {
+				Event.one('Controller.oncheck', function () {
+					var layer = Controller.ids['{id}'];
+					Event.handler('Layer.onshow', function () {
+						var div = $('#'+layer.div);
+						Cart.calc(div);
+						div.find('[type=number]').change( function () {
+							Cart.calc(div);
+						});
+					}, 'cart', layer);
 				});
 			});
-		});
-	</script>
-	<script>
-		domready(function(){
-			return;
-			Event.one('Controller.onshow', function () {
-				var layer = Controller.ids['{id}'];
-				var div = $('#'+layer.div);
-				var counter = {counter};
-				Event.handler('Layer.onsubmit', function (layer) {
-					if (!layer.showed || counter != layer.counter) return;
-					var ans = layer.config.ans;
-					Controller.global.set(['cat_basket', 'order']);
-					Cart.goTop();
-				}, '', layer);
-			});
+			
 		});
 	</script>
 	{inforoz:}
 		<div class="cartblockinfo alert alert-info">
 			<p>
-			Для вас действуют <b onclick="$(this).parents('.alert:first').find('div').toggle()" class="a cartinfo">розничные цены</b>.
+				Для вас действуют <b onclick="$(this).parents('.alert:first').find('div').toggle()" class="a cartinfo">розничные цены</b>.
 			</p>
 			<div style="display:none; margin-top:10px">
 				<p>
-					Сумма оплаченых заявок: <b>{~cost(data.hadpaid)} руб.</b><br>
+					Сумма оплаченых заявок: <b>{~cost(data.order.hadpaid)} руб.</b><br>
 					Розничная сумма текущей заявки: <b class="cartsumroz"></b><br>
 					Оптовая сумма текущей заявки: <b class="cartsumopt"></b>
 				</p>
 				<p>
-					Оптовые цены действуют от <b>{~cost(data.level)} руб.</b><br>
+					Оптовые цены действуют от <b>{~cost(data.order.level)} руб.</b><br>
 					В активную заявку нужно добавить товар на сумму <b class="cartneed"></b>
 				</p>
 			</div>
@@ -133,7 +112,7 @@
 			</p>
 			<div style="display:none; margin-top:10px">
 				<p>
-					Сумма оплаченых заявок: <b>{~cost(data.hadpaid)} руб.</b><br>
+					Сумма оплаченых заявок: <b>{~cost(data.order.hadpaid)} руб.</b><br>
 					Розничная сумма текущей заявки: <b class="cartsumroz"></b><br>
 					Оптовая сумма текущей заявки: <b class="cartsumopt"></b>
 				</p>
@@ -141,59 +120,60 @@
 		</div>
 	{cartlist:}
 		<table class="table">
-			{data.basket::cartpos}
+			{basket::cartpos}
 		</table>
 		<div>Итого: <span class="cartsum"></span> <del title="Розничная цена" style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel"></del></div>
 		<div style="margin-top:10px">
-			<a onclick="Cart.goTop();" href="/cart/orders/my" style="text-decoration:none" class="btn btn-success">Перейти к оформлению заявки</a>
+			<a onclick="Cart.goTop();" href="/{crumb.parent}" style="text-decoration:none" class="btn btn-success">Перейти к {id?:заявке {id}?:оформлению заявки}</a>
 		</div>
-	{cartpos:}
-		<tr class="active">
-			<td style="color:gray; vertical-align:middle">{num}</td>
-			<td style="vertical-align:middle">
-				<div class="title">
-					<a href="/catalog/{producer}/{article}"><nobr>{Производитель}</nobr> <nobr>{Артикул}</nobr></a>
-				</div>
-			</td>
-			<td colspan="4" style="vertical-align:middle">
-				{Наименование} 
-			</td>
-			<td style="vertical-align:middle;">
-				<div style="float:right; margin-right:10px" class="cart">
-					<a class="abasket bg-danger" data-producer="{producer}" data-article="{article}" href="/cart/orders/my/list/add/{producer} {article}">
-						<span class="pe-7s-close-circle"></span>
+		{cartname:}
+		{cartpos:}
+			<tr class="active">
+				<td style="color:gray; vertical-align:middle">{num}</td>
+				<td style="vertical-align:middle">
+					<div class="title">
+						<a href="/catalog/{producer}/{article}"><nobr>{Производитель}</nobr> <nobr>{Артикул}</nobr></a>
+					</div>
+				</td>
+				<td colspan="4" style="vertical-align:middle">
+					{Наименование} 
+				</td>
+				<td style="vertical-align:middle;">
+					<div style="float:right; margin-right:10px" class="cart">
+						<span class="abasket bg-danger" data-order="{data.order.id}" data-producer="{producer}" data-article="{article}">
+							<span class="pe-7s-close-circle"></span>
+						</span>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td rowspan="3"></td>
+				<td rowspan="3" style="width:1px">
+					<a href="/catalog/{producer}/{article}">
+						<img src="/-imager/?h=90&src={Config.get(:catalog).dir}{Производитель}/{article}/&or=-imager/empty">
 					</a>
-				</div>
-			</td>
-		</tr>
-		<tr>
-			<td rowspan="3"></td>
-			<td rowspan="3" style="width:1px">
-				<a href="/catalog/{producer}/{article}">
-					<img src="/-imager/?h=90&src={Config.get(:catalog).dir}{Производитель}/{article}/&or=-imager/empty">
-				</a>
-			</td>
-			<td style="">
-				Цена:
-			</td>
-			<td></td>
-			<td style="white-space:nowrap;">
-				<span class="myprice" data-article="{article}" data-producer="{Производитель}">
-					{Цена?Цена:itemcost?:itemnocost}
-				</span>
-			</td>
-			<td style="width:100%"></td><td></td>
-		</tr>
-		<tr>
-			<td style="vertical-align:middle;">Количество:</td>
-			<td style="vertical-align:middle; padding-top:0; padding-bottom:0;"><input type="number" min="0" name="basket.{Производитель} {article}.count"></td>
-			<td style="white-space:nowrap; vertical-align:middle">
-				<span class="sum" data-article="{article}" data-producer="{Производитель}"></span>
-			</td>	
-		</tr>
-		<tr>
-			<td colspan="4" style="height:100%"></td>
-		</tr>
+				</td>
+				<td style="">
+					Цена:
+				</td>
+				<td></td>
+				<td style="white-space:nowrap;">
+					<span class="myprice" data-article="{article}" data-producer="{Производитель}">
+						{Цена?Цена:itemcost?:itemnocost}
+					</span>
+				</td>
+				<td style="width:100%"></td><td></td>
+			</tr>
+			<tr>
+				<td style="vertical-align:middle;">Количество:</td>
+				<td style="vertical-align:middle; padding-top:0; padding-bottom:0;"><input type="number" min="0" name="basket.{Производитель} {article}.count"></td>
+				<td style="white-space:nowrap; vertical-align:middle">
+					<span class="sum" data-article="{article}" data-producer="{Производитель}"></span>
+				</td>	
+			</tr>
+			<tr>
+				<td colspan="4" style="height:100%"></td>
+			</tr>
 {cartmsg:}<p>Корзина пустая. Добавьте в корзину интересующие позиции.
 		
 		</p>
@@ -208,10 +188,14 @@
 		В <a href="/cart/order">корзине</a>
 		<!--<span class="bold_basket">{data.allcount}</span> {~words(data.allcount,:позиция,:позиции,:позиций)}<br> Сумма <span class="bold_basket">{~cost(data.allsum)} руб.</span>-->
 	</div>
+{RBREAD:}
+	<ul class="breadcrumb cart">
+		{data.email?:breaduser?:breadguest}
+		<span onclick="Cart.refresh(this)" class="btn btn-default btn-xs pull-right"><span class="pe-7s-refresh"></span></span>
+	</ul>
 	{breaduser:}
+		<li><a href="/user">{data.email|:Профиль}</a></li>
 		<li><a href="/cart/orders/my/list">Корзина</a></li>
-		<li><a href="/cart/orders">Все заявки</a></li>
-		<span class="btn btn-default btn-xs pull-right"><span class="pe-7s-refresh"></span></span>
 	{breadguest:}
 		<li><a href="/user/signin">Вход</a></li>
 		<li><a href="/user/signup">Регистрация</a></li>
@@ -220,10 +204,10 @@
 	<ol class="breadcrumb">
 		<li><a href="/">Главная</a></li>
 		<li><a href="/catalog">Каталог</a></li>
-		<li><a class="text text-warning" href="/user">{data.email|:Профиль}</a></li>
-		
-		<li class="active">Сообщения <span class="label label-info">42</span></li>
-		{data.email?:breaduser?:breadguest}
+		<li class="active">Сообщения</li>
+		<li><a href="/cart/orders">Мои заявки</a></li>
+		<li><a href="/cart/orders/my">Заявка Активая</a></li>
+		<li><a href="/cart/orders/my/list">Корзина</a></li>
 	</ol>
 	<h1>Сообщения</h1>
 	{data.email?:account?:noaccount}
@@ -232,7 +216,7 @@
 	
 	
 	<p>
-		В <a onclick="Cart.goTop();" href="/cart/list">корзине</a> {data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)}.
+		В <a onclick="Cart.goTop();" href="/cart/orders/my/list">корзине</a> {data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)}.
 	</p>
 	
 	{data.admin?:adminControl?(data.manager?:youAreManager)}
@@ -292,45 +276,6 @@
 			</script>
 		{allertForAdmin:}
 			<div class="mesage">Необходимо <a onclick="Cart.goTop()" href="/cart/signup">зарегистрироваться</a>, чтобы получить права менеджера</div>
-{CARTMENU:}
-	<style scoped>
-		table.userMenu td {
-			text-align: center;
-			vertical-align: middle;
-			padding:10px; 
-		}
-		table.userMenu {
-			margin-top:25px;
-			width:100%;
-			border-top:3px solid #ccc;
-		}
-		table.userMenu {
-			background-color: #f0f0f0;
-		}
-		table.userMenu .active {
-			font-weight:bold;
-		}
-	</style>
-	<script>
-		domready( function () {
-			Event.one('Controller.onshow', function () {
-				Cart.init();
-			});
-		});
-	</script>
-	<table class="userMenu table">
-	 	<tr>
-	 		<td class="info"><a class="{state.child??:active}" onclick="Cart.goTop()" href="/cart">Личный кабинет</a></td>
-	 		<td class="info"><a class="{state.child.name=:cart?:active}" onclick="Cart.goTop()" href="/cart/order">Корзина</a></td>
-	 		<td class="info"><a class="{state.child.name=:orders?:active}" onclick="Cart.goTop()" href="/cart/orders">Мои заявки</a></td>
-	 		{data.email?:signed?:unsigned}
-	 	</tr>
-	</table>
-	<!--
-	<h2 style="color:red;">Тестовая версия личного кабинет</h2>
-	<p>Оплата картой и оформление заявки тестируется. Для подтверждения заказа необходимо звонить по телефону 8482 51-75-70</p>
-	<hr>
-	-->	
 {signed:}
 	
 	{data.manager?:youAreManager}
@@ -363,46 +308,22 @@
 
 {ORDERS:}
 	<ol class="breadcrumb">
+		<li><a href="/">Главная</a></li>
 		<li><a href="/catalog">Каталог</a></li>
-		<li><a href="/user">{data.email|:Профиль}</a></li>
 		
-		<li><a href="/cart">Сообщения <span class="label label-default">42</span></a></li>
-		<li class="active">Мои заявки <span class="label label-info">2</span></li>
+		<li><a href="/cart">Сообщения</a></li>
+		<li class="active">Мои заявки</li>
+		<li><a href="/cart/orders/my">Заявка Активная</a></li>
+		<li><a href="/cart/orders/my/list">Корзина</a></li>
 	</ol>
-	{:header}
-	{data?:ordersList?:noOrders}
-{header:}
-	<style scoped>
-		.a.pay > a {
-			color: inherit;
-			text-decoration: none;
-		}
-		.a.pay > a:hover {
-			color: inherit;
-			text-decoration: none;
-		}
-		.delivery, .legal{
-			display:none;
-		}
-		.ordersList td {
-			text-align: center;
-			vertical-align: middle;
-		}
-		table.common.ordersList th.com {
-			text-align: center;
-			vertical-align: top;
-			border-bottom: 1px solid #ccc;
-			border-left: 1px solid #ccc;
-		}
-		table.common.ordersList th.com.first {
-			border-left: none;
-		}
-		#content > form#adminForm {
-			margin: 20px 0;
-		}
-	</style>
-{ordersList:}
 	<h1>Мои заявки</h1>
+	{~length(data.orders)?:ordersList?:noOrders}
+	{noOrders:} <div>В данный момент у вас нет сохранённых заявок с товарами.</div>
+	<div style="margin-top:10px">
+		<a onclick="Cart.goTop();" href="/cart/orders/my" style="text-decoration:none" class="btn btn-success">Активная заявка ({data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)})</a>
+	</div>
+{ordersList:}
+	
 	<!--<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>-->
 	<table class="ordersList table table-striped">
 		<thead>
@@ -415,13 +336,10 @@
 		</tr>
 		</thead>
 		<tbody>
-			{data.list::rowOrders}
+			{data.orders::rowOrders}
 		</tbody>
 	</table>
-	<div style="margin-top:10px">
-		<a onclick="Cart.goTop();" href="/cart/orders/my" style="text-decoration:none" class="btn btn-success">Активная заявка ({data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)})</a>
-	</div>
-	{noOrders:} <div>В данный момент у вас нет заявок с товарами.</div>
+	
 	{rowOrders:}
 		<tr>
 			<td>
@@ -439,7 +357,7 @@
 			<td>{~date(:j F H:i,time)}</td>
 		</tr>
 	{dateform:}d.m.Y
-	{product:} <nobr>{count} <a href="?Каталог/{Производитель}/{article}">{Артикул}</a>{~last()|:comma}</nobr>
+	{product:} <nobr>{count} <a href="/catalog/{producer}/{article}">{Артикул}</a>{~last()|:comma}</nobr>
 	
 	{copyOnly:}
 		<span class="a copy" data-id="{id}">Копировать</span>
@@ -497,8 +415,7 @@
 		<script>
 			domready( function () {
 				Event.one('Controller.onshow', function () {
-					var layer = Controller.ids['{id}'];
-					var div=$('#'+layer.div);
+					var div=$('#{div}');
 					if(div.find("input[name=entity]:checked").val()!='legal'){
 						div.find('.entitylegal').hide();
 					}
@@ -529,8 +446,7 @@
 			<script>
 				domready( function () {
 					Event.one('Controller.onshow', function () {
-						var layer = Controller.ids['{id}'];
-						var div=$('#'+layer.div);
+						var div = $('#{div}');
 						if(div.find("input[name=details]:checked").val()!='allentity'){
 							div.find('.allentity').hide();
 						}
@@ -557,8 +473,7 @@
 			<script>
 				domready( function () {
 					Event.one('Controller.onshow', function () {
-						var layer = Controller.ids['{id}'];
-						var div=$('#'+layer.div);
+						var div=$('#{div}');
 						if(div.find("input[name=details]:checked").val()!='here'){
 							div.find('.detailshere').hide();
 						}
@@ -635,8 +550,7 @@
 		<script>
 			domready( function () {
 				Event.one('Controller.onshow', function () {
-					var layer = Controller.ids['{id}'];
-					var div=$('#'+layer.div);
+					var div = $('#{div}');
 					if(div.find("input[name=delivery]:checked").val()!='delivery'){
 						div.find('.delivery').hide();
 					}
@@ -655,18 +569,17 @@
 			<input {rule.edit[place]|:disabled} type="text" name="addresdelivery" value="{addresdelivery}" class="form-control" placeholder="Адрес доставки">
 		</div>
 	</div>
-{ORDERPAGE:}
+{ORDER:}
 	<ol class="breadcrumb">
+		<li><a href="/">Главная</a></li>
 		<li><a href="/catalog">Каталог</a></li>
-		<li><a href="/user">{data.email|:Профиль}</a></li>
-		
-		<li><a href="/cart">Сообщения <span class="label label-default">42</span></a></li>
-		<li><a href="/cart/orders">Мои заявки <span class="label label-info">2</span></a></li>
-		<li class="active">Заявка SDF87-2342</li>
-		<li><a href="/cart/orders/my/list">Корзина</a> <span class="label label-default">2</span></li>
+		<li><a href="/cart">Сообщения</a></li>
+		<li><a href="/cart/orders">Мои заявки</a></li>
+		<li class="active">Заявка {crumb.name=:my?:Активная?crumb.name}</li>
+		<li><a href="/{crumb}/list">Корзина</a></li>
 	</ol>
-	{:header}
 	{data.result?data:orderPageContent?:message}
+
 	{message:}
 		<h1>{data.id}</h1>
 		<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>
@@ -681,26 +594,26 @@
 		
 		<div class="alert alert-info" role="alert"><h3 style="margin-top:0">Сообщение менеджера</h3>{manage.comment}</div>
 	{orderPageContent:}
-		<h1>{rule.title}</h1>
-		{data.id?:ordernum}
+		<h1>{order.rule.title}</h1>
+		{order.id?order:ordernum}
 		{manage.comment?:manage}
 		<form>
 			<div class="cartcontacts">
-				{:orderfields}
+				{order:orderfields}
 				<div>
 					<strong>Сообщение для менеджера</strong>
-					<textarea {rule.edit[place]|:disabled} name="comment" class="form-control" rows="4">{comment}</textarea>
+					<textarea {order.rule.edit[place]|:disabled} name="comment" class="form-control" rows="4">{comment}</textarea>
 				</div>
 			</div>
 			<div class="answer"><b class="alert">{config.ans.msg}</b></div>
 			<script>
-				domready(function(){
+				domready ( function () {
 					Event.one('Controller.oncheck', function () {
-						var layer = Controller.ids["{id}"];
+						var layer = Controller.ids["{..id}"];
 						Event.one('Layer.onshow', function () {
 							var div=$('#'+layer.div);
-							var id="{state.name}";
-							if (id=='my') id=null;
+							var id="{crumb.name}";
+							if (id == 'my') id = null;
 							var order = Cart.getGoodOrder(id);
 							var place = div.find('.myactions').data('place');
 						}, '', layer);
@@ -709,16 +622,16 @@
 			</script>
 		</form>
 		
-		{~length(basket)?:tableWidthProduct?:noProducts}
-		<div style="margin-bottom:10px">Итого: <span class="cartsum">{~sum(total,manage.deliverycost|:0):itemcost}</span></div>
-		<h3>{rule.title}</h3>
-		{data.id?:ordernum}
+		{~length(order.basket)?order:tableWidthProduct?order:noProducts}
+		<div style="margin-bottom:10px">Итого: <span class="cartsum">{~sum(order.total,order.manage.deliverycost|:0):itemcost}</span></div>
+		<h3>{order.rule.title}</h3>
+		{data.order.id?order:ordernum}
 		<div class="myactions" data-place="orders">
-			{rule.user:myactions}
+			{order.rule.user:myactions}
 		</div>
 		
 	{myactions:}
-		<div style="margin:20px 0;">
+		<div style="margin:20px 0;" class="cart">
 			<div class="btn-toolbar dropup" role="toolbar">
 				<div class="btn-group">
 					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -729,100 +642,47 @@
 					</ul>
 				</div>
 				{buttons::mybtns}
-				
 			</div>
+			<script>
+				domready( function () {
+					Event.one('Controller.onshow', function () {
+						Cart.init();
+					});
+				});
+			</script>
 		</div>
 		{mybtns:}
 			<div class="btn-group">
-				<a data-id="{data.id}" class="act-{act} btn btn-{cls}"
-					{link?:actlink?:actact} style="text-decoration:none">
+				<a class="act-{act} btn btn-{cls}" data-id="{data.id}" data-crumb="false" onclick="return false"
+					href="{link?:link?:actact}" style="text-decoration:none">
 					{title}
 				</a>
 			</div>
 		{actprint:}
 			<li>
-				<a onclick="return false" class="act-{act}" style="text-decoration:none" {link?:actlink?:actact}>
+				<a class="act-{act}" style="text-decoration:none"  data-id="{data.id}" 
+					data-crumb="false" onclick="return false" href="{link?link?:actact}">
 					{title}
 				</a>
 			</li>
-			{actlink:}href="{link}" data-id="{data.id}" onclick="return false"
-			{actact:}data-id="{data.id}" href="?{state}" onclick="return false"
+			{actact:}/{crumb}
 	{b:}<b>
 	{/b:}</b>
 	{noProducts:}
 		<h3>В заявке нет товаров.</h3>
-	{copyOnly2:}
-	<!--	<span class="a copy" data-id="{id}" data-orderPage="1">Копировать</span>-->
-
-	{copyWithCancel2:}
-	<!--	<span class="a copy" data-id="{id}" data-orderPage="1">Копировать</span><br>
-		<span class="a refunds" data-id="{id}">Отменить</span>-->
-
-	{readyPack2:} 
-		<!--<div style="margin-bottom:10px">
-			<span data-id="{id}" data-orderPage="1" class="paycard btn btn-success">
-				Перейти к оплате
-			</span>
-			<span data-id="{id}" data-orderPage="1" class="active btn btn-primary">
-				сделать активной
-			</span>
-		</div>
-		<span class="a copy" data-id="{id}" data-orderPage="1">копировать</span><br>
-		<span class="a remove" data-id="{id}">удалить</span>-->
-	{savedPack2:}
-		<!--<span class="a check" data-id="{id}" data-orderPage="1">на проверку</span><br>
-		<span class="a active" data-id="{id}" data-orderPage="1">сделать активной</span><br>
-		<span class="a copy" data-id="{id}" data-orderPage="1">копировать</span><br>
-		<span class="a remove" data-id="{id}">удалить</span>-->
-
-	{activePack2:}
-		<!--<div class="btn-toolbar" role="toolbar">
-			<div class="btn-group pull-right">
-				<span data-id="{id}" data-orderPage="1" class="check btn btn-success">
-					Отправить заявку на проверку
-				</span>
-			</div>
-			<div class="btn-group pull-left">
-				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-					Доступные действия <span class="caret"></span>
-				</button>
-				<ul class="dropdown-menu pull-left" role="menu">
-					<li>
-						<a class="check" data-id="{id}" data-orderPage="1" href="?{state}"
-							onclick="return false" style="text-decoration:none">
-							<b>Отправить заявку на проверку</b>
-						</a>
-					</li>
-					<li class="divider"></li>
-					
-					<li>
-						<a href="/cart/cart"
-							onclick="Cart.goTop()" style="text-decoration:none">
-							Редактировать товары в заявке
-						</a>
-					</li>
-					
-					<li>
-						<a class="save" data-id="{id}" data-orderPage="1" href="?{state}"
-							onclick="return false" style="text-decoration:none">
-							Перенести заявку в сохранённые
-						</a>
-					</li>
-					<li>
-						<a class="clear" data-id="{id}" href="?{state}"
-							onclick="return false" style="text-decoration:none">
-							Очистить все товары из заявки
-						</a>
-					</li>
-				</ul>
-			</div>
-		</div>-->
-		
-
-
 {dateFormat:}d.m.Y h:i:s
-
 {tableWidthProduct:}
+	<table class="table table-striped">
+		<tr>
+			<th>Позиция</th>
+			<th><span class="bg-info">Цена</span></th>
+			<th>Количество</th>
+			<th>Сумма</th>
+		</tr>
+		{basket::positionRow}
+		<tr><th colspan="3"><a href="/{crumb}/list">Редактировать корзину</a></td><td>{sum:itemcost}</td></tr>
+	</table>
+{tableWidthProductopt:}
 	<table class="table table-striped">
 		<tr>
 			<th>Позиция</th>
@@ -839,7 +699,7 @@
 	
 	{positionRow:}
 		<tr>
-			<td><a href="?Каталог/{Производитель}/{article}">{Производитель} {article}</a>{change?:star}</td>
+			<td><a href="/catalog/{producer}/{article}">{Производитель} {Артикул}</a>{change?:star}</td>
 			<td>{cost:itemcost}</td>
 			<td>{count}</td>
 			<td>{sum:itemcost}</td>
@@ -857,7 +717,6 @@
 
 
 {adm_root:}
-	{:header}
 	{data.result?:adm_listPage?:adm_message}
 {adm_listPage:}
 	<h1>Список заявок <button type="button" class="btn btn-default pull-right" onclick="Cart.refresh()"><span class="glyphicon glyphicon-refresh"></span></button></h1>
@@ -915,11 +774,10 @@
 				{~date(:d.m.Y H:i,time)}
 			</td>
 		</tr>
-		{adm_product:} <nobr>{count} <a href="?Каталог/{Производитель}/{article}">{Артикул}</a>{~last()|:comma}</nobr>
+		{adm_product:} <nobr>{count} <a href="/catalog/{producer}/{article}">{Артикул}</a>{~last()|:comma}</nobr>
 
 {adm_paidorder:}<b>{~cost(manage.paid)} руб.</b> {manage.paidtype=:bank?:банк?:менеджер} {~date(:d.m.Y H:i,manage.paidtime)}
 {adm_orderPage:}
-	{:header}
 	{data.result?data:adm_orderPageContent?:adm_message}
 
 	
@@ -929,7 +787,7 @@
 {freezemsg:}<br>Цены зафиксированы {~date(manage.freeze)}
 {adm_orderPageContent:}
 	<h1>{rule.title}</h1>
-	{data.id?:ordernum}
+	{data.id?order:ordernum}
 	<form action="/-cart/orderscontrol.php?save=1" id="adminForm" method="post">
 		<div class="disabled">
 			<div class="cartcontacts">
@@ -954,7 +812,7 @@
 		</div>
 	</form>
 	<h3>{rule.title}</h3>
-	{data.id?:ordernum}
+	{data.id?order:ordernum}
 	{data.rule.freeze?:freezemsg}
 	<div class="checkbox">
 		<label>
@@ -1044,5 +902,5 @@
 {comma:},
 {itemcost:}{~cost(.)}&nbsp;<small>руб.</small>
 {star:}*
-{ordernum:}Номер заявки: <b>{data.id}</b>{manage.paid?:msgpaidorder}
+{ordernum:}Номер заявки: <b>{id}</b>{manage.paid?:msgpaidorder}
 	{msgpaidorder:}. Оплата <b>{~cost(manage.paid)} руб.</b> отметка {manage.paidtype=:bank?:банка?:менеджера} {~date(:d.m.Y H:i,manage.paidtime)}

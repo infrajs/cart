@@ -14,30 +14,30 @@
 			"json":"-cart/?type=orders",
 			"global":["order", "cat_basket"],
 			"child":{
-				"jsontpl":"-cart/?type=orders&id={state.name=:my|state.name}&place=orders",
+				"jsontpl":"-cart/?type=order&id={crumb.name=:my|crumb.name}&place=orders",
 				"id":"order",
-				"autosavenametpl":"{state.name=:my?:user?:userelse}{userelse:}orders{state.name}",
+				"autosavenametpl":"{crumb.name=:my?:user?:userelse}{userelse:}orders{crumb.name}",
 				"tpl":"-cart/cart.tpl",
 				"global":["order", "cat_basket"],
-				"tplroot":"ORDERPAGE",
+				"tplroot":"ORDER",
 				"onsubmit":true,
 				"childs":{
 					"list":{
 						"tpl":"-cart/cart.tpl",
 						"tplroot":"LIST",
 						"global":["sign", "cat_basket"],
-						"json":"-cart/?type=list",
+						"jsontpl":"-cart/?type=list&id={crumb.parent.name}",
 						"onsubmit":true,
 						"autosavename":"user"
 					},
 					"paycard":{
-						"jsontpl":"-cart/paycard.php?id={state.parent.name}&action=paycard",
+						"jsontpl":"-cart/paycard.php?id={crumb.parent.name}&action=paycard",
 						"tplroot":"paycard",
 						"tpl":"-cart/paycard.tpl",
 						"global":["cat_basket","order"]
 					},
 					"refunds":{
-						"jsontpl":"-cart/paycard.php?id={state.parent.name}&action=refunds",
+						"jsontpl":"-cart/paycard.php?id={crumb.parent.name}&action=refunds",
 						"tplroot":"refunds",
 						"tpl":"-cart/paycard.tpl",
 						"global":["cat_basket","order"]
@@ -51,8 +51,8 @@
 			"tplroot":"adm_root",
 			"global":"order",
 			"child":{
-				"jsontpl":"-cart/order.php?id={state.name}&place=admin",
-				"autosavenametpl":"admin{state.name}",
+				"jsontpl":"-cart/order.php?id={crumb.name}&place=admin",
+				"autosavenametpl":"admin{crumb.name}",
 				"tpl":"-cart/orders.tpl",
 				"global":"order",
 				"onsubmit":true,
