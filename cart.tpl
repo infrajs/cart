@@ -628,13 +628,13 @@
 	{orderPageContent:}
 		<h1>{order.rule.title}</h1>
 		{order.id?order:ordernum}
-		{manage.comment?:manage}
+		{order.manage.comment?order:manage}
 		<form>
 			<div class="cartcontacts">
 				{order:orderfields}
 				<div>
 					<strong>Сообщение для менеджера</strong>
-					<textarea {order.rule.edit[place]|:disabled} name="comment" class="form-control" rows="4">{comment}</textarea>
+					<textarea {order.rule.edit[place]|:disabled} name="comment" class="form-control" rows="4">{order.comment}</textarea>
 				</div>
 			</div>
 			<div class="answer"><b class="alert">{config.ans.msg}</b></div>
@@ -838,8 +838,7 @@
 
 				<label>Цена со скидкой<br> 
 				<input name="manage.summary" value="{manage.summary}" type="text"></label><br />
-				<label>Цена доставки <br> 
-				<input name="manage.deliverycost" value="{manage.deliverycost}" type="text"></label><br />
+				{~conf.cart.delivery?:mngdelivery}
 				<label>Сообщение для клиента</label><br>
 				<textarea name="manage.comment" class="form-control" rows="4">{manage.comment}</textarea>
 				<div class="answer"><b class="alert">{config.ans.msg}</b></div>
@@ -930,6 +929,8 @@
 				});
 			});
 		</script>
+	{mngdelivery:}<label>Цена доставки <br> 
+				<input name="manage.deliverycost" value="{manage.deliverycost}" type="text"></label><br />
 	{freezemsg:}<br>Цены зафиксированы {~date(manage.freeze)}
 	{adm_orderinfo:}
 		<div>

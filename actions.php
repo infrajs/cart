@@ -51,7 +51,6 @@ if (!Cart::canI($id, $action)) return Ans::err($ans, 'У вас нет дост�
 $order = Cart::loadOrder($id);
 if (!$order) return Ans::err($ans, 'Заявка {id} не найдена');
 $status = $order['status'];
-
 //На проверку может отправить и менеджер и пользователь, менедежр не может активную отправить на проверку
 //Если в текущем статусе были разрешены изменения, значит нужно проверить введёные данные
 //Если изменения не разрешены, значит нужно чтобы они не применялись из сессии
@@ -59,12 +58,15 @@ $status = $order['status'];
 //Изменять статус можно и без строкой проверки данных, сохранить можно любые данные? Это касается только saved
 
 
-if (Session::get('safe.manager') || $order['rule']['edit'][$place]) { //Place - orders admin wholesale
+$rule = Cart::getRule($order);
+
+
+if (Session::get('safe.manager') || $rule['edit'][$place]) { //Place - orders admin wholesale
 	Cart::mergeOrder($order, $place);
 }
 
-
-if ($act['checkdata'] && $ogood['rule']['edit'][$place]) {
+$ans['order'] = $order;
+if ($act['checkdata'] && $rule['edit'][$place]) {
 	$msg = User::checkReg($order['email']);
 	if (is_string($msg)) return Ans::err($ans,$msg);
 	//Действие требует проверку данных и текущий стату заявки разрешает редактирование, соответственно можно применит ьданные
@@ -72,25 +74,26 @@ if ($act['checkdata'] && $ogood['rule']['edit'][$place]) {
 	$page = '';
 	if (!User::checkData($order['phone'],'value')) return Ans::err($ans, 'Укажите корректный телефон'.$page);
 	if (!User::checkData($order['name'],'value')) return Ans::err($ans, 'Укажите корректное имя контактного лица'.$page);
-	if (!User::checkData($order['entity'],'radio')) return Ans::err($ans, 'Укажите кто будет оплачивать'.$page);
-	if (!User::checkData($order['paymenttype'],'radio')) return Ans::err($ans, 'Укажите способ оплаты'.$page);
-	if (!User::checkData($order['delivery'],'radio')) return Ans::err($ans, 'Укажите способ доставки'.$page);
-	
-
-	if ($order['entity'] == 'legal') {
-		if (!User::checkData($order['details'],'radio')) return Ans::err($ans, 'Необходимо заполнить реквизиты'.$page);
-		if ($order['details'] == 'allentity') {
-			if (!User::checkData($order['allentity'],'value')) return Ans::err($ans, 'Необходимо указать реквизиты'.$page);
-		} else {
-			if (!User::checkData($order['company'],'value')) return Ans::err($ans, 'Укажите название юр.лица'.$page);
-			if (!User::checkData($order['inn'],'value')) return Ans::err($ans, 'Укажите ИНН'.$page);
-			if (!User::checkData($order['addreslegal'],'value')) return Ans::err($ans, 'Укажите адрес юр.лица'.$page);
-			if (!User::checkData($order['addrespochta'],'value')) return Ans::err($ans, 'Укажите почтовый адрес юр.лица'.$page);
+	if ($conf['pay']) {
+		if (!User::checkData($order['entity'],'radio')) return Ans::err($ans, 'Укажите кто будет оплачивать'.$page);
+		if (!User::checkData($order['paymenttype'],'radio')) return Ans::err($ans, 'Укажите способ оплаты'.$page);
+		if ($order['entity'] == 'legal') {
+			if (!User::checkData($order['details'],'radio')) return Ans::err($ans, 'Необходимо заполнить реквизиты'.$page);
+			if ($order['details'] == 'allentity') {
+				if (!User::checkData($order['allentity'],'value')) return Ans::err($ans, 'Необходимо указать реквизиты'.$page);
+			} else {
+				if (!User::checkData($order['company'],'value')) return Ans::err($ans, 'Укажите название юр.лица'.$page);
+				if (!User::checkData($order['inn'],'value')) return Ans::err($ans, 'Укажите ИНН'.$page);
+				if (!User::checkData($order['addreslegal'],'value')) return Ans::err($ans, 'Укажите адрес юр.лица'.$page);
+				if (!User::checkData($order['addrespochta'],'value')) return Ans::err($ans, 'Укажите почтовый адрес юр.лица'.$page);
+			}
 		}
 	}
-
-	if ($order['delivery'] == 'delivery') {
-		if (!User::checkData($order['addresdelivery'],'value')) return Ans::err($ans, 'Укажите адрес доставки'.$page);
+	if ($conf['delivery']) {
+		if (!User::checkData($order['delivery'],'radio')) return Ans::err($ans, 'Укажите способ доставки'.$page);
+		if ($order['delivery'] == 'delivery') {
+			if (!User::checkData($order['addresdelivery'],'value')) return Ans::err($ans, 'Укажите адрес доставки'.$page);
+		}
 	}
 }
 
@@ -121,9 +124,9 @@ if ($action == 'saved') {
 } else if($action == 'sync') {
 	$msg = Cart::sync($place, $orderid);
 } else if ($action == 'setPaid') {//Обновить данные из каталога
-
+	$ogood = Cart::getGoodOrder($orderid);
 	if ($order['manage']['paid']) return Ans::err($ans, 'По заявке {id} уже есть отметка об оплате {paid}');
-	$order['manage']['paid']=$ogood['alltotal'];
+	$order['manage']['paid'] = $ogood['alltotal'];
 	$order['manage']['paidtime']=time();
 	$order['manage']['paidtype']='manager';
 	Cart::saveOrder($order, $place);
