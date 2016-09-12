@@ -17,12 +17,13 @@ if (!is_file('vendor/autoload.php')) {
 }
 Nostore::on();
 $ans = array();
-$type = Ans::REQ('type', [false, 'sync', 'orders','order','list','cart','user','admin']);
+$type = Ans::REQ('type', ['sync', 'orders','order','list','cart','user','admin']);
 if (!$type) return Ans::err($ans, 'Указан неправильный параметр type');
 $place = Ans::REQ('place',['orders', 'admin'], 'orders');
 $ans['place'] = $place;
 $ans['type'] = $type;
 $orderid = Ans::REQ('id');
+if ($orderid == 'my') $orderid = '';
 
 
 if (!Cart::canI($orderid)) return Ans::err($ans,'Действие не разрешено!');
