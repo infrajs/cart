@@ -19,13 +19,17 @@ if (!is_file('vendor/autoload.php')) {
 
 $ans = array();
 $id = Ans::REQ('id','int');
-$ans['id'] = $id;
+$orderid = $id;
+//$ans['id'] = $id;
 
 $rules = Load::loadJSON('-cart/rules.json');
 $allactions = array_keys($rules['actions']);
-$action = Ans::REQ('action', $allactions);
-$ans['action'] = $action;
+$action = Ans::REQ('type', $allactions);
 if (!$action) return Ans::err($ans, 'Указан незарегистрированный Action');
+
+$ans['action'] = $action;
+$act = $rules['actions'][$action];
+
 $place = Ans::REQ('place');
 $ans['place'] = $place;
 $conf = Config::get('cart');
@@ -39,15 +43,12 @@ if ($action == 'wholesaleDelete') {
 	return Ans::ret($ans);
 }
 
-$order = Cart::loadOrder($id);
-if (Session::get('safe.manager') || $order['rule']['edit']['orders']) { //Place - orders admin wholesale
-	Cart::mergeOrder($order, $place);
-}
+
 //Заявка принадлежит тому человеку, который первым изменил её статус с активного на какой-то
 //Передать заявку может и можно, но сумма по заявке будет всегда принадлежать первому человеку
 
 if (!Cart::canI($id, $action)) return Ans::err($ans, 'У вас нет доступа на совершение действия '.$action.' с заявкой {id}!');
-
+$order = Cart::loadOrder($id);
 if (!$order) return Ans::err($ans, 'Заявка {id} не найдена');
 $status = $order['status'];
 
@@ -58,13 +59,15 @@ $status = $order['status'];
 //Изменять статус можно и без строкой проверки данных, сохранить можно любые данные? Это касается только saved
 
 
-if (!in_array($action, array('realdel', 'clear'))) {
-	$msg = User::checkReg($order['email']);
-	if (is_string($msg)) return Ans::err($ans,$msg);
+if (Session::get('safe.manager') || $order['rule']['edit'][$place]) { //Place - orders admin wholesale
+	Cart::mergeOrder($order, $place);
 }
 
-$ogood = Cart::getGoodOrder($id);
-if (!in_array($action, array('realdel','active','clear','saved','dismiss'))&&$ogood['rule']['edit'][$place]) {
+
+if ($act['checkdata'] && $ogood['rule']['edit'][$place]) {
+	$msg = User::checkReg($order['email']);
+	if (is_string($msg)) return Ans::err($ans,$msg);
+	//Действие требует проверку данных и текущий стату заявки разрешает редактирование, соответственно можно применит ьданные
 	if (!$order['basket']) return Ans::err($ans, 'Заявк пустая! Добавьте товар!');
 	$page = '';
 	if (!User::checkData($order['phone'],'value')) return Ans::err($ans, 'Укажите корректный телефон'.$page);
@@ -92,18 +95,17 @@ if (!in_array($action, array('realdel','active','clear','saved','dismiss'))&&$og
 }
 
 
-if ($action == 'saved') {
 
-	if (!$order['basket']) return Ans::err($ans, 'Заявк пустая! Добавьте товар!');
+if ($action == 'saved') {
 	$order['status'] = 'saved';
 	Cart::saveOrder($order, $place);
 	if ($status == 'active') {
-		Session::set('user.basket');//Очистили Текущую активную заявку
-		Session::set('user.id');
-		Session::set('user.fixid');
-		Session::set('user.copyid');
-		Session::set('user.time');
-		Session::set('user.manage');
+		Session::set('order.my.basket');//Очистили Текущую активную заявку
+		Session::set('order.my.id');
+		Session::set('order.my.fixid');
+		Session::set('order.my.copyid');
+		Session::set('order.my.time');
+		Session::set('order.my.manage');
 	}
 } else if ($action == 'removechanges') {
 	if ($order['status'] == 'active') return Ans::err($ans, 'У активной заявки нельзя отменить изменения');
@@ -115,44 +117,51 @@ if ($action == 'saved') {
 	Each::foro($order['basket'],function(&$pos) {
 		unset($pos['article']);//Если нет артикула данные при сохранении обновятся
 	});
-	Cart::saveOrder($order,$place);
+	Cart::saveOrder($order, $place);
+} else if($action == 'sync') {
+	$msg = Cart::sync($place, $orderid);
 } else if ($action == 'setPaid') {//Обновить данные из каталога
 
 	if ($order['manage']['paid']) return Ans::err($ans, 'По заявке {id} уже есть отметка об оплате {paid}');
 	$order['manage']['paid']=$ogood['alltotal'];
 	$order['manage']['paidtime']=time();
 	$order['manage']['paidtype']='manager';
-	Cart::saveOrder($order,$place);
+	Cart::saveOrder($order, $place);
 } else if ($action == 'savechanges') {
-	Cart::saveOrder($order,$place);//К order применились изменения и после сохранения эти изменения будут доступны другим
+	Cart::saveOrder($order, $place);//К order применились изменения и после сохранения эти изменения будут доступны другим
 } else if ($action == 'check') {
-	$order['status']='check';
-	Cart::saveOrder($order,$place);
+	$order['status'] = 'check';
+	Cart::saveOrder($order, $place);
 	if ($status == 'active') {
-		Session::set('user.basket');//Очистили заявку
-		Session::set('user.id');
-		Session::set('user.fixid');
-		Session::set('user.copyid');
-		Session::set('user.time');
-		Session::set('user.manage');
+		Session::set('order.my.basket');//Очистили заявку
+		Session::set('order.my.id');
+		Session::set('order.my.fixid');
+		Session::set('order.my.copyid');
+		Session::set('order.my.time');
+		Session::set('order.my.manage');
 	}
+} else if ($action == 'cart-edit') {
+	$prodart = Ans::REQ('prodart');
+	if (!$prodart) return Ans::err($ans, 'Требуется параметр prodart');
+	unset($order['basket'][$prodart]);
+	Cart::saveOrder($order, $place);
 } else if ($action == 'active') {
 	
 	$noworder = Cart::loadOrder();
 	if ($noworder['basket']) {
 		return Ans::err($ans,
-			'У вас уже есть <a onclick="cart.goTop(); popup.close()" href="?office/orders/my">активная непустая заявка</a>.<br>
+			'У вас уже есть <a onclick="cart.goTop(); popup.close()" href="/cart/orders/my">активная непустая заявка</a>.<br>
 			Чтобы сделать заявку активной нужно<br>
 			очистить или сохранить текущую активную заявку!');
 	}
-	$order['status']='active';
-	Cart::saveOrder($order,$place);
+	$order['status'] = 'active';
+	Cart::saveOrder($order, $place);
 } else if ($action == 'copy') {
 
 	$noworder = Cart::loadOrder();
 	if ($noworder['basket']) {
 		return Ans::err($ans,
-			'У вас уже есть <a onclick="cart.goTop(); popup.close()" href="?office/orders/my">активная непустая заявка</a>.<br>
+			'У вас уже есть <a onclick="cart.goTop(); popup.close()" href="/cart/orders/my">активная непустая заявка</a>.<br>
 			Чтобы сделать копию заявки нужно<br>
 			очистить или сохранить текущую активную заявку!');
 	}
@@ -162,13 +171,13 @@ if ($action == 'saved') {
 	unset($order['id']);
 	unset($order['manage']);
 
-	$order['status']='active';
-	Cart::saveOrder($order,$place);
+	$order['status'] = 'active';
+	Cart::saveOrder($order, $place);
 
 } else if ($action == 'realdel') {
 	
 	$myorders=Session::get('safe.orders',array());
-	infra_forr($myorders,function($id) use($order) {
+	infra_forr($myorders, function ($id) use ($order) {
 		if ($order['id'] == $id) return new infra_Fix('del',true);
 	});
 	$path = Cart::getPath($id);
@@ -179,39 +188,38 @@ if ($action == 'saved') {
 	if (!$order['basket']) return Ans::err($ans, 'Корзина уже пустая');
 	unset($order['basket']);
 	if ($order['status'] == 'active') {
-		Session::set('user.basket');
+		Session::set('order.my.basket');
 	} else {
-		Cart::saveOrder($order,$place);
+		Cart::saveOrder($order, $place);
 	} 
 
 
 } else if ($action == 'refuseable') {
-	$order['status']='refunds';
-	Cart::saveOrder($order,$place);
+	$order['status'] = 'refunds';
+	Cart::saveOrder($order, $place);
 } else if ($action == 'ready') {
-	$order['status']='ready';
-	Cart::saveOrder($order,$place);
+	$order['status'] = 'ready';
+	Cart::saveOrder($order, $place);
 } else if ($action == 'execution') {
-	$order['status']='execution';
-	Cart::saveOrder($order,$place);
+	$order['status'] = 'execution';
+	Cart::saveOrder($order, $place);
 } else if ($action == 'dismiss') {
-	$order['status']='dismiss';
-	Cart::saveOrder($order,$place);
+	$order['status'] = 'dismiss';
+	Cart::saveOrder($order, $place);
 } else if ($action == 'picked') {
-	$order['status']='picked';
-	Cart::saveOrder($order,$place);
+	$order['status'] = 'picked';
+	Cart::saveOrder($order, $place);
 } else if ($action == 'delivery') {
-	$order['status']='delivery';
-	Cart::saveOrder($order,$place);
+	$order['status'] = 'delivery';
+	Cart::saveOrder($order, $place);
 } else if ($action == 'complete') {
-	$order['status']='complete';
-	Cart::saveOrder($order,$place);
+	$order['status'] = 'complete';
+	Cart::saveOrder($order, $place);
 } else if ($action == 'editcart') {
 	if (!$id) return Ans::err($ans, 'Нельзя активную заявку сделать активной');
-	$ans=Load::loadJSON('*cart/orderActions.php?place='.$place.'&id='.$id.'&action=active');
-	if (!$ans['result']) return infra_ans($ans);
+	$ans = Load::loadJSON('-cart/action.php?place='.$place.'&id='.$id.'&type=active');
+	if (!$ans['result']) return Ans::ans($ans);
 	$order = Cart::loadOrder();//Активную заявку сделать активной нельзя... был id а тут его нет
 }
-
-return Ans::ret($order);
-?>
+$ans['order'] = $order;
+return Cart::ret($ans, $action);

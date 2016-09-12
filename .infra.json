@@ -1,8 +1,9 @@
 {
 	"pub":["opt"],
 	"opt":false,
+	"pay":false,
+	"delivery":false,
 	"external":"external",
-	"ordersdir":"~.Заявки/",
 	"js":["Cart.js","infra.js"],
 	"css":"cart.css",
 	"update":"update.php",

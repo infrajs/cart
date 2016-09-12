@@ -11,176 +11,12 @@
 			"caption":"Заявки ожидающие проверку менеджера",
 			"title":"Заявка находится на проверке",
 			"user":{
-				"buttons":{"editcart":"danger"},
-				"actions":["copy","realdel"]
+				"buttons":{"saved":"default"},
+				"actions":["sync","active"]
 			},
 			"manager":{
-				"buttons":{"dismiss":"danger","ready":"success","execution":"success"},
-				"actions":["setPaid","execution","saved","ready","dismiss","picked","complete","realdel","removechanges","savechanges","clear","refresh"]
-			}
-		},
-		"paid":{
-			"freeze":true,
-			"edit":{
-				"orders":false,
-				"admin":false
-			},
-			"notice":"success",
-			"short":"Оплачена",
-			"caption":"Оплаченные заявки",
-			"title":"Заявка оплачена",
-			"user":{
-				"actions":["copy"]
-			},
-			"manager":{
-				"buttons":{"execution":"success"},
-				"actions":["execution","picked","complete","removechanges","savechanges","clear","refresh","refuseable"]
-			}
-		},
-		"refunds":{
-			"freeze":true,
-			"edit":{
-				"orders":false,
-				"admin":false
-			},
-			"notice":"success",
-			"short":"Разрешён возврат оплаты",
-			"caption":"Разрешён возврат оплаты",
-			"title":"Разрешён возврат оплаты",
-			"user":{
-				"buttons":{
-					"refunds":"success"
-				},
-				"actions":["copy"]
-			},
-			"manager":{
-				"buttons":{"execution":"success"},
-				"actions":["execution","picked","complete","removechanges","savechanges","clear","refresh"]
-			}
-		},
-		"canceled":{
-			"freeze":true,
-			"edit":{
-				"orders":false,
-				"admin":false
-			},
-			"notice":"danger",
-			"short":"Отменена",
-			"title":"Заявка с возвратом оплаты",
-			"caption":"Заявки по которым возвращена оплата",
-			"user":{
-				"actions":["copy"]
-			}
-		},
-		"error":{
-			"freeze":true,
-			"edit":{
-				"orders":false,
-				"admin":false
-			},
-			"notice":"danger",
-			"short":"Ошибка",
-			"caption":"Заявка с ошибкой",
-			"title":"Заявки с ошибками",
-			"user":{
-				"actions":["copy"]
-			}
-		},
-		"execution":{
-			"freeze":true,
-			"edit":{
-				"orders":false,
-				"admin":true
-			},
-			"notice":"warning",
-			"short":"Исполняется",
-			"caption":"Заявки в исполнении",
-			"title":"Заявка исполняется",
-			"user":{
-				"actions":["copy"]
-			},
-			"manager":{
-				"buttons":{"picked":"success","setPaid":"default"},
-				"actions":["check","saved","ready","dismiss","picked","complete","realdel","removechanges","savechanges","clear","refresh","refuseable"]
-			}
-		},
-		"picked":{
-			"freeze":true,
-			"edit":{
-				"orders":false,
-				"admin":true
-			},
-			"notice":"success",
-			"short":"Укомплектована",
-			"caption":"Укомплектованные заявки",
-			"title":"Заявка укомплектована",
-			"user":{
-				"actions":["copy"]
-			},
-			"manager":{	
-				"buttons":{"delivery":"success","complete":"success","setPaid":"default"},
-				"actions":["delivery","complete","setPaid","check","execution","saved","ready","dismiss","picked","realdel","removechanges","savechanges","clear","refresh"]
-			}
-		},
-		"complete":{
-			"freeze":true,
-			"edit":{
-				"orders":false,
-				"admin":false
-			},
-			"notice":"success",
-			"short":"Выполнена",
-			"caption":"Выполненные",
-			"title":"Заявка выполнена",
-			"user":{
-				"actions":["copy"]
-			},
-			"manager":{
-				"buttons":{"setPaid":"default"},
-				"actions":["check","execution","saved","ready","dismiss","picked","complete","realdel","refresh"]
-			}
-		},
-		"delivery":{
-			"freeze":true,
-			"edit":{
-				"orders":false,
-				"admin":true
-			},
-			"notice":"success",
-			"short":"Доставляется",
-			"caption":"Доставляются",
-			"title":"Заявка доставляется",
-			"user":{
-				"actions":["copy"]
-			},
-			"manager":{
-				"buttons":{"complete":"success","setPaid":"default"},
-				"actions":["check","execution","saved","ready","dismiss","picked","complete","realdel","removechanges","savechanges","clear","refresh"]
-			}
-		},
-		"ready":{
-			"freeze":true,
-			"edit":{
-				"orders":false,
-				"admin":true
-			},
-			"notice":"success",
-			"short":"Готова к оплате",
-			"caption":"Заявки ожидающие оплату",
-			"title":"Заявка ожидает оплату",
-			"user":{
-				"buttons":{
-					"editcart":"default",
-					"paycard":"success"
-				},
-				"actions":["editcart","copy"]
-			},
-			"manager":{
-				"buttons":{
-					"dismiss":"danger",
-					"check":"default"
-				},
-				"actions":["check","execution","saved","ready","dismiss","picked","complete","realdel","removechanges","savechanges","clear"]
+				"buttons":{"saved":"success"},
+				"actions":["sync"]
 			}
 		},
 		"active":{
@@ -196,18 +32,14 @@
 			"title":"Активная заявка",
 			"user":{
 				"buttons":{
-					"cart":"default",
 					"check":"success"
 				},
-				"actions":["saved","clear"]
-			},
-			"manager":{
-				"actions":["realdel"]
+				"actions":["saved"]
 			}
 		},
 		"saved":{
 			"freeze":false,
-			"notice":"default",
+			"notice":"info",
 			"edit":{
 				"orders":true,
 				"admin":true
@@ -218,58 +50,32 @@
 			"title":"Сохранённая заявка",
 			"user":{
 				"buttons":{
-					"editcart":"default",
+					"active":"default",
 					"check":"success"
 				},
-				"actions":["cart-edit", "check","active","copy","clear","realdel"]
+				"actions":["sync"]
 			},
 			"manager":{
-				"actions":["check","execution","saved","ready","dismiss","picked","complete","realdel","removechanges","savechanges","clear"]
-			}
-		},
-		"dismiss":{
-			"freeze":false,
-			"notice":"danger",
-			"edit":{
-				"orders":true,
-				"admin":true
-			},
-			"short":"Отклонена",
-			"caption":"Отклонённые заявки",
-			"title":"Отклонённая заявка",
-			"user":{
-				"buttons":{"editcart":"primary","check":"success"},
-				"actions":["editcart","check","saved","clear"]
-			},
-			"manager":{
-				"buttons":{"savechanges":"success"},
-				"actions":["check","execution","saved","ready","dismiss","picked","complete","realdel","removechanges","savechanges","clear"]
+				"actions":["sync","check"]
 			}
 		}
 	},
 	"actions":{
 		"check":{
+			"checkdata":true,
 			"go":{
 				"orders":"/cart",
 				"admin":"/cart/admin"
 			},
+			"checkdata":true,
 			"title":"Отправить заявку на проверку",
 			"confirm":"Отправить заявку на проверку?",
-			"result":"Заявка отправлена на проверку менеджеру. После проверки будет отправлено письмо на {email}.",
+			"result":"Заявка отправлена на проверку менеджеру.<br>После проверки будет отправлено письмо на <b>{email}</b>.",
 			"usermail":"orderToCheck",
 			"mangmail":"AdmOrderToCheck"
 		},
-		"setPaid":{
-			"omit":"{(paymenttype=:card|manage.paid)?:yes}",
-			"go":{
-				"admin":"/cart/{place}/{id}"
-			},
-			"title":"Отметить оплату заявки",
-			"confirm":"Оплачено {~cost(total)} руб.?",
-			"result":"Оплата по заявке зафиксированна.",
-			"usermail":"setPaid"
-		},
 		"saved":{
+			"checkdata":false,
 			"go":{
 				"orders":"/cart",
 				"admin":"/cart/admin"
@@ -279,184 +85,19 @@
 			"result":"Заявка успешно сохранена!"
 		},
 		"active":{
+			"checkdata":false,
 			"go":{
 				"orders":"/cart/orders/my"
 			},
 			"title":"Сделать заявку активной",
-			"confirm":"Заявка {id} будет сделана активной.",
+			"confirm":"Заявку {id} сделать активной?",
 			"result":"Заявка {id} сделана активной."
 		},
-		"removechanges":{
-			"go":{
-				"orders":"/cart/{place}/{id}",
-				"admin":"/cart/{place}/{id}"
-			},
-			"title":"Отменить несохраённые измнения",
-			"confirm":"Оменить сделанные изменения в полях для ввода?",
-			"result":"Изменения отменены"
-		},
-		"savechanges":{
-			"go":{
-				"orders":"/cart/{place}/{id}",
-				"admin":"/cart/{place}/{id}"
-			},
-			"title":"Сохранить изменения",
-			"confirm":"Сделанные вами изменения станут доступными всем у кого есть доступ к заявке",
-			"result":"Изменения сохранены"
-		},
-		"paycard":{
-			"omit":"{paymenttype!:card?:yes}",
-			"link":"/cart/orders/{id}/paycard",
-			"title":"Перейти к оплате картой",
-			"confirm":"Перейти к оплате заявки?"
-		},
-		"cart":{
-			"link":"/cart/orders/{id|:my}/list",
-			"title":"Редактировать товары",
-			"confirm":"Перейти к корзину?"
-		},
-		"refresh":{
-			"omit":"{basket|:yes}",
-			"go":{
-				"admin":"/cart/admin/{id}"
-			},
-			"title":"Обновить данные из каталога",
-			"confirm":"Обновить данные?",
-			"result":"Данные обновлены!"
-		},
-		"refunds":{
-			"link":"/cart/orders/{id}/refunds",
-			"title":"Перейти к возврату оплаты",
-			"confirm":"Перейти к возврату оплаты?"
-		},
-		"refuseable":{
-			"omit":"{(paymenttype!:card|manage.paid)??:yes}",
-			"go":{
-				"admin":"/cart/admin"
-			},
-			"title":"Разрешить возврат оплаты",
-			"confirm":"Разрешить возврат оплаты?",
-			"result":"Разрешён возврат оплаты",
-			"usermail":"refuseable"
-		},
-		"clear":{
-			"omit":"{basket?(manage.paid?:yes)?:yes}",
-			"go":{
-				"orders":"/cart/{place}/{id}",
-				"admin":"/cart/{place}/{id}"
-			},
-			"title":"Очистить корзину в заявке",
-			"confirm":"Очистить заявку?",
-			"result":"Корзина заявки {id} очищена"
-		},
-		"realdel":{
-			"omit":"{manage.paid?:yes}",
-			"title":"Удалить заявку",
-			"go":{
-				"orders":"/cart",
-				"admin":"/cart/admin"
-			},
-			"confirm":"Удалить заявку {id}?",
-			"result":"Заявка {id} удалена"
-		},
-		"wholesaleDelete":{
-			"go":{
-				"wholesale":"/cart/wholesale"
-			},
-			"title":"Удалить запись об оптовике",
-			"confirm":"Удалить запись об оптовике?",
-			"result":"Запись об оптовике удалена!"
-		},
-		"copy":{
-			"go":{
-				"orders":"/cart"
-			},
-			"title":"Сделать копию заявки",
-			"confirm":"Копировать заявку {id}?",
-			"result":"Заявка <a onclick='cart.goTop()' href='/cart/orders/{copyid}'>{copyid}</a> скопирована в активную заявку"
-		},
-		"ready":{
-			"omit":"{paymenttype!:card?:yes}",
-			"go":{
-				"admin":"/cart/admin"
-			},
-			"title":"Заявка готова к оплате",
-			"confirm":"Заявка готова к оплате?",
-			"result":"Заявка готова к оплате.",
-			"usermail":"ready"
-		},
-		"editcart":{
-			"go":{
-				"orders":"/cart/orders/my/list"
-			},
-			"title":"Редактировать товары в заявке",
-			"confirm":"Сделать заявку активной?",
-			"result":"Заявка сделана активной, в <a onclick='cart.goTop()' href='/cart/orders/my/list'>корзине</a> возможно изменить выбранные товары."
-		},
-		"dismiss":{
-			"omit":"{manage.paid?:yes}",
-			"go":{
-				"admin":"/cart/admin"
-			},
-			"title":"Отклонить заявку",
-			"confirm":"Отклонить заявку?",
-			"result":"Заявка отклонена.",
-			"usermail":"dismiss"
-		},
-		"delivery":{
-			"omit":"{delivery!:delivery?:yes}",
-			"go":{
-				"admin":"/cart/admin"
-			},
-			"title":"Заявка доставлется",
-			"confirm":"Заявка доставляеся?",
-			"result":"Заявка доставляется.",
-			"usermail":"delivery"
-		},
-		"complete":{
-			"go":{
-				"admin":"/cart/admin"
-			},
-			"title":"Заявка выполнена",
-			"confirm":"Заявка выполнена?",
-			"result":"Заявка выполнена.",
-			"usermail":"complete"
-		},
-		"execution":{
-			"omit":"{manage.paid??(paymenttype=:card?:yes)}",
-			"go":{
-				"admin":"/cart/admin"
-			},
-			"title":"Заявка в исполнении",
-			"confirm":"Заявка исполняется?",
-			"result":"Заявка исполняется.",
-			"usermail":"execution"
-		},
-		"picked":{
-			"go":{
-				"admin":"/cart/admin"
-			},
-			"title":"Заявка укоплектована",
-			"confirm":"Заявка упомплектована?",
-			"result":"Заявка укомплектована.",
-			"usermail":"picked"
-		},
-		"bankrefunds":{
-			"title":"Отметка о возврате оплаты",
-			"result":"Действие для банка! Возврат денег.",
-			"usermail":"bankrefunds",
-			"mangmail":"AdmBankrefunds"
-		},
-		"cart-edit":{
-			"confirm":"Вы хотите внести изменения в корзину?",
-			"title":"Изменения корзины",
-			"result":"Корзина скорректирована"
-		},
-		"bankpaid":{
-			"title":"Отметка об оплате заявки",
-			"result":"Действие для банка! Заявка оплачена.",
-			"usermail":"BankPaid",
-			"mangmail":"AmdBankPaid"
+		"sync":{
+			"checkdata":false,
+			"title":"Синхронизация заявки с сервером",
+			"confirm":"Заявка {id} будет синхронизирована?.",
+			"result":"Заявка {id} синхронизирована."
 		}
 	},
 	"mails":{

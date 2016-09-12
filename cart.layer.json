@@ -4,7 +4,7 @@
 	"tpl":"-cart/cart.tpl",
 	"tplroot":"CART",
 	"json":"-cart/?type=cart",
-	"global":["sign", "cat_basket"],
+	"global":["user", "cart"],
 	"onsubmit":true,
 	"conf":"cart",
 	"childs":{
@@ -12,68 +12,48 @@
 			"tpl":"-cart/cart.tpl",
 			"tplroot":"ORDERS",
 			"json":"-cart/?type=orders",
-			"global":["order", "cat_basket"],
+			"global":["user", "cart"],
 			"child":{
-				"jsontpl":"-cart/?type=order&id={crumb.name=:my|crumb.name}&place=orders",
 				"id":"order",
-				"autosavenametpl":"{crumb.name=:my?:user?:userelse}{userelse:}orders{crumb.name}",
+				"jsontpl":"-cart/?type=order&id={crumb.name=:my|crumb.name}&place=orders",
+				"autosavenametpl":"{crumb.parent.name}.{crumb.name}",
 				"tpl":"-cart/cart.tpl",
-				"global":["order", "cat_basket"],
+				"global":["user", "cart"],
 				"tplroot":"ORDER",
 				"onsubmit":true,
 				"childs":{
 					"list":{
 						"tpl":"-cart/cart.tpl",
 						"tplroot":"LIST",
-						"global":["sign", "cat_basket"],
+						"global":["user", "cart"],
 						"jsontpl":"-cart/?type=list&id={crumb.parent.name}",
 						"onsubmit":true,
-						"autosavename":"user"
-					},
-					"paycard":{
-						"jsontpl":"-cart/paycard.php?id={crumb.parent.name}&action=paycard",
-						"tplroot":"paycard",
-						"tpl":"-cart/paycard.tpl",
-						"global":["cat_basket","order"]
-					},
-					"refunds":{
-						"jsontpl":"-cart/paycard.php?id={crumb.parent.name}&action=refunds",
-						"tplroot":"refunds",
-						"tpl":"-cart/paycard.tpl",
-						"global":["cat_basket","order"]
+						"autosavenametpl":"{crumb.parent.parent.name}.{crumb.parent.name}"
 					}
 				}
 			}
 		},
 		"admin":{
-			"tpl":"-cart/orders.tpl",
-			"json":"-cart/orderscontrol.php",
-			"tplroot":"adm_root",
+			"tpl":"-cart/cart.tpl",
+			"json":"-cart/?type=admin",
+			"tplroot":"ADMIN",
 			"global":"order",
 			"child":{
-				"jsontpl":"-cart/order.php?id={crumb.name}&place=admin",
-				"autosavenametpl":"admin{crumb.name}",
-				"tpl":"-cart/orders.tpl",
+				"jsontpl":"-cart/?type=order&id={crumb.name}&place=admin",
+				"autosavenametpl":"admin.{crumb.name}",
+				"tpl":"-cart/cart.tpl",
 				"global":"order",
 				"onsubmit":true,
-				"tplroot":"adm_orderPage"
-			}
-		},
-		"wholesale":{
-			"tpl":"-cart/wholesalecontrol.tpl",
-			"json":"-cart/wholesalecontrol.php",
-			"global":["order", "cat_basket"],
-			"onsubmit":true,
-			"autosavename":"wholesale",
-			"divs":{
-				"level":{
-					"sub":true,
-					"tpl":"-cart/wholesalecontrol.tpl",
-					"json":"-cart/wholesalecontrol.php",
-					"global":["order", "cat_basket"],
-					"autosavename":"wholesale",
-					"tplroot":"level",
-					"onsubmit":true
+				"tplroot":"ADMORDER",
+				"childs":{
+					"list":{
+						"tpl":"-cart/cart.tpl",
+						"tplroot":"LIST",
+						"global":["user", "cart"],
+						"jsontpl":"-cart/?type=list&id={crumb.parent.name}",
+						"onsubmit":true,
+						"autosavenametpl":"{crumb.parent.parent.name}.{crumb.parent.name}"
+					}
 				}
 			}
 		}

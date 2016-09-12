@@ -1,9 +1,10 @@
 Event.handler('Controller.onshow', function () {
-	var activate = function (a, id) {
-		var name = 'user.basket.'+id;
-		var r = Session.get(name);
+	var activate = function (a, prodart) {
 		var orderid = a.data('order');
-		if (r || orderid) {
+		if (!orderid) orderid = 'my';
+		var name = ['orders', orderid, 'basket', prodart];
+		var r = Session.get(name);
+		if (r || orderid != 'my') {
 			a.next().stop().slideDown();
 			a.addClass('selected');
 			a.attr('title','Удалить из корзины');
@@ -18,12 +19,13 @@ Event.handler('Controller.onshow', function () {
 		var a = $(this);
 		var prodart = a.data('producer')+' '+a.data('article');
 		var orderid = a.data('order');
+		if (!orderid) orderid = 'my';
 		Cart.toggle(orderid, prodart, function () {
-			activate(a, id);	
+			activate(a, prodart);	
 		});	
 	}).each(function(){
 		var a = $(this);
-		var id = a.data('producer')+' '+a.data('article');
-		activate(a, id)
+		var prodart = a.data('producer')+' '+a.data('article');
+		activate(a, prodart)
 	});
 });

@@ -1,0 +1,19 @@
+{
+	"crumb":"wholesale",
+	"tpl":"-cart/wholesalecontrol.tpl",
+	"json":"-cart/wholesalecontrol.php",
+	"global":["order", "cat_basket"],
+	"onsubmit":true,
+	"autosavename":"wholesale",
+	"divs":{
+		"level":{
+			"sub":true,
+			"tpl":"-cart/wholesalecontrol.tpl",
+			"json":"-cart/wholesalecontrol.php",
+			"global":["order", "cat_basket"],
+			"autosavename":"wholesale",
+			"tplroot":"level",
+			"onsubmit":true
+		}
+	}
+}

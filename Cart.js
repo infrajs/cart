@@ -7,7 +7,7 @@ window.Cart = {
 	refresh: function (el) {
 		if (el) $(el).removeClass('btn-default').addClass('btn-danger').find('span').addClass('spin');
 		setTimeout( function () {
-			Controller.global.set(['order','cat_basket','sign']);
+			Controller.global.set(['user','cart']);
 			Session.syncNow();
 			Controller.check();
 			Cart.goTop();
@@ -21,7 +21,7 @@ window.Cart = {
 		div.find("textarea").removeAttr("disabled");
 		div.find("select").removeAttr("disabled");
 	},
-	getLink: function (order,place) {
+	getLink: function (order, place) {
 		if (place =='admin') {
 			var link = '<a onclick = "Cart.goTop()" href="/cart/'+place+'/{id}">{id}</a>';
 		} else {//place =='orders'
@@ -34,6 +34,7 @@ window.Cart = {
 		link = Template.parse([link],order);
 		return link;
 	},
+
 	act: function (place, name, orderid, cb, param) {
 		if (!cb) cb = function () {};
 		var rules = Load.loadJSON('-cart/rules.json');
@@ -45,14 +46,15 @@ window.Cart = {
 			return cb({result:1});	
 		}
 		if (param) param = '&' + param;
-		var path = '/-cart/orderActions.php?id=' + orderid + '&action=' + name + '&place = ' + place + param;
+		else param = '';
+		var path = '-cart/actions.php?id=' + orderid + '&type=' + name + '&place=' + place + param;
 		Cart.getJSON(path, function (ans) {
-			Global.set(['order','cat_basket','sign']);
+			Global.set(['order','cat_basket','sign','user']);
 			Session.syncNow();
 			cb(ans);
 		});
 	},
-	action: function(name, place, orderid, cb, param) {
+	action: function(place, name, orderid, cb, param) {
 		//place - контекст в котором идёт работа
 		var rules = Load.loadJSON('-cart/rules.json');
 		var act = rules.actions[name];
@@ -61,14 +63,14 @@ window.Cart = {
 		var layer = Controller.ids['order'];
 		//if (!act.link && (!act.go || !act.go[place])) alert('Ошибка. Действие невозможно выполнить с этой странице!');
 	
-		var link = Cart.getLink(order,place);
-		var ask = Template.parse([act.confirm],order);
+		var link = Cart.getLink(order, place);
+		var ask = Template.parse([act.confirm], order);
 		ask = link+'<br>'+ask;
 		popup.confirm(ask, function () { 
-			if (!act.link) Cart.blockform(layer);
+			//if (!act.link) Cart.blockform(layer);
 			Cart.act(place, name, orderid, function (ans) {
 				Cart.goTop( function () {
-					var order = Cart.getGoodOrder(ans.id);
+					var order = Cart.getGoodOrder(ans.order.id);
 					if (order) {
 						order.place = place;
 						if (act.link) {
@@ -79,15 +81,17 @@ window.Cart = {
 							}
 							return;
 						}
-						Cart.unblockform(layer);
+						//Cart.unblockform(layer);
 						
 						if (ans.result) {
-							if(act.go && act.go[place]) Crumb.go(Template.parse([act.go[place]], order));
+							
 							if (act.result) {
 								var msg = Template.parse([act.result], order);
 								var link = Cart.getLink(order, place);
 								popup.alert(link+'<br>'+msg);
 							}
+							if(act.go && act.go[place]) Crumb.go(Template.parse([act.go[place]], order));
+							else Controller.check();
 						} else {
 							if (ans.msg) { 
 								var msg = Template.parse([ans.msg], order);
@@ -118,15 +122,15 @@ window.Cart = {
 				var place = $(this).parents('.myactions').data('place');
 				var id = $(this).data('id');
 
-				Cart.action(name, place, id);
+				Cart.action(place, name, id);
 				return false;
 			});
 		}
 	},
-	getJSON: function (src,call) {
+	getJSON: function (src, call) {
 		$.ajax({
 		  dataType: "json",
-		  url: src,
+		  url: '/'+src,
 		  async:true,
 		  success: call,
 		  error: function () {
@@ -134,97 +138,40 @@ window.Cart = {
 		  }
 		});
 	},
-	calc: function (div) {
-		var order = Cart.getGoodOrder();
-		if (!order.basket) order.basket = {};
-		var tplcost = function (val) {
-			return Template.parse('-cart/cart.tpl', val, 'itemcost')
-		}
-		var conf = Config.get('cart');
-		if (conf.opt) {
-			if (!order.merch) {
-				if (order.merchdyn) {
-					div.find('.cartinfo').html('оптовые цены');
-					div.find('.cartblockinfo').removeClass('alert-info').addClass('alert-success');
-				} else {
-					div.find('.cartinfo').html('розничные цены');
-					div.find('.cartblockinfo').removeClass('alert-success').addClass('alert-info');
-				}
-				div.find('.cartneed').html(tplcost(order.need));
-			}
-			div.find('.sum').each( function () {
-				var prodart=$(this).data('producer')+' '+$(this).data('article');
-				var pos=order.basket[prodart];
-				if (order.merchdyn) {
-					$(this).html(tplcost(pos.sumopt));
-					$(this).addClass('bg-success').removeClass('bg-info');
-				} else {
-					$(this).html(Template.parse('-cart/cart.tpl',pos,'itemcost','sumroz'));
-					$(this).addClass('bg-info').removeClass('bg-success');
-				}
-			});
-			div.find('.myprice').each( function () {
-				var prodart=$(this).data('producer')+' '+$(this).data('article');
-				var pos=order.basket[prodart];
-				if (order.merchdyn) {
-					$(this).html(Template.parse('-cart/cart.tpl',pos,'itemcost','Цена оптовая'));
-					$(this).addClass('bg-success').removeClass('bg-info');
-				} else {
-					$(this).html(Template.parse('-cart/cart.tpl',pos,'itemcost','Цена розничная'));
-					$(this).addClass('bg-info').removeClass('bg-success');
-				}
-			});
-			div.find('.cartsumroz').html(Template.parse('-cart/cart.tpl',order,'itemcost','sumroz'));
-			div.find('.cartsumopt').html(Template.parse('-cart/cart.tpl',order,'itemcost','sumopt'));
-			if (order.merchdyn) {
-				div.find('.cartsum').html(Template.parse('-cart/cart.tpl',order,'itemcost','sumopt'));
-				div.find('.cartsum').addClass('bg-success').removeClass('bg-info');
-				if (order.sumroz!=order.sumopt) {
-					div.find('.cartsumdel').html(tplcost(order.sumroz));
-				}
-			} else {
-				div.find('.cartsum').html(Template.parse('-cart/cart.tpl',order,'itemcost','sumroz'));
-				div.find('.cartsum').addClass('bg-info').removeClass('bg-success');
-				div.find('.cartsumdel').html(tplcost(''));
-			}
-		} else {
-			div.find('.sum').each( function () {
-				var prodart=$(this).data('producer')+' '+$(this).data('article');
-				var pos = order.basket[prodart];
-				$(this).html(Template.parse('-cart/cart.tpl', pos, 'itemcost', 'sumroz'));
-				$(this).addClass('bg-info').removeClass('bg-success');
-			});
-			div.find('.myprice').each( function () {
-				var prodart = $(this).data('producer')+' '+$(this).data('article');
-				var pos = order.basket[prodart];
-				$(this).html(Template.parse('-cart/cart.tpl',pos,'itemcost','Цена'));
-				$(this).addClass('bg-info').removeClass('bg-success');
-			});
-			div.find('.cartsumroz').html(Template.parse('-cart/cart.tpl', order, 'itemcost', 'sumroz'));
-			div.find('.cartsum').html(Template.parse('-cart/cart.tpl', order, 'itemcost', 'sumroz'));
-			div.find('.cartsum').addClass('bg-info').removeClass('bg-success');
-			div.find('.cartsumdel').html(tplcost(''));
-		}
-		
+	sync: function (place, orderid) {
+		//Синхронизируем сессию клиента с реальной заявкой на сервере
+		Cart.getJSON('-cart/actions.php?type=sync&id='+orderid+'&place='+place);
+	},
+	usersync: function () {
+		//Синхронизируем user с активной заявкой
+		var props = ['email','name','phone'];
+		Each.exec(props, function (prop) {
+			var userval = Session.get(['user', prop]);
+			var cartval = Session.get(['orders','my',prop]);
+			if (userval && cartval) return;
+			if (!userval && !cartval) return;
+			if (!cartval) Session.set(['orders','my',prop], userval);
+			if (!userval) Session.set(['user', prop], cartval);
+		});
 	},
 	goTop: function (cb) {
 		Ascroll.go(null, null, cb);
 	},
 	canI: function (id, action) {//action true совпадёт с любой строчкой
 		var order = Cart.getGoodOrder(id);
-		if (!order)return false;
-		if (infra.seq.get(order,['rule','user','buttons',action]))return true;
-		return infra.forr(infra.seq.get(order,['rule','user','actions']), function (r) {
+		if (!order) return false;
+		if (Sequence.get(order,['rule','user','buttons',action]))return true;
+		return infra.forr(Sequence.get(order,['rule','user','actions']), function (r) {
 			if (r['act']==action)return true;
 		});
 	},
 	getGoodOrder: function (orderid) {
 		if (!orderid) orderid = '';
 		//генерирует объект описывающий все цены... передаётся basket на случай если count актуальный именно в basket
-		var path='-cart/?type=list&id='+orderid;
+		var path='-cart/?type=order&id='+orderid;
 		Global.unload('order', path);
-		Load.unload(path);
-		Session.syncNow();
+		//Load.unload(path);
+		//Session.syncNow();
 		var order = Load.loadJSON(path);//GoodOrder серверная версия
 		if (!order.result) return false;
 		return order.order;
@@ -232,21 +179,21 @@ window.Cart = {
 	toggle: function (orderid, prodart, cb) {
 		var fn = function () {
 			if (cb) cb();
-			Global.check(['cat_basket']);
+			Global.check(['cat_basket','order','cart']);
 		}
-		if (!orderid) {
-			var name = 'user.basket.'+prodart;
-			var r = Session.get(name);
-			if (r) {
-				Session.set(name, null, true, fn);
-			} else {
-				Session.set(name, { count: 1 }, true, fn);
-			}
+		//if (orderid != 'my') {
+		var name = ['orders', orderid, 'basket', prodart];
+		var r = Session.get(name);
+		if (r) {
+			Session.set(name, null, true, fn);
 		} else {
-			var order = Cart.getGoodOrder(orderid);
-			var param = 'prodart = ' + prodart
-			Cart.action('cart-edit', 'orders', orderid, fn, param);
+			Session.set(name, { count: 1 }, true, fn);
 		}
+		/*} else {
+			var order = Cart.getGoodOrder(orderid);
+			var param = 'prodart=' + prodart
+			Cart.action('orders', 'cart-edit', orderid, fn, param);
+		}*/
 		return !r;
 	},
 	initPrice: function (div) {
@@ -254,7 +201,7 @@ window.Cart = {
 			var cart=$(this).find('.basket_img');
 
 			var id=cart.data('producer')+' '+cart.data('article');
-			if (Session.get('user.basket.'+id)) {
+			if (Session.get('order.my.basket.'+id)) {
 				$(this).find('.posbasket').show();
 				cart.addClass('basket_img_sel');
 				cart.attr('title','Удалить из корзины');
@@ -263,13 +210,13 @@ window.Cart = {
 			}
 		});
 		var callback = function () {
-			Controller.global.set('cat_basket');
+			Global.set('cart');
 			Controller.check();
 		}
 		div.find('.cat_item .basket_img').click( function () {
 			var cart=$(this);
 			var id=cart.data('producer')+' '+cart.data('article');
-			var name = 'user.basket.'+id;
+			var name = 'order.my.basket.'+id;
 			var r = Session.get(name);
 			if (r) {
 				$(this).removeClass('basket_img_over');
