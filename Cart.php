@@ -336,12 +336,11 @@ class Cart {
 		$rules = Load::loadJSON('-cart/rules.json');
 
 		$data['host'] = View::getHost();
-		$data['path'] = View::getRoot();
 		$data['link'] = Session::getLink($email);
 		$data['email'] = $email;
 		$data['user'] = Session::getUser($email);
 		$data['time'] = time();
-		$data["site"] = $data['host'].'/'.$data['path'];
+		$data["site"] = $data['host'];
 
 		$subject = Template::parse(array($rules['mails'][$mailroot]),$data);
 		$body = Template::parse('-cart/cart.mail.tpl',$data,$mailroot);
@@ -440,6 +439,7 @@ class Cart {
 	}
 	public static function ret($ans, $action) {
 		$rules = Load::loadJSON('-cart/rules.json');
+		$order = $ans['order'];
 		$rule = $rules['actions'][$action];
 		if (!Session::get('dontNofify') && $rule['usermail']) {
 			Cart::mail('user', $order['email'], $rule['usermail'], $ans['order']);
