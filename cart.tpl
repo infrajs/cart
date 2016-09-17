@@ -364,7 +364,7 @@
 				})
 			</script>
 		{allertForAdmin:}
-			<div class="mesage">Необходимо <a onclick="Cart.goTop()" href="/cart/signup">зарегистрироваться</a>, чтобы получить права менеджера</div>
+			<div class="mesage">Необходимо <a onclick="Cart.goTop()" href="/user/signup">зарегистрироваться</a>, чтобы получить права менеджера</div>
 {ORDERS:}
 	<ol class="breadcrumb">
 		<li><a href="/">Главная</a></li>

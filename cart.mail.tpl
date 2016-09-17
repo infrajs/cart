@@ -51,24 +51,6 @@
 По заявке разрешён возврат денег.
 {:links}
 
-{signup:}
-Регистрация на сайте http://{site}
-
-Логин {user.email}
-Пароль {user.password}
-Страница для входа http://{site}/user/signin
-Ссылка для быстрого входа 
-{link}&src=office
-
-{resendpass:}
-Восстановление доступа к личному кабинету на сайте http://{site}
-
-Логин {user.email}
-Пароль {user.password}
-Страница для входа http://{site}/user/signin
-Ссылка для быстрого входа 
-{link}&src=office
-
 {AdmLinks:}
 
 Заявка: http://{site}/cart/admin/{id}
