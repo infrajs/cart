@@ -1,5 +1,6 @@
 {orig::}vendor/infrajs/catalog/extend.tpl
 {pos-page:}{:orig.pos-page}
+{nds:}{:orig.nds}
 {pos-sign:}{:orig.pos-sign}
 {pos-item-css:}{:orig.pos-item-css}
 {pos-item:}{:orig.pos-item}
