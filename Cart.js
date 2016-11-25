@@ -140,7 +140,9 @@ window.Cart = {
 	},
 	sync: function (place, orderid) {
 		//Синхронизируем сессию клиента с реальной заявкой на сервере
-		Cart.getJSON('-cart/actions.php?type=sync&id='+orderid+'&place='+place);
+		Cart.getJSON('-cart/actions.php?type=sync&id='+orderid+'&place='+place, function () {
+			Global.set('cart');
+		});
 	},
 	usersync: function () {
 		//Синхронизируем user с активной заявкой

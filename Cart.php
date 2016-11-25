@@ -175,13 +175,14 @@ class Cart {
 						$pos['cost']=$pos['Цена розничная'];
 					});
 				}
+				if (!$pos['cost']) $pos['cost'] = 0;
 			} else {
 				$pos['cost'] = $pos['Цена'];
 				$order['sum'] = $order['sumroz'];
 				Each::foro($order['basket'],function(&$pos) {
-						$pos['sum']=$pos['sumroz'];
-						$pos['cost']=$pos['Цена'];
-					});
+					$pos['sum']=$pos['sumroz'];
+					$pos['cost']=$pos['Цена'];
+				});
 			}
 			$order['total']=$order['sum'];
 			if ($order['manage']['summary']) {

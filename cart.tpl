@@ -70,6 +70,7 @@
 		<script>
 
 			domready(function(){
+				
 				Once.exec('layer{id}', function () {
 					var tplcost = function (val) {
 						return Template.parse('-cart/cart.tpl', val, 'itemcost')
@@ -85,21 +86,22 @@
 						var order = Autosave.get(layer, '', { });
 						if (!order.basket) order.basket = { };
 						var conf = Config.get('cart');
-						/* if (conf.opt) {
-							if (!order.merch) {
-								if (order.merchdyn) {
+						if (conf.opt) {
+							var gorder = Cart.getGoodOrder(orderid);
+							if (!gorder.merch) {
+								if (gorder.merchdyn) {
 									div.find('.cartinfo').html('оптовые цены');
 									div.find('.cartblockinfo').removeClass('alert-info').addClass('alert-success');
 								} else {
 									div.find('.cartinfo').html('розничные цены');
 									div.find('.cartblockinfo').removeClass('alert-success').addClass('alert-info');
 								}
-								div.find('.cartneed').html(tplcost(order.need));
+								div.find('.cartneed').html(tplcost(gorder.need));
 							}
 							div.find('.sum').each( function () {
 								var prodart=$(this).data('producer')+' '+$(this).data('article');
-								var pos=order.basket[prodart];
-								if (order.merchdyn) {
+								var pos = gorder.basket[prodart];
+								if (gorder.merchdyn) {
 									$(this).html(tplcost(pos.sumopt));
 									$(this).addClass('bg-success').removeClass('bg-info');
 								} else {
@@ -107,50 +109,52 @@
 									$(this).addClass('bg-info').removeClass('bg-success');
 								}
 							});
+
 							div.find('.myprice').each( function () {
 								var prodart=$(this).data('producer')+' '+$(this).data('article');
-								var pos = $(this).data();//order.basket[prodart];
-								if (order.merchdyn) {
-									$(this).html(Template.parse('-cart/cart.tpl',pos,'itemcost','Цена оптовая'));
-									$(this).addClass('bg-success').removeClass('bg-info');
+								var pos = gorder.basket[prodart];
+								if (!pos.cost) return;
+								if (gorder.merchdyn) {
+									$(this).find('.cost').html(tplcost(pos['Цена оптовая']));
+									$(this).find('.cost').addClass('bg-success').removeClass('bg-info');
 								} else {
-									$(this).html(Template.parse('-cart/cart.tpl',pos,'itemcost','Цена розничная'));
-									$(this).addClass('bg-info').removeClass('bg-success');
+									$(this).find('.cost').html(tplcost(pos['Цена розничная']));
+									$(this).find('.cost').addClass('bg-info').removeClass('bg-success');
 								}
 							});
-							div.find('.cartsumroz').html(Template.parse('-cart/cart.tpl',order,'itemcost','sumroz'));
-							div.find('.cartsumopt').html(Template.parse('-cart/cart.tpl',order,'itemcost','sumopt'));
-							if (order.merchdyn) {
-								div.find('.cartsum').html(Template.parse('-cart/cart.tpl',order,'itemcost','sumopt'));
+							
+							div.find('.cartsumroz').html(tplcost(gorder.sumroz));
+							div.find('.cartsumopt').html(tplcost(gorder.sumopt));
+							if (gorder.merchdyn) {
+								div.find('.cartsum').html(tplcost(gorder.sumopt));
 								div.find('.cartsum').addClass('bg-success').removeClass('bg-info');
-								if (order.sumroz!=order.sumopt) {
-									div.find('.cartsumdel').html(tplcost(order.sumroz));
+								if (gorder.sumroz != gorder.sumopt) {
+									div.find('.cartsumdel').html(tplcost(gorder.sumroz));
 								}
 							} else {
-								div.find('.cartsum').html(Template.parse('-cart/cart.tpl',order,'itemcost','sumroz'));
+								div.find('.cartsum').html(tplcost(gorder.sumroz));
 								div.find('.cartsum').addClass('bg-info').removeClass('bg-success');
 								div.find('.cartsumdel').html(tplcost(''));
 							}
-						} else { */
-						var ordersumroz = 0;
-						div.find('.myprice').each( function () {
-							var pos = $(this).data();
-							var prodart = pos.producer+' '+pos.article;
-							var count = pos.count;
-							if(order.basket[prodart]) count = order.basket[prodart].count;
-							var sumroz = pos.cost * count;
-							if (!sumroz) sumroz = 0;
-							ordersumroz += sumroz;
-							$(this).find('.sum').html(tplcost(sumroz));
-							$(this).find('.sum').addClass('bg-info').removeClass('bg-success');
-							$(this).find('.cost').addClass('bg-info').removeClass('bg-success');
-						});
-
-
-						div.find('.cartsumroz').html(tplcost(ordersumroz));
-						div.find('.cartsum').html(tplcost(ordersumroz));
-						div.find('.cartsum').addClass('bg-info').removeClass('bg-success');
-						div.find('.cartsumdel').html(tplcost(''));
+						} else {
+							var ordersumroz = 0;
+							div.find('.myprice').each( function () {
+								var pos = $(this).data();
+								var prodart = pos.producer+' '+pos.article;
+								var count = pos.count;
+								if(order.basket[prodart]) count = order.basket[prodart].count;
+								var sumroz = pos.cost * count;
+								if (!sumroz) sumroz = 0;
+								ordersumroz += sumroz;
+								$(this).find('.sum').html(tplcost(sumroz));
+								$(this).find('.sum').addClass('bg-info').removeClass('bg-success');
+								$(this).find('.cost').addClass('bg-info').removeClass('bg-success');
+							});
+							div.find('.cartsumroz').html(tplcost(ordersumroz));
+							div.find('.cartsum').html(tplcost(ordersumroz));
+							div.find('.cartsum').addClass('bg-info').removeClass('bg-success');
+							div.find('.cartsumdel').html(tplcost(''));
+						}
 					}
 					Event.one('Controller.oncheck', function () {
 						var layer = Controller.ids['{id}'];
@@ -272,7 +276,7 @@
 			<a href="/catalog" style="text-decoration:none" class="btn btn-success">Открыть каталог</a>
 		</div>
 {itemcost:}{~cost(.)} <small>руб.</small>
-{itemnocost:}<a style="color:white" href="/contacts">Уточнить</a>
+{itemnocost:}<a href="/contacts">Уточнить</a>
 {basket:}
 	<div id="basket_text">
 		В <a href="/cart/order">корзине</a>

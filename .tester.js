@@ -1,21 +1,21 @@
-infra.wait(infrajs,'onshow',function(){
-	var test=infra.test;
-	test.tgo=function(title,css,src){
-		test.tasks.push([title,function(){
-			test.tgo.ses=infra.session.getId();
-			infra.when(infrajs,'onshow',function(){
+Event.one('Controller.onshow', function () {
+	var test = Tester;
+	test.tgo = function(title, css, src){
+		test.tasks.push([title, function () {
+			test.tgo.ses = Session.getId();
+			Event.onext('Controller.onshow', function () {
 				test.check();
 			});
-			$(css).filter(':first').click();
-		},function(){
+			$(css).filter(':first')[0].click();
+		}, function () {
 			test.checksrc(src);
-			if(!test.tgo.ses&&infra.session.getId())return test.err('При переходам по страницам появляется сессия');
+			if (!test.tgo.ses && Session.getId()) return test.err('При переходам по страницам появляется сессия');
 			test.ok();
 		}]);
 	}
 	test.tgoa=function(title,css,src){
 		test.tasks.push(['Переход '+title,function(){
-			infra.when(infrajs,'onshow',function(){
+			Event.onext('Controller.onshow',function(){
 				test.check();
 			});
 			$(css).filter(':first').find('a[weblife_href="?'+src+'"]').click();
@@ -24,9 +24,9 @@ infra.wait(infrajs,'onshow',function(){
 			test.ok();
 		}]);
 	}
-	test.tclick=function(title,css,check){
-		test.tasks.push([title,function(){
-			infra.when(infrajs,'onshow',function(){
+	test.tclick=function(title, css, check){
+		test.tasks.push([title, function (){
+			Event.onext('Controller.onshow',function(){
 				test.check();
 			});
 			$(css).filter(':first').click();
@@ -35,19 +35,19 @@ infra.wait(infrajs,'onshow',function(){
 		}]);
 	}
 	test.checksrc=function(src){
-		if(typeof(src)=='undefined')return;
-		if(infra.State.get()!=src)test.err('Не перешли на страницу '+src);
+		if (typeof(src)=='undefined') return;
+		if (Crumb.query != src) test.err('Не перешли на страницу '+src);
 	}
 	test.orderaction=function(action,src){
 		var rules=infra.loadJSON('-cart/rules.json');
 		var title=rules.actions[action].title;
 		test.tasks.push([title,function(){
-			infra.when(infrajs,'onshow',function(){//Окно подтверждения
-				infra.when(infrajs,'onshow',function(){//Окно подтверждения закрылось
-					infra.when(infrajs,'onshow',function(){//Переход на страницу
+			Event.onext('Controller.onshow',function(){//Окно подтверждения
+				Event.onext('Controller.onshow',function(){//Окно подтверждения закрылось
+					Event.onext('Controller.onshow',function(){//Переход на страницу
 						if(!rules.actions[action].result)return test.check();//Результат о действии не предусмотрен
-						infra.when(infrajs,'onshow',function(){//Показано окно результата
-							infra.when(infrajs,'onshow',function(){//Закрыто окно результатов
+						Event.onext('Controller.onshow',function(){//Показано окно результата
+							Event.onext('Controller.onshow',function(){//Закрыто окно результатов
 								test.check();
 							});
 							popup.close();
@@ -66,7 +66,7 @@ infra.wait(infrajs,'onshow',function(){
 	test.adminorder=function(status){
 		test.tgoa('Управление заявками','#usermenu','office/admin');
 		test.tasks.push(['Переход на первую заявку от менеджера',function(){
-			infra.when(infrajs,'onshow',function(){
+			Event.onext('Controller.onshow',function(){
 				test.check();
 			});
 
@@ -78,7 +78,7 @@ infra.wait(infrajs,'onshow',function(){
 			});
 			if(a)a.click();
 		},function(){
-			var state=infra.State.getState('').child.child;
+			var state=Crumb.getInstance('').child.child;
 			var id=infra.foro(state.obj,function(name,key){return key});
 			if(!id)return test.err('В адресной строке не появился идентификатор заявки');
 			var idonpage=$('#content > b:nth-child(4)').text();
@@ -94,16 +94,16 @@ infra.wait(infrajs,'onshow',function(){
 	test.userorder=function(status){
 		test.tgoa('Мои заявки','#usermenu','office/orders');
 		test.tasks.push(['Переход на первую заявку от пользователя',function(){
-			infra.when(infrajs,'onshow',function(){
+			Event.onext('Controller.onshow',function(){
 				test.check();
 			});
 			var tr=$('#content table.ordersList > tbody > tr:first');
 			var td=tr.find('td:nth-child(1)');
 			td.find('a').click();
 		},function(){
-			var state=infra.State.getState('').child.child;
-			var id=infra.foro(state.obj,function(name,key){return key});
-			if(!id)return test.err('В адресной строке не появился идентификатор заявки');
+			var state = Crumb.getInstance('').child.child;
+			var id = state.value;
+			if (!id) return test.err('В адресной строке не появился идентификатор заявки');
 			test.orderid=id;//Для Управления заявками чтобы нужную заявку смотреть
 			var idonpage=$('#content > b:nth-child(4)').text();
 			if(id!=idonpage)return test.err('На странице id и в адресной строке id не совпадают')
@@ -119,52 +119,52 @@ infra.wait(infrajs,'onshow',function(){
 		test.tgoa('Личный кабинет','#usermenu','office');
 		var val=is?'Да':'Нет';
 		test.tasks.push(['Устанавливаем менеджера '+val,function(){
-			infra.when(infrajs,'onshow',function(){
+			Event.onext('Controller.onshow',function(){
 				test.check();
 			});
 			$('#content form .btn').click();
 		},function(){
-			if(is&&!infra.session.get('safe.manager'))return test.err('Не стал менеджером');
-			if(!is&&infra.session.get('safe.manager'))return test.err('Стал менеджером');
+			if(is&&!Session.get('safe.manager'))return test.err('Не стал менеджером');
+			if(!is&&Session.get('safe.manager'))return test.err('Стал менеджером');
 			test.ok();
 		}]);
 	}
 	test.INITLOGIN=function(){
 		
 		//===================== шаг 1 Авторизация ===================//
-		test.tasks.push(['Инициализация',function(){
+		test.tasks.push(['Инициализация', function() {
 			console.log('INITLOGIN');
-			infra.require('-cart/cart.js');
-			infra.when(infra.State,'onchange',function(){
-				infra.session.logout();
-				infrajs.global.set(['order','cat_basket','sign']);
-				infra.when(infrajs,'onshow',function(){
+			Event.onext('Crumb.onchange', function () {
+				Session.logout();
+				Global.set(['cart','order','cat_basket','sign']);
+				Event.onext('Controller.onshow', function () {
 					test.check();
 				});
-				infrajs.check();
+				Controller.check();
 			});
-			infra.State.go('?');
-		},function(){
-			var email=$('#basket_text > span > a').text();
-			if(email!='Гость')return test.err('Когда был logout в блоке показывается какой-то email '+email);
+			Crumb.go('/');
+		}, function () {
+			var email = $('#basket_text > span > a').text();
+			if (email!='Гость') return test.err('Когда был logout в блоке показывается какой-то email '+email);
 			test.checksrc('');
-			if(infra.session.getId())return test.err('Все ещё есть авторизация');
-			if(!window.cart)return test.err('Нет объекта window.cart');
+			if (Session.getId()) return test.err('Все ещё есть авторизация');
+			if (!window.Cart) return test.err('Нет объекта window.Cart');
 			test.ok();
 		}]);
 
 		
-		test.tgo('Вход','#basket_text > span > a','office/signin')
+		test.tgo('Вход','#basket_text > span > a','user/signin')
 		
 
 
-		test.tasks.push(['Отправить форму авторизации',function(){
-			$('#sign-email').val('test@itlf.ru');
-			$('#sign-password').val('04eae403');
-			infra.when(infrajs,'onshow',function(){
+		test.tasks.push(['Отправить форму авторизации', function () {
+
+			$('#email').val('test@itlf.ru');
+			$('#password').val('04eae403');
+			Event.onext('Controller.onshow', function() {
 				test.check();
 			});
-			$('#content > form').submit();
+			$('#content form').submit();
 		},function(){
 			var msg=$('#content > form > div.alert.alert-danger').text();
 			var email=$('#basket_text > span > a').text();
@@ -174,20 +174,20 @@ infra.wait(infrajs,'onshow',function(){
 
 		test.tasks.push(['Очистить корзину',function(){
 			infra.session.set('user.basket',null,true,function(){
-				infrajs.global.set(['order','cat_basket','sign']);
-				infra.when(infrajs,'onshow',function(){
-					test.check()
+				infrajs.global.set(['cart','user','order','cat_basket','sign']);
+				Event.onext('Controller.onshow',function(){
+					test.check();
 				});
-				infra.State.go('?office/cart');
+				Crumb.go('/cart/orders/my/list');
 			});
 		},function(){
-			test.checksrc('office/cart');
-			var basket=infra.session.get('user.basket');
+			test.checksrc('cart/orders/my/list');
+			var basket=Session.get('user.basket');
 			if(basket)return test.err('Не удалось очистить корзину');
 			return test.ok();
 		}]);
 
-		test.tgo('Каталог','#nav > table > tbody > tr > td:nth-child(3) > a','Каталог/Каталог');
+		test.tgo('Каталог','#nav > table > tbody > tr > td:nth-child(3) > a','catalog');
 
 		
 		test.tasks.push([
@@ -203,11 +203,11 @@ infra.wait(infrajs,'onshow',function(){
 			}
 		]);
 
-		test.tgo('Корзина','div.cat_items td.producer > table > tbody > tr:nth-child(3) > td > div > small > a','office/cart');
+		test.tgo('Корзина','div.cat_items td.producer > table > tbody > tr:nth-child(3) > td > div > small > a','cart/orders/my/list');
 
 
 		
-		test.tgo('Активная заявка','#cart > div.usercart > div:nth-child(3) > a','office/orders/my');
+		test.tgo('Активная заявка','#cart > div.usercart > div:nth-child(3) > a','cart/orders/my');
 
 
 
@@ -218,13 +218,13 @@ infra.wait(infrajs,'onshow',function(){
 		});
 		test.tclick('Клик ОК в окне подтверждения','.modal .popup-confirm-ok',function(){
 			//сейчас onshow скрываемого окна confirm 
-			infra.when(infrajs,'onshow',function(){
+			Event.onext('Controller.onshow',function(){
 				//Пришёл ответ и запусился общий onshow
-				infra.when(infrajs,'onshow',function(){
+				Event.onext('Controller.onshow',function(){
 					//А вот это уже показалось окно результата
 					if(!popup.st)return test.err('Не открылось окно result');
 					test.checksrc('office/orders');
-					if(infra.session.get('user.basket'))return test.err('Не очистилась корзина');
+					if(Session.get('user.basket'))return test.err('Не очистилась корзина');
 					popup.close();
 					test.ok();
 				});
@@ -234,7 +234,7 @@ infra.wait(infrajs,'onshow',function(){
 		test.tasks.push([
 			'Очистить сессию',
 			function(){
-				var orders=infra.session.get('safe.orders');
+				var orders=Session.get('safe.orders');
 				var counter=0;
 				var check=function(){
 					if(counter)return;
@@ -242,7 +242,7 @@ infra.wait(infrajs,'onshow',function(){
 					infra.unload(src);
 					infra.loadJSON(src);
 					infra.session.clear(function(){
-						console.log(infra.session.get());
+						console.log(Session.get());
 						test.check();
 					});
 				};
@@ -262,8 +262,8 @@ infra.wait(infrajs,'onshow',function(){
 				});
 				check();
 			},function(){
-				if(infra.session.get('safe'))return test.err('safe остался');
-				var data=infra.session.get();
+				if(Session.get('safe'))return test.err('safe остался');
+				var data=Session.get();
 				if(infra.foro(data,function(val,name){
 					return true;
 				}))return test.err('Сессия не очистилась');
@@ -292,7 +292,7 @@ infra.wait(infrajs,'onshow',function(){
 				$('#content table:nth-child(2) > tbody > tr:nth-child(3) > td > table > tbody > tr:nth-child(2) > td:nth-child(2) > div').click();
 				test.check();
 			},function(){
-				var basket=infra.session.get('user.basket');
+				var basket=Session.get('user.basket');
 				if(infra.fora(basket,function(){return true}))return test.err('Товар есть в корзине');
 				var block=$('#content table:nth-child(2) > tbody > tr:nth-child(3) > td > table .posbasket:first');
 				if(block.css('display')=='block')return test.err('Показан блок со ссылкой в корзину');
@@ -312,7 +312,7 @@ infra.wait(infrajs,'onshow',function(){
 				return test.ok();
 			}
 		]);
-		test.tgo('Переход в корзину','#basket_text > div > a:nth-child(5)','office/cart');
+		test.tgo('Переход в корзину','#basket_text > div > a:nth-child(5)','cart/orders/my/list');
 		
 		test.tasks.push(['Устанавливаем количество 7',
 			function(){
@@ -321,13 +321,13 @@ infra.wait(infrajs,'onshow',function(){
 				});
 				$('#cart > div.usercart > table > tbody > tr:nth-child(3) > td:nth-child(2) > input[type="number"]').val(7).change();
 			},function(){
-				var basket=infra.session.get('user.basket');
+				var basket=Session.get('user.basket');
 				pos=infra.foro(basket,function(pos){return pos});
 				if(pos.count!=7)return test.err('Количество не установилось');
 				test.ok();
 			}
 		]);
-		test.tgo('Переход к активной заявке','#cart > div.usercart > div:nth-child(3) > a','office/orders/my');
+		test.tgo('Переход к активной заявке','#cart > div.usercart > div:nth-child(3) > a','cart/orders/my');
 		
 
 
@@ -344,7 +344,7 @@ infra.wait(infrajs,'onshow',function(){
 				$('textarea[name="comment"]').val('ТЕСТ').change();
 				infra.session.sync();
 			},function(){
-				var order=infra.session.get('user');
+				var order=Session.get('user');
 				if(order.name!='Антон')return test.err('name не установилось');
 				if(order.phone!='1231231231')return test.err('phone не установилось');
 				if(order.entity!='individual')return test.err('entity не установилось');
@@ -366,7 +366,7 @@ infra.wait(infrajs,'onshow',function(){
 			test.ok();
 		}]);
 		/================== Продажа одного товара. (корзина пуста, аккаунт тестовый, страница главная, сессия пустая)=======================/
-		test.tgoa('Корзина','#basket_text','office/cart');
+		test.tgoa('Корзина','#basket_text','cart/orders/my/list');
 		test.userorder('saved');
 		
 		test.orderaction('check','office');
@@ -411,9 +411,9 @@ infra.wait(infrajs,'onshow',function(){
 		},function(){
 			test.ok();
 		}]);
-		test.tgoa('Корзина','#basket_text','office/cart');
+		test.tgoa('Корзина','#basket_text','cart/orders/my/list');
 		test.userorder('saved');
-		test.orderaction('active','office/orders/my');
+		test.orderaction('active','cart/orders/my');
 
 		test.tasks.push(['Заполняем заявку',function(){
 			infra.when(infra.session,'onsync',function(){
@@ -421,7 +421,7 @@ infra.wait(infrajs,'onshow',function(){
 			});
 			$('input[name=paymenttype][value=card]').prop('checked',true).change();
 		},function(){
-			var paymenttype=infra.session.get('user.paymenttype');
+			var paymenttype=Session.get('user.paymenttype');
 			if(paymenttype!='card')return test.err('Не смогли указать тип оплаты картой');
 			test.ok();
 		}]);
@@ -434,7 +434,7 @@ infra.wait(infrajs,'onshow',function(){
 		test.tasks.push(['Проверяем страницу оплаты',function(){
 			test.check();
 		},function(){
-			var paymenttype=infra.session.get('user.paymenttype');
+			var paymenttype=Session.get('user.paymenttype');
 			if(paymenttype!='card')return test.err('Тип оплаты не указан что картой');
 			var inputnames=['AMOUNT','CURRENCY','ORDER','DESC','TERMINAL','TRTYPE','MERCH_NAME',
 			'MERCHANT','EMAIL','TIMESTAMP','NONCE','BACKREF','P_SIGN'];
@@ -451,11 +451,11 @@ infra.wait(infrajs,'onshow',function(){
 	};
 
 	test.INITLOGIN();
-	test.ADDGOOD();
-	test.ONESELL();
-	test.INITLOGIN();
-	test.ADDGOOD();
-	test.BANK();
+	//test.ADDGOOD();
+	//test.ONESELL();
+	//test.INITLOGIN();
+	//test.ADDGOOD();
+	//test.BANK();
 	test.exec();
 	//Установить что оплата картой и отправить на проверку
 });

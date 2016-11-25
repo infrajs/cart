@@ -75,6 +75,10 @@ if ($type == 'user') {
 		$order = Cart::getGoodOrder();
 		$ans['order'] = $order;
 	}
+	if (Session::getId()) {
+		$ans['user'] = User::get();
+	}
+	$ans['manager'] = Session::get('safe.manager'); 
 } else if ($type == 'admin') {
 	if (!Session::get('safe.manager')) return Ans::err($ans, 'У вас нет доступа к этому разделу. Вы не являетесь Менеджером.');
 
