@@ -53,9 +53,11 @@ class Cart {
 	}
 	public static function getByProdart($prodart) {
 		$data = Catalog::init();
-		$pos = Xlsx::runPoss($data, function ($pos) use ($prodart) {
+		$pos = Xlsx::runPoss($data, function &($pos) use ($prodart) {
+			$r = null;
 		    $realprodart=$pos['producer'].' '.$pos['article'];
 		    if ($realprodart == $prodart) return $pos;
+		    return $r;
 		});
 		return $pos;
 	}
@@ -63,7 +65,11 @@ class Cart {
 	{
 		if (is_array($id)) {
 			$order = $id;
-			$id = $order['id'];
+			if (empty($order['id'])) {
+				$id = null;
+			} else {
+				$id = $order['id'];
+			}
 		} else {
 			$order = false;
 		}
@@ -75,26 +81,38 @@ class Cart {
 			$order['id'] = $id;
 			$order['rule'] = Cart::getRule($order);
 			
+			if(empty($order['email']))$order['email'] = '';
 			$order['email'] = trim($order['email']);
 			$order['sumopt'] = 0;
 			$order['sumroz'] = 0;
 			$order['count'] = 0;
 			$num=0;
 
-			Each::foro($order['basket'],function(&$pos,$prodart) use(&$order,&$num) {
+			Each::foro($order['basket'], function &(&$pos,$prodart) use(&$order,&$num) {
+				$r = null;
 				$count=$pos['count'];//Сохранили значение из корзины
-				if ($count<1) return new infra_Fix('del');
+
+				if ($count<1) {
+					$r = new infra_Fix('del');
+					return $r;
+				}
 
 				if (!$order['rule']['freeze']) {
 					$pos=Cart::getByProdart($prodart);
-					if (!$pos) return new infra_Fix('del');
+					if (!$pos) {
+						$r = new infra_Fix('del');
+						return $r;
+					}
 				} else {
 					$p = Cart::getByProdart($prodart);
 					
 					if (!$pos['article']) {//Такое может быть со старыми заявками... deprcated удалить потом.
 						//Значит позиция некорректно заморожена
 						$pos=Cart::getByProdart($prodart);
-						if (!$pos) return new infra_Fix('del');
+						if (!$pos) {
+							$r = new infra_Fix('del');
+							return $r;
+						}
 					} else {
 						$hash = Cart::getPosHash($p);
 						if ($pos['hash'] != $hash) $pos['change'] = true;//Метка что что-то поменялось в описании позиции.
@@ -117,6 +135,7 @@ class Cart {
 				$order['sumopt']+=$pos['sumopt'];
 				$order['sumroz']+=$pos['sumroz'];
 
+				return $r;
 			});
 			$hadpaid=0;//Сумма уже оплаченных заявок
 			
@@ -128,19 +147,21 @@ class Cart {
 			//В общем то что заявка у нескольких пользователей пофигу. 
 			//Менеджер отталкиваемся пользователя который перевёл заявку из активного статуса, самый первый именно он попадает в order.email это в saveOrder
 
-			Each::forr($orders, function ($id) use (&$hadpaid, $order) {
-				if ($order['id']==$id) return;//Текущую заявку не считаем
+			Each::forr($orders, function &($id) use (&$hadpaid, $order) {
+				$r = null;
+				if ($order['id']==$id) return $r;//Текущую заявку не считаем
 				$order=Cart::loadOrder($id);
 				$rules=Load::loadJSON('-cart/rules.json');
 				
-				if (!$order['manage']['paid']) return;//Если статус не считается оплаченым выходим
-				if (in_array($order['status'],array('canceled','error'))) return;//Если статус не считается оплаченым выходим
-				if ($order['manage']['bankrefused']) return;
+				if (!$order['manage']['paid']) return $r;//Если статус не считается оплаченым выходим
+				if (in_array($order['status'],array('canceled','error'))) return $r;//Если статус не считается оплаченым выходим
+				if ($order['manage']['bankrefused']) return $r;
 				
 				//Хотя оплачена alltotal вместе с доставкой
 				//if (!$order['total']) return;//У оплаченой заявки обязательно должно быть total оплаченная, без цены доставки.
 				//$order['manage']['paid'] вся оплаченная сумма с заявкой, по факту.
 				$hadpaid+=$order['manage']['paid'];
+				return $r;
 			});
 			$order['hadpaid']=$hadpaid;
 			//sum цена всех товаров
@@ -149,7 +170,7 @@ class Cart {
 			$merch=Load::loadJSON('~merchants.json');
 			//$order['email']=Session::getEmail();
 			$order['level']=$merch['level'];
-			if ($order['email']&&$merch['merchants'][$order['email']]) {
+			if ($order['email'] && !empty($merch['merchants'][$order['email']])) {
 				$order['merch']=true;
 			} else {
 				$order['merch']=false;
@@ -160,39 +181,46 @@ class Cart {
 			} else {
 				$order['need']=0;
 			}
+			$conf = Config::get('cart');
 			if ($conf['opt']) {
 				$order['merchdyn']=!$order['need'];
 				if ($order['merchdyn']) {
 					$order['sum']=$order['sumopt'];
-					Each::foro($order['basket'],function(&$pos) {
+					Each::foro($order['basket'], function &(&$pos) {
+						$r = null;
 						$pos['sum']=$pos['sumopt'];
 						$pos['cost']=$pos['Цена оптовая'];
+						return $r;
 					});
 				} else {
 					$order['sum']=$order['sumroz'];
-					Each::foro($order['basket'],function(&$pos) {
+					Each::foro($order['basket'], function &(&$pos) {
+						$r = null;
 						$pos['sum']=$pos['sumroz'];
 						$pos['cost']=$pos['Цена розничная'];
+						return $r;
 					});
 				}
-				if (!$pos['cost']) $pos['cost'] = 0;
+				if (empty($pos['cost'])) $pos['cost'] = 0;
 			} else {
 				$pos['cost'] = $pos['Цена'];
 				$order['sum'] = $order['sumroz'];
-				Each::foro($order['basket'],function(&$pos) {
-					$pos['sum']=$pos['sumroz'];
-					$pos['cost']=$pos['Цена'];
+				Each::foro($order['basket'], function &(&$pos) {
+					$r = null;
+					$pos['sum'] = $pos['sumroz'];
+					$pos['cost'] = $pos['Цена'];
+					return $r;
 				});
 			}
 			$order['total']=$order['sum'];
-			if ($order['manage']['summary']) {
+			if (!empty($order['manage']['summary'])) {
 				$order['manage']['summary']=preg_replace('/\s/','',$order['manage']['summary']);
 				$order['total']=$order['manage']['summary'];
 			}
 
 			//Стоимость с доставкой
 			$order['alltotal']=$order['total'];
-			if ($order['manage']['deliverycost']) {
+			if (!empty($order['manage']['deliverycost'])) {
 				$order['manage']['deliverycost']=preg_replace('/\s/','',$order['manage']['deliverycost']);
 				$order['alltotal']+=$order['manage']['deliverycost'];
 			}
@@ -221,8 +249,11 @@ class Cart {
 		if ($action === true) return true;
 		$rule = Cart::getRule($order);
 		if ($rule['user']['buttons'][$action]) return true;
-		return Each::exec($rule['user']['actions'],function($r) use($action) {
-			if ($r['act'] == $action) return true;
+		return Each::exec($rule['user']['actions'], function &($r) use($action) {
+			$r = true;
+			if ($r['act'] == $action) return $r;
+			$r = null;
+			return $r;
 		});
 	}
 	public static function &loadOrder($id = '', $re = false)
@@ -253,27 +284,30 @@ class Cart {
 				$order['id'] = $id;
 			} else {
 				$order = Session::get('orders.my', array());
-				Each::foro($order, function (&$val, $name) {
+				Each::foro($order, function &(&$val, $name) {
+					$r = null;
 					if (is_string($val)) $val = trim($val);
+					return $r;
 				});//По идеи в сессии хранится email и он уже там есть, как и любые другие поля.
 				$email = Session::getEmail();//Это единственное место где в заявку добавляется email
 				if ($email)$order['email'] = $email;//Когда нет регистрации email берём из формы autosave
 				$order['status'] = 'active';
 			}
-			if (!$order['manage']) $order['manage'] = array();
+			if (empty($order['manage'])) $order['manage'] = array();
 			return $order;
 		}, array($id), $re);
 	}
 	public static function getRule($order) {
 		$rules = Load::loadJSON('-cart/rules.json');
 		foreach ($rules as $i => $act) {
-			if ($rules[$i]['link']) $rules[$i]['link'] = Template::parse(array($rules[$i]['link']), $order);
+			if (!empty($rules[$i]['link'])) $rules[$i]['link'] = Template::parse(array($rules[$i]['link']), $order);
 		}
 		$rule = $rules['rules'][$order['status']];
 
 		$list = array(&$rule['manager'], &$rule['user']);
 
-		Each::forr($list,function(&$ar) use ($rules, &$order) {
+		Each::forr($list, function &(&$ar) use ($rules, &$order) {
+			$r = null;
 			/*Each::foro($ar['others'],function($other,$istpl) use(&$order,&$ar) {
 				$is=Template::parse(array($istpl),$order);
 
@@ -285,7 +319,8 @@ class Cart {
 			});
 			*/
 
-			Each::foro($ar['buttons'],function(&$cls,$act) use($rules,&$order,&$ar) {
+			Each::foro($ar['buttons'], function &(&$cls,$act) use($rules,&$order,&$ar) {
+				$r = null;
 				$index=array_search($act, $ar['actions']);
 				if ($index!==false) {
 					array_splice($ar['actions'],$index,1);
@@ -301,13 +336,14 @@ class Cart {
 					$cls['act']=$act;
 					$cls['cls']=$t;
 				}
-				if ($cls['omit']) {
+				if (!empty($cls['omit'])) {
 					$omit=Template::parse(array($cls['omit']),$order);
 					if ($omit) return new infra_Fix('del');
 				}
-				
+				return $r;
 			});
-			Each::fora($ar['actions'], function (&$act) use ($rules, &$order) {
+			Each::fora($ar['actions'], function &(&$act) use ($rules, &$order) {
+				$r = null;
 				if (!$rules['actions'][$act]) {
 					$cls=array(
 						'act'=>$act
@@ -317,15 +353,18 @@ class Cart {
 					$cls['act']=$act;
 				}
 
-				if ($cls['omit']) {
+				if (!empty($cls['omit'])) {
 					$omit=Template::parse(array($cls['omit']),$order);
-					if ($omit) return new Fix('del');
+					if ($omit) {
+						$r = new Fix('del');
+						return $r;
+					}
 					
 				}
-				$act=$cls;
+				$act = $cls;
+				return $r;
 			});
-
-
+			return $r;
 		});
 		return $rule;
 	}
@@ -349,7 +388,7 @@ class Cart {
 		if ($to=='manager') return Mail::toAdmin($subject,$email,$body);
 	}
 	public static function mergeOrder(&$order, $place) {
-		if (!$order['id']) return;
+		if (empty($order['id'])) return;
 		$actualdata = Session::get([$place, $order['id']], array());
 		foreach ($actualdata as $name => $val) {
 			if (!is_string($val)) continue;
@@ -392,20 +431,24 @@ class Cart {
 		}
 		$rules = Load::loadJSON('-cart/rules.json');
 		if ($rules['rules'][$order['status']]['freeze']) {//Текущий статус должен замораживать позиции
-			Each::foro($order['basket'], function (&$pos, $prodart) {
-				if ($pos['article']) return;
+			Each::foro($order['basket'], function &(&$pos, $prodart) {
+				$r = null;
+				if ($pos['article']) return $r;
 				$p=Cart::getByProdart($prodart);
 				if ($p) {//Товар найден в каталоге
 					$pos = array_merge($p,array('count'=>$pos['count']));
 					$pos['hash'] = Cart::getPosHash($p);//Метка версии замороженной позиции
 				}
+				return $r;
 			});
 		} else {//Текущий статус не замораживает позиции
-			Each::foro($order['basket'], function (&$pos,$prodart) {
-				if (!$pos['article']) return;
+			Each::foro($order['basket'], function &(&$pos,$prodart) {
+				$r = null;
+				if (!$pos['article']) return $r;
 				$pos = array(
 					'count'=>$pos['count']
 				);
+				return $r;
 			});
 		}
 
@@ -442,10 +485,10 @@ class Cart {
 		$rules = Load::loadJSON('-cart/rules.json');
 		$order = $ans['order'];
 		$rule = $rules['actions'][$action];
-		if (!Session::get('dontNofify') && $rule['usermail']) {
+		if (!Session::get('dontNofify') && !empty($rule['usermail'])) {
 			Cart::mail('user', $order['email'], $rule['usermail'], $ans['order']);
 		}
-		if ($rule['mangmail']) {
+		if (!empty($rule['mangmail'])) {
 			Cart::mail('manager', $order['email'], $rule['mangmail'], $order);
 		}
 		return Ans::ret($ans);

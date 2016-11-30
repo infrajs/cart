@@ -50,13 +50,15 @@ if ($type == 'user') {
 	$order = Cart::getGoodOrder();
 	$ans['order']=$order;
 	$list=array();
-	Each::forr($orders,function($order) use(&$list){
+	Each::forr($orders, function &($order) use(&$list){
+		$r = null;
 		$status=$order['status'];
 		if(!$list[$status])$list[$status]=array();
 		$list[$status][]=array(
 			'id'=>$order['id'],
 			'time'=>$order['time']
 		);
+		return $r;
 	});
 	$ans['rules'] = Load::loadJSON('-cart/rules.json');
 	$ans['list']=$list;
@@ -124,7 +126,6 @@ if ($type == 'user') {
 	if (!Session::get('safe.manager') && $place == 'admin') return Ans::err($ans,'У вас нет доступа к этому разделу!');
 
 	Cart::sync($place, $orderid);
-
 	
 	//Заява либо моя либо это менеджер
 	if (!isset($_GET['easy'])){
