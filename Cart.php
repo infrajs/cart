@@ -230,7 +230,7 @@ class Cart {
 	public static function sync($place, $orderid) {
 		$order = Cart::loadOrder($orderid);
 		$rule = Cart::getRule($order);
-		if (Session::get('safe.manager') || $rule['edit'][$place]) { //Place - orders admin wholesale
+		if (Session::get('safe.manager') || !empty($rule['edit'][$place])) { //Place - orders admin wholesale
 			$r = Cart::mergeOrder($order, $place);
 			if ($r) Cart::saveOrder($order, $place);
 		}

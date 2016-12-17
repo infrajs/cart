@@ -61,7 +61,7 @@ $status = $order['status'];
 $rule = Cart::getRule($order);
 
 
-if (Session::get('safe.manager') || $rule['edit'][$place]) { //Place - orders admin wholesale
+if (Session::get('safe.manager') || !empty($rule['edit'][$place])) { //Place - orders admin wholesale
 	Cart::mergeOrder($order, $place);
 }
 
