@@ -198,6 +198,10 @@ window.Cart = {
 		}*/
 		return !r;
 	},
+	lang: function (str) {
+		if(typeof(str) == 'undefined') return Lang.name('cart');
+		return Lang.str('cart', str);
+	},
 	initPrice: function (div) {
 		div.find('.cat_item').each( function () {
 			var cart=$(this).find('.basket_img');

@@ -26,20 +26,20 @@
 	</div>
 </div>
 {umenu:}
-	<a onclick="Cart.goTop()" href="/cart/orders">Мои заявки</a> |
-	<a class="signout" onclick="Cart.goTop()" href="/user/signout">Выход</a><br>
+	<a onclick="Cart.goTop()" href="/cart/orders">{Cart.lang(:Мои заявки)}</a> |
+	<a class="signout" onclick="Cart.goTop()" href="/user/signout">{Cart.lang(:Выход)}</a><br>
 	<script>
 		domready(function(){
 			$('.signout').click(function(){
-				infra.session.logout();
-				infrajs.global.set(['cat_basket',"sign"]);
-				infra.session.syncNow();
+				Session.logout();
+				Global.set(['cat_basket',"sign"]);
+				Session.syncNow();
 				Cart.goTop();
 
 			});
 		});
 	</script>
-{reg:}<a onclick="Cart.goTop()" href="/user/signin">Гость</a>
+{reg:}<a onclick="Cart.goTop()" href="/user/signin">{Cart.lang(:Гость)}</a>
 {user:}{data.order.merch?:icomerch?:icouser} <a onclick="Cart.goTop()" href="/user">{data.user.email}</a>
 {icouser:}<span title="Розничный покупатель" class="glyphicon glyphicon-user"></span>
 {icomerch:}<span title="Оптовый покупатель" class="glyphicon glyphicon-briefcase"></span>

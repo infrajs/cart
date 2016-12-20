@@ -29,3 +29,11 @@ Event.handler('Controller.onshow', function () {
 		activate(a, prodart)
 	});
 });
+
+
+Event.one('Controller.oninit', function () {
+	Template.scope['Cart'] = {};
+	Template.scope['Cart']['lang'] = function (str) {
+		return Cart.lang(str);
+	};
+});

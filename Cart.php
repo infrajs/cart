@@ -86,21 +86,21 @@ class Cart {
 			$order['sumopt'] = 0;
 			$order['sumroz'] = 0;
 			$order['count'] = 0;
-			$num=0;
+			$num = 0;
 
-			Each::foro($order['basket'], function &(&$pos,$prodart) use(&$order,&$num) {
+			Each::foro($order['basket'], function &(&$pos,$prodart) use (&$order,&$num) {
 				$r = null;
-				$count=$pos['count'];//Сохранили значение из корзины
+				$count = $pos['count'];//Сохранили значение из корзины
 
 				if ($count<1) {
-					$r = new infra_Fix('del');
+					$r = new Fix('del');
 					return $r;
 				}
-
 				if (!$order['rule']['freeze']) {
 					$pos=Cart::getByProdart($prodart);
 					if (!$pos) {
-						$r = new infra_Fix('del');
+
+						$r = new Fix('del');
 						return $r;
 					}
 				} else {
@@ -110,7 +110,8 @@ class Cart {
 						//Значит позиция некорректно заморожена
 						$pos=Cart::getByProdart($prodart);
 						if (!$pos) {
-							$r = new infra_Fix('del');
+
+							$r = new Fix('del');
 							return $r;
 						}
 					} else {
@@ -137,6 +138,7 @@ class Cart {
 
 				return $r;
 			});
+
 			$hadpaid=0;//Сумма уже оплаченных заявок
 			
 			//В заявке сохранён email по нему можно получить пользователя и все его заявки
@@ -338,7 +340,10 @@ class Cart {
 				}
 				if (!empty($cls['omit'])) {
 					$omit=Template::parse(array($cls['omit']),$order);
-					if ($omit) return new infra_Fix('del');
+					if ($omit) {
+						$fix = new Fix('del');
+						return $fix;
+					}
 				}
 				return $r;
 			});
@@ -480,6 +485,11 @@ class Cart {
 		$conf = Config::get('cart');
 		if ($conf['opt']) return md5($pos['Цена оптовая'].':'.$pos['Цена розничная']);
 		else return md5($pos['Цена']);
+	}
+	public static function lang($str = null)
+	{
+		if (is_null($str)) return Lang::name('cart');
+		return Lang::str('cart',$str);
 	}
 	public static function ret($ans, $action) {
 		$rules = Load::loadJSON('-cart/rules.json');

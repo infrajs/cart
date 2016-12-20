@@ -74,6 +74,7 @@ if ($type == 'user') {
 		$ans['order'] = $order;
 	} else {
 		// работаем с активной заявкой
+
 		$order = Cart::getGoodOrder();
 		$ans['order'] = $order;
 	}
