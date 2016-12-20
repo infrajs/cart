@@ -27,8 +27,8 @@ if (!is_file('vendor/autoload.php')) {
 class Cart {
 	public static function getPath($id = '') 
 	{
-		if (!$id) return '~.cart/';	
-		return '~.cart/'.$id.'.json';
+		if (!$id) return '~auto/.cart/';	
+		return '~auto/.cart/'.$id.'.json';
 	}
 	public static function getMyOrders()
 	{
@@ -126,9 +126,9 @@ class Cart {
 				$order['count']++;
 				$conf = Config::get('cart');
 				if ($conf['opt']) {
-					if ($pos['Цена оптовая']) $pos['sumopt']=$pos['Цена оптовая']*$pos['count'];
+					if (!empty($pos['Цена оптовая'])) $pos['sumopt']=$pos['Цена оптовая']*$pos['count'];
 					else $pos['sumopt']=0;
-					if ($pos['Цена розничная']) $pos['sumroz']=$pos['Цена розничная']*$pos['count'];
+					if (!empty($pos['Цена розничная'])) $pos['sumroz']=$pos['Цена розничная']*$pos['count'];
 					else $pos['sumroz']=0;
 				} else {
 					$pos['sumroz']=$pos['Цена']*$pos['count'];
@@ -155,7 +155,7 @@ class Cart {
 				$order=Cart::loadOrder($id);
 				$rules=Load::loadJSON('-cart/rules.json');
 				
-				if (!$order['manage']['paid']) return $r;//Если статус не считается оплаченым выходим
+				if (empty($order['manage']['paid'])) return $r;//Если статус не считается оплаченым выходим
 				if (in_array($order['status'],array('canceled','error'))) return $r;//Если статус не считается оплаченым выходим
 				if ($order['manage']['bankrefused']) return $r;
 				
@@ -199,7 +199,7 @@ class Cart {
 					Each::foro($order['basket'], function &(&$pos) {
 						$r = null;
 						$pos['sum']=$pos['sumroz'];
-						$pos['cost']=$pos['Цена розничная'];
+						if(!empty($pos['Цена розничная']))  $pos['cost'] = $pos['Цена розничная'];
 						return $r;
 					});
 				}
@@ -403,18 +403,19 @@ class Cart {
 			unset($actualdata['manage']); //Только админ на странице admin может менять manage
 		}
 		if (!$actualdata) return false;
-		if ($actualdata['manage'] && $order['manage']) $actualdata['manage'] = array_merge($order['manage'], $actualdata['manage']);
-		if ($actualdata['basket'] && $order['basket']) $actualdata['basket'] = array_merge($order['basket'], $actualdata['basket']);
+		if (!empty($actualdata['manage']) && !empty($order['manage'])) $actualdata['manage'] = array_merge($order['manage'], $actualdata['manage']);
+		if (!empty($actualdata['basket']) && !empty($order['basket'])) $actualdata['basket'] = array_merge($order['basket'], $actualdata['basket']);
 		$order = array_merge($order, $actualdata);
 		return true;
 	}
 	public static function saveOrder(&$order, $place = false) {
-		$id = $order['id'];
+		if (!empty($order['id'])) $id = $order['id'];
+		else $id = false;
 
 		if ($place) Session::set([$place, $id]);
 
 		if (!$id) {
-			if ($order['fixid']) {
+			if (!empty($order['fixid'])) {
 				$id = $order['fixid'];//Заявка уже есть в списке моих заявок
 			} else {
 				$id = time();
@@ -449,7 +450,7 @@ class Cart {
 		} else {//Текущий статус не замораживает позиции
 			Each::foro($order['basket'], function &(&$pos,$prodart) {
 				$r = null;
-				if (!$pos['article']) return $r;
+				if (empty($pos['article'])) return $r;
 				$pos = array(
 					'count'=>$pos['count']
 				);

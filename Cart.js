@@ -171,7 +171,7 @@ window.Cart = {
 		if (!orderid) orderid = '';
 		//генерирует объект описывающий все цены... передаётся basket на случай если count актуальный именно в basket
 		var path='-cart/?type=order&id='+orderid;
-		Global.unload('order', path);
+		Global.unload('cart', path);
 		//Load.unload(path);
 		//Session.syncNow();
 		var order = Load.loadJSON(path);//GoodOrder серверная версия

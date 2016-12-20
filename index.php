@@ -32,7 +32,7 @@ if ($type == 'user') {
 	$ans = User::get();
 	$ans['manager'] = Session::get('safe.manager');
 } else if ($type == 'cart') {
-	if ($_REQUEST['submit']) {
+	if (Ans::REQ('submit')) {
 		$ans = array('msg'=>'','result'=>0);
 		
 		if (Access::admin() && Session::getEmail()) {
@@ -53,7 +53,7 @@ if ($type == 'user') {
 	Each::forr($orders, function &($order) use(&$list){
 		$r = null;
 		$status=$order['status'];
-		if(!$list[$status])$list[$status]=array();
+		if (empty($list[$status])) $list[$status] = array();
 		$list[$status][]=array(
 			'id'=>$order['id'],
 			'time'=>$order['time']

@@ -50,7 +50,11 @@
 			vertical-align:top;
 			padding:5px 2px;
 		}
-		
+		.usercart .refresh {
+			color:black;
+			display:none;
+			cursor: pointer;
+		}
 		.usercart .cartparam {
 			margin-bottom:20px;
 		}
@@ -101,7 +105,9 @@
 							div.find('.sum').each( function () {
 								var prodart=$(this).data('producer')+' '+$(this).data('article');
 								var pos = gorder.basket[prodart];
-								if (gorder.merchdyn) {
+								if (!pos) {
+									$(this).addClass('bg-info').removeClass('bg-success');
+								} else if (gorder.merchdyn) {
 									$(this).html(tplcost(pos.sumopt));
 									$(this).addClass('bg-success').removeClass('bg-info');
 								} else {
@@ -113,8 +119,9 @@
 							div.find('.myprice').each( function () {
 								var prodart=$(this).data('producer')+' '+$(this).data('article');
 								var pos = gorder.basket[prodart];
-								if (!pos.cost) return;
-								if (gorder.merchdyn) {
+								if (!pos) {
+									$(this).find('.cost').addClass('bg-info').removeClass('bg-success');
+								} else if (gorder.merchdyn) {
 									$(this).find('.cost').html(tplcost(pos['Цена оптовая']));
 									$(this).find('.cost').addClass('bg-success').removeClass('bg-info');
 								} else {
@@ -140,13 +147,15 @@
 							var ordersumroz = 0;
 							div.find('.myprice').each( function () {
 								var pos = $(this).data();
-								var prodart = pos.producer+' '+pos.article;
-								var count = pos.count;
-								if(order.basket[prodart]) count = order.basket[prodart].count;
-								var sumroz = pos.cost * count;
-								if (!sumroz) sumroz = 0;
-								ordersumroz += sumroz;
-								$(this).find('.sum').html(tplcost(sumroz));
+								if (pos) {
+									var prodart = pos.producer+' '+pos.article;
+									var count = pos.count;
+									if(order.basket[prodart]) count = order.basket[prodart].count;
+									var sumroz = pos.cost * count;
+									if (!sumroz) sumroz = 0;
+									ordersumroz += sumroz;
+									$(this).find('.sum').html(tplcost(sumroz));
+								}
 								$(this).find('.sum').addClass('bg-info').removeClass('bg-success');
 								$(this).find('.cost').addClass('bg-info').removeClass('bg-success');
 							});
@@ -162,6 +171,12 @@
 							var div = $('#'+layer.div);
 							calc(div, layer);
 							div.find('[type=number]').change( function () {
+								div.find('.refresh').show();
+								
+							});
+							div.find('.refresh').click( function () {
+								div.find('.refresh').hide();
+								Global.set('cart');
 								calc(div, layer);
 							});
 						}, 'cart', layer);
@@ -173,7 +188,7 @@
 							var layer = Controller.ids['{id}'];
 							var orderid = layer.crumb.parent.name;
 							var place = layer.crumb.parent.parent.name;
-							Cart.sync(place, orderid);	
+							Cart.sync(place, orderid);
 						});
 					});
 				})
@@ -248,7 +263,10 @@
 					<td style="">
 						Цена:
 					</td>
-					<td></td>
+					<td style="text-align:center">
+						<span class="pe-7s-refresh refresh"></span>
+
+					</td>
 					<td style="white-space:nowrap;">
 						<span class="cost">
 							{Цена?Цена:itemcost?:itemnocost}
@@ -258,7 +276,8 @@
 				</tr>
 				<tr>
 					<td style="vertical-align:middle;">Количество:</td>
-					<td style="vertical-align:middle; padding-top:0; padding-bottom:0;"><input value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer} {article}.count"></td>
+					<td style="vertical-align:middle; padding-top:0; padding-bottom:0;">
+						<input value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer} {article}.count"></td>
 					<td style="white-space:nowrap; vertical-align:middle">
 						<span class="sum" data-article="{article}" data-producer="{Производитель}"></span>
 					</td>	
@@ -433,7 +452,7 @@
 		</div>
 		<div class="form-group">
 			<label>Email <span class="req">*</span></label>
-			<input type="email" name="email" value="{email}" {email?:disabled} class="form-control" placeholder="Email">
+			<input type="email" name="email" value="{email}" class="form-control" placeholder="Email">
 		</div>
 		{~conf.cart.pay?:orderpayinfo}
 		{~conf.cart.delivery?:ordertransportinfo}
