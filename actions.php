@@ -72,9 +72,9 @@ if ($act['checkdata'] && $rule['edit'][$place]) {
 	//Действие требует проверку данных и текущий стату заявки разрешает редактирование, соответственно можно применит ьданные
 	if (!$order['basket']) return Ans::err($ans, 'Заявк пустая! Добавьте товар!');
 	$page = '';
-	if (!User::checkData($order['phone'],'value')) return Ans::err($ans, 'Укажите корректный телефон'.$page);
-	if (!User::checkData($order['name'],'value')) return Ans::err($ans, 'Укажите корректное имя контактного лица'.$page);
-	if ($conf['pay']) {
+	if (empty($order['phone'])||!User::checkData($order['phone'],'value')) return Ans::err($ans, 'Укажите корректный телефон'.$page);
+	if (empty($order['name'])||!User::checkData($order['name'],'value')) return Ans::err($ans, 'Укажите корректное имя контактного лица'.$page);
+	if (!empty($conf['pay'])) {
 		if (!User::checkData($order['entity'],'radio')) return Ans::err($ans, 'Укажите кто будет оплачивать'.$page);
 		if (!User::checkData($order['paymenttype'],'radio')) return Ans::err($ans, 'Укажите способ оплаты'.$page);
 		if ($order['entity'] == 'legal') {
@@ -151,7 +151,7 @@ if ($action == 'saved') {
 } else if ($action == 'active') {
 	
 	$noworder = Cart::loadOrder();
-	if ($noworder['basket']) {
+	if (!empty($noworder['basket'])) {
 		return Ans::err($ans,
 			'У вас уже есть <a onclick="cart.goTop(); popup.close()" href="/cart/orders/my">активная непустая заявка</a>.<br>
 			Чтобы сделать заявку активной нужно<br>

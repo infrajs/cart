@@ -197,7 +197,7 @@
 	{inforoz:}
 		<div class="cartblockinfo alert alert-info">
 			<p>
-				Для вас действуют <b onclick="$(this).parents('.alert:first').find('div').toggle()" class="a cartinfo">розничные цены</b>.
+				Для вас действуют <b onclick="$(this).parents('.alert:first').find('div').toggle('fast')" class="a cartinfo">розничные цены</b>.
 			</p>
 			<div style="display:none; margin-top:10px">
 				<p>
@@ -452,7 +452,7 @@
 		</div>
 		<div class="form-group">
 			<label>Email <span class="req">*</span></label>
-			<input type="email" name="email" value="{email}" class="form-control" placeholder="Email">
+			<input {:isdisabled} type="email" name="email" value="{email}" class="form-control" placeholder="Email">
 		</div>
 		{~conf.cart.pay?:orderpayinfo}
 		{~conf.cart.delivery?:ordertransportinfo}
@@ -657,7 +657,7 @@
 				{order:orderfields}
 				<div>
 					<strong>Сообщение для менеджера</strong>
-					<textarea {order.rule.edit[place]|:disabled} name="comment" class="form-control" rows="4">{order.comment}</textarea>
+					<textarea name="comment" class="form-control" rows="4">{order.comment}</textarea>
 				</div>
 			</div>
 			<div class="answer"><b class="alert">{config.ans.msg}</b></div>
@@ -859,8 +859,10 @@
 				<div style="margin-bottom:10px">Итого: <span class="cartsum">{~sum(total,manage.deliverycost|:0):itemcost}</span></div>
 
 
-				<label>Цена со скидкой<br> 
-				<input name="manage.summary" value="{manage.summary}" type="text"></label><br />
+				<!--
+					<label>Цена со скидкой<br> 
+					<input name="manage.summary" value="{manage.summary}" type="text"></label><br />
+				-->
 				{~conf.cart.delivery?:mngdelivery}
 				<label>Сообщение для клиента</label><br>
 				<textarea name="manage.comment" class="form-control" rows="4">{manage.comment}</textarea>
@@ -870,7 +872,7 @@
 		<h3>{rule.title}</h3>
 		{data.id?order:ordernum}
 		{data.rule.freeze?:freezemsg}
-		<div class="checkbox">
+		<!--<div class="checkbox">
 			<label>
 				<input type="checkbox" "autosave"="0" onclick="Session.set('dontNotify',this.checked)" name="dontNotify">
 				НЕ оповещать пользователя о совершённом действии
@@ -885,7 +887,7 @@
 					});
 				});
 			</script>
-		</div>
+		</div>-->
 
 		<div class="myactions" data-place="admin">
 			{rule.manager:myactions}

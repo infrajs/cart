@@ -69,10 +69,16 @@ if ($type == 'user') {
 	if ($orderid) {
 		//работаем с сохранённой заявкой
 		$order = Cart::getGoodOrder($orderid);
-		if (!$order) return Ans::err($ans, 'Заявка не найдена!');
-		if (!Session::get('safe.manager') && !Cart::isMy($orderid)) return Ans::err($ans, 'Заявки нет в списке ваших заявок!');
-		$ans['order'] = $order;
-	} else {
+		if ($order['status'] != 'active') {
+			if (!$order) return Ans::err($ans, 'Заявка не найдена!');
+			if (!Session::get('safe.manager') && !Cart::isMy($orderid)) return Ans::err($ans, 'Заявки нет в списке ваших заявок!');
+			$ans['order'] = $order;
+		} else {
+			$orderid = false;
+		}
+	} 
+
+	if (!$orderid) {
 		// работаем с активной заявкой
 
 		$order = Cart::getGoodOrder();
@@ -122,6 +128,7 @@ if ($type == 'user') {
 	
 	$order = Cart::loadOrder($orderid);
 	if (!$order) return Ans::err($ans,'Заявка не найдена!');
+	if ($order['status'] == 'active') $order = Cart::loadOrder();
 	
 	if (!Session::get('safe.manager') && !Cart::isMy($orderid)) return Ans::err($ans,'Заявки нет в списке ваших заявок!');
 	if (!Session::get('safe.manager') && $place == 'admin') return Ans::err($ans,'У вас нет доступа к этому разделу!');

@@ -96,7 +96,7 @@ class Cart {
 					$r = new Fix('del');
 					return $r;
 				}
-				if (!$order['rule']['freeze']) {
+				if (empty($order['rule']['freeze'])) {
 					$pos=Cart::getByProdart($prodart);
 					if (!$pos) {
 
@@ -106,7 +106,7 @@ class Cart {
 				} else {
 					$p = Cart::getByProdart($prodart);
 					
-					if (!$pos['article']) {//Такое может быть со старыми заявками... deprcated удалить потом.
+					if (empty($pos['article'])) {//Такое может быть со старыми заявками... deprcated удалить потом.
 						//Значит позиция некорректно заморожена
 						$pos=Cart::getByProdart($prodart);
 						if (!$pos) {
@@ -439,7 +439,7 @@ class Cart {
 		if ($rules['rules'][$order['status']]['freeze']) {//Текущий статус должен замораживать позиции
 			Each::foro($order['basket'], function &(&$pos, $prodart) {
 				$r = null;
-				if ($pos['article']) return $r;
+				if (!empty($pos['article'])) return $r;
 				$p=Cart::getByProdart($prodart);
 				if ($p) {//Товар найден в каталоге
 					$pos = array_merge($p,array('count'=>$pos['count']));
@@ -462,11 +462,12 @@ class Cart {
 			$order['fixid'] = $id;
 			unset($order['id']);//У активной заявки нет id
 			$oldactive = Session::get('orders.my');
-			if ($oldactive['fixid']) { //Освобождаем старую активную заявку
+			if (!empty($oldactive['fixid'])) { //Освобождаем старую активную заявку
 				unlink(Path::resolve(Cart::getPath($oldactive['fixid'])));
-
 			}
 			Session::set('orders.my', $order);//Исключение, данные заявки хранятся в user
+			if (empty($order['phone'])) $order['phone'] = '';
+			if (empty($order['name'])) $order['name'] = '';
 			$save = array(
 				'email' => Session::getEmail(),//Тот пользователь который сделал заявку активной или последний кто с ней работал
 				'name' => $order['name'],

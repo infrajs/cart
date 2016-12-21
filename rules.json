@@ -11,12 +11,50 @@
 			"caption":"Заявки ожидающие проверку менеджера",
 			"title":"Заявка находится на проверке",
 			"user":{
-				"buttons":{"saved":"default"},
-				"actions":["sync","active"]
+				"buttons":{"sync":"default"},
+				"actions":["sync","active","saved"]
 			},
 			"manager":{
-				"buttons":{"saved":"success"},
+				"buttons":{"picked":"success"},
+				"actions":["sync","saved","picked"]
+			}
+		},
+		"picked":{
+			"freeze":true,
+			"edit":{
+				"orders":false,
+				"admin":false
+			},
+			"notice":"warning",
+			"short":"Готова",
+			"caption":"Собранные заявки",
+			"title":"Заявка укомплектована",
+			"user":{
+				"buttons":{"sync":"default"},
 				"actions":["sync"]
+			},
+			"manager":{
+				"buttons":{"complete":"success"},
+				"actions":["sync","check","saved","complete"]
+			}
+		},
+		"complete":{
+			"freeze":true,
+			"edit":{
+				"orders":false,
+				"admin":false
+			},
+			"notice":"warning",
+			"short":"Готова",
+			"caption":"Выполненные заявки",
+			"title":"Заявка выполнена",
+			"user":{
+				"buttons":{"sync":"default"},
+				"actions":["sync"]
+			},
+			"manager":{
+				"buttons":{"complete":"success"},
+				"actions":["sync","check","saved"]
 			}
 		},
 		"active":{
@@ -73,6 +111,28 @@
 			"result":"Заявка отправлена на проверку менеджеру.<br>После проверки будет отправлено письмо на <b>{email}</b>.",
 			"usermail":"orderToCheck",
 			"mangmail":"AdmOrderToCheck"
+		},
+		"picked":{
+			"checkdata":true,
+			"go":{
+				"admin":"/cart/admin"
+			},
+			"checkdata":true,
+			"title":"Заявка собрана",
+			"confirm":"Заявка собрана?",
+			"result":"Заявка готова к оплате и передачи клиенту.",
+			"usermail":"picked"
+		},
+		"complete":{
+			"checkdata":true,
+			"go":{
+				"admin":"/cart/admin"
+			},
+			"checkdata":true,
+			"title":"Заявка выполнена",
+			"confirm":"Заявка выполнена?",
+			"result":"Заявка выполнена.",
+			"usermail":"complete"
 		},
 		"saved":{
 			"checkdata":false,
