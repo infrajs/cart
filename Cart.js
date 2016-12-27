@@ -245,3 +245,17 @@ window.Cart = {
 		});
 	}
 }
+Event.handler('Session.onsync', function () {
+	$(document).find('.cat_item').each( function () {
+		var cart=$(this).find('.basket_img');
+
+		var id=cart.data('producer')+' '+cart.data('article');
+		if (Session.get('order.my.basket.'+id)) {
+			$(this).find('.posbasket').show();
+			cart.addClass('basket_img_sel');
+			cart.attr('title','Удалить из корзины');
+		} else {
+			cart.attr('title','Добавить в корзину');
+		}
+	});
+});
