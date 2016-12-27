@@ -26,7 +26,7 @@
 						"tpl":"-cart/cart.tpl",
 						"tplroot":"LIST",
 						"global":["user", "cart"],
-						"jsontpl":"-cart/?type=list&id={crumb.parent.name}",
+						"jsontpl":"-cart/?type=list&id={crumb.parent.name}&add={crumb.child.child.name}",
 						"onsubmit":true,
 						"autosavenametpl":"{crumb.parent.parent.name}.{crumb.parent.name}"
 					}

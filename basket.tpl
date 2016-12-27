@@ -27,7 +27,7 @@
 </div>
 {umenu:}
 	<a onclick="Cart.goTop()" href="/cart/orders">{Cart.lang(:Мои заявки)}</a> |
-	<a class="signout" onclick="Cart.goTop()" href="/user/signout">{Cart.lang(:Выход)}</a><br>
+	<a class="signout" onclick="Cart.goTop()" href="/user/logout">{Cart.lang(:Выход)}</a><br>
 	<script>
 		domready(function(){
 			$('.signout').click(function(){

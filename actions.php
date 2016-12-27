@@ -67,7 +67,8 @@ if (Session::get('safe.manager') || !empty($rule['edit'][$place])) { //Place - o
 
 $ans['order'] = $order;
 if ($act['checkdata'] && $rule['edit'][$place]) {
-	$msg = User::checkReg($order['email']);
+	$email = empty($order['email']) ? null : $order['email'];
+	$msg = User::checkReg($email);
 	if (is_string($msg)) return Ans::err($ans,$msg);
 	//Действие требует проверку данных и текущий стату заявки разрешает редактирование, соответственно можно применит ьданные
 	if (!$order['basket']) return Ans::err($ans, 'Заявк пустая! Добавьте товар!');

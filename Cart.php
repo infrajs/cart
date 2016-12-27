@@ -77,7 +77,8 @@ class Cart {
 		return Once::exec(__FILE__.'-getGoodOrder', function &($id, $re) use (&$order) {
 			
 			if (!$order) $order = Cart::loadOrder($id, $re);
-			if (!$order) return false;//Нет заявки с таким $id
+			$r = false;
+			if (!$order) return $r;//Нет заявки с таким $id
 			$order['id'] = $id;
 			$order['rule'] = Cart::getRule($order);
 			
@@ -169,19 +170,22 @@ class Cart {
 			//sum цена всех товаров
 			//total цена всех товаров с учётом цены указанной менеджером, тобишь со скидкой
 			//
-			$merch=Load::loadJSON('~merchants.json');
-			//$order['email']=Session::getEmail();
+
+			$order['merch']=false;
+			$merch = Load::loadJSON('~merchants.json');
 			$order['level']=$merch['level'];
-			if ($order['email'] && !empty($merch['merchants'][$order['email']])) {
-				$order['merch']=true;
-			} else {
-				$order['merch']=false;
+
+			if (User::is()) {	
+				$email = Session::getEmail();
+				if (!empty($merch['merchants'][$email])) {
+					$order['merch'] = $merch['merchants'][$email];
+				}
 			}
 			if (!$order['merch']) {
 				$order['need']=$order['level']-($order['sumopt']+$order['hadpaid']);
 				if ($order['need']<0)$order['need']=0;
 			} else {
-				$order['need']=0;
+				$order['need'] = 0;
 			}
 			$conf = Config::get('cart');
 			if ($conf['opt']) {
@@ -190,8 +194,8 @@ class Cart {
 					$order['sum']=$order['sumopt'];
 					Each::foro($order['basket'], function &(&$pos) {
 						$r = null;
-						$pos['sum']=$pos['sumopt'];
-						$pos['cost']=$pos['Цена оптовая'];
+						$pos['sum'] = $pos['sumopt'];
+						if(!empty($pos['Цена оптовая'])) $pos['cost'] = $pos['Цена оптовая'];
 						return $r;
 					});
 				} else {
@@ -199,7 +203,7 @@ class Cart {
 					Each::foro($order['basket'], function &(&$pos) {
 						$r = null;
 						$pos['sum']=$pos['sumroz'];
-						if(!empty($pos['Цена розничная']))  $pos['cost'] = $pos['Цена розничная'];
+						if(!empty($pos['Цена розничная'])) $pos['cost'] = $pos['Цена розничная'];
 						return $r;
 					});
 				}
@@ -264,8 +268,8 @@ class Cart {
 		return Once::exec(__FILE__.'-loadOrder', function &($id) {
 			if ($id) {
 				$order = Load::loadJSON(Cart::getPath($id));
-
-				if (!$order) return false;//Нет такой заявки с таким id
+				$r = false;
+				if (!$order) return $r;//Нет такой заявки с таким id
 				//$email=Session::getEmail();
 				
 

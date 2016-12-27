@@ -9,6 +9,7 @@ use infrajs\load\Load;
 use infrajs\path\Path;
 use infrajs\access\Access;
 use infrajs\session\Session;
+use infrajs\sequence\Sequence;
 
 if (!is_file('vendor/autoload.php')) {
 	chdir(explode('vendor/', __DIR__)[0]);
@@ -125,10 +126,20 @@ if ($type == 'user') {
 	if ($orderid == 'my') $orderid = '';
 	
 	$ans['place'] = $place;
+
+
+	$order = Cart::loadOrder($orderid);	
+	$add = Ans::GET('add');
+	if ($add) {
+		$right = array('basket',$add,'count');
+		$val = 1;
+		if (!Sequence::get($order, $right)) {
+			Sequence::set($order, $right, $val);
+			Cart::saveOrder($order, $place);
+		}
+	}
 	
-	$order = Cart::loadOrder($orderid);
 	if (!$order) return Ans::err($ans,'Заявка не найдена!');
-	if ($order['status'] == 'active') $order = Cart::loadOrder();
 	
 	if (!Session::get('safe.manager') && !Cart::isMy($orderid)) return Ans::err($ans,'Заявки нет в списке ваших заявок!');
 	if (!Session::get('safe.manager') && $place == 'admin') return Ans::err($ans,'У вас нет доступа к этому разделу!');

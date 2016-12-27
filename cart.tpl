@@ -74,7 +74,7 @@
 		<script>
 
 			domready(function(){
-				
+
 				Once.exec('layer{id}', function () {
 					var tplcost = function (val) {
 						return Template.parse('-cart/cart.tpl', val, 'itemcost')
@@ -167,6 +167,8 @@
 					}
 					Event.one('Controller.oncheck', function () {
 						var layer = Controller.ids['{id}'];
+						//history.replaceState(null,null,'/'+layer.crumb);
+						if (layer.crumb.child) Crumb.go('/'+layer.crumb, false);
 						Event.handler('Layer.onshow', function () {
 							var div = $('#'+layer.div);
 							calc(div, layer);
@@ -182,7 +184,7 @@
 						}, 'cart', layer);
 					});
 				});
-				Once.exec('Cart sync', function () {
+				Once.exec('{tpl}{tplroot}', function () {
 					Event.one('Controller.onshow', function () {
 						Event.handler('Session.onsync', function () {
 							var layer = Controller.ids['{id}'];

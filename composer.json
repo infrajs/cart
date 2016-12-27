@@ -10,6 +10,7 @@
         "infrajs/mail":"~1",
         "infrajs/nostore":"~1",
         "infrajs/router":"~1",
+        "infrajs/sequence":"~1",
         "infrajs/event":"~1",
         "infrajs/controller":"~1",
     	"infrajs/doc":"~1",
