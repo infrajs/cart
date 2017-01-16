@@ -44,7 +44,7 @@
 				"orders":false,
 				"admin":false
 			},
-			"notice":"warning",
+			"notice":"default",
 			"short":"Готова",
 			"caption":"Выполненные заявки",
 			"title":"Заявка выполнена",
@@ -54,7 +54,7 @@
 			},
 			"manager":{
 				"buttons":{"complete":"success"},
-				"actions":["sync","check","saved"]
+				"actions":["complete","sync","check","saved"]
 			}
 		},
 		"active":{
@@ -72,7 +72,7 @@
 				"buttons":{
 					"check":"success"
 				},
-				"actions":["saved"]
+				"actions":["saved","check"]
 			}
 		},
 		"saved":{
@@ -91,7 +91,7 @@
 					"active":"default",
 					"check":"success"
 				},
-				"actions":["sync"]
+				"actions":["active","sync","check"]
 			},
 			"manager":{
 				"actions":["sync","check"]

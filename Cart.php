@@ -327,10 +327,11 @@ class Cart {
 
 			Each::foro($ar['buttons'], function &(&$cls,$act) use($rules,&$order,&$ar) {
 				$r = null;
-				$index=array_search($act, $ar['actions']);
+				/*$index=array_search($act, $ar['actions']);
 				if ($index!==false) {
 					array_splice($ar['actions'],$index,1);
-				}
+				}*/
+
 				if (!$rules['actions'][$act]) {
 					$cls=array(
 						'cls'=>$cls,
@@ -351,7 +352,14 @@ class Cart {
 				}
 				return $r;
 			});
-			Each::fora($ar['actions'], function &(&$act) use ($rules, &$order) {
+			
+			if ($ar['buttons']) { //Все кнопки добавим в список
+				$buttons = array_keys($ar['buttons']);
+				$ar['actions'] = array_merge($ar['actions'],$buttons);
+				$ar['actions'] = array_unique($ar['actions']);
+			}
+
+			Each::exec($ar['actions'], function &(&$act) use ($rules, &$order) {
 				$r = null;
 				if (!$rules['actions'][$act]) {
 					$cls=array(
