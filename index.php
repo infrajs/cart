@@ -11,11 +11,6 @@ use infrajs\access\Access;
 use infrajs\session\Session;
 use infrajs\sequence\Sequence;
 
-if (!is_file('vendor/autoload.php')) {
-	chdir(explode('vendor/', __DIR__)[0]);
-	require_once('vendor/autoload.php');
-	Router::init();
-}
 Nostore::on();
 $ans = array();
 $type = Ans::REQ('type', ['sync', 'orders','order','list','cart','user','admin']);

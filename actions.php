@@ -180,13 +180,15 @@ if ($action == 'saved') {
 
 } else if ($action == 'realdel') {
 	
-	$myorders=Session::get('safe.orders',array());
-	infra_forr($myorders, function ($id) use ($order) {
+	$myorders = Session::get('safe.orders', array());
+
+	Each::forr($myorders, function ($id) use ($order) {
 		if ($order['id'] == $id) return new infra_Fix('del',true);
 	});
+	
 	$path = Cart::getPath($id);
-	$src=infra_theme($path);
-	if ($src)unlink(ROOT.$src);
+	$src = Path::theme($path);
+	if ($src) unlink($src);
 
 } else if ($action == 'clear') {
 	if (!$order['basket']) return Ans::err($ans, 'Корзина уже пустая');
