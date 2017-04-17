@@ -81,7 +81,6 @@ if ($type == 'user') {
 
 	if (!$orderid) {
 		// работаем с активной заявкой
-
 		$order = Cart::getGoodOrder();
 		$ans['order'] = $order;
 	}

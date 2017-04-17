@@ -77,6 +77,7 @@ class Cart {
 		return Once::exec(__FILE__.'-getGoodOrder', function &($id, $re) use (&$order) {
 			
 			if (!$order) $order = Cart::loadOrder($id, $re);
+
 			$r = false;
 			if (!$order) return $r;//Нет заявки с таким $id
 			$order['id'] = $id;
@@ -98,20 +99,17 @@ class Cart {
 					return $r;
 				}
 				if (empty($order['rule']['freeze'])) {
-					$pos=Cart::getByProdart($prodart);
+					$pos = Cart::getByProdart($prodart);
 					if (!$pos) {
-
 						$r = new Fix('del');
 						return $r;
 					}
 				} else {
 					$p = Cart::getByProdart($prodart);
-					
 					if (empty($pos['article'])) {//Такое может быть со старыми заявками... deprcated удалить потом.
 						//Значит позиция некорректно заморожена
-						$pos=Cart::getByProdart($prodart);
+						$pos = Cart::getByProdart($prodart);
 						if (!$pos) {
-
 							$r = new Fix('del');
 							return $r;
 						}
