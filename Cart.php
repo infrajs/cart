@@ -426,7 +426,13 @@ class Cart {
 
 		if (!$id) {
 			if (!empty($order['fixid'])) {
+				
 				$id = $order['fixid'];//Заявка уже есть в списке моих заявок
+
+			} else if ($order['status'] == 'active') {
+				//Активная заявка и нет fixid не сохраняем в файл
+				Session::set('orders.my', $order);//Исключение, данные заявки
+				return;
 			} else {
 				$id = time();
 				$src = Cart::getPath($id);
@@ -468,14 +474,14 @@ class Cart {
 			});
 		}
 
-		if ($order['status'] == 'active') {//Сохраняем активную заявку без лишних данных, нужно хронить её номер чтобы другая заявка не заняла
+		if ($order['status'] == 'active') { //Сохраняем активную заявку без лишних данных, нужно хронить её номер чтобы другая заявка не заняла
 			$order['fixid'] = $id;
 			unset($order['id']);//У активной заявки нет id
 			$oldactive = Session::get('orders.my');
 			if (!empty($oldactive['fixid'])) { //Освобождаем старую активную заявку
 				unlink(Path::resolve(Cart::getPath($oldactive['fixid'])));
 			}
-			Session::set('orders.my', $order);//Исключение, данные заявки хранятся в user
+			Session::set('orders.my', $order);//Исключение, данные заявки
 			if (empty($order['phone'])) $order['phone'] = '';
 			if (empty($order['name'])) $order['name'] = '';
 			$save = array(

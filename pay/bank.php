@@ -3,7 +3,7 @@
 	require_once(ROOT.'infra/plugins/infra/infra.php');
 	infra_require('-cart/cart.inc.php');
 	$ans=array();
-
+	exit;
 	
 	$ba=$_REQUEST; //banksAnswer
 	$conf=infra_config();
