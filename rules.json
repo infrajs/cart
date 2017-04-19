@@ -105,6 +105,7 @@
 				"orders":"/cart",
 				"admin":"/cart/admin"
 			},
+
 			"checkdata":true,
 			"title":"Отправить заявку на проверку",
 			"confirm":"Отправить заявку на проверку?",
@@ -154,6 +155,7 @@
 			"result":"Заявка {id} сделана активной."
 		},
 		"sync":{
+			"goal":"cart",
 			"checkdata":false,
 			"title":"Отправить изменения на сервер",
 			"confirm":"Сохранить данные заявки {id}?",

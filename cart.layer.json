@@ -5,7 +5,6 @@
 	"tplroot":"CART",
 	"json":"-cart/?type=cart",
 	"global":["user", "cart"],
-	"onsubmit":true,
 	"conf":"cart",
 	"childs":{
 		"orders":{
@@ -20,14 +19,13 @@
 				"tpl":"-cart/cart.tpl",
 				"global":["user", "cart"],
 				"tplroot":"ORDER",
-				"onsubmit":true,
+				"goal":"cart",
 				"childs":{
 					"list":{
 						"tpl":"-cart/cart.tpl",
 						"tplroot":"LIST",
 						"global":["user", "cart"],
 						"jsontpl":"-cart/?type=list&id={crumb.parent.name}&add={crumb.child.child.name}",
-						"onsubmit":true,
 						"autosavenametpl":"{crumb.parent.parent.name}.{crumb.parent.name}"
 					}
 				}
@@ -43,7 +41,6 @@
 				"autosavenametpl":"admin.{crumb.name}",
 				"tpl":"-cart/cart.tpl",
 				"global":"order",
-				"onsubmit":true,
 				"tplroot":"ADMORDER",
 				"childs":{
 					"list":{
@@ -51,7 +48,6 @@
 						"tplroot":"LIST",
 						"global":["user", "cart"],
 						"jsontpl":"-cart/?type=list&id={crumb.parent.name}",
-						"onsubmit":true,
 						"autosavenametpl":"{crumb.parent.parent.name}.{crumb.parent.name}"
 					}
 				}
