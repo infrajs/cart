@@ -658,7 +658,7 @@
 			<div class="cartcontacts">
 				{order:orderfields}
 				<div>
-					<strong>Сообщение для менеджера</strong>
+					<strong>Сообщение для менеджера</strong> <br><i>Реквизиты для счёта, адрес доставки и т.п.</i>
 					<textarea name="comment" class="form-control" rows="4">{order.comment}</textarea>
 				</div>
 			</div>

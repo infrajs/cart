@@ -15,7 +15,7 @@
 				"actions":["sync","active","saved"]
 			},
 			"manager":{
-				"buttons":{"picked":"success"},
+				"buttons":{"sync":"default", "picked":"success"},
 				"actions":["sync","saved","picked"]
 			}
 		},
@@ -155,9 +155,9 @@
 		},
 		"sync":{
 			"checkdata":false,
-			"title":"Синхронизация заявки с сервером",
-			"confirm":"Заявка {id} будет синхронизирована?.",
-			"result":"Заявка {id} синхронизирована."
+			"title":"Отправить изменения на сервер",
+			"confirm":"Сохранить данные заявки {id}?",
+			"result":"Данные заявки {id} сохранены."
 		}
 	},
 	"mails":{
