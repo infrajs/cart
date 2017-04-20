@@ -164,7 +164,7 @@
 	},
 	"mails":{
 		"orderToCheck":"{site} заявка отправлена на проверку",
-		"AdmOrderToCheck":"{site} заявка отправлена на проверку",
+		"AdmOrderToCheck":"{site} {email} заявка отправлена на проверку",
 
 		"setPaid":"{site} зафиксирована оплата заявки",
 		"ready":"{site} заявка готова к оплате!",
@@ -176,10 +176,10 @@
 		"picked":"{site} заявка укомплектована",
 
 		"bankrefunds":"{site} возврат оплаты",
-		"AdmBankrefunds":"{site} возврат оплаты",
+		"AdmBankrefunds":"{site} {email} возврат оплаты",
 
 		"bankpaid":"{site} заявка оплачена",
-		"AdmBankpaid":"{site} оплачена заявка",
+		"AdmBankpaid":"{site} {email} оплачена заявка",
 
 		"signup":"{site} регистрация на сайте",
 		"resendpass":"{site} восстановление пароля",
