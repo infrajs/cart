@@ -259,7 +259,7 @@
 					<td rowspan="3"></td>
 					<td rowspan="3" style="width:1px">
 						<a href="/catalog/{producer}/{article}">
-							<img src="/-imager/?h=90&src={Config.get(:catalog).dir}{producer}/{article}/&or=-imager/empty">
+							<img src="/-imager/?h=90&src={Config.get(:catalog).dir}{producer}/{article}/&or=-imager/empty.png">
 						</a>
 					</td>
 					<td style="">
