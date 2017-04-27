@@ -501,7 +501,10 @@ class Cart {
 	}
 	public static function getPosHash($pos) {
 		$conf = Config::get('cart');
+		if(!isset($pos['Цена оптовая'])) $pos['Цена оптовая'] = '';
+		if(!isset($pos['Цена розничная'])) $pos['Цена розничная'] = '';
 		if ($conf['opt']) return md5($pos['Цена оптовая'].':'.$pos['Цена розничная']);
+		if(!isset($pos['Цена'])) $pos['Цена'] = '';
 		else return md5($pos['Цена']);
 	}
 	public static function lang($str = null)
