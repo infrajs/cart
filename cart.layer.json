@@ -19,7 +19,6 @@
 				"tpl":"-cart/cart.tpl",
 				"global":["user", "cart"],
 				"tplroot":"ORDER",
-				"goal":"cart",
 				"childs":{
 					"list":{
 						"tpl":"-cart/cart.tpl",
