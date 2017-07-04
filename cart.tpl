@@ -106,13 +106,13 @@
 								var prodart=$(this).data('producer')+' '+$(this).data('article');
 								var pos = gorder.basket[prodart];
 								if (!pos) {
-									$(this).addClass('bg-info').removeClass('bg-success');
+									$(this).parent().addClass('bg-info').removeClass('bg-success');
 								} else if (gorder.merchdyn) {
 									$(this).html(tplcost(pos.sumopt));
-									$(this).addClass('bg-success').removeClass('bg-info');
+									$(this).parent().addClass('bg-success').removeClass('bg-info');
 								} else {
 									$(this).html(Template.parse('-cart/cart.tpl',pos,'itemcost','sumroz'));
-									$(this).addClass('bg-info').removeClass('bg-success');
+									$(this).parent().addClass('bg-info').removeClass('bg-success');
 								}
 							});
 
@@ -120,13 +120,13 @@
 								var prodart=$(this).data('producer')+' '+$(this).data('article');
 								var pos = gorder.basket[prodart];
 								if (!pos) {
-									$(this).find('.cost').addClass('bg-info').removeClass('bg-success');
+									$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
 								} else if (gorder.merchdyn) {
 									$(this).find('.cost').html(tplcost(pos['Цена оптовая']));
-									$(this).find('.cost').addClass('bg-success').removeClass('bg-info');
+									$(this).find('.cost').parent().addClass('bg-success').removeClass('bg-info');
 								} else {
 									$(this).find('.cost').html(tplcost(pos['Цена розничная']));
-									$(this).find('.cost').addClass('bg-info').removeClass('bg-success');
+									$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
 								}
 							});
 							
@@ -134,13 +134,13 @@
 							div.find('.cartsumopt').html(tplcost(gorder.sumopt));
 							if (gorder.merchdyn) {
 								div.find('.cartsum').html(tplcost(gorder.sumopt));
-								div.find('.cartsum').addClass('bg-success').removeClass('bg-info');
+								div.find('.cartsum').parent().addClass('bg-success').removeClass('bg-info');
 								if (gorder.sumroz != gorder.sumopt) {
 									div.find('.cartsumdel').html(tplcost(gorder.sumroz));
 								}
 							} else {
 								div.find('.cartsum').html(tplcost(gorder.sumroz));
-								div.find('.cartsum').addClass('bg-info').removeClass('bg-success');
+								div.find('.cartsum').parent().addClass('bg-info').removeClass('bg-success');
 								div.find('.cartsumdel').html(tplcost(''));
 							}
 						} else {
@@ -156,12 +156,12 @@
 									ordersumroz += sumroz;
 									$(this).find('.sum').html(tplcost(sumroz));
 								}
-								$(this).find('.sum').addClass('bg-info').removeClass('bg-success');
-								$(this).find('.cost').addClass('bg-info').removeClass('bg-success');
+								$(this).find('.sum').parent().addClass('bg-info').removeClass('bg-success');
+								$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
 							});
 							div.find('.cartsumroz').html(tplcost(ordersumroz));
 							div.find('.cartsum').html(tplcost(ordersumroz));
-							div.find('.cartsum').addClass('bg-info').removeClass('bg-success');
+							div.find('.cartsum').parent().addClass('bg-info').removeClass('bg-success');
 							div.find('.cartsumdel').html(tplcost(''));
 						}
 					}
@@ -169,14 +169,20 @@
 						var layer = Controller.ids['{id}'];
 						//history.replaceState(null,null,'/'+layer.crumb);
 						if (layer.crumb.child) Crumb.go('/'+layer.crumb, false);
+						
 						Event.handler('Layer.onshow', function () {
 							var div = $('#'+layer.div);
+							var timer;
 							calc(div, layer);
 							div.find('[type=number]').change( function () {
 								div.find('.refresh').show();
-								
+								clearTimeout(timer);
+								timer = setTimeout( function () {
+									div.find('.refresh').click();	
+								}, 2000);
 							});
 							div.find('.refresh').click( function () {
+								clearTimeout(timer);
 								div.find('.refresh').hide();
 								Global.set('cart');
 								calc(div, layer);
@@ -227,12 +233,20 @@
 			</div>
 		</div>
 	{cartlist:}
-		<table class="table">
+		<table class="table cart">
 			{basket::cartpos}
 		</table>
-		<div>Итого: <span class="cartsum"></span> <del title="Розничная цена" style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel"></del></div>
+		<table style="width:auto">
+			<tr>
+				<td style="padding:5px">
+					Итого: <b class="cartsum"></b>
+					<del title="Розничная цена" style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel"></del>
+				</td>
+			</tr>
+		</table>
+		
 		<div style="margin-top:10px">
-			<a onclick="Cart.goTop();" href="/{crumb.parent}" style="text-decoration:none" class="btn btn-success">Перейти к {data.order.id?:заявке {data.order.id}?:оформлению заявки}</a>
+			<a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-success">Перейти к {data.order.id?:заявке {data.order.id}?:оформлению заявки}</a>
 		</div>
 		{cartname:}
 		{cartpos:}
@@ -262,11 +276,11 @@
 							<img src="/-imager/?h=90&src={Config.get(:catalog).dir}{producer}/{article}/&or=-imager/empty.png">
 						</a>
 					</td>
-					<td style="">
+					<td>
 						Цена:
 					</td>
 					<td style="text-align:center">
-						<span class="pe-7s-refresh refresh"></span>
+						<div class="spin"><span class="pe-7s-refresh refresh"></span></div>
 
 					</td>
 					<td style="white-space:nowrap;">
@@ -282,7 +296,8 @@
 						<input value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer} {article}.count"></td>
 					<td style="white-space:nowrap; vertical-align:middle">
 						<span class="sum" data-article="{article}" data-producer="{Производитель}"></span>
-					</td>	
+					</td>
+
 				</tr>
 				<tr>
 					<td colspan="4" style="height:100%"></td>
@@ -329,7 +344,7 @@
 
 	<p>{~length(data.list)?:showinfo?:Для вас нет важных сообщений.}</p>
 	<p>
-		В <a onclick="Cart.goTop();" href="/cart/orders/my/list">корзине</a> активной заявки <b>{data.order.count}</b> {~words(data.order.count,:позиция,:позиции,:позиций)}.
+		В <a href="/cart/orders/my/list">корзине</a> активной заявки <b>{data.order.count}</b> {~words(data.order.count,:позиция,:позиции,:позиций)}.
 	</p>
 	
 	{data.admin?:adminControl}
@@ -340,10 +355,10 @@
 		</table>
 	{stinfo:}
 		<tr class="{data.rules.rules[~key].notice}"><td>{data.rules.rules[~key].caption}</td><td>{::prorder}</td></tr>
-		{prorder:}{~key?:comma}<a onclick="Cart.goTop()" href="/cart/orders/{id}">{id}</a>
+		{prorder:}{~key?:comma}<a href="/cart/orders/{id}">{id}</a>
 	{noaccount:}
 		<p>
-			<b><a onclick="Cart.goTop()" href="/user">Вход</a> не выполнен!</b>
+			<b><a href="/user">Вход</a> не выполнен!</b>
 		</p>
 	{account:}
 		<p>
@@ -389,7 +404,7 @@
 				})
 			</script>
 		{allertForAdmin:}
-			<div class="mesage">Необходимо <a onclick="Cart.goTop()" href="/user/signup">зарегистрироваться</a>, чтобы получить права менеджера</div>
+			<div class="mesage">Необходимо <a href="/user/signup">зарегистрироваться</a>, чтобы получить права менеджера</div>
 {ORDERS:}
 	<ol class="breadcrumb">
 		<li><a href="/">Главная</a></li>
@@ -403,7 +418,7 @@
 	<h1>Мои заявки</h1>
 	{~length(data.orders)?:ordersList?:noOrders}
 	<div style="margin-top:10px">
-		<a onclick="Cart.goTop();" href="/cart/orders/my/list" style="text-decoration:none" class="btn btn-success">Активная заявка ({data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)})</a>
+		<a href="/cart/orders/my/list" style="text-decoration:none" class="btn btn-success">Активная заявка ({data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)})</a>
 	</div>
 	{noOrders:} <div>В данный момент у вас нет сохранённых заявок с товарами.</div>
 	
@@ -428,13 +443,13 @@
 		{rowOrders:}
 			<tr>
 				<td>
-					<a onclick="Cart.goTop()" href="/cart/orders/{status=:active?:my?id}">{status=:active?:Активная?id}</a>
+					<a href="/cart/orders/{status=:active?:my?id}">{status=:active?:Активная?id}</a>
 				</td>
 				<td>
 					{rule.short}
 				</td>
-				<td>
-					<span class="{merchdyn?:bg-success?(manage.summary|:bg-info)}">{total:itemcost}</span>
+				<td class="{merchdyn?:bg-success?(manage.summary|:bg-info)}">
+					<span>{total:itemcost}</span>
 				</td>
 				<td>
 					{basket::product}
@@ -643,7 +658,7 @@
 		{data.ismy?:activebutton}
 	{activebutton:}
 		<div style="margin-top:10px">
-			<a onclick="Cart.goTop()" href="/cart/orders/my" class="btn btn-success">
+			<a href="/cart/orders/my" class="btn btn-success">
 				Показать заявку
 			</a>
 		</div>
@@ -658,7 +673,8 @@
 			<div class="cartcontacts">
 				{order:orderfields}
 				<div>
-					<strong>Сообщение для менеджера</strong> <br><i>Реквизиты для счёта, адрес доставки и т.п.</i>
+					<strong>Сообщение для менеджера</strong> <br><i>Укажите, пожалуйста, как вам удобно оплатить и получить товар, адрес доставки если требуется. 
+					<br>С вами свяжется менеджер для уточнения деталей.</i>
 					<textarea name="comment" class="form-control" rows="4">{order.comment}</textarea>
 				</div>
 			</div>
@@ -732,7 +748,7 @@
 	<table class="table table-striped">
 		<tr>
 			<th>Позиция</th>
-			<th><span class="bg-info">Цена</span></th>
+			<th class="bg-info"><span>Цена</span></th>
 			<th>Количество</th>
 			<th>Сумма</th>
 		</tr>
@@ -745,7 +761,7 @@
 	<table class="table table-striped">
 		<tr>
 			<th>Позиция</th>
-			<th><span class="{merchdyn?:bg-success?:bg-info}">Цена {merchdyn?: оптовая?: розничная}</span></th>
+			<th class="{merchdyn?:bg-success?:bg-info}"><span>Цена {merchdyn?: оптовая?: розничная}</span></th>
 			<th>Количество</th>
 			<th>Сумма</th>
 		</tr>
@@ -810,14 +826,14 @@
 		{adm_row:}
 			<tr>
 				<td>
-					<a onclick="Cart.goTop()" href="/cart/admin/{id}">{id}</a>
+					<a href="/cart/admin/{id}">{id}</a>
 				</td>
 				<td>{email}</td>
 				<td>	
 					{rule.short}
 				</td>
-				<td>
-					<span style="cursor:pointer" onclick="$(this).next().toggle()" class="{merchdyn?:bg-success?(manage.summary|:bg-info)}">
+				<td class="{merchdyn?:bg-success?(manage.summary|:bg-info)}">
+					<span style="cursor:pointer" onclick="$(this).next().toggle()">
 						{total:itemcost}</span>
 						<div style="font-size:10px; text-align:left; display:none;">
 							Доставка <b>{manage.deliverycost:itemcost}</b><br>

@@ -201,12 +201,13 @@ window.Cart = {
 	lang: function (str) {
 		if(typeof(str) == 'undefined') return Lang.name('cart');
 		return Lang.str('cart', str);
-	},
+	}
+	/*,
 	initPrice: function (div) {
 		div.find('.cat_item').each( function () {
-			var cart=$(this).find('.basket_img');
+			var cart = $(this).find('.basket_img');
 
-			var id=cart.data('producer')+' '+cart.data('article');
+			var id = cart.data('producer')+' '+cart.data('article');
 			if (Session.get('order.my.basket.'+id)) {
 				$(this).find('.posbasket').show();
 				cart.addClass('basket_img_sel');
@@ -243,14 +244,32 @@ window.Cart = {
 		}, function () {
 			$(this).removeClass('basket_img_over');
 		});
+	}*/
+	,
+	activate: function (a) {
+		var orderid = a.data('order');
+		if (!orderid) orderid = 'my';
+
+		var prodart = a.data('producer')+' '+a.data('article');
+		var name = ['orders', orderid, 'basket', prodart];
+		var r = Session.get(name);
+		if (r || orderid != 'my') {
+			a.next().stop().slideDown();
+			a.addClass('selected');
+			a.attr('title','Удалить из корзины');
+		} else {
+			a.next().stop().slideUp();	
+			a.removeClass('selected');
+			a.attr('title','Добавить в корзину');
+		}
 	}
 }
+/*
 Event.handler('Session.onsync', function () {
 	$(document).find('.cat_item').each( function () {
-		var cart=$(this).find('.basket_img');
-
-		var id=cart.data('producer')+' '+cart.data('article');
-		if (Session.get('order.my.basket.'+id)) {
+		var cart = $(this).find('.basket_img');
+		var id = cart.data('producer') + ' ' + cart.data('article');
+		if (Session.get('order.my.basket.' + id)) {
 			$(this).find('.posbasket').show();
 			cart.addClass('basket_img_sel');
 			cart.attr('title','Удалить из корзины');
@@ -259,3 +278,4 @@ Event.handler('Session.onsync', function () {
 		}
 	});
 });
+*/

@@ -20,21 +20,6 @@
 
 
 .cart .spin {
-	-webkit-animation-name: cart-spin;
-	-webkit-animation-duration: 600ms;
-	-webkit-animation-iteration-count: infinite;
-	-webkit-animation-timing-function: linear;
-
-	-moz-animation-name: cart-spin;
-	-moz-animation-duration: 600ms;
-	-moz-animation-iteration-count: infinite;
-	-moz-animation-timing-function: linear;
-
-	-ms-animation-name: cart-spin;
-	-ms-animation-duration: 600ms;
-	-ms-animation-iteration-count: infinite;
-	-ms-animation-timing-function: linear;
-
 	animation-name: cart-spin;
 	animation-duration: 600ms;
 	animation-iteration-count: infinite;
@@ -77,4 +62,20 @@
 .cart .ordersList td {
 	text-align: center;
 	vertical-align: middle;
+}
+@keyframes cart-flash {
+	from {
+		background: #00809e; 
+	}
+	to {
+		background: #468847;
+	}
+}
+.cart .flash {
+	animation: cart-flash 1s infinite alternate;
+	animation-timing-function:ease-in-out;
+	display:inline-block;
+}
+.cart .selected .flash, .cart .flash:hover {
+	animation:none;
 }
