@@ -237,6 +237,9 @@ class Cart {
 		if (Session::get('safe.manager') || !empty($rule['edit'][$place])) { //Place - orders admin wholesale
 			$r = Cart::mergeOrder($order, $place);
 			if ($r) Cart::saveOrder($order, $place);
+		} else {
+			$r = Cart::mergeOrder($order, $place, true);
+			if ($r) Cart::saveOrder($order, $place);
 		}
 	}
 	public static function isMy($id) {
@@ -252,11 +255,9 @@ class Cart {
 		$order = Cart::loadOrder($id);
 		if ($action === true) return true;
 		$rule = Cart::getRule($order);
-		if ($rule['user']['buttons'][$action]) return true;
-		return Each::exec($rule['user']['actions'], function &($r) use($action) {
-			$r = true;
-			if ($r['act'] == $action) return $r;
+		return Each::exec($rule['user']['actions'], function &($a) use ($action) {
 			$r = null;
+			if ($a['act'] == $action) $r = true;
 			return $r;
 		});
 	}
@@ -402,13 +403,19 @@ class Cart {
 		if ($to=='user') return Mail::fromAdmin($subject,$email,$body);
 		if ($to=='manager') return Mail::toAdmin($subject,$email,$body);
 	}
-	public static function mergeOrder(&$order, $place) {
+	public static function mergeOrder(&$order, $place, $safe = false) {
 		if (empty($order['id'])) return;
-		$actualdata = Session::get([$place, $order['id']], array());
-		foreach ($actualdata as $name => $val) {
-			if (!is_string($val)) continue;
-			$actualdata[$name] = trim(strip_tags($val));
+		if ($safe) {
+			$actualdata = Session::get([$place, $order['id']], array());
+			foreach ($actualdata as $name => $val) {
+				if (!is_string($val)) continue;
+				$actualdata[$name] = trim(strip_tags($val));
+			}
+		} else { //Когда нельзя редактировать... если хочется то можно сохранить комент
+			$val = Session::get([$place, $order['id'], 'comment'], '');
+			$actualdata[$name]['comment'] = trim(strip_tags($val));
 		}
+		
 		if (!Session::get('safe.manager') || $place != 'admin') {
 			unset($actualdata['manage']); //Только админ на странице admin может менять manage
 		}

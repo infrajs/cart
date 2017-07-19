@@ -46,10 +46,10 @@ if ($action == 'wholesaleDelete') {
 
 //Заявка принадлежит тому человеку, который первым изменил её статус с активного на какой-то
 //Передать заявку может и можно, но сумма по заявке будет всегда принадлежать первому человеку
-
-if (!Cart::canI($id, $action)) return Ans::err($ans, 'У вас нет доступа на совершение действия '.$action.' с заявкой {id}!');
+$ans['order'] = array('id' => $id);
+if (!Cart::canI($id, $action)) return Ans::err($ans, 'У вас нет доступа на совершение действия '.$action.' с заявкой '.$id.'!');
 $order = Cart::loadOrder($id);
-if (!$order) return Ans::err($ans, 'Заявка {id} не найдена');
+if (!$order) return Ans::err($ans, 'Заявка '.$id.' не найдена');
 $status = $order['status'];
 //На проверку может отправить и менеджер и пользователь, менедежр не может активную отправить на проверку
 //Если в текущем статусе были разрешены изменения, значит нужно проверить введёные данные
@@ -66,12 +66,12 @@ if (Session::get('safe.manager') || !empty($rule['edit'][$place])) { //Place - o
 }
 
 $ans['order'] = $order;
-if ($act['checkdata'] && $rule['edit'][$place]) {
+if (!empty($act['checkdata']) && !empty($rule['edit'][$place])) {
 	$email = empty($order['email']) ? null : $order['email'];
 	$msg = User::checkReg($email);
 	if (is_string($msg)) return Ans::err($ans,$msg);
 	//Действие требует проверку данных и текущий стату заявки разрешает редактирование, соответственно можно применит ьданные
-	if (!$order['basket']) return Ans::err($ans, 'Заявк пустая! Добавьте товар!');
+	if (empty($order['basket'])) return Ans::err($ans, 'Заявк пустая! Добавьте товар!');
 	$page = '';
 	if (empty($order['phone'])||!User::checkData($order['phone'],'value')) return Ans::err($ans, 'Укажите корректный телефон'.$page);
 	if (empty($order['name'])||!User::checkData($order['name'],'value')) return Ans::err($ans, 'Укажите корректное имя контактного лица'.$page);

@@ -3,6 +3,7 @@
 	"activelink":true,
 	"tpl":"-cart/cart.tpl",
 	"tplroot":"CART",
+	"onsubmit":true,
 	"json":"-cart/?type=cart",
 	"global":["user", "cart"],
 	"conf":"cart",

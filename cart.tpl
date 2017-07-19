@@ -445,7 +445,7 @@
 				<td>
 					<a href="/cart/orders/{status=:active?:my?id}">{status=:active?:Активная?id}</a>
 				</td>
-				<td>
+				<td style="white-space: nowrap;">
 					{rule.short}
 				</td>
 				<td class="{merchdyn?:bg-success?(manage.summary|:bg-info)}">
@@ -457,7 +457,7 @@
 				<td>{~date(:j F H:i,time)}</td>
 			</tr>
 			{dateform:}d.m.Y
-			{product:} <nobr>{count} <a href="/catalog/{producer}/{article}">{Артикул}</a>{~last()|:comma}</nobr>
+			{product:} <nobr><a href="/catalog/{producer}/{article}">{Артикул}</a><sup style="color:gray">{count}</sup>{~last()|:comma}</nobr>
 	{orderfields:}
 		<div class="form-group">
 			<label>Контактное лицо <span class="req">*</span></label>
