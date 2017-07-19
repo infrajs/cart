@@ -144,7 +144,7 @@ if ($action == 'saved') {
 		Session::set('order.my.time');
 		Session::set('order.my.manage');
 	}
-} else if ($action == 'cart-edit') {
+} else if ($action == 'remove') {
 	$prodart = Ans::REQ('prodart');
 	if (!$prodart) return Ans::err($ans, 'Требуется параметр prodart');
 	unset($order['basket'][$prodart]);

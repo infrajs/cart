@@ -23,12 +23,12 @@ window.Cart = {
 	},
 	getLink: function (order, place) {
 		if (place =='admin') {
-			var link = '<a onclick = "Cart.goTop()" href="/cart/'+place+'/{id}">{id}</a>';
+			var link = '<a onclick = "Popup.closeAll();" href="/cart/'+place+'/{id}">{id}</a>';
 		} else {//place =='orders'
 			if (!order.id) {
-				var link = '<a onclick = "Cart.goTop()" href="/cart/'+place+'/my">Активная заявка</a>';
+				var link = '<a onclick = "Popup.closeAll();" href="/cart/'+place+'/my">Активная заявка</a>';
 			} else {
-				var link = '<a onclick = "Cart.goTop()" href="/cart/'+place+'/{id}">{id}</a>';
+				var link = '<a onclick = "Popup.closeAll();" href="/cart/'+place+'/{id}">{id}</a>';
 			}			
 		}
 		link = Template.parse([link],order);
@@ -65,11 +65,11 @@ window.Cart = {
 	
 		var link = Cart.getLink(order, place);
 		var ask = Template.parse([act.confirm], order);
-		ask = link+'<br>'+ask;
+		ask = 'Заявка '+link+'<br>'+ask;
 		popup.confirm(ask, function () { 
 			//if (!act.link) Cart.blockform(layer);
 			Cart.act(place, name, orderid, function (ans) {
-				Cart.goTop( function () {
+				var call = function () {
 					var order = Cart.getGoodOrder(ans.order.id);
 					if (order) {
 						order.place = place;
@@ -109,7 +109,9 @@ window.Cart = {
 						}
 					}
 					if (cb && ans.result) cb(ans);
-				});
+				}
+				if (act.noscroll) call();
+				else Cart.goTop(call);					
 			}, param);
 		});
 	},
@@ -179,24 +181,33 @@ window.Cart = {
 		return order.order;
 	},
 	toggle: function (place, orderid, prodart, cb) {
+		var name = [place, orderid, 'basket', prodart];
+		var order = Cart.getGoodOrder(orderid);
+		var r = Sequence.get(order, ['basket', prodart, 'count']);
+		if (r) {
+			Cart.remove(place, orderid, prodart, cb);
+		} else {
+			Cart.add(place, orderid, prodart, cb);
+		}
+		return !r;
+	},
+	remove: function (place, orderid, prodart, cb) {
+		var fn = function () {
+			if (cb) cb();
+			Global.check(['cat_basket', 'order', 'cart']);
+		}
+		Cart.action(place, 'remove', orderid, function () {
+			var name = [place, orderid, 'basket', prodart];
+			Session.set(name, null, true, fn);
+		}, 'prodart=' + prodart);
+	},
+	add: function (place, orderid, prodart, cb) {
 		var fn = function () {
 			if (cb) cb();
 			Global.check(['cat_basket','order','cart']);
 		}
-		//if (orderid != 'my') {
 		var name = [place, orderid, 'basket', prodart];
-		var r = Session.get(name);
-		if (r) {
-			Session.set(name, null, true, fn);
-		} else {
-			Session.set(name, { count: 1 }, true, fn);
-		}
-		/*} else {
-			var order = Cart.getGoodOrder(orderid);
-			var param = 'prodart=' + prodart
-			Cart.action('orders', 'cart-edit', orderid, fn, param);
-		}*/
-		return !r;
+		Session.set(name, { count: 1 }, true, fn);
 	},
 	lang: function (str) {
 		if(typeof(str) == 'undefined') return Lang.name('cart');
