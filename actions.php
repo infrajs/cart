@@ -126,7 +126,7 @@ if ($action == 'saved') {
 	$msg = Cart::sync($place, $orderid);
 } else if ($action == 'setPaid') {//Обновить данные из каталога
 	$ogood = Cart::getGoodOrder($orderid);
-	if ($order['manage']['paid']) return Ans::err($ans, 'По заявке {id} уже есть отметка об оплате {paid}');
+	if ($order['manage']['paid']) return Ans::err($ans, 'По заявке '.$id.' уже есть отметка об оплате');
 	$order['manage']['paid'] = $ogood['alltotal'];
 	$order['manage']['paidtime']=time();
 	$order['manage']['paidtype']='manager';

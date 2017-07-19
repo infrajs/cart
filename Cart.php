@@ -405,7 +405,9 @@ class Cart {
 	}
 	public static function mergeOrder(&$order, $place, $safe = false) {
 		if (empty($order['id'])) return;
-		if ($safe) {
+
+		
+		if (!$safe) {
 			$actualdata = Session::get([$place, $order['id']], array());
 			foreach ($actualdata as $name => $val) {
 				if (!is_string($val)) continue;
@@ -415,7 +417,6 @@ class Cart {
 			$val = Session::get([$place, $order['id'], 'comment'], '');
 			$actualdata['comment'] = trim(strip_tags($val));
 		}
-		
 		if (!Session::get('safe.manager') || $place != 'admin') {
 			unset($actualdata['manage']); //Только админ на странице admin может менять manage
 		}
@@ -449,14 +450,12 @@ class Cart {
 				}
 				$myorders = Session::get(['safe','orders'], array());
 				$myorders[] = $id;
-				$myorders = array_values($myorders);//depricated fix old errors in session
+				//$myorders = array_values($myorders);//depricated fix old errors in session
 				Session::set(['safe','orders'], $myorders);
 			}
 		} else {
-			if ($place) {
-				$src = Cart::getPath($id);
-				Session::set($place.$id);
-			}
+			if ($place) Session::set([$place, $id]);
+			$src = Cart::getPath($id);
 		}
 		$rules = Load::loadJSON('-cart/rules.json');
 		if ($rules['rules'][$order['status']]['freeze']) {//Текущий статус должен замораживать позиции

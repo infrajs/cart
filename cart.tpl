@@ -263,7 +263,7 @@
 					</td>
 					<td style="vertical-align:middle;">
 						<div style="float:right; margin-right:10px" class="cart">
-							<span class="abasket bg-danger" data-order="{data.order.id}" data-producer="{producer}" data-article="{article}">
+							<span class="abasket bg-danger" data-place="{crumb.parent.parent.name}" data-order="{data.order.id}" data-producer="{producer}" data-article="{article}">
 								<span class="pe-7s-close-circle"></span>
 							</span>
 						</div>

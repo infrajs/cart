@@ -4,8 +4,10 @@ Event.handler('Controller.onshow', function () {
 		var a = $(this);
 		var prodart = a.data('producer')+' '+a.data('article');
 		var orderid = a.data('order');
+		var place = a.data('place');
+		if (!place) place = 'orders';
 		if (!orderid) orderid = 'my';
-		Cart.toggle(orderid, prodart, function () {
+		Cart.toggle(place, orderid, prodart, function () {
 			Cart.activate(a);	
 		});	
 	}).each(function(){

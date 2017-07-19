@@ -178,13 +178,13 @@ window.Cart = {
 		if (!order.result) return false;
 		return order.order;
 	},
-	toggle: function (orderid, prodart, cb) {
+	toggle: function (place, orderid, prodart, cb) {
 		var fn = function () {
 			if (cb) cb();
 			Global.check(['cat_basket','order','cart']);
 		}
 		//if (orderid != 'my') {
-		var name = ['orders', orderid, 'basket', prodart];
+		var name = [place, orderid, 'basket', prodart];
 		var r = Session.get(name);
 		if (r) {
 			Session.set(name, null, true, fn);
