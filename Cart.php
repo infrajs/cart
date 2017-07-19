@@ -413,7 +413,7 @@ class Cart {
 			}
 		} else { //Когда нельзя редактировать... если хочется то можно сохранить комент
 			$val = Session::get([$place, $order['id'], 'comment'], '');
-			$actualdata[$name]['comment'] = trim(strip_tags($val));
+			$actualdata['comment'] = trim(strip_tags($val));
 		}
 		
 		if (!Session::get('safe.manager') || $place != 'admin') {

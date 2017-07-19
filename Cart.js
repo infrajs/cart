@@ -162,9 +162,9 @@ window.Cart = {
 	canI: function (id, action) {//action true совпадёт с любой строчкой
 		var order = Cart.getGoodOrder(id);
 		if (!order) return false;
-		if (Sequence.get(order,['rule','user','buttons',action]))return true;
-		return infra.forr(Sequence.get(order,['rule','user','actions']), function (r) {
-			if (r['act']==action)return true;
+		//if (Sequence.get(order,['rule','user','buttons',action]))return true;
+		return Each.exec(Sequence.get(order,['rule','user','actions']), function (r) {
+			if (r['act'] == action) return true;
 		});
 	},
 	getGoodOrder: function (orderid) {

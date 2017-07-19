@@ -143,7 +143,7 @@ if ($type == 'user') {
 	//Заява либо моя либо это менеджер
 	if (!isset($_GET['easy'])){
 		$order = Cart::getGoodOrder($order);
-		if (!$order['rule']['edit'][$place]) return Ans::err($ans,'Редактировать заявку в текущем статусе нельзя. '.$order['rule']['title'].'!');
+		if (!Session::get('safe.manager') && empty($order['rule']['edit'][$place])) return Ans::err($ans,'Редактировать заявку в текущем статусе нельзя. '.$order['rule']['title'].'!');
 		$order['place'] = $place;
 		$order['user'] = Load::loadJSON('-cart/?type=user');
 		$order['ismy'] = Cart::isMy($orderid);
