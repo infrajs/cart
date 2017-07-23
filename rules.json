@@ -137,8 +137,7 @@
 			"checkdata":false,
 			"title":"Сохранить",
 			"confirm":"Сохранить данные заявки?",
-			"result":"Данные заявки сохранены.",
-			"mangmail":"AdmEdit"
+			"result":"Данные заявки сохранены."
 		}
 	},
 	"mails":{
