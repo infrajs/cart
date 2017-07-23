@@ -529,7 +529,7 @@ class Cart {
 		$rules = Load::loadJSON('-cart/rules.json');
 		$order = $ans['order'];
 		$rule = $rules['actions'][$action];
-		if ($ans['place'] != 'admin') { //Админ сам решает когда, что отправлять
+		if ($ans['place'] != 'admin'  && !empty($order['email'])) { //Админ сам решает когда, что отправлять
 			if (!empty($rule['usermail'])) {
 				Cart::mail('user', $order['email'], $rule['usermail'], $ans['order']);
 			}
