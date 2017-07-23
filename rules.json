@@ -1,4 +1,6 @@
 {
+	"list":["check","wait"],
+	"def":"wait",
 	"rules":{
 		"check":{
 			"freeze":true,
@@ -11,50 +13,49 @@
 			"caption":"Заявки ожидающие проверку менеджера",
 			"title":"Заявка находится на проверке",
 			"user":{
-				"buttons":{"sync":"default"},
-				"actions":["sync","active","saved"]
+				"buttons":{"active":"danger", "sync":"success"},
+				"actions":["sync","active"]
 			},
 			"manager":{
-				"buttons":{"sync":"default", "picked":"success"},
-				"actions":["sync","saved","picked"]
+				"buttons":{"wait":"primary", "complete":"warning", "sync":"success"},
+				"actions":["wait","complete","delete","email","sync"]
 			}
 		},
-		"picked":{
-			"freeze":true,
+		"wait":{
 			"edit":{
-				"orders":false,
-				"admin":false
+				"orders":true,
+				"admin":true
 			},
-			"notice":"warning",
-			"short":"Готова",
-			"caption":"Собранные заявки",
-			"title":"Заявка укомплектована",
+			"notice":"success",
+			"short":"Ожидание",
+			"caption":"Заявки ожидающие пользователя",
+			"title":"Заявка в ожидании",
 			"user":{
-				"buttons":{"sync":"default"},
-				"actions":["sync"]
+				"buttons":{"active":"danger","check":"success"},
+				"actions":["active","check"]
 			},
 			"manager":{
-				"buttons":{"complete":"success"},
-				"actions":["sync","check","saved","complete"]
+				"buttons":{"complete":"warning","email":"danger", "sync":"success"},
+				"actions":["check","complete","delete","email","sync"]
 			}
 		},
 		"complete":{
 			"freeze":true,
 			"edit":{
 				"orders":false,
-				"admin":false
+				"admin":true
 			},
 			"notice":"default",
 			"short":"Готова",
 			"caption":"Выполненные заявки",
 			"title":"Заявка выполнена",
 			"user":{
-				"buttons":{"sync":"default"},
-				"actions":["sync"]
+				"buttons":{"check":"success"},
+				"actions":[]
 			},
 			"manager":{
-				"buttons":{"complete":"success"},
-				"actions":["complete","sync","check","saved"]
+				"buttons":{"email":"danger"},
+				"actions":["wait","check","delete","email","sync"]
 			}
 		},
 		"active":{
@@ -72,78 +73,49 @@
 				"buttons":{
 					"check":"success"
 				},
-				"actions":["saved","check"]
-			}
-		},
-		"saved":{
-			"freeze":false,
-			"notice":"info",
-			"edit":{
-				"orders":true,
-				"admin":true
-			},
-			"caption":"Сохранённые заявки",
-			"short":"Сохранена",
-			"editable":true,
-			"title":"Сохранённая заявка",
-			"user":{
-				"buttons":{
-					"active":"default",
-					"check":"success"
-				},
-				"actions":["active","sync","check"]
-			},
-			"manager":{
-				"actions":["sync","check"]
+				"actions":["check"]
 			}
 		}
 	},
 	"actions":{
+		"delete":{
+			"go":{
+				"orders":"/cart",
+				"admin":"/cart/admin"
+			},
+			"title":"Удалить заявку",
+			"confirm":"Крайний вариант. Заявка бесследно исчезнет. Удалить заявку?",
+			"result":"Заявка удалена!"
+		},
+		"email":{
+			"title":"Отправить письмо",
+			"confirm":"<p>Отправить пользователю письмо об изменении заявки?</p><p>Что именно поменялось не забудьте указать в поле <b>сообщение для клиента</b> на странице.</p><p>Письмо {emailtime?:was?:no}{no:}<b>ещё не отправлялось</b>{was:}было <b>{~date(:j F H:i,emailtime)}</b></p>",
+			"result":"Письмо отправлено!",
+			"usermail":"edit",
+			"mangmail":"AdmEdit"
+		},
 		"check":{
 			"checkdata":true,
 			"go":{
-				"orders":"/cart",
-				"admin":"/cart/admin"
+				"orders":"/cart"
 			},
 			"goal":"cart",
 			"checkdata":true,
-			"title":"Отправить заявку на проверку",
-			"confirm":"Отправить заявку на проверку?",
-			"result":"Заявка отправлена на проверку менеджеру.<br>После проверки будет отправлено письмо на <b>{email}</b>.",
+			"title":"Отправить заявку менеджеру",
+			"confirm":"Будет присвоен заявке номер и оповещён Менеджер. Если есть какие-то уточнения, не забудьте указать их в поле <b>Сообщение для менеджера</b>.",
+			"result":"Заявка отправлена менеджеру.<br>После проверки будет отправлено письмо на <b>{email}</b>.",
 			"usermail":"orderToCheck",
 			"mangmail":"AdmOrderToCheck"
 		},
-		"picked":{
-			"checkdata":true,
-			"go":{
-				"admin":"/cart/admin"
-			},
-			"checkdata":true,
-			"title":"Заявка собрана",
-			"confirm":"Заявка собрана?",
-			"result":"Заявка готова к оплате и передачи клиенту.",
-			"usermail":"picked"
+		"wait":{
+			"title":"Заявка в ожидании",
+			"confirm":"От клиента, что-то ожидается. Оплата, получение товара или какая-то информация. Менеджер всё, что нужно сделал и ждёт.",
+			"result":"Заявка в ожидании."
 		},
 		"complete":{
-			"checkdata":true,
-			"go":{
-				"admin":"/cart/admin"
-			},
-			"checkdata":true,
 			"title":"Заявка выполнена",
-			"confirm":"Заявка выполнена?",
-			"result":"Заявка выполнена.",
-			"usermail":"complete"
-		},
-		"saved":{
-			"checkdata":false,
-			"go":{
-				"orders":"/cart",
-				"admin":"/cart/admin"
-			},
-			"title":"Сохранить заявку",
-			"confirm":"Заявка будет сохранена, продолжить?",
-			"result":"Заявка успешно сохранена!"
+			"confirm":"Заявка выполнена и больше возвращаться к ней не понадобиться ни менеджеру, ни пользователю. Не забудьте отправить письмо пользователю, если требуется.",
+			"result":"Заявка выполнена."
 		},
 		"active":{
 			"checkdata":false,
@@ -151,8 +123,8 @@
 				"orders":"/cart/orders/my"
 			},
 			"title":"Сделать заявку активной",
-			"confirm":"Заявку {id} сделать активной?",
-			"result":"Заявка {id} сделана активной."
+			"confirm":"Заявка будет сделана активной и в нёе можно будет добавлять новые позиции из каталога.",
+			"result":"Заявка сделана активной."
 		},
 		"remove":{
 			"checkdata":false,
@@ -163,12 +135,20 @@
 		},
 		"sync":{
 			"checkdata":false,
-			"title":"Отправить изменения на сервер",
-			"confirm":"Сохранить данные заявки {id}?",
-			"result":"Данные заявки {id} сохранены."
+			"title":"Сохранить",
+			"confirm":"Сохранить данные заявки?",
+			"result":"Данные заявки сохранены.",
+			"mangmail":"AdmEdit"
 		}
 	},
 	"mails":{
+		"orderToCheck":"{site} заявка отправлена на проверку",
+		"AdmOrderToCheck":"{site} {email} заявка отправлена на проверку",
+		
+		"edit":"{site} изменения по вашей заявке",
+		"AdmEdit":"{site} {email} изменения в заявке"
+	},
+	"mails-old":{
 		"orderToCheck":"{site} заявка отправлена на проверку",
 		"AdmOrderToCheck":"{site} {email} заявка отправлена на проверку",
 
@@ -187,10 +167,6 @@
 		"bankpaid":"{site} заявка оплачена",
 		"AdmBankpaid":"{site} {email} оплачена заявка",
 
-		"signup":"{site} регистрация на сайте",
-		"resendpass":"{site} восстановление пароля",
-
 		"refuseable":"{site} Разрешён возврат денег по оплаченной заявке"
-
 	}
 }

@@ -49,7 +49,7 @@ window.Cart = {
 		else param = '';
 		var path = '-cart/actions.php?id=' + orderid + '&type=' + name + '&place=' + place + param;
 		Cart.getJSON(path, function (ans) {
-			Global.set(['order','cat_basket','sign','user']);
+			Global.set(['cart','order','cat_basket','sign','user']);
 			Session.syncNow();
 			cb(ans);
 		});

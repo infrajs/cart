@@ -10,6 +10,7 @@ use infrajs\config\Config;
 use infrajs\session\Session;
 use infrajs\access\Access;
 use infrajs\user\User;
+use infrajs\each\Fix;
 
 if (!is_file('vendor/autoload.php')) {
 	chdir(explode('vendor/', __DIR__)[0]);
@@ -37,9 +38,9 @@ $conf = Config::get('cart');
 if ($action == 'wholesaleDelete') {	
 	if (!Session::get('safe.manager')) return Ans::err($ans, 'У вас нет доступа!');
 	$email = $id;
-	$data = Load::loadJSON('~merchants.json');
+	$data = Load::loadJSON('~cart/merchants.json');
 	unset($data['merchants'][$email]);
-	file_put_contents(Path::resolve('~merchants.json'), Load::json_encode($data));
+	file_put_contents(Path::resolve('~cart/merchants.json'), Load::json_encode($data));
 	return Ans::ret($ans);
 }
 
@@ -124,6 +125,9 @@ if ($action == 'saved') {
 	Cart::saveOrder($order, $place);
 } else if($action == 'sync') {
 	$msg = Cart::sync($place, $orderid);
+} else if($action == 'email') {
+	$order['emailtime'] = time();
+	Cart::saveOrder($order, $place);
 } else if ($action == 'setPaid') {//Обновить данные из каталога
 	$ogood = Cart::getGoodOrder($orderid);
 	if ($order['manage']['paid']) return Ans::err($ans, 'По заявке '.$id.' уже есть отметка об оплате');
@@ -151,13 +155,15 @@ if ($action == 'saved') {
 	Cart::saveOrder($order, $place);
 } else if ($action == 'active') {
 	
-	$noworder = Cart::loadOrder();
+	/*$noworder = Cart::loadOrder();
 	if (!empty($noworder['basket'])) {
 		return Ans::err($ans,
 			'У вас уже есть <a onclick="cart.goTop(); popup.close()" href="/cart/orders/my">активная непустая заявка</a>.<br>
 			Чтобы сделать заявку активной нужно<br>
 			очистить или сохранить текущую активную заявку!');
-	}
+	}*/
+	//Текущую заявку просто грохаем
+	
 	$order['status'] = 'active';
 	Cart::saveOrder($order, $place);
 } else if ($action == 'copy') {
@@ -165,7 +171,7 @@ if ($action == 'saved') {
 	$noworder = Cart::loadOrder();
 	if ($noworder['basket']) {
 		return Ans::err($ans,
-			'У вас уже есть <a onclick="cart.goTop(); popup.close()" href="/cart/orders/my">активная непустая заявка</a>.<br>
+			'У вас уже есть <a onclick="Popup.close()" href="/cart/orders/my">активная непустая заявка</a>.<br>
 			Чтобы сделать копию заявки нужно<br>
 			очистить или сохранить текущую активную заявку!');
 	}
@@ -178,12 +184,28 @@ if ($action == 'saved') {
 	$order['status'] = 'active';
 	Cart::saveOrder($order, $place);
 
+} else if ($action == 'delete') {
+	
+	$path = Cart::getPath($id);
+	$src = Path::theme($path);
+	if ($src) {
+		$dir = Path::theme(Cart::getPath());
+		$r = rename($src, $dir.'deleted/'.$id.'.json');
+		if (!$r) return Ans::err($ans, 'Неудалось удалить заявку');
+	}
+
+
+	$myorders = Session::get('safe.orders', array());
+	Each::exec($myorders, function ($id) use ($order) {
+		if ($order['id'] == $id) return new Fix('del',true);
+	});
+	
+
 } else if ($action == 'realdel') {
 	
 	$myorders = Session::get('safe.orders', array());
-
-	Each::forr($myorders, function ($id) use ($order) {
-		if ($order['id'] == $id) return new infra_Fix('del',true);
+	Each::exec($myorders, function ($id) use ($order) {
+		if ($order['id'] == $id) return new Fix('del',true);
 	});
 	
 	$path = Cart::getPath($id);
@@ -198,34 +220,17 @@ if ($action == 'saved') {
 	} else {
 		Cart::saveOrder($order, $place);
 	} 
-
-
 } else if ($action == 'refuseable') {
 	$order['status'] = 'refunds';
-	Cart::saveOrder($order, $place);
-} else if ($action == 'ready') {
-	$order['status'] = 'ready';
-	Cart::saveOrder($order, $place);
-} else if ($action == 'execution') {
-	$order['status'] = 'execution';
-	Cart::saveOrder($order, $place);
-} else if ($action == 'dismiss') {
-	$order['status'] = 'dismiss';
-	Cart::saveOrder($order, $place);
-} else if ($action == 'picked') {
-	$order['status'] = 'picked';
-	Cart::saveOrder($order, $place);
-} else if ($action == 'delivery') {
-	$order['status'] = 'delivery';
-	Cart::saveOrder($order, $place);
-} else if ($action == 'complete') {
-	$order['status'] = 'complete';
 	Cart::saveOrder($order, $place);
 } else if ($action == 'editcart') {
 	if (!$id) return Ans::err($ans, 'Нельзя активную заявку сделать активной');
 	$ans = Load::loadJSON('-cart/action.php?place='.$place.'&id='.$id.'&type=active');
 	if (!$ans['result']) return Ans::ans($ans);
 	$order = Cart::loadOrder();//Активную заявку сделать активной нельзя... был id а тут его нет
+} else if (in_array($action, ['complete', 'delivery', 'picked', 'dismiss', 'execution', 'wait', 'ready'])) {
+	$order['status'] = $action;
+	Cart::saveOrder($order, $place);
 }
 $ans['order'] = $order;
 return Cart::ret($ans, $action);

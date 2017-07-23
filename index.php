@@ -82,6 +82,10 @@ if ($type == 'user') {
 	if (Session::getId()) {
 		$ans['user'] = User::get();
 	}
+	
+	$ans['messages'] = Load::loadJSON('~cart/messages.json');
+	if (!$ans['messages']) $ans['messages'] = Load::loadJSON('-cart/messages.json');
+
 	$ans['manager'] = Session::get('safe.manager'); 
 } else if ($type == 'admin') {
 	if (!Session::get('safe.manager')) return Ans::err($ans, 'У вас нет доступа к этому разделу. Вы не являетесь Менеджером.');
@@ -98,12 +102,19 @@ if ($type == 'user') {
 		$src = Cart::getPath();
 		$src = Path::theme($src);
 		$file_list = glob($src."*");
+		$rules = Cart::getRule();
+
+		$isall = Ans::GET('all','bool');
 		foreach ($file_list as $file){
 			$f = Load::srcinfo($file);
 			if ($f['ext'] !=='json') continue;
 			$id = $f['name'];
 			$order = Cart::getGoodOrder($id);
+			
+			if (!$isall && !in_array($order['status'], $rules['list'])) continue;
+
 			$order['place'] = $place;
+
 			$orders[] = $order;
 		}
 		usort($orders, function ($o1, $o2) {

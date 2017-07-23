@@ -15,6 +15,10 @@
 Перейти к оплате: http://{site}/cart/orders/{id}/paycard
 {:links}
 
+{edit:}
+Есть изменения по вашей заявке
+{:links}
+
 {dismiss:}
 Заявка отклонена.
 {:links}
@@ -42,6 +46,10 @@
 {bankpaid:}
 Заявка оплачена.
 {:links}
+
+{AdmEdit:}
+Внесены изменения в заявку
+{:AdmLinks}
 
 {AdmBankpaid:}
 Оплачена заявка.

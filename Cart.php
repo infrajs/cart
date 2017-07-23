@@ -24,6 +24,7 @@ if (!is_file('vendor/autoload.php')) {
 	require_once('vendor/autoload.php');
 	Router::init();
 }
+
 class Cart {
 	public static function getPath($id = '') 
 	{
@@ -44,7 +45,7 @@ class Cart {
 				$list[] = $order;
 			}
 			
-			usort($list, function ($a,$b) {
+			usort($list, function ($a, $b) {
 			    return $a['time'] < $b['time'];
 			});
 			
@@ -82,6 +83,8 @@ class Cart {
 			if (!$order) return $r;//Нет заявки с таким $id
 			$order['id'] = $id;
 			$order['rule'] = Cart::getRule($order);
+
+
 			
 			if(empty($order['email']))$order['email'] = '';
 			$order['email'] = trim($order['email']);
@@ -142,7 +145,7 @@ class Cart {
 			
 			//В заявке сохранён email по нему можно получить пользователя и все его заявки
 			//email появляется у активной заявки и потом больше не меняется
-			$orders=Session::user_get($order['email'],'safe.orders',array());//Получить значение сессии какого-то пользователя
+			$orders = Session::user_get($order['email'],'safe.orders',array());//Получить значение сессии какого-то пользователя
 
 			//Если заявка числится у нескольких пользователей, в safe.orders мы будем смотреть по текущей
 			//В общем то что заявка у нескольких пользователей пофигу. 
@@ -151,8 +154,8 @@ class Cart {
 			Each::forr($orders, function &($id) use (&$hadpaid, $order) {
 				$r = null;
 				if ($order['id']==$id) return $r;//Текущую заявку не считаем
-				$order=Cart::loadOrder($id);
-				$rules=Load::loadJSON('-cart/rules.json');
+				$order = Cart::loadOrder($id);
+				$rules = Load::loadJSON('-cart/rules.json');
 				
 				if (empty($order['manage']['paid'])) return $r;//Если статус не считается оплаченым выходим
 				if (in_array($order['status'],array('canceled','error'))) return $r;//Если статус не считается оплаченым выходим
@@ -170,7 +173,9 @@ class Cart {
 			//
 
 			$order['merch']=false;
-			$merch = Load::loadJSON('~merchants.json');
+			
+			$merch = Load::loadJSON('~cart/merchants.json');
+			if (!$merch) $merch = Load::loadJSON('-cart/merchants.json');
 			$order['level']=$merch['level'];
 
 			if (User::is()) {	
@@ -287,6 +292,8 @@ class Cart {
 				//Если я менеджер сессия применяется всегда.
 				//Если не менеджер то только если разрешено в месте orders  
 				$order['id'] = $id;
+				$rules = Cart::getRule();
+				if (empty($rules['rules'][$order['status']])) $order['status'] = $rules['def'];
 			} else {
 				$order = Session::get('orders.my', array());
 				Each::foro($order, function &(&$val, $name) {
@@ -295,34 +302,25 @@ class Cart {
 					return $r;
 				});//По идеи в сессии хранится email и он уже там есть, как и любые другие поля.
 				$email = Session::getEmail();//Это единственное место где в заявку добавляется email
-				if ($email)$order['email'] = $email;//Когда нет регистрации email берём из формы autosave
+				if ($email) $order['email'] = $email;//Когда нет регистрации email берём из формы autosave
 				$order['status'] = 'active';
 			}
 			if (empty($order['manage'])) $order['manage'] = array();
 			return $order;
 		}, array($id), $re);
 	}
-	public static function getRule($order) {
+	public static function getRule($order = false) {
 		$rules = Load::loadJSON('-cart/rules.json');
+		if (!$order) return $rules;
+
 		foreach ($rules as $i => $act) {
 			if (!empty($rules[$i]['link'])) $rules[$i]['link'] = Template::parse(array($rules[$i]['link']), $order);
 		}
 		$rule = $rules['rules'][$order['status']];
-
 		$list = array(&$rule['manager'], &$rule['user']);
 
-		Each::forr($list, function &(&$ar) use ($rules, &$order) {
+		Each::exec($list, function &(&$ar) use ($rules, &$order) {
 			$r = null;
-			/*Each::foro($ar['others'],function($other,$istpl) use(&$order,&$ar) {
-				$is=Template::parse(array($istpl),$order);
-
-				if ($is) {
-					if (isset($other['buttons']))$ar['buttons']=$other['buttons'];
-					if (isset($other['actions']))$ar['actions']=$other['actions'];
-					return true;
-				}	
-			});
-			*/
 
 			Each::foro($ar['buttons'], function &(&$cls,$act) use($rules,&$order,&$ar) {
 				$r = null;
@@ -332,15 +330,15 @@ class Cart {
 				}*/
 
 				if (!$rules['actions'][$act]) {
-					$cls=array(
-						'cls'=>$cls,
-						'act'=>$act
+					$cls = array(
+						'cls' => $cls,
+						'act' => $act
 					);
 				} else {
-					$t=$cls;
-					$cls=$rules['actions'][$act];
-					$cls['act']=$act;
-					$cls['cls']=$t;
+					$t = $cls;
+					$cls = $rules['actions'][$act];
+					$cls['act'] = $act;
+					$cls['cls'] = $t;
 				}
 				if (!empty($cls['omit'])) {
 					$omit=Template::parse(array($cls['omit']),$order);
@@ -355,11 +353,14 @@ class Cart {
 			if ($ar['buttons']) { //Все кнопки добавим в список
 				$buttons = array_keys($ar['buttons']);
 				$ar['actions'] = array_merge($ar['actions'],$buttons);
+
 				$ar['actions'] = array_unique($ar['actions']);
+				$ar['actions'] = array_values($ar['actions']);
 			}
 
 			Each::exec($ar['actions'], function &(&$act) use ($rules, &$order) {
-				$r = null;
+				
+
 				if (!$rules['actions'][$act]) {
 					$cls=array(
 						'act'=>$act
@@ -458,7 +459,7 @@ class Cart {
 			$src = Cart::getPath($id);
 		}
 		$rules = Load::loadJSON('-cart/rules.json');
-		if ($rules['rules'][$order['status']]['freeze']) {//Текущий статус должен замораживать позиции
+		if (!empty($rules['rules'][$order['status']]['freeze'])) {//Текущий статус должен замораживать позиции
 			Each::foro($order['basket'], function &(&$pos, $prodart) {
 				$r = null;
 				if (!empty($pos['article'])) return $r;
@@ -480,16 +481,22 @@ class Cart {
 			});
 		}
 
-		if ($order['status'] == 'active') { //Сохраняем активную заявку без лишних данных, нужно хронить её номер чтобы другая заявка не заняла
+		if ($order['status'] == 'active') { 
+			//Сохраняем активную заявку без лишних данных, нужно хронить её номер чтобы другая заявка не заняла
 			$order['fixid'] = $id;
 			unset($order['id']);//У активной заявки нет id
 			$oldactive = Session::get('orders.my');
 			if (!empty($oldactive['fixid'])) { //Освобождаем старую активную заявку
 				unlink(Path::resolve(Cart::getPath($oldactive['fixid'])));
 			}
-			Session::set('orders.my', $order);//Исключение, данные заявки
+			
+			//unset($order['manage']);//Сообщение менеджера удаляется
 			if (empty($order['phone'])) $order['phone'] = '';
 			if (empty($order['name'])) $order['name'] = '';
+
+			Session::set('orders.my', $order);//Исключение, данные заявки
+			
+
 			$save = array(
 				'email' => Session::getEmail(),//Тот пользователь который сделал заявку активной или последний кто с ней работал
 				'name' => $order['name'],
@@ -522,11 +529,13 @@ class Cart {
 		$rules = Load::loadJSON('-cart/rules.json');
 		$order = $ans['order'];
 		$rule = $rules['actions'][$action];
-		if (!Session::get('dontNofify') && !empty($rule['usermail'])) {
-			Cart::mail('user', $order['email'], $rule['usermail'], $ans['order']);
-		}
-		if (!empty($rule['mangmail'])) {
-			Cart::mail('manager', $order['email'], $rule['mangmail'], $order);
+		if ($ans['place'] != 'admin') { //Админ сам решает когда, что отправлять
+			if (!empty($rule['usermail'])) {
+				Cart::mail('user', $order['email'], $rule['usermail'], $ans['order']);
+			}
+			if (!empty($rule['mangmail'])) {
+				Cart::mail('manager', $order['email'], $rule['mangmail'], $order);
+			}
 		}
 		return Ans::ret($ans);
 	}

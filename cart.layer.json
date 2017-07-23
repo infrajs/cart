@@ -33,14 +33,15 @@
 		},
 		"admin":{
 			"tpl":"-cart/cart.tpl",
-			"json":"-cart/?type=admin",
+			"jsontpl":"-cart/?type=admin&all={crumb.child.name=:all?:1}",
 			"tplroot":"ADMIN",
-			"global":"order",
+			"global":["user", "cart"],
 			"child":{
+				"istpl":"{crumb.name!:all?:yes}",
 				"jsontpl":"-cart/?type=order&id={crumb.name}&place=admin",
 				"autosavenametpl":"admin.{crumb.name}",
 				"tpl":"-cart/cart.tpl",
-				"global":"order",
+				"global":["user", "cart"],
 				"tplroot":"ADMORDER",
 				"childs":{
 					"list":{

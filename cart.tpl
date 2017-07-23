@@ -334,7 +334,7 @@
 	<ol class="breadcrumb">
 		<li><a href="/">Главная</a></li>
 		<li><a href="/catalog">Каталог</a></li>
-		<li class="active">Сообщения</li>
+		<li class="{data.manager?:text-danger}" class="active">Сообщения</li>
 		<li><a href="/cart/orders">Мои заявки</a></li>
 		<li><a href="/cart/orders/my">Заявка Активая</a></li>
 		<li><a href="/cart/orders/my/list">Корзина</a></li>
@@ -410,7 +410,7 @@
 		<li><a href="/">Главная</a></li>
 		<li><a href="/catalog">Каталог</a></li>
 		
-		<li><a href="/cart">Сообщения</a></li>
+		<li><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
 		<li class="active">Мои заявки</li>
 		<li><a href="/cart/orders/my">Заявка Активная</a></li>
 		<li><a href="/cart/orders/my/list">Корзина</a></li>
@@ -664,7 +664,9 @@
 		</div>
 	{manage:}
 		
-		<div class="alert alert-info" role="alert"><h3 style="margin-top:0">Сообщение менеджера</h3>{manage.comment}</div>
+		<div class="alert alert-info" role="alert"><h3 style="margin-top:0">Сообщение менеджера</h3>
+<div style="white-space: pre">{manage.comment}</div>
+	</div>
 	{orderPageContent:}
 		<h1>{order.rule.title}</h1>
 		{order.id?order:ordernum}
@@ -673,8 +675,12 @@
 			<div class="cartcontacts">
 				{order:orderfields}
 				<div>
-					<strong>Сообщение для менеджера</strong> <br><i>Укажите, пожалуйста, как вам удобно оплатить и получить товар, адрес доставки если требуется. 
-					<br>С вами свяжется менеджер для уточнения деталей.</i>
+					<strong>Сообщение для менеджера</strong> <br>
+					<i>
+					Опишите вашу задачу, чтобы менеджер мог предложить оптимальный вариант по цене и качеству.<br>
+					Укажите, пожалуйста, как вам удобно оплатить и получить товар, адрес доставки если требуется.<br>
+					С вами свяжется менеджер для уточнения деталей.<br>
+					</i>
 					<textarea name="comment" class="form-control" rows="4">{order.comment}</textarea>
 				</div>
 			</div>
@@ -793,11 +799,14 @@
 	<ol class="breadcrumb">
 		<li><a href="/">Главная</a></li>
 		<li><a href="/catalog">Каталог</a></li>
-		<li><a href="/cart">Сообщения</a></li>
+		<li><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
 		<li class="active">Все заявки</li>
 	</ol>
 	{data.result?:adm_listPage?:adm_message}
+	{longlistlink:}<a href="/cart/admin/all">Показать готовые</a>
+	{shortlistlink:}<a href="/cart/admin">Скрыть готовые</a>
 	{adm_listPage:}
+		<div class="pull-right">{crumb.child.name=:all?:shortlistlink?:longlistlink}</div>
 		<h1>Все заявки</h1>
 		<script>
 			domready( function () {
@@ -807,7 +816,7 @@
 			});
 		</script>
 		<table id="orderscontrol" class="table table-striped ordersList tablesorter-bootstrap tablesorter-icon">
-			<thead>
+			<thead style="cursor: pointer">
 			<tr>
 				<th>Номер</th>
 				<th>Клиент</th>
@@ -862,8 +871,12 @@
 		<h1>{rule.title}</h1>
 		{id?:ordernum}
 		{(data.place=:admin&status=:active)?:adm_orderinfo?:adm_orderinputs}
+	{msg_samples:}
+		<span class="a" onclick="var t=$('[name=\'manage.comment\']'); t.val(t.val()+$(this).next().html()).change();">{~key}</span>
+		<div style="display:none">{.}</div>
+		{~last()|:comma}
 	{adm_orderinputs:}
-		<form action="/-cart/orderscontrol.php?save=1" id="adminForm" method="post">
+		<form method="post">
 			<div class="disabled">
 				<div class="cartcontacts">
 					{:orderfields}
@@ -882,8 +895,10 @@
 					<input name="manage.summary" value="{manage.summary}" type="text"></label><br />
 				-->
 				{~conf.cart.delivery?:mngdelivery}
-				<label>Сообщение для клиента</label><br>
+				<label>Сообщение для клиента</label>
+				{data.messages::msg_samples}<br>
 				<textarea name="manage.comment" class="form-control" rows="4">{manage.comment}</textarea>
+
 				<div class="answer"><b class="alert">{config.ans.msg}</b></div>
 			</div>
 		</form>
@@ -982,6 +997,7 @@
 			Телефон: <b>{phone}</b>
 		</div>
 {comma:}, 
+{text-danger:}text-danger
 {usersync:}
 	<script>
 		domready( function () {
@@ -993,7 +1009,7 @@
 	<ol class="breadcrumb">
 		<li><a href="/">Главная</a></li>
 		<li><a href="/catalog">Каталог</a></li>
-		<li><a href="/cart">Сообщения</a></li>
+		<li><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
 		<li><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заявки</a></li>
 		<li><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заявка {crumb.parent.name=:my?:Активная?crumb.parent.name}</a></li>
 		<li class="active">Корзина</li>
@@ -1003,7 +1019,7 @@
 	<ol class="breadcrumb">
 		<li><a href="/">Главная</a></li>
 		<li><a href="/catalog">Каталог</a></li>
-		<li><a href="/cart">Сообщения</a></li>
+		<li><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
 		<li><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb.parent}">{crumb.parent.name=:admin?:Все?:Мои} заявки</a></li>
 		<li class="active">Заявка {crumb.name=:my?:Активная?crumb.name}</li>
 		<li><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb}/list">Корзина</a></li>
