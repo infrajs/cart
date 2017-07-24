@@ -196,16 +196,26 @@ if ($action == 'saved') {
 
 
 	$myorders = Session::get('safe.orders', array());
-	Each::exec($myorders, function ($id) use ($order) {
-		if ($order['id'] == $id) return new Fix('del',true);
+	Each::exec($myorders, function &($id) use ($order) {
+		$r = null;
+		if ($order['id'] == $id) {
+			$r = new Fix('del',true);
+			return $r;
+		}
+		return $r;
 	});
 	
 
 } else if ($action == 'realdel') {
 	
 	$myorders = Session::get('safe.orders', array());
-	Each::exec($myorders, function ($id) use ($order) {
-		if ($order['id'] == $id) return new Fix('del',true);
+	Each::exec($myorders, function &($id) use ($order) {
+		$r = null;
+		if ($order['id'] == $id) {
+			$r = new Fix('del',true);
+			return $r;
+		}
+		return $r;
 	});
 	
 	$path = Cart::getPath($id);
