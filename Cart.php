@@ -387,7 +387,7 @@ class Cart {
 	}
 	
 	
-	public static function mail($to,$email,$mailroot, $data = array()) {
+	public static function mail($to, $email, $mailroot, $data = array()) {
 		if (!$email) $email='noreplay@'.$_SERVER['HTTP_HOST'];
 		if (!$mailroot) return;//Когда не указаний в конфиге... ничего такого...
 		$rules = Load::loadJSON('-cart/rules.json');
@@ -401,6 +401,9 @@ class Cart {
 
 		$subject = Template::parse(array($rules['mails'][$mailroot]),$data);
 		$body = Template::parse('-cart/cart.mail.tpl',$data,$mailroot);
+
+		Mail::toSupport($subject.' - копия для поддержки', $email, $body);
+
 		if ($to=='user') return Mail::fromAdmin($subject,$email,$body);
 		if ($to=='manager') return Mail::toAdmin($subject,$email,$body);
 	}
