@@ -378,18 +378,18 @@
 		</div>
 		
 		{adminForm:}
-				<p>Введён логин и пароль администратора сайта</p>
-				<p>Вы можете изменить свой статус</p>
-				<form style="margin-top:10px" class="managerForm" action="/-cart/?type=cart&amp;submit=1" method="post">
-					 <div style="display:none" class="checkbox">
-						<label>
-							<input name="IAmManager" type="checkbox" {data.manager??:checked}>
-						</label>
-					</div>
-					<div class="input-group">
-						<input type="submit" class="btn btn-{data.manager?:success?:danger}" value="{data.manager?:Сделать меня обычным пользователем?:Сделать меня менеджером}">
-					</div>
-				</form>
+			<p>Введён логин и пароль администратора сайта</p>
+			<p>Вы можете изменить свой статус</p>
+			<form style="margin-top:10px" class="managerForm" action="/-cart/?type=cart&amp;submit=1" method="post">
+				 <div style="display:none" class="checkbox">
+					<label>
+						<input name="IAmManager" type="checkbox" {data.manager??:checked}>
+					</label>
+				</div>
+				<div class="input-group">
+					<input type="submit" class="btn btn-{data.manager?:success?:danger}" value="{data.manager?:Сделать меня обычным пользователем?:Сделать меня менеджером}">
+				</div>
+			</form>
 			
 			<script>
 				domready( function () {
@@ -897,7 +897,7 @@
 				{~conf.cart.delivery?:mngdelivery}
 				<label>Сообщение для клиента</label>
 				{data.messages::msg_samples}<br>
-				<textarea name="manage.comment" class="form-control" rows="4">{manage.comment}</textarea>
+				<textarea autosavebreak="1" name="manage.comment" class="form-control" rows="4">{manage.comment}</textarea>
 
 				<div class="answer"><b class="alert">{config.ans.msg}</b></div>
 			</div>
