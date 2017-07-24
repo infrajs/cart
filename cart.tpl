@@ -872,16 +872,15 @@
 		{id?:ordernum}
 		{(data.place=:admin&status=:active)?:adm_orderinfo?:adm_orderinputs}
 	{msg_samples:}
-		<span class="a" onclick="var t=$('[name=\'manage.comment\']'); t.val(t.val()+$(this).next().html()).change();">{~key}</span>
-		<div style="display:none">{.}</div>
-		{~last()|:comma}
+		<span class="a" onclick="var t=$('[name=\'manage.comment\']'); t.val(t.val()+$(this).next().html()).change();">{~key}</span><div style="display:none">{.}
+</div>{~last()|:comma}
 	{adm_orderinputs:}
 		<form method="post">
 			<div class="disabled">
 				<div class="cartcontacts">
 					{:orderfields}
 					<label>Сообщение для менеджера</label><br> 
-					<textarea disabled name="comment" class="form-control" rows="4">{comment}</textarea>
+					<textarea disabled name="comment" class="form-control" rows="6">{comment}</textarea>
 				</div>
 				<br><hr><br>
 				
@@ -895,9 +894,8 @@
 					<input name="manage.summary" value="{manage.summary}" type="text"></label><br />
 				-->
 				{~conf.cart.delivery?:mngdelivery}
-				<label>Сообщение для клиента</label>
-				{data.messages::msg_samples}<br>
-				<textarea autosavebreak="1" name="manage.comment" class="form-control" rows="4">{manage.comment}</textarea>
+				<label>Сообщение для клиента</label>&nbsp;<small>{data.messages::msg_samples}</small><br>
+				<textarea autosavebreak="1" name="manage.comment" class="form-control" rows="6">{manage.comment}</textarea>
 
 				<div class="answer"><b class="alert">{config.ans.msg}</b></div>
 			</div>
