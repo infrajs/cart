@@ -415,11 +415,11 @@ class Cart {
 			$actualdata = Session::get([$place, $order['id']], array());
 			foreach ($actualdata as $name => $val) {
 				if (!is_string($val)) continue;
-				$actualdata[$name] = trim(strip_tags($val));
+				$actualdata[$name] = mb_substr(trim(strip_tags($val)), 0, 200);
 			}
 		} else { //Когда нельзя редактировать... если хочется то можно сохранить комент
 			$val = Session::get([$place, $order['id'], 'comment'], '');
-			$actualdata['comment'] = trim(strip_tags($val));
+			$actualdata['comment'] = mb_substr(trim(strip_tags($val)), 0, 20000);
 		}
 		if (!Session::get('safe.manager') || $place != 'admin') {
 			unset($actualdata['manage']); //Только админ на странице admin может менять manage
