@@ -665,7 +665,7 @@
 	{manage:}
 		
 		<div class="alert alert-info" role="alert"><h3 style="margin-top:0">Сообщение менеджера</h3>
-<div style="white-space: pre">{manage.comment}</div>
+<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
 	</div>
 	{orderPageContent:}
 		<h1>{order.rule.title}</h1>
@@ -872,8 +872,8 @@
 		{id?:ordernum}
 		{(data.place=:admin&status=:active)?:adm_orderinfo?:adm_orderinputs}
 	{msg_samples:}
-		<span class="a" onclick="var t=$('[name=\'manage.comment\']'); t.val(t.val()+$(this).next().html()).change();">{~key}</span><div style="display:none">{.}
-</div>{~last()|:comma}
+		<span class="a" onclick="var t=$('[name=\'manage.comment\']'); t.val(t.val()+$(this).next().html()).change();">{~key}</span><pre style="display:none">{.}
+</pre>{~last()|:comma}
 	{adm_orderinputs:}
 		<form method="post">
 			<div class="disabled">
