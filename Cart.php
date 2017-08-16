@@ -410,7 +410,6 @@ class Cart {
 	public static function mergeOrder(&$order, $place, $safe = false) {
 		if (empty($order['id'])) return;
 
-		
 		if (!$safe) {
 			$actualdata = Session::get([$place, $order['id']], array());
 			foreach ($actualdata as $name => $val) {
