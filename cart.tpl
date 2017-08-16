@@ -457,7 +457,7 @@
 				<td>{~date(:j F H:i,time)}</td>
 			</tr>
 			{dateform:}d.m.Y
-			{product:} <nobr><a href="/catalog/{producer}/{article}">{Артикул}</a><sup style="color:gray">{count}</sup>{~last()|:comma}</nobr>
+			{product:} <nobr><a href="/catalog/{producer}/{article}">{Артикул}</a><sup style="color:gray">{count}</sup>{~last()|:comma}</nobr><wbr>
 	{orderfields:}
 		<div class="form-group">
 			<label>Контактное лицо <span class="req">*</span></label>
