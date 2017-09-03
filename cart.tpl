@@ -70,50 +70,8 @@
 	{showlist:}
 		<div class="usercart" style="margin-top:15px;">		
 			{data.order.count?data.order:cartlist?:cartmsg}
-		</div>
-		<div id="addSearchWrap">
-			<input autosave="0" type="text" id="addSearch">
-			<script>
-			domready(function () {
-				
-				$('#addSearch').autocomplete({
-					serviceUrl: '/-cart/autocompletest.php',
-					onSelect: function(data, value){ 
-						console.log(data, value); 
-					},
-					"formatResult": function (suggestion, currentValue) {
-				        // Do not replace anything if the current value is empty
-				        if (!currentValue) {
-				            return suggestion;
-				        }
-				        var pattern = '(' + $.Autocomplete.utils.escapeRegExChars(currentValue) + ')';
-
-				        return suggestion.value
-				            .replace(new RegExp(pattern, 'gi'), '<strong>$1<\/strong>')
-				            .replace(/&/g, '&amp;')
-				            .replace(/</g, '&lt;')
-				            .replace(/>/g, '&gt;')
-				            .replace(/"/g, '&quot;')
-				            .replace(/&lt;(\/?strong)&gt;/g, '<$1>');
-				    }
-				});
-
-                //$('#addSearch').autocomplete({
-                   // serviceUrl: '/-cart/autocompletest.php', // Страница для обработки запросов автозаполнения
-                    //minChars: 1, // Минимальная длина запроса для срабатывания автозаполнения
-                    //delimiter: /(,|;)\s*/, // Разделитель для нескольких запросов, символ или регулярное выражение
-                    //maxHeight: 400, // Максимальная высота списка подсказок, в пикселях
-                    //width: 300, // Ширина списка
-                    //zIndex: 9999, // z-index списка
-                    //deferRequestBy: 200, // Задержка запроса (мсек), на случай, если мы не хотим слать миллион запросов, пока пользователь печатает. Я обычно ставлю 300.
-                    //params: { country: 'Yes'}, // Дополнительные параметры
-                    //onSelect: function(data, value){ console.log(data, value); }
-                    //, // Callback функция, срабатывающая на выбор одного из предложенных вариантов,
-                    //lookup: ['January', 'February', 'March'] // Список вариантов для локального автозаполнения
-                //});
-			});
-			</script>
-		</div>
+		</div>		
+		
 		<script>
 
 			domready(function(){
@@ -279,6 +237,8 @@
 		<table class="table cart">
 			{basket::cartpos}
 		</table>
+		<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a pull-right">Поиск позиций по артикулу</span>
+		<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-clear a pull-right" style="clear:both">Очистить корзину</span>
 		<table style="width:auto">
 			<tr>
 				<td style="padding:5px">
@@ -287,7 +247,6 @@
 				</td>
 			</tr>
 		</table>
-		
 		<div style="margin-top:10px">
 			<a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-success">Перейти к {data.order.id?:заявке {data.order.id}?:оформлению заявки}</a>
 		</div>
@@ -350,7 +309,8 @@
 {cartmsg:}<p>Корзина пустая. Добавьте в корзину интересующие позиции.
 		
 		</p>
-		<p>Чтобы добавить позицию нужно кликнуть по иконке корзины рядом с ценой.</p>
+		<p>Чтобы добавить позицию нужно кликнуть по иконке корзины рядом с ценой в <a href="/catalog">каталог</a>.</p>
+				<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a pull-right">Поиск позиций по артикулу</span>
 		<div style="margin-top:10px">
 			<a href="/catalog" style="text-decoration:none" class="btn btn-success">Открыть каталог</a>
 		</div>

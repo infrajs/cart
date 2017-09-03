@@ -133,6 +133,12 @@
 			"result":"Позиция удалена.",
 			"noscroll":true
 		},
+		"clear":{
+			"checkdata":false,
+			"title":"Очистить корзину",
+			"confirm":"Очистить корзину заявки?",
+			"result":"Корзина очищена."
+		},
 		"sync":{
 			"checkdata":false,
 			"title":"Сохранить",

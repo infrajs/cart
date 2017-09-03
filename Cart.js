@@ -191,6 +191,16 @@ window.Cart = {
 		}
 		return !r;
 	},
+	clear: function (place, orderid, cb) {
+		var fn = function () {
+			if (cb) cb();
+			Global.check(['cat_basket', 'order', 'cart']);
+		}
+		Cart.action(place, 'clear', orderid, function () {
+			var name = [place, orderid, 'basket'];
+			Session.set(name, null, true, fn);
+		});
+	},
 	remove: function (place, orderid, prodart, cb) {
 		var fn = function () {
 			if (cb) cb();
@@ -206,11 +216,14 @@ window.Cart = {
 			if (cb) cb();
 			Global.check(['cat_basket','order','cart']);
 		}
-		var name = [place, orderid, 'basket', prodart];
+		if (!orderid) orderid = 'my';
+		
+		var name = [place, orderid, 'basket', prodart];	
+		
 		Session.set(name, { count: 1 }, true, fn);
 	},
 	lang: function (str) {
-		if(typeof(str) == 'undefined') return Lang.name('cart');
+		if (typeof(str) == 'undefined') return Lang.name('cart');
 		return Lang.str('cart', str);
 	}
 	/*,
