@@ -402,7 +402,7 @@ class Cart {
 		$subject = Template::parse(array($rules['mails'][$mailroot]),$data);
 		$body = Template::parse('-cart/cart.mail.tpl',$data,$mailroot);
 
-		Mail::toSupport($subject.' - копия для поддержки', $email, $body);
+		//Mail::toSupport($subject.' - копия для поддержки', $email, $body);
 
 		if ($to=='user') return Mail::fromAdmin($subject,$email,$body);
 		if ($to=='manager') return Mail::toAdmin($subject,$email,$body);
