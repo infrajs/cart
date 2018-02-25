@@ -1,7 +1,6 @@
 {
     "name": "infrajs/cart",
     "description": "Catalog Cart",
-    "license": "GPL3",
     "require":{
         "infrajs/catalog":"~1",
         "infrajs/user":"~1",
