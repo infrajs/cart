@@ -62,7 +62,7 @@ class Cart {
 		});
 		return $pos;
 	}
-	public static function getGoodOrder($id = '', $re = false)
+	public static function getGoodOrder($id = '')
 	{
 		if (is_array($id)) {
 			$order = $id;
@@ -75,9 +75,9 @@ class Cart {
 			$order = false;
 		}
 
-		return Once::exec(__FILE__.'-getGoodOrder', function &($id, $re) use (&$order) {
+		return Once::func(function &($id) use (&$order) {
 			
-			if (!$order) $order = Cart::loadOrder($id, $re);
+			if (!$order) $order = Cart::loadOrder($id);
 
 			$r = false;
 			if (!$order) return $r;//Нет заявки с таким $id
@@ -234,7 +234,7 @@ class Cart {
 				$order['alltotal']+=$order['manage']['deliverycost'];
 			}
 			return $order;
-		}, array($id), $re);
+		}, array($id));
 	}
 	public static function sync($place, $orderid) {
 		$order = Cart::loadOrder($orderid);
