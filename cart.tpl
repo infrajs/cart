@@ -104,7 +104,7 @@
 							div.find('.cartneed').html(tplcost(gorder.need));
 						}
 						div.find('.sum').each( function () {
-							var prodart=$(this).data('producer')+' '+$(this).data('article');
+							var prodart = $(this).data('producer')+' '+$(this).data('article') + ' ' +$(this).data('index');
 							var pos = gorder.basket[prodart];
 							if (!pos) {
 								$(this).parent().addClass('bg-info').removeClass('bg-success');
@@ -118,7 +118,7 @@
 						});
 
 						div.find('.myprice').each( function () {
-							var prodart=$(this).data('producer')+' '+$(this).data('article');
+							var prodart=$(this).data('producer')+' '+$(this).data('article') + ' ' +$(this).data('index');
 							var pos = gorder.basket[prodart];
 							if (!pos) {
 								$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
@@ -149,7 +149,7 @@
 						div.find('.myprice').each( function () {
 							var pos = $(this).data();
 							if (pos) {
-								var prodart = pos.producer+' '+pos.article;
+								var prodart = pos.producer+' '+pos.article + ' ' +pos.index;
 								var count = pos.count;
 								if(order.basket[prodart]) count = order.basket[prodart].count;
 								var sumroz = pos.cost * count;
@@ -233,11 +233,15 @@
 			</div>
 		</div>
 	{cartlist:}
+		
 		<table class="table cart">
 			{basket::cartpos}
 		</table>
-		<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a pull-right">Поиск позиций по артикулу</span>
-		<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-clear a pull-right" style="clear:both">Очистить корзину</span>
+		<p align="right">
+			<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a">Поиск позиций</span><br>
+			<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-clear a" style="clear:both">Очистить корзину</span>
+		</p>
+		
 		<table style="width:auto">
 			<tr>
 				<td style="padding:5px">
@@ -251,16 +255,17 @@
 		</div>
 		{cartname:}
 		{cartpos:}
-			<tbody class="myprice" data-cost="{cost}" data-count="{count}" data-article="{article}" data-producer="{producer}">
+			<tbody class="myprice" data-cost="{cost}" data-count="{count}" data-article="{article}" data-index="{index}" data-producer="{producer}">
 				<tr class="active">
 					<td style="color:gray; vertical-align:middle">{num}</td>
 					<td style="vertical-align:middle">
 						<div class="title">
-							<a href="/catalog/{producer}/{article}"><nobr>{Производитель}</nobr> <nobr>{Артикул}</nobr></a>
+							<a href="/catalog/{producer}/{article}/{index}">{Производитель} {Артикул}</a>
 						</div>
 					</td>
 					<td colspan="4" style="vertical-align:middle">
-						{Наименование} 
+						{Наименование}
+						{itemrow}
 					</td>
 					<td style="vertical-align:middle;">
 						<div style="float:right; margin-right:10px" class="cart">
@@ -273,8 +278,8 @@
 				<tr>
 					<td rowspan="3"></td>
 					<td rowspan="3" style="width:1px">
-						<a href="/catalog/{producer}/{article}">
-							<img src="/-imager/?h=90&src={images.0}&or={Config.get(:catalog).dir}{producer}/">
+						<a href="/catalog/{producer}/{article}/{index}">
+							<img class="img-responsive" src="/-imager/?w=140&h=100&src={images.0}&or=-imager/empty.png">
 						</a>
 					</td>
 					<td>
@@ -292,11 +297,11 @@
 					<td style="width:100%"></td><td></td>
 				</tr>
 				<tr>
-					<td style="vertical-align:middle;">Количество:</td>
+					<td style="vertical-align:middle;">Кол<span class="hidden-xs">ичество</span>:</td>
 					<td style="vertical-align:middle; padding-top:0; padding-bottom:0;">
-						<input value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer} {article}.count"></td>
+						<input value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer} {article} {index}.count"></td>
 					<td style="white-space:nowrap; vertical-align:middle">
-						<span class="sum" data-article="{article}" data-producer="{Производитель}"></span>
+						<span class="sum" data-article="{article}" data-producer="{producer}" data-index="{index}"></span>
 					</td>
 
 				</tr>
@@ -304,7 +309,7 @@
 					<td colspan="4" style="height:100%"></td>
 				</tr>
 			</tbody>
-		{prodart:}{producer} {article}
+		{prodart:}{producer} {article} {index}
 {cartmsg:}<p>Корзина пустая. Добавьте в корзину интересующие позиции.
 		
 		</p>
@@ -459,7 +464,7 @@
 				<td>{~date(:j F H:i,time)}</td>
 			</tr>
 			{dateform:}d.m.Y
-			{product:} <nobr><a href="/catalog/{producer}/{article}">{Артикул}</a><sup style="color:gray">{count}</sup>{~last()|:comma}</nobr><wbr>
+			{product:} <nobr><a href="/catalog/{producer}/{article}/{index}">{Артикул}</a><sup style="color:gray">{count}</sup>{~last()|:comma}</nobr><wbr>
 	{orderfields:}
 		<div class="form-group">
 			<label>Контактное лицо <span class="req">*</span></label>
@@ -757,7 +762,7 @@
 		<tr>
 			<th>Позиция</th>
 			<th class="bg-info"><span>Цена</span></th>
-			<th>Количество</th>
+			<th>Кол<span class="hidden-xs">ичество</span></th>
 			<th>Сумма</th>
 		</tr>
 		{basket::positionRow}
@@ -782,7 +787,7 @@
 	
 	{positionRow:}
 		<tr>
-			<td><a href="/catalog/{producer}/{article}">{Производитель} {Артикул}</a>{change?:star}</td>
+			<td><a href="/catalog/{producer}/{article}/{index}">{Производитель} {Артикул}</a>{change?:star}<br>{itemrow}</td>
 			<td>{cost:itemcost}</td>
 			<td>{count}</td>
 			<td>{sum:itemcost}</td>
@@ -863,7 +868,7 @@
 					{~date(:d.m.Y H:i,time)}
 				</td>
 			</tr>
-			{adm_product:} <nobr>{count} <a href="/catalog/{producer}/{article}">{Артикул}</a>{~last()|:comma}</nobr>
+			{adm_product:} <nobr>{count} <a href="/catalog/{producer}/{article}/{index}">{Артикул}</a>{~last()|:comma}</nobr>
 
 			{adm_paidorder:}<b>{~cost(manage.paid)} руб.</b> {manage.paidtype=:bank?:банк?:менеджер} {~date(:d.m.Y H:i,manage.paidtime)}
 {ADMORDER:}
@@ -1025,7 +1030,7 @@
 		<li><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb}/list">Корзина</a></li>
 	</ol>
 {itemcost:}{~cost(.)}&nbsp;<small>руб.</small>
-{star:}*
+{star:}<span title="Позиция в каталоге изменилась">*</span>
 {ordernum:}Номер заявки: <b>{id}</b>{manage.paid?:msgpaidorder}
 	{msgpaidorder:}. Оплата <b>{~cost(manage.paid)} руб.</b> отметка {manage.paidtype=:bank?:банка?:менеджера} {~date(:d.m.Y H:i,manage.paidtime)}
 {adm_message:}

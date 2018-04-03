@@ -46,7 +46,7 @@ if ($type == 'user') {
 	$order = Cart::getGoodOrder();
 	$ans['order']=$order;
 	$list=array();
-	Each::forr($orders, function &($order) use(&$list){
+	Each::forr($orders, function &($order) use (&$list){
 		$r = null;
 		$status=$order['status'];
 		if (empty($list[$status])) $list[$status] = array();

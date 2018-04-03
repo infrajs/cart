@@ -29,13 +29,15 @@
 				},
 				onSelect: function (suggestion) {
 					var pos = suggestion.data;
-					prodart = pos['producer'] + ' ' + pos['article'];
+					prodart = pos['producer'] + ' ' + pos['article'] + ' ' + pos['index'];
 				},
 				transformResult: function (ans) {
 					return {
 						suggestions: $.map(ans.list, function (pos) {
+							var itemrow = Catalog.getItemRowValue(pos);
+							if (itemrow) itemrow = ' ' + itemrow;
 							return { 
-								value: pos['Производитель'] + ' ' + pos['Артикул'], 
+								value: pos['Производитель'] + ' ' + pos['Артикул'] + itemrow, 
 								data: pos 
 							};
 						})
@@ -50,7 +52,7 @@
 					if (!currentValue) return suggestion;
 					//var pattern = '(' + $.Autocomplete.utils.escapeRegExChars(currentValue) + ')';
 					//var res = suggestion.value;
-
+					suggestion.data.itemrow = Catalog.getItemRowValue(suggestion.data);
 					var res = Template.parse('-cart/rest/search/layout.tpl',suggestion.data, 'SUGGESTION');
 
 					return res;
@@ -60,12 +62,11 @@
 	</script>
 </div>
 {SUGGESTION:}
-	
-		<b><a href="/catalog/{producer}/{article}">{Производитель} {Артикул}</a></b>
-		<br>
-		<a href="/catalog?m=:group::.{group}=1">{Группа}</a> {Цена?:cost}
+		{images.0?:img}
+		<b><a href="/catalog/{producer}/{article}">{Производитель} {Артикул}</a></b> {Цена?:cost}<br>
+		<!--<a href="/catalog?m=:group::.{group}=1">{Группа}</a> <br>-->
+		{itemrow}
 		
-			{images.0?:img}
 		
-	{cost:}<b>{~cost(Цена оптовая)}</b> / <b>{~cost(Цена розничная)}</b>&nbsp;руб.
+	{cost:}<b>{~cost(Цена)}&nbsp;руб.</b>
 	{img:}<img style="margin-left:5px; float:right" src="/-imager/?src={images.0}&h=60">

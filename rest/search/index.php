@@ -12,22 +12,22 @@ return Rest::get( function () {
 }, function ($search) {
 	$data = Catalog::init();
 	$search = Path::encode($search);
-	$v = preg_split("/\-/", mb_strtolower($search));
-	foreach ($v as $i => $s) {
+	$v = preg_split("/[\s\-]+/", mb_strtolower($search));
+	foreach($v as $i => $s) {
 		$v[$i] = preg_replace("/ы$/","",$s);
 	}
 	$list = array();
+
 	Xlsx::runPoss( $data, function &($pos) use ($v, &$list) {
-		$str = mb_strtolower($pos['producer'].' '.$pos['article']);
-		$r = null;
-		foreach ($v as $i => $s) {
-			if ($s && mb_strrpos($str, $s) === false) {
-				return $r;
-			}
-		}
-		$list[] = Catalog::getPos($pos);
 		
-		if (sizeof($list) > 10) {
+		$items = Xlsx::getItemsFromPos($pos);
+
+		foreach ($items as $item) {
+			$r = Catalog::searchTestItem($item, $v);
+			if (!$r) continue;
+			$list[] = Catalog::getPos($item);	
+		}
+		if (sizeof($list) > 20) {
 			$r = false;
 			return $r;
 		}

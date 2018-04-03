@@ -60,12 +60,14 @@ class Cart {
 
 		$pos = Xlsx::runPoss($data, function &($pos) use ($prodart, $index) {
 			$r = null;
-		    $realprodart = $pos['producer'].' '.$pos['article'].' '.$index;
+		    $realprodart = $pos['producer'].' '.$pos['article'];
+		    //if ($realprodart == $prodart) return $pos;
+		    $realprodart .= ' '.$index;
 		    if ($realprodart == $prodart) return $pos;
 		    return $r;
 		});
 		if (!$pos) return false;
-		Xlsx::setItem($pos, $index);
+		if ($index) Xlsx::setItem($pos, $index);
 		
 		$pos = Catalog::getPos($pos);
 		
