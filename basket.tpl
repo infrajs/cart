@@ -2,9 +2,9 @@
 	<style scoped>
 		.cartbasket {
 			padding:5px 10px;
-			height:100%;
+			/*height:100%;
 			font-size:90%;
-			border-radius: 2px;
+			border-radius: 2px;*/
 		}
 		.cartbasket #basket_text a {
 			
@@ -15,16 +15,18 @@
 		}
 	</style>
 	<div id="basket_text">
-		<a href="/cart/orders/my/list" class="pull-right" style="font-size:42px; display:block">
+		<a href="/cart/orders/my/list" class="pull-right" style="font-size:42px;line-height:42px; display:block">
 			<span class="pe-7s-cart"></span>
 		</a>
 		<span class="bold_basket">{data.user.email?:user?:reg}</span>
 		<div>
 			{data.user.email?:umenu}
-			В <a onclick="Cart.goTop()" href="/cart/orders/my/list">корзине</a> <b><span class="bold_basket">{data.order.count}</span> {~words(data.order.count,:позиция,:позиции,:позиций)}</b>
+			В <a onclick="Cart.goTop()" href="/cart/orders/my/list">корзине</a> <b><span class="bold_basket">{data.order.count|:str0}</span> {~words(data.order.count,:позиция,:позиции,:позиций)}</b>
 		</div>
+		<div style="clear:both"></div>
 	</div>
 </div>
+{str0:}0
 {umenu:}
 	<a onclick="Cart.goTop()" href="/cart/orders">{Cart.lang(:Мои заявки)}</a> |
 	<a class="signout" onclick="Cart.goTop()" href="/user/logout">{Cart.lang(:Выход)}</a><br>

@@ -54,12 +54,21 @@ class Cart {
 	}
 	public static function getByProdart($prodart) {
 		$data = Catalog::init();
-		$pos = Xlsx::runPoss($data, function &($pos) use ($prodart) {
+		$r = preg_match("/.*\s(\d+)/",$prodart,$match);
+		if ($r) $index = $match[1];
+		else $index = 0;
+
+		$pos = Xlsx::runPoss($data, function &($pos) use ($prodart, $index) {
 			$r = null;
-		    $realprodart=$pos['producer'].' '.$pos['article'];
+		    $realprodart = $pos['producer'].' '.$pos['article'].' '.$index;
 		    if ($realprodart == $prodart) return $pos;
 		    return $r;
 		});
+		if (!$pos) return false;
+		Xlsx::setItem($pos, $index);
+		
+		$pos = Catalog::getPos($pos);
+		
 		return $pos;
 	}
 	public static function getGoodOrder($id = '')
@@ -132,10 +141,11 @@ class Cart {
 					else $pos['sumopt']=0;
 					if (!empty($pos['Цена розничная'])) $pos['sumroz']=$pos['Цена розничная']*$pos['count'];
 					else $pos['sumroz']=0;
+					$order['sumopt']+=$pos['sumopt'];
 				} else {
 					$pos['sumroz']=$pos['Цена']*$pos['count'];
 				}
-				$order['sumopt']+=$pos['sumopt'];
+				
 				$order['sumroz']+=$pos['sumroz'];
 
 				return $r;
@@ -212,7 +222,7 @@ class Cart {
 				}
 				if (empty($pos['cost'])) $pos['cost'] = 0;
 			} else {
-				$pos['cost'] = $pos['Цена'];
+				//$pos['cost'] = $pos['Цена'];
 				$order['sum'] = $order['sumroz'];
 				Each::foro($order['basket'], function &(&$pos) {
 					$r = null;
@@ -266,10 +276,10 @@ class Cart {
 			return $r;
 		});
 	}
-	public static function &loadOrder($id = '', $re = false)
+	public static function &loadOrder($id = '')
 	{
 		//Результат этой фукции можно сохранять в файл она не добавляет лишних данных, но оптимизирует имеющиеся
-		return Once::exec(__FILE__.'-loadOrder', function &($id) {
+		return Once::func( function &($id) {
 			if ($id) {
 				$order = Load::loadJSON(Cart::getPath($id));
 				$r = false;
@@ -307,7 +317,7 @@ class Cart {
 			}
 			if (empty($order['manage'])) $order['manage'] = array();
 			return $order;
-		}, array($id), $re);
+		}, array($id));
 	}
 	public static function getRule($order = false) {
 		$rules = Load::loadJSON('-cart/rules.json');

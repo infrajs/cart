@@ -66,7 +66,7 @@ window.Cart = {
 		var link = Cart.getLink(order, place);
 		var ask = Template.parse([act.confirm], order);
 		ask = 'Заявка '+link+'<br>'+ask;
-		popup.confirm(ask, function () { 
+		var justdo = function () { 
 			//if (!act.link) Cart.blockform(layer);
 			Cart.act(place, name, orderid, function (ans) {
 				var call = function () {
@@ -85,7 +85,7 @@ window.Cart = {
 						
 						if (ans.result) {
 							if (act.goal) Goal.reach(act.goal)
-							if (act.result) {
+							if (act.result && !act.silent) {
 								var msg = Template.parse([act.result], order);
 								var link = Cart.getLink(order, place);
 								popup.alert(link+'<br>'+msg);
@@ -113,7 +113,9 @@ window.Cart = {
 				if (act.noscroll) call();
 				else Cart.goTop(call);					
 			}, param);
-		});
+		};
+		if (act.silent) justdo();
+		else popup.confirm(ask, justdo);
 	},
 	init: function () {
 		var rules = Load.loadJSON('-cart/rules.json');
@@ -274,7 +276,7 @@ window.Cart = {
 		var orderid = a.data('order');
 		if (!orderid) orderid = 'my';
 
-		var prodart = a.data('producer')+' '+a.data('article');
+		var prodart = a.data('producer')+' '+a.data('article')+' '+a.data('index');
 		var name = ['orders', orderid, 'basket', prodart];
 		var r = Session.get(name);
 		if (r || orderid != 'my') {
@@ -286,7 +288,23 @@ window.Cart = {
 			a.removeClass('selected');
 			a.attr('title','Добавить в корзину');
 		}
-	}
+	},
+	/*activate: function (a) {
+		var orderid = a.data('order');
+		if (!orderid) orderid = 'my';
+
+		var prodart = a.data('producer')+' '+a.data('article');
+		var name = ['orders', orderid, 'basket', prodart];
+		var r = Session.get(name);
+		if (r || orderid != 'my') {
+			a.addClass('selected');
+			a.attr("data-crumb","true");
+			a.attr('title','Перейти в корзину');
+		} else {
+			a.removeClass('selected');
+			a.attr('title','Добавить в корзину');
+		}
+	}*/
 }
 /*
 Event.handler('Session.onsync', function () {

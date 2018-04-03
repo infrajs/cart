@@ -2,7 +2,7 @@ Event.handler('Controller.onshow', function () {
 	$('.cart .abasket').filter("[data-crumb!=false]").attr("data-crumb","false").click( function (event) {
 		event.preventDefault();
 		var a = $(this);
-		var prodart = a.data('producer') + ' ' + a.data('article');
+		var prodart = a.data('producer') + ' ' + a.data('article') + ' ' + a.data('index');
 		var orderid = a.data('order');
 		var place = a.data('place');
 		if (!place) place = 'orders';

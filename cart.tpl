@@ -76,120 +76,119 @@
 
 			domready(function(){
 
-				Once.exec('layer{id}', function () {
-					var tplcost = function (val) {
-						return Template.parse('-cart/cart.tpl', val, 'itemcost')
-					}
-					var calc = function (div, layer) {
-						var orderid = layer.crumb.parent.name;
-						var place = layer.crumb.parent.parent.name;
-						if (orderid == 'my') orderid = '';
-						/*var goodorder = Cart.getGoodOrder(orderid);
-						Брать данные из разметки HTML
-						*/
+				
+				var tplcost = function (val) {
+					return Template.parse('-cart/cart.tpl', val, 'itemcost')
+				}
+				var calc = function (div, layer) {
+					var orderid = layer.crumb.parent.name;
+					var place = layer.crumb.parent.parent.name;
+					if (orderid == 'my') orderid = '';
+					/*var goodorder = Cart.getGoodOrder(orderid);
+					Брать данные из разметки HTML
+					*/
 
-						var order = Autosave.get(layer, '', { });
-						if (!order.basket) order.basket = { };
-						var conf = Config.get('cart');
-						if (conf.opt) {
-							var gorder = Cart.getGoodOrder(orderid);
-							if (!gorder.merch) {
-								if (gorder.merchdyn) {
-									div.find('.cartinfo').html('оптовые цены');
-									div.find('.cartblockinfo').removeClass('alert-info').addClass('alert-success');
-								} else {
-									div.find('.cartinfo').html('розничные цены');
-									div.find('.cartblockinfo').removeClass('alert-success').addClass('alert-info');
-								}
-								div.find('.cartneed').html(tplcost(gorder.need));
-							}
-							div.find('.sum').each( function () {
-								var prodart=$(this).data('producer')+' '+$(this).data('article');
-								var pos = gorder.basket[prodart];
-								if (!pos) {
-									$(this).parent().addClass('bg-info').removeClass('bg-success');
-								} else if (gorder.merchdyn) {
-									$(this).html(tplcost(pos.sumopt));
-									$(this).parent().addClass('bg-success').removeClass('bg-info');
-								} else {
-									$(this).html(Template.parse('-cart/cart.tpl',pos,'itemcost','sumroz'));
-									$(this).parent().addClass('bg-info').removeClass('bg-success');
-								}
-							});
-
-							div.find('.myprice').each( function () {
-								var prodart=$(this).data('producer')+' '+$(this).data('article');
-								var pos = gorder.basket[prodart];
-								if (!pos) {
-									$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
-								} else if (gorder.merchdyn) {
-									$(this).find('.cost').html(tplcost(pos['Цена оптовая']));
-									$(this).find('.cost').parent().addClass('bg-success').removeClass('bg-info');
-								} else {
-									$(this).find('.cost').html(tplcost(pos['Цена розничная']));
-									$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
-								}
-							});
-							
-							div.find('.cartsumroz').html(tplcost(gorder.sumroz));
-							div.find('.cartsumopt').html(tplcost(gorder.sumopt));
+					var order = Autosave.get(layer, '', { });
+					if (!order.basket) order.basket = { };
+					var conf = Config.get('cart');
+					if (conf.opt) {
+						var gorder = Cart.getGoodOrder(orderid);
+						if (!gorder.merch) {
 							if (gorder.merchdyn) {
-								div.find('.cartsum').html(tplcost(gorder.sumopt));
-								div.find('.cartsum').parent().addClass('bg-success').removeClass('bg-info');
-								if (gorder.sumroz != gorder.sumopt) {
-									div.find('.cartsumdel').html(tplcost(gorder.sumroz));
-								}
+								div.find('.cartinfo').html('оптовые цены');
+								div.find('.cartblockinfo').removeClass('alert-info').addClass('alert-success');
 							} else {
-								div.find('.cartsum').html(tplcost(gorder.sumroz));
-								div.find('.cartsum').parent().addClass('bg-info').removeClass('bg-success');
-								div.find('.cartsumdel').html(tplcost(''));
+								div.find('.cartinfo').html('розничные цены');
+								div.find('.cartblockinfo').removeClass('alert-success').addClass('alert-info');
+							}
+							div.find('.cartneed').html(tplcost(gorder.need));
+						}
+						div.find('.sum').each( function () {
+							var prodart=$(this).data('producer')+' '+$(this).data('article');
+							var pos = gorder.basket[prodart];
+							if (!pos) {
+								$(this).parent().addClass('bg-info').removeClass('bg-success');
+							} else if (gorder.merchdyn) {
+								$(this).html(tplcost(pos.sumopt));
+								$(this).parent().addClass('bg-success').removeClass('bg-info');
+							} else {
+								$(this).html(Template.parse('-cart/cart.tpl',pos,'itemcost','sumroz'));
+								$(this).parent().addClass('bg-info').removeClass('bg-success');
+							}
+						});
+
+						div.find('.myprice').each( function () {
+							var prodart=$(this).data('producer')+' '+$(this).data('article');
+							var pos = gorder.basket[prodart];
+							if (!pos) {
+								$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
+							} else if (gorder.merchdyn) {
+								$(this).find('.cost').html(tplcost(pos['Цена оптовая']));
+								$(this).find('.cost').parent().addClass('bg-success').removeClass('bg-info');
+							} else {
+								$(this).find('.cost').html(tplcost(pos['Цена розничная']));
+								$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
+							}
+						});
+						
+						div.find('.cartsumroz').html(tplcost(gorder.sumroz));
+						div.find('.cartsumopt').html(tplcost(gorder.sumopt));
+						if (gorder.merchdyn) {
+							div.find('.cartsum').html(tplcost(gorder.sumopt));
+							div.find('.cartsum').parent().addClass('bg-success').removeClass('bg-info');
+							if (gorder.sumroz != gorder.sumopt) {
+								div.find('.cartsumdel').html(tplcost(gorder.sumroz));
 							}
 						} else {
-							var ordersumroz = 0;
-							div.find('.myprice').each( function () {
-								var pos = $(this).data();
-								if (pos) {
-									var prodart = pos.producer+' '+pos.article;
-									var count = pos.count;
-									if(order.basket[prodart]) count = order.basket[prodart].count;
-									var sumroz = pos.cost * count;
-									if (!sumroz) sumroz = 0;
-									ordersumroz += sumroz;
-									$(this).find('.sum').html(tplcost(sumroz));
-								}
-								$(this).find('.sum').parent().addClass('bg-info').removeClass('bg-success');
-								$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
-							});
-							div.find('.cartsumroz').html(tplcost(ordersumroz));
-							div.find('.cartsum').html(tplcost(ordersumroz));
+							div.find('.cartsum').html(tplcost(gorder.sumroz));
 							div.find('.cartsum').parent().addClass('bg-info').removeClass('bg-success');
 							div.find('.cartsumdel').html(tplcost(''));
 						}
+					} else {
+						var ordersumroz = 0;
+						div.find('.myprice').each( function () {
+							var pos = $(this).data();
+							if (pos) {
+								var prodart = pos.producer+' '+pos.article;
+								var count = pos.count;
+								if(order.basket[prodart]) count = order.basket[prodart].count;
+								var sumroz = pos.cost * count;
+								if (!sumroz) sumroz = 0;
+								ordersumroz += sumroz;
+								$(this).find('.sum').html(tplcost(sumroz));
+							}
+							$(this).find('.sum').parent().addClass('bg-info').removeClass('bg-success');
+							$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
+						});
+						div.find('.cartsumroz').html(tplcost(ordersumroz));
+						div.find('.cartsum').html(tplcost(ordersumroz));
+						div.find('.cartsum').parent().addClass('bg-info').removeClass('bg-success');
+						div.find('.cartsumdel').html(tplcost(''));
 					}
-					Event.one('Controller.oncheck', function () {
-						var layer = Controller.ids['{id}'];
-						//history.replaceState(null,null,'/'+layer.crumb);
-						if (layer.crumb.child) Crumb.go('/'+layer.crumb, false);
-						
-						Event.handler('Layer.onshow', function () {
-							var div = $('#'+layer.div);
-							var timer;
+				}
+				Event.one('Controller.oncheck', function () {
+					var layer = Controller.ids['{id}'];
+					//history.replaceState(null,null,'/'+layer.crumb);
+					if (layer.crumb.child) Crumb.go('/'+layer.crumb, false);
+					
+					Event.handler('Layer.onshow', function () {
+						var div = $('#'+layer.div);
+						var timer;
+						calc(div, layer);
+						div.find('[type=number]').change( function () {
+							div.find('.refresh').show();
+							clearTimeout(timer);
+							timer = setTimeout( function () {
+								div.find('.refresh').click();	
+							}, 2000);
+						});
+						div.find('.refresh').click( function () {
+							clearTimeout(timer);
+							div.find('.refresh').hide();
+							Global.set('cart');
 							calc(div, layer);
-							div.find('[type=number]').change( function () {
-								div.find('.refresh').show();
-								clearTimeout(timer);
-								timer = setTimeout( function () {
-									div.find('.refresh').click();	
-								}, 2000);
-							});
-							div.find('.refresh').click( function () {
-								clearTimeout(timer);
-								div.find('.refresh').hide();
-								Global.set('cart');
-								calc(div, layer);
-							});
-						}, 'cart', layer);
-					});
+						});
+					}, 'cart', layer);
 				});
 				Once.exec('{tpl}{tplroot}', function () {
 					Event.one('Controller.onshow', function () {
@@ -265,7 +264,7 @@
 					</td>
 					<td style="vertical-align:middle;">
 						<div style="float:right; margin-right:10px" class="cart">
-							<span class="abasket bg-danger" data-place="{crumb.parent.parent.name}" data-order="{data.order.id}" data-producer="{producer}" data-article="{article}">
+							<span class="abasket bg-danger" data-place="{crumb.parent.parent.name}" data-order="{data.order.id}" data-producer="{producer}" data-article="{article}" data-index="{index}">
 								<span class="pe-7s-close-circle"></span>
 							</span>
 						</div>
@@ -275,7 +274,7 @@
 					<td rowspan="3"></td>
 					<td rowspan="3" style="width:1px">
 						<a href="/catalog/{producer}/{article}">
-							<img src="/-imager/?h=90&src={Config.get(:catalog).dir}{producer}/{article}/&or=-imager/empty.png">
+							<img src="/-imager/?h=90&src={images.0}&or={Config.get(:catalog).dir}{producer}/">
 						</a>
 					</td>
 					<td>

@@ -226,7 +226,7 @@ if ($action == 'saved') {
 	if (!$order['basket']) return Ans::err($ans, 'Корзина уже пустая');
 	unset($order['basket']);
 	if ($order['status'] == 'active') {
-		Session::set('order.my.basket');
+		Session::set('orders.my.basket');
 	} else {
 		Cart::saveOrder($order, $place);
 	} 

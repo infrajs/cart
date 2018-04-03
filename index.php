@@ -134,6 +134,7 @@ if ($type == 'user') {
 
 
 	$order = Cart::loadOrder($orderid);	
+	
 	$add = Ans::GET('add');
 	if ($add) {
 		$right = array('basket',$add,'count');
