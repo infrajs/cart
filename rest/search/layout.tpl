@@ -12,7 +12,7 @@
 	<p>
 		<input autosave="0" type="text" class="formControll input" style="width:100%">
 	</p>
-	<span class="btn btn-default button">Добавить</span>
+	<!--<span class="btn btn-default button">Добавить</span>-->
 	<script>
 		domready(function () {
 			//https://github.com/devbridge/jQuery-Autocomplete
@@ -21,23 +21,27 @@
 			div.find('.button').click( function () {
 				if (!prodart) return;
 				Cart.add('{config.place}', '{config.orderid}', prodart);
-				div.find('.input').val('');	
+				div.find('.input').val('');
 			});
+			var query = '';
 			div.find('.input').autocomplete({
 				serviceUrl: function (q) {
+					query = q;
 					return '/-cart/rest/search/' + q;
 				},
 				onSelect: function (suggestion) {
 					var pos = suggestion.data;
 					prodart = pos['producer'] + ' ' + pos['article'] + ' ' + pos['index'];
+					Cart.add('{config.place}', '{config.orderid}', prodart);
 				},
 				transformResult: function (ans) {
 					return {
 						suggestions: $.map(ans.list, function (pos) {
-							var itemrow = Catalog.getItemRowValue(pos);
-							if (itemrow) itemrow = ' ' + itemrow;
+							//var itemrow = Catalog.getItemRowValue(pos);
+							//if (itemrow) itemrow = ' ' + itemrow;
+							//var value = pos['Производитель'] + ' ' + pos['Артикул'] + itemrow;
 							return { 
-								value: pos['Производитель'] + ' ' + pos['Артикул'] + itemrow, 
+								value: query, 
 								data: pos 
 							};
 						})

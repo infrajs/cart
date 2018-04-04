@@ -33,7 +33,7 @@ class Cart {
 	}
 	public static function getMyOrders()
 	{
-		return Once::exec(__FILE__.'-getMyOrders', function () {
+		return Once::func( function () {
 			$myorders = Session::get('safe.orders', array());
 			
 			$list = array();
@@ -314,7 +314,16 @@ class Cart {
 					return $r;
 				});//По идеи в сессии хранится email и он уже там есть, как и любые другие поля.
 				$email = Session::getEmail();//Это единственное место где в заявку добавляется email
-				if ($email) $order['email'] = $email;//Когда нет регистрации email берём из формы autosave
+				if (isset($order['email']) && $email && $email != $order['email']) {
+					$user = Session::getUser($order['email']);
+					if ($user) { //Пользователь с указанным уже есть и это не текущий пользователь
+						if (Session::get('safe.manager')) {
+
+						} else {
+							return Cart::lang('To your email on the website there is a registration, you need to <a href=\'/user/signin\'>login</a>');
+						}
+					}
+				}
 				$order['status'] = 'active';
 			}
 			if (empty($order['manage'])) $order['manage'] = array();
@@ -463,10 +472,14 @@ class Cart {
 					$id++;
 					$src=Cart::getPath($id);
 				}
-				$myorders = Session::get(['safe','orders'], array());
+				$user = Session::getUser($order['email']);
+				if(!$user) $user = Session::createUser($order['email']);
+				$orders = Session::user_get($order['email'],'safe.orders',array());
+				$orders[] = $id;
+				Session::user_set($order['email'],'safe.orders',array());
+				/*$myorders = Session::get(['safe','orders'], array());
 				$myorders[] = $id;
-				//$myorders = array_values($myorders);//depricated fix old errors in session
-				Session::set(['safe','orders'], $myorders);
+				Session::set(['safe','orders'], $myorders);*/
 			}
 		} else {
 			if ($place) Session::set([$place, $id]);

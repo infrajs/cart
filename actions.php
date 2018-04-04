@@ -72,7 +72,7 @@ if (!empty($act['checkdata']) && !empty($rule['edit'][$place])) {
 	$msg = User::checkReg($email);
 	if (is_string($msg)) return Ans::err($ans,$msg);
 	//Действие требует проверку данных и текущий стату заявки разрешает редактирование, соответственно можно применит ьданные
-	if (empty($order['basket'])) return Ans::err($ans, 'Заявк пустая! Добавьте товар!');
+	//if (empty($order['basket'])) return Ans::err($ans, 'Заявка пустая! Добавьте товар!');
 	$page = '';
 	if (empty($order['phone'])||!User::checkData($order['phone'],'value')) return Ans::err($ans, 'Укажите корректный телефон'.$page);
 	if (empty($order['name'])||!User::checkData($order['name'],'value')) return Ans::err($ans, 'Укажите корректное имя контактного лица'.$page);

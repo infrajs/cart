@@ -314,7 +314,7 @@
 		
 		</p>
 		<p>Чтобы добавить позицию нужно кликнуть по иконке корзины рядом с ценой в <a href="/catalog">каталог</a>.</p>
-				<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a pull-right">Поиск позиций по артикулу</span>
+				<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a pull-right">Поиск позиций</span>
 		<div style="margin-top:10px">
 			<a href="/catalog" style="text-decoration:none" class="btn btn-success">Открыть каталог</a>
 		</div>
@@ -669,12 +669,14 @@
 				Показать заявку
 			</a>
 		</div>
+	{clearfields:}<span class="pull-right a" onclick="$('.cartcontacts input, .cartcontacts textarea').val('').change();">Очистить данные</span>
 	{manage:}
 		
 		<div class="alert alert-info" role="alert"><h3 style="margin-top:0">Сообщение менеджера</h3>
 <pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
 	</div>
 	{orderPageContent:}
+		{order.rule.edit.orders?:clearfields}
 		<h1>{order.rule.title}</h1>
 		{order.id?order:ordernum}
 		{order.manage.comment?order:manage}
