@@ -480,6 +480,8 @@ class Cart {
 				$p=Cart::getByProdart($prodart);
 				if ($p) {//Товар найден в каталоге
 					$pos = array_merge($p,array('count'=>$pos['count']));
+					unset($pos['items']);
+					unset($pos['itemrows']);
 					$pos['hash'] = Cart::getPosHash($p);//Метка версии замороженной позиции
 				}
 				return $r;

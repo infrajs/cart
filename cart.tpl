@@ -868,9 +868,10 @@
 					{~date(:d.m.Y H:i,time)}
 				</td>
 			</tr>
-			{adm_product:} <nobr>{count} <a href="/catalog/{producer}/{article}/{index}">{Артикул}</a>{~last()|:comma}</nobr>
+			{adm_product:} <nobr>{count} <a href="/catalog/{producer}/{article}{:cat.indexsl}">{Артикул}</a>{~last()|:comma}</nobr>
 
 			{adm_paidorder:}<b>{~cost(manage.paid)} руб.</b> {manage.paidtype=:bank?:банк?:менеджер} {~date(:d.m.Y H:i,manage.paidtime)}
+{cat::}-catalog/cat.tpl
 {ADMORDER:}
 	{:ordercrumb}
 	{data.result?data.order:adm_orderPageContent?:adm_message}
