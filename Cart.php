@@ -54,23 +54,25 @@ class Cart {
 	}
 	public static function getByProdart($prodart) {
 		$data = Catalog::init();
-		$r = preg_match("/.*\s(\d+)/",$prodart,$match);
-		if ($r) $index = $match[1];
-		else $index = 0;
 
-		$pos = Xlsx::runPoss($data, function &($pos) use ($prodart, $index) {
+		/*$r = preg_match("/.*\s(\d+)/",$prodart,$match);
+		if ($r) $index = $match[1];
+		else $index = 0;*/
+
+		$pos = Xlsx::runPoss($data, function &($pos) use ($prodart) {
 			$r = null;
 		    $realprodart = $pos['producer'].' '.$pos['article'];
-		    //if ($realprodart == $prodart) return $pos;
-		    $realprodart .= ' '.$index;
 		    if ($realprodart == $prodart) return $pos;
+		    if (isset($pos['items'])) foreach ($pos['items'] as $item) {
+		    	if ($realprodart.' '.$item['id'] == $prodart) {
+		    		Xlsx::setItem($pos, $item['id']);
+		    		return $pos;
+		    	}
+		    }
 		    return $r;
 		});
 		if (!$pos) return false;
-		if ($index) Xlsx::setItem($pos, $index);
-		
 		$pos = Catalog::getPos($pos);
-		
 		return $pos;
 	}
 	public static function getGoodOrder($id = '')

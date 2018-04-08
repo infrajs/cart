@@ -104,7 +104,10 @@
 							div.find('.cartneed').html(tplcost(gorder.need));
 						}
 						div.find('.sum').each( function () {
-							var prodart = $(this).data('producer')+' '+$(this).data('article') + ' ' +$(this).data('index');
+							var prodart = $(this).data('producer')+' '+$(this).data('article');
+							var id =  $(this).data('id');
+							if (id)  prodart += ' ' +id;
+							
 							var pos = gorder.basket[prodart];
 							if (!pos) {
 								$(this).parent().addClass('bg-info').removeClass('bg-success');
@@ -118,7 +121,9 @@
 						});
 
 						div.find('.myprice').each( function () {
-							var prodart=$(this).data('producer')+' '+$(this).data('article') + ' ' +$(this).data('index');
+							var prodart = $(this).data('producer')+' '+$(this).data('article');
+							var id =  $(this).data('id');
+							if (id)  prodart += ' ' +id;
 							var pos = gorder.basket[prodart];
 							if (!pos) {
 								$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
@@ -149,7 +154,8 @@
 						div.find('.myprice').each( function () {
 							var pos = $(this).data();
 							if (pos) {
-								var prodart = pos.producer+' '+pos.article + ' ' +pos.index;
+								var prodart = pos.producer+' '+pos.article;
+								if(pos.id)  prodart += ' ' +pos.id;
 								var count = pos.count;
 								if(order.basket[prodart]) count = order.basket[prodart].count;
 								var sumroz = pos.cost * count;
@@ -255,12 +261,12 @@
 		</div>
 		{cartname:}
 		{cartpos:}
-			<tbody class="myprice" data-cost="{cost}" data-count="{count}" data-article="{article}" data-index="{index}" data-producer="{producer}">
+			<tbody class="myprice" data-cost="{cost}" data-count="{count}" data-article="{article}" data-id="{id}" data-producer="{producer}">
 				<tr class="active">
 					<td style="color:gray; vertical-align:middle">{num}</td>
 					<td style="vertical-align:middle">
 						<div class="title">
-							<a href="/catalog/{producer}/{article}/{index}">{Производитель} {Артикул}</a>
+							<a href="/catalog/{producer}/{article}{cat.idsl}">{Производитель} {Артикул}</a>
 						</div>
 					</td>
 					<td colspan="4" style="vertical-align:middle">
@@ -269,7 +275,7 @@
 					</td>
 					<td style="vertical-align:middle;">
 						<div style="float:right; margin-right:10px" class="cart">
-							<span class="abasket bg-danger" data-place="{crumb.parent.parent.name}" data-order="{data.order.id}" data-producer="{producer}" data-article="{article}" data-index="{index}">
+							<span class="abasket bg-danger" data-place="{crumb.parent.parent.name}" data-order="{data.order.id}" data-producer="{producer}" data-article="{article}" data-id="{id}">
 								<span class="pe-7s-close-circle"></span>
 							</span>
 						</div>
@@ -278,7 +284,7 @@
 				<tr>
 					<td rowspan="3"></td>
 					<td rowspan="3" style="width:1px">
-						<a href="/catalog/{producer}/{article}/{index}">
+						<a href="/catalog/{producer}/{article}{cat.idsl}">
 							<img class="img-responsive" src="/-imager/?w=140&h=100&src={images.0}&or=-imager/empty.png">
 						</a>
 					</td>
@@ -299,9 +305,9 @@
 				<tr>
 					<td style="vertical-align:middle;">Кол<span class="hidden-xs">ичество</span>:</td>
 					<td style="vertical-align:middle; padding-top:0; padding-bottom:0;">
-						<input value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer} {article} {index}.count"></td>
+						<input value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer} {article}{:cat.idsp}.count"></td>
 					<td style="white-space:nowrap; vertical-align:middle">
-						<span class="sum" data-article="{article}" data-producer="{producer}" data-index="{index}"></span>
+						<span class="sum" data-article="{article}" data-producer="{producer}" data-id="{id}"></span>
 					</td>
 
 				</tr>
@@ -309,7 +315,7 @@
 					<td colspan="4" style="height:100%"></td>
 				</tr>
 			</tbody>
-		{prodart:}{producer} {article} {index}
+		{prodart:}{producer} {article}{:cat.idsp}
 {cartmsg:}<p>Корзина пустая. Добавьте в корзину интересующие позиции.
 		
 		</p>
@@ -464,7 +470,7 @@
 				<td>{~date(:j F H:i,time)}</td>
 			</tr>
 			{dateform:}d.m.Y
-			{product:} <nobr><a href="/catalog/{producer}/{article}/{index}">{Артикул}</a><sup style="color:gray">{count}</sup>{~last()|:comma}</nobr><wbr>
+			{product:} <nobr><a href="/catalog/{producer}/{article}{cat.idsl}">{Артикул}</a><sup style="color:gray">{count}</sup>{~last()|:comma}</nobr><wbr>
 	{orderfields:}
 		<div class="form-group">
 			<label>Контактное лицо <span class="req">*</span></label>
@@ -789,7 +795,7 @@
 	
 	{positionRow:}
 		<tr>
-			<td><a href="/catalog/{producer}/{article}/{index}">{Производитель} {Артикул}</a>{change?:star}<br>{itemrow}</td>
+			<td><a href="/catalog/{producer}/{article}{cat.idsl}">{Производитель} {Артикул}</a>{change?:star}<br>{itemrow}</td>
 			<td>{cost:itemcost}</td>
 			<td>{count}</td>
 			<td>{sum:itemcost}</td>
@@ -870,7 +876,7 @@
 					{~date(:d.m.Y H:i,time)}
 				</td>
 			</tr>
-			{adm_product:} <nobr>{count} <a href="/catalog/{producer}/{article}{:cat.indexsl}">{Артикул}</a>{~last()|:comma}</nobr>
+			{adm_product:} <nobr>{count} <a href="/catalog/{producer}/{article}{:cat.idsl}">{Артикул}</a>{~last()|:comma}</nobr>
 
 			{adm_paidorder:}<b>{~cost(manage.paid)} руб.</b> {manage.paidtype=:bank?:банк?:менеджер} {~date(:d.m.Y H:i,manage.paidtime)}
 {cat::}-catalog/cat.tpl

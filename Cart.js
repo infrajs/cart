@@ -186,6 +186,7 @@ window.Cart = {
 		var name = [place, orderid, 'basket', prodart];
 		var order = Cart.getGoodOrder(orderid);
 		var r = Sequence.get(order, ['basket', prodart, 'count']);
+		console.log(order);
 		if (r) {
 			Cart.remove(place, orderid, prodart, cb);
 		} else {
@@ -276,7 +277,10 @@ window.Cart = {
 		var orderid = a.data('order');
 		if (!orderid) orderid = 'my';
 
-		var prodart = a.data('producer')+' '+a.data('article')+' '+a.data('index');
+		var prodart = a.data('producer') + ' ' + a.data('article');
+		var id = a.data('id');
+		if (id) prodart += ' ' + a.data('id');
+
 		var name = ['orders', orderid, 'basket', prodart];
 		var r = Session.get(name);
 		if (r || orderid != 'my') {
