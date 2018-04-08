@@ -31,7 +31,8 @@
 				},
 				onSelect: function (suggestion) {
 					var pos = suggestion.data;
-					prodart = pos['producer'] + ' ' + pos['article'] + ' ' + pos['index'];
+					prodart = pos['producer'] + ' ' + pos['article'];
+					if (pos['id']) prodart += ' ' + pos['id'];
 					Cart.add('{config.place}', '{config.orderid}', prodart);
 				},
 				transformResult: function (ans) {
@@ -65,9 +66,10 @@
 		});
 	</script>
 </div>
+{cat::}-catalog/cat.tpl
 {SUGGESTION:}
 		{images.0?:img}
-		<b><a href="/catalog/{producer}/{article}">{Производитель} {Артикул}</a></b> {Цена?:cost}<br>
+		<b><a href="/catalog/{producer}/{article}{:cat.idsl}">{Производитель} {Артикул}</a></b> {Цена?:cost}<br>
 		<!--<a href="/catalog?m=:group::.{group}=1">{Группа}</a> <br>-->
 		{itemrow}
 		
