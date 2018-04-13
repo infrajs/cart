@@ -61,8 +61,10 @@ class Cart {
 
 		$pos = Xlsx::runPoss($data, function &($pos) use ($prodart) {
 			$r = null;
+
 		    $realprodart = $pos['producer'].' '.$pos['article'];
 		    if ($realprodart == $prodart) return $pos;
+		    if (!empty($pos['id']) && $realprodart.' '.$pos['id'] == $prodart) return $pos;
 		    if (isset($pos['items'])) foreach ($pos['items'] as $item) {
 		    	if ($realprodart.' '.$item['id'] == $prodart) {
 		    		Xlsx::setItem($pos, $item['id']);
