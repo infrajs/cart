@@ -129,7 +129,7 @@
 		"remove":{
 			"checkdata":false,
 			"title":"Удалить позицию из заявки",
-			"confirm":"Удалить позицию из заявки?",
+			"confirm2":"Удалить позицию из заявки?",
 			"result":"Позиция удалена.",
 			"silent":true,
 			"noscroll":true
@@ -137,6 +137,7 @@
 		"clear":{
 			"checkdata":false,
 			"title":"Очистить корзину",
+			"silent":true,
 			"confirm":"Очистить корзину заявки?",
 			"result":"Корзина очищена."
 		},

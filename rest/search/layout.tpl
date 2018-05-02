@@ -33,7 +33,11 @@
 					var pos = suggestion.data;
 					prodart = pos['producer'] + ' ' + pos['article'];
 					if (pos['id']) prodart += ' ' + pos['id'];
-					Cart.add('{config.place}', '{config.orderid}', prodart);
+					Popup.confirm('Количество: <input name="count">', function(div){
+						var count = div.find('[name=count]').val();
+						Cart.set('{config.place}', '{config.orderid}', prodart, count);
+					}, pos['Производитель'] + ' ' + pos['Артикул'] + '<br><small>' + pos['itemrow']+'</small>');
+					
 				},
 				transformResult: function (ans) {
 					return {

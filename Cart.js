@@ -10,7 +10,7 @@ window.Cart = {
 			Controller.global.set(['user','cart']);
 			Session.syncNow();
 			Controller.check();
-			Cart.goTop();
+			//Cart.goTop();
 			if (el) $(el).removeClass('btn-danger').addClass('btn-default').find('span').removeClass('spin');
 		},100);
 	},
@@ -64,8 +64,7 @@ window.Cart = {
 		//if (!act.link && (!act.go || !act.go[place])) alert('Ошибка. Действие невозможно выполнить с этой странице!');
 	
 		var link = Cart.getLink(order, place);
-		var ask = Template.parse([act.confirm], order);
-		ask = 'Заявка '+link+'<br>'+ask;
+		
 		var justdo = function () { 
 			//if (!act.link) Cart.blockform(layer);
 			Cart.act(place, name, orderid, function (ans) {
@@ -110,12 +109,19 @@ window.Cart = {
 					}
 					if (cb && ans.result) cb(ans);
 				}
-				if (act.noscroll) call();
-				else Cart.goTop(call);					
+				//if (act.noscroll) call();
+				//else Cart.goTop(call);	
+				call();
+				if (!act.noscroll) Cart.goTop();
 			}, param);
 		};
-		if (act.silent) justdo();
-		else popup.confirm(ask, justdo);
+		if (act.confirm) {
+			var ask = Template.parse([act.confirm], order);
+			ask = 'Заявка '+link+'<br>'+ask;
+			popup.confirm(ask, justdo);
+		} else {
+			justdo();
+		}
 	},
 	init: function () {
 		var rules = Load.loadJSON('-cart/rules.json');
@@ -186,7 +192,6 @@ window.Cart = {
 		var name = [place, orderid, 'basket', prodart];
 		var order = Cart.getGoodOrder(orderid);
 		var r = Sequence.get(order, ['basket', prodart, 'count']);
-		console.log(order);
 		if (r) {
 			Cart.remove(place, orderid, prodart, cb);
 		} else {
@@ -213,6 +218,12 @@ window.Cart = {
 			var name = [place, orderid, 'basket', prodart];
 			Session.set(name, null, true, fn);
 		}, 'prodart=' + prodart);
+	},
+	set: function (place, orderid, prodart, count) {
+		if (!orderid) orderid = 'my';
+		var name = [place, orderid, 'basket', prodart];	
+		Session.set(name, { count: count }, true);
+		Global.check(['cat_basket','order','cart']);
 	},
 	add: function (place, orderid, prodart, cb) {
 		var fn = function () {

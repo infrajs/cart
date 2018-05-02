@@ -264,7 +264,7 @@
 			<tbody class="myprice" data-cost="{cost}" data-count="{count}" data-article="{article}" data-id="{id}" data-producer="{producer}">
 				<tr class="active">
 					<td style="color:gray; vertical-align:middle">{num}</td>
-					<td style="vertical-align:middle">
+					<td style="vertical-align:middle; min-width:120px">
 						<div class="title">
 							<a href="/catalog/{producer}/{article}{cat.idsl}">{Производитель} {Артикул}</a>
 						</div>
@@ -320,7 +320,7 @@
 		
 		</p>
 		<p>Чтобы добавить позицию нужно кликнуть по иконке корзины рядом с ценой в <a href="/catalog">каталог</a>.</p>
-				<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a pull-right">Поиск позиций</span>
+		<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a pull-right">Поиск позиций</span>
 		<div style="margin-top:10px">
 			<a href="/catalog" style="text-decoration:none" class="btn btn-success">Открыть каталог</a>
 		</div>
@@ -763,7 +763,11 @@
 	{b:}<b>
 	{/b:}</b>
 	{noProducts:}
-		<h3>В заявке нет товаров.</h3>
+		<h3>В заявке нет товаров</h3>
+		<p align="right">
+			<a href="/{crumb}/list">Редактировать корзину</a><br>
+			<span data-orderid="{data.order.id}" data-place="{crumb.parent.name}" class="cart-search a">Поиск позиций</span>
+		</p>
 {dateFormat:}d.m.Y h:i:s
 {tableWidthProduct:}
 	<table class="table table-striped">
@@ -774,10 +778,18 @@
 			<th>Сумма</th>
 		</tr>
 		{basket::positionRow}
-		{data.order.rule.edit[crumb.parent.name]?:basketedit}
+		<tr><th colspan="3">
+		</td><td>{sum:itemcost}</td></tr>
 	</table>
-	{basketedit:}
-		<tr><th colspan="3"><a href="/{crumb}/list">Редактировать корзину</a></td><td>{sum:itemcost}</td></tr>
+	<div style="margin-bottom:10px">
+		{data.order.rule.edit[crumb.parent.name]?:basketedit}
+	</div>
+{basketedit:}
+	<p align="right">
+		<a href="/{crumb}/list">Редактировать корзину</a><br>
+		<span data-orderid="{data.order.id}" data-place="{crumb.parent.name}" class="cart-search a">Поиск позиций</span><br>
+		<span data-orderid="{data.order.id}" data-place="{crumb.parent.name}" class="cart-clear a">Очистить корзину</span>
+	</p>
 {tableWidthProductopt:}
 	<table class="table table-striped">
 		<tr>
@@ -898,11 +910,11 @@
 					<label>Сообщение для менеджера</label><br> 
 					<textarea disabled name="comment" class="form-control" rows="6">{comment}</textarea>
 				</div>
-				<br><hr><br>
 				
+				<br>
 				{count?:tableWidthProduct?:noProducts}
 				
-				<div style="margin-bottom:10px">Итого: <span class="cartsum">{~sum(total,manage.deliverycost|:0):itemcost}</span></div>
+
 
 
 				<!--
