@@ -266,7 +266,7 @@
 					<td style="color:gray; vertical-align:middle">{num}</td>
 					<td style="vertical-align:middle; min-width:120px">
 						<div class="title">
-							<a href="/catalog/{producer}/{article}{cat.idsl}">{Производитель} {Артикул}</a>
+							<a href="/catalog/{producer}/{article}{:cat.idsl}">{Производитель} {Артикул}</a>
 						</div>
 					</td>
 					<td colspan="4" style="vertical-align:middle">
@@ -284,7 +284,7 @@
 				<tr>
 					<td rowspan="3"></td>
 					<td rowspan="3" style="width:1px">
-						<a href="/catalog/{producer}/{article}{cat.idsl}">
+						<a href="/catalog/{producer}/{article}{:cat.idsl}">
 							<img class="img-responsive" src="/-imager/?w=140&h=100&src={images.0}&or=-imager/empty.png">
 						</a>
 					</td>
@@ -470,7 +470,7 @@
 				<td>{~date(:j F H:i,time)}</td>
 			</tr>
 			{dateform:}d.m.Y
-			{product:} <nobr><a href="/catalog/{producer}/{article}{cat.idsl}">{Артикул}</a><sup style="color:gray">{count}</sup>{~last()|:comma}</nobr><wbr>
+			{product:} <nobr><a href="/catalog/{producer}/{article}{:cat.idsl}">{Артикул}</a><sup style="color:gray">{count}</sup>{~last()|:comma}</nobr><wbr>
 	{orderfields:}
 		<div class="form-group">
 			<label>Контактное лицо <span class="req">*</span></label>
@@ -807,7 +807,7 @@
 	
 	{positionRow:}
 		<tr>
-			<td><a href="/catalog/{producer}/{article}{cat.idsl}">{Производитель} {Артикул}</a>{change?:star}<br>{itemrow}</td>
+			<td><a href="/catalog/{producer}/{article}{:cat.idsl}">{Производитель} {Артикул}</a>{change?:star}<br>{itemrow}</td>
 			<td>{cost:itemcost}</td>
 			<td>{count}</td>
 			<td>{sum:itemcost}</td>

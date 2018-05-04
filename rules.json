@@ -17,7 +17,7 @@
 				"actions":["sync","active"]
 			},
 			"manager":{
-				"buttons":{"wait":"primary", "complete":"warning", "sync":"success"},
+				"buttons":{"wait":"primary", "complete":"warning"},
 				"actions":["wait","complete","delete","email","sync"]
 			}
 		},

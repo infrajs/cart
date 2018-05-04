@@ -12,12 +12,6 @@ use infrajs\access\Access;
 use infrajs\user\User;
 use infrajs\each\Fix;
 
-if (!is_file('vendor/autoload.php')) {
-	chdir(explode('vendor/', __DIR__)[0]);
-	require_once('vendor/autoload.php');
-	Router::init();
-}
-
 $ans = array();
 $id = Ans::REQ('id','int');
 $orderid = $id;

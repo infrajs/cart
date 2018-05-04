@@ -466,6 +466,7 @@ class Cart {
 				$id = $order['fixid'];//Заявка уже есть в списке моих заявок
 
 			} else if ($order['status'] == 'active') {
+				//Сохранить активную заявку
 				//Активная заявка и нет fixid не сохраняем в файл
 				Session::set('orders.my', $order);//Исключение, данные заявки
 				return;

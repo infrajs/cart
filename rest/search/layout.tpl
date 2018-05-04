@@ -10,7 +10,7 @@
 	<h1>Добавить позицию</h1>
 	<p>Заявка: <a href="/cart/{config.place}/{config.orderid|:my}/list">{config.orderid|:Активная}</a></p>
 	<p>
-		<input autosave="0" type="text" class="formControll input" style="width:100%">
+		<input value='' autosave="0" type="text" class="formControll input" style="width:100%">
 	</p>
 	<!--<span class="btn btn-default button">Добавить</span>-->
 	<script>
@@ -33,9 +33,11 @@
 					var pos = suggestion.data;
 					prodart = pos['producer'] + ' ' + pos['article'];
 					if (pos['id']) prodart += ' ' + pos['id'];
-					Popup.confirm('Количество: <input name="count">', function(div){
+					Popup.confirm('Количество: <input name="count" type="number">', function(div){
 						var count = div.find('[name=count]').val();
 						Cart.set('{config.place}', '{config.orderid}', prodart, count);
+						//Cart.sync('{config.place}', '{config.orderid}');
+						Cart.act('{config.place}', 'sync', '{config.orderid}');
 					}, pos['Производитель'] + ' ' + pos['Артикул'] + '<br><small>' + pos['itemrow']+'</small>');
 					
 				},
