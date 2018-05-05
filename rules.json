@@ -5,7 +5,7 @@
 		"check":{
 			"freeze":true,
 			"edit":{
-				"orders":false,
+				"orders":true,
 				"admin":true
 			},
 			"notice":"warning",
@@ -27,12 +27,12 @@
 				"admin":true
 			},
 			"notice":"success",
-			"short":"Ожидание",
-			"caption":"Заявки ожидающие пользователя",
-			"title":"Заявка в ожидании",
+			"short":"Есть ответ менеджера",
+			"caption":"Заявки с ответом менеджера",
+			"title":"Есть ответ менеджера",
 			"user":{
 				"buttons":{"active":"danger","check":"success"},
-				"actions":["active","check"]
+				"actions":["active","check","sync"]
 			},
 			"manager":{
 				"buttons":{"complete":"warning","email":"danger", "sync":"success"},
@@ -108,9 +108,9 @@
 			"mangmail":"AdmOrderToCheck"
 		},
 		"wait":{
-			"title":"Заявка в ожидании",
+			"title":"Заявка отвечена",
 			"confirm":"От клиента, что-то ожидается. Оплата, получение товара или какая-то информация. Менеджер всё, что нужно сделал и ждёт.",
-			"result":"Заявка в ожидании."
+			"result":"Заявка отвечена."
 		},
 		"complete":{
 			"title":"Заявка выполнена",

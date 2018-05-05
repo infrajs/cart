@@ -99,12 +99,12 @@ if ($action == 'saved') {
 	$order['status'] = 'saved';
 	Cart::saveOrder($order, $place);
 	if ($status == 'active') {
-		Session::set('order.my.basket');//Очистили Текущую активную заявку
-		Session::set('order.my.id');
-		Session::set('order.my.fixid');
-		Session::set('order.my.copyid');
-		Session::set('order.my.time');
-		Session::set('order.my.manage');
+		Session::set('orders.my.basket');//Очистили Текущую активную заявку
+		Session::set('orders.my.id');
+		Session::set('orders.my.fixid');
+		Session::set('orders.my.copyid');
+		Session::set('orders.my.time');
+		Session::set('orders.my.manage');
 	}
 } else if ($action == 'removechanges') {
 	if ($order['status'] == 'active') return Ans::err($ans, 'У активной заявки нельзя отменить изменения');
@@ -135,12 +135,12 @@ if ($action == 'saved') {
 	$order['status'] = 'check';
 	Cart::saveOrder($order, $place);
 	if ($status == 'active') {
-		Session::set('order.my.basket');//Очистили заявку
-		Session::set('order.my.id');
-		Session::set('order.my.fixid');
-		Session::set('order.my.copyid');
-		Session::set('order.my.time');
-		Session::set('order.my.manage');
+		Session::set('orders.my.basket');//Очистили заявку
+		Session::set('orders.my.id');
+		Session::set('orders.my.fixid');
+		Session::set('orders.my.copyid');
+		Session::set('orders.my.time');
+		Session::set('orders.my.manage');
 	}
 } else if ($action == 'remove') {
 	$prodart = Ans::REQ('prodart');

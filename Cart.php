@@ -18,12 +18,7 @@ use infrajs\excel\Xlsx;
 use infrajs\each\Fix;
 use infrajs\user\User;
 use infrajs\view\View;
-
-if (!is_file('vendor/autoload.php')) {
-	chdir('../../../');
-	require_once('vendor/autoload.php');
-	Router::init();
-}
+use infrajs\lang\Lang;
 
 class Cart {
 	public static function getPath($id = '') 
@@ -257,10 +252,12 @@ class Cart {
 		$rule = Cart::getRule($order);
 		if (Session::get('safe.manager') || !empty($rule['edit'][$place])) { //Place - orders admin wholesale
 			$r = Cart::mergeOrder($order, $place);
-			if ($r) Cart::saveOrder($order, $place);
+			//if ($r) 
+			Cart::saveOrder($order, $place);
 		} else {
 			$r = Cart::mergeOrder($order, $place, true);
-			if ($r) Cart::saveOrder($order, $place);
+			//if ($r) 
+			Cart::saveOrder($order, $place);
 		}
 	}
 	public static function isMy($id) {
@@ -316,7 +313,8 @@ class Cart {
 					$r = null;
 					if (is_string($val)) $val = trim($val);
 					return $r;
-				});//По идеи в сессии хранится email и он уже там есть, как и любые другие поля.
+				});
+				/*//По идеи в сессии хранится email и он уже там есть, как и любые другие поля.
 				$email = Session::getEmail();//Это единственное место где в заявку добавляется email
 				if (isset($order['email']) && $email && $email != $order['email']) {
 					$user = Session::getUser($order['email']);
@@ -324,10 +322,11 @@ class Cart {
 						if (Session::get('safe.manager')) {
 
 						} else {
-							return Cart::lang('To your email on the website there is a registration, you need to <a href=\'/user/signin\'>login</a>');
+							$r = Cart::lang('To your email on the website there is a registration, you need to <a href=\'/user/signin\'>login</a>');
+							return $r;
 						}
 					}
-				}
+				}*/
 				$order['status'] = 'active';
 			}
 			if (empty($order['manage'])) $order['manage'] = array();
@@ -454,11 +453,25 @@ class Cart {
 		$order = array_merge($order, $actualdata);
 		return true;
 	}
+	public static function catchOrder($order, $email = false) {
+		$id = $order['id'];
+		if (!$email) {
+			$myorders = Session::get(['safe','orders'], array());
+			$myorders[] = $id;
+			Session::set(['safe','orders'], array_unique($myorders));
+		} else {
+			$user = Session::getUser($order['email']);
+			if (!$user) $user = Session::createUser($order['email']);
+			
+			$myorders = Session::user_get($order['email'],'safe.orders',array());
+			$myorders[] = $id;
+			Session::user_set($order['email'], ['safe','orders'], array_unique($myorders));
+		}
+			
+	}
 	public static function saveOrder(&$order, $place = false) {
 		if (!empty($order['id'])) $id = $order['id'];
 		else $id = false;
-
-		if ($place) Session::set([$place, $id]);
 
 		if (!$id) {
 			if (!empty($order['fixid'])) {
@@ -473,23 +486,25 @@ class Cart {
 			} else {
 				$id = time();
 				$src = Cart::getPath($id);
-				while( Path::theme($src)) {
+				while (Path::theme($src)) {
 					$id++;
-					$src=Cart::getPath($id);
+					$src = Cart::getPath($id);
 				}
-				$user = Session::getUser($order['email']);
-				if(!$user) $user = Session::createUser($order['email']);
-				$orders = Session::user_get($order['email'],'safe.orders',array());
-				$orders[] = $id;
-				Session::user_set($order['email'],'safe.orders',array());
-				/*$myorders = Session::get(['safe','orders'], array());
-				$myorders[] = $id;
-				Session::set(['safe','orders'], $myorders);*/
 			}
+			$order['id'] = $id;
+			//Добавляем в заявки пользователя
+			Cart::catchOrder($order);
 		} else {
-			if ($place) Session::set([$place, $id]);
+			if ($place) Session::set([$place, $id]); //Удаляем автосохранение
 			$src = Cart::getPath($id);
 		}
+		
+		$myemail = Session::getEmail();
+		if ($myemail != $order['email']) {
+			Cart::catchOrder($order, $order['email']);
+		}
+
+
 		$rules = Load::loadJSON('-cart/rules.json');
 		if (!empty($rules['rules'][$order['status']]['freeze'])) {//Текущий статус должен замораживать позиции
 			Each::foro($order['basket'], function &(&$pos, $prodart) {

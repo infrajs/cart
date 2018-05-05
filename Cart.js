@@ -37,6 +37,7 @@ window.Cart = {
 
 	act: function (place, name, orderid, cb, param) {
 		if (!cb) cb = function () {};
+		
 		var rules = Load.loadJSON('-cart/rules.json');
 		var act = rules.actions[name];
 		var order = Cart.getGoodOrder(orderid);
@@ -48,9 +49,10 @@ window.Cart = {
 		if (param) param = '&' + param;
 		else param = '';
 		var path = '-cart/actions.php?id=' + orderid + '&type=' + name + '&place=' + place + param;
+		
 		Cart.getJSON(path, function (ans) {
-			Global.set(['cart','order','cat_basket','sign','user']);
 			Session.syncNow();
+			Global.set('cart');
 			cb(ans);
 		});
 	},
@@ -84,12 +86,12 @@ window.Cart = {
 						
 						if (ans.result) {
 							if (act.goal) Goal.reach(act.goal)
-							if (act.result && !act.silent) {
+							if (!act.silent) {
 								var msg = Template.parse([act.result], order);
 								var link = Cart.getLink(order, place);
 								popup.alert(link+'<br>'+msg);
 							}
-							if(act.go && act.go[place]) Crumb.go(Template.parse([act.go[place]], order));
+							if (act.go && act.go[place]) Crumb.go(Template.parse([act.go[place]], order));
 							else Controller.check();
 						} else {
 							if (ans.msg) { 
@@ -141,6 +143,7 @@ window.Cart = {
 		$.ajax({
 		  dataType: "json",
 		  url: '/'+src,
+		  cache:false,
 		  async:true,
 		  success: call,
 		  error: function () {
@@ -202,7 +205,7 @@ window.Cart = {
 	clear: function (place, orderid, cb) {
 		var fn = function () {
 			if (cb) cb();
-			Global.check(['cat_basket', 'order', 'cart']);
+			Global.check('cart');
 		}
 		Cart.action(place, 'clear', orderid, function () {
 			var name = [place, orderid, 'basket'];
@@ -212,7 +215,7 @@ window.Cart = {
 	remove: function (place, orderid, prodart, cb) {
 		var fn = function () {
 			if (cb) cb();
-			Global.check(['cat_basket', 'order', 'cart']);
+			Global.check('cart');
 		}
 		Cart.action(place, 'remove', orderid, function () {
 			var name = [place, orderid, 'basket', prodart];
@@ -222,13 +225,14 @@ window.Cart = {
 	set: function (place, orderid, prodart, count) {
 		if (!orderid) orderid = 'my';
 		var name = [place, orderid, 'basket', prodart];	
-		Session.set(name, { count: count }, true);
-		Global.check(['cat_basket','order','cart']);
+		Session.set(name, { count: count }, false, function () {
+			Global.check('cart');
+		});
 	},
 	add: function (place, orderid, prodart, cb) {
 		var fn = function () {
 			if (cb) cb();
-			Global.check(['cat_basket','order','cart']);
+			Global.check('cart');
 		}
 		if (!orderid) orderid = 'my';
 		

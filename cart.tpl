@@ -677,10 +677,9 @@
 		</div>
 	{clearfields:}<span class="pull-right a" onclick="$('.cartcontacts input, .cartcontacts textarea').val('').change();">Очистить данные</span>
 	{manage:}
-		
-		<div class="alert alert-info" role="alert"><h3 style="margin-top:0">Сообщение менеджера</h3>
-<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
-	</div>
+		<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-info" role="alert"><b>Сообщение менеджера</b>
+				<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
+		</div>
 	{orderPageContent:}
 		{order.rule.edit.orders?:clearfields}
 		<h1>{order.rule.title}</h1>
@@ -1052,7 +1051,7 @@
 	</ol>
 {itemcost:}{~cost(.)}&nbsp;<small>руб.</small>
 {star:}<span title="Позиция в каталоге изменилась">*</span>
-{ordernum:}Номер заявки: <b>{id}</b>{manage.paid?:msgpaidorder}
+{ordernum:}{counter}Номер заявки: <b>{id}</b>{manage.paid?:msgpaidorder}
 	{msgpaidorder:}. Оплата <b>{~cost(manage.paid)} руб.</b> отметка {manage.paidtype=:bank?:банка?:менеджера} {~date(:d.m.Y H:i,manage.paidtime)}
 {adm_message:}
 		<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>
