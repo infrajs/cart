@@ -1051,7 +1051,7 @@
 	</ol>
 {itemcost:}{~cost(.)}&nbsp;<small>руб.</small>
 {star:}<span title="Позиция в каталоге изменилась">*</span>
-{ordernum:}{counter}Номер заявки: <b>{id}</b>{manage.paid?:msgpaidorder}
+{ordernum:}Номер заявки: <b>{id}</b>{manage.paid?:msgpaidorder}
 	{msgpaidorder:}. Оплата <b>{~cost(manage.paid)} руб.</b> отметка {manage.paidtype=:bank?:банка?:менеджера} {~date(:d.m.Y H:i,manage.paidtime)}
 {adm_message:}
 		<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>
