@@ -222,12 +222,10 @@ window.Cart = {
 			Session.set(name, null, true, fn);
 		}, 'prodart=' + prodart);
 	},
-	set: function (place, orderid, prodart, count) {
+	set: function (place, orderid, prodart, count, cb) {
 		if (!orderid) orderid = 'my';
 		var name = [place, orderid, 'basket', prodart];	
-		Session.set(name, { count: count }, false, function () {
-			Global.check('cart');
-		});
+		Session.set(name, { count: count }, true, cb);
 	},
 	add: function (place, orderid, prodart, cb) {
 		var fn = function () {

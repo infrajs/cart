@@ -62,6 +62,7 @@ if ($type == 'user') {
 	$ans['email']=Session::getEmail();
 	$ans['manager']=Session::get('safe.manager');
 } else if ($type == 'order') {
+	$ans['fields'] = Load::loadJSON('-cart/fields.json');
 	if ($orderid) {
 		//работаем с сохранённой заявкой
 		$order = Cart::getGoodOrder($orderid);

@@ -35,9 +35,11 @@
 					if (pos['id']) prodart += ' ' + pos['id'];
 					Popup.confirm('Количество: <input name="count" type="number">', function(div){
 						var count = div.find('[name=count]').val();
-						Cart.set('{config.place}', '{config.orderid}', prodart, count);
-						//Cart.sync('{config.place}', '{config.orderid}');
-						Cart.act('{config.place}', 'sync', '{config.orderid}');
+						Cart.set('{config.place}', '{config.orderid}', prodart, count, function(){
+							Cart.act('{config.place}', 'sync', '{config.orderid}');
+							Global.check('cart');	
+						});
+						
 					}, pos['Производитель'] + ' ' + pos['Артикул'] + '<br><small>' + pos['itemrow']+'</small>');
 					
 				},

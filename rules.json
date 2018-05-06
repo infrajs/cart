@@ -13,11 +13,11 @@
 			"caption":"Заявки ожидающие проверку менеджера",
 			"title":"Заявка находится на проверке",
 			"user":{
-				"buttons":{"active":"danger", "sync":"success"},
-				"actions":["sync","active"]
+				"buttons":{"sync":"success"},
+				"actions":["active", "sync"]
 			},
 			"manager":{
-				"buttons":{"wait":"primary", "complete":"warning"},
+				"buttons":{"wait":"success", "complete":"warning"},
 				"actions":["wait","complete","delete","email","sync"]
 			}
 		},
@@ -31,7 +31,7 @@
 			"caption":"Заявки с ответом менеджера",
 			"title":"Есть ответ менеджера",
 			"user":{
-				"buttons":{"active":"danger","check":"success"},
+				"buttons":{"check":"success"},
 				"actions":["active","check","sync"]
 			},
 			"manager":{
@@ -144,7 +144,7 @@
 		"sync":{
 			"checkdata":false,
 			"title":"Сохранить",
-			"confirm":"Сохранить данные заявки?",
+			"confirm2":"Сохранить данные заявки?",
 			"result":"Данные заявки сохранены."
 		}
 	},

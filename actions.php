@@ -59,8 +59,8 @@ $rule = Cart::getRule($order);
 if (Session::get('safe.manager') || !empty($rule['edit'][$place])) { //Place - orders admin wholesale
 	Cart::mergeOrder($order, $place);
 }
-
 $ans['order'] = $order;
+$ans['fields'] = Load::loadJSON('-cart/fields.json');
 if (!empty($act['checkdata']) && !empty($rule['edit'][$place])) {
 	$email = empty($order['email']) ? null : $order['email'];
 	$msg = User::checkReg($email);
@@ -70,6 +70,10 @@ if (!empty($act['checkdata']) && !empty($rule['edit'][$place])) {
 	$page = '';
 	if (empty($order['phone'])||!User::checkData($order['phone'],'value')) return Ans::err($ans, 'Укажите корректный телефон'.$page);
 	if (empty($order['name'])||!User::checkData($order['name'],'value')) return Ans::err($ans, 'Укажите корректное имя контактного лица'.$page);
+	
+	if ($ans['fields']['passport'] && (empty($order['passport'])||!User::checkData($order['passport'],'value')))  return Ans::err($ans, 'Укажите серию и номер паспорта'.$page);
+	if ($ans['fields']['address'] && (empty($order['address'])||!User::checkData($order['address'],'value')))  return Ans::err($ans, 'Укажите адрес доставки'.$page);
+
 	if (!empty($conf['pay'])) {
 		if (!User::checkData($order['entity'],'radio')) return Ans::err($ans, 'Укажите кто будет оплачивать'.$page);
 		if (!User::checkData($order['paymenttype'],'radio')) return Ans::err($ans, 'Укажите способ оплаты'.$page);
@@ -85,7 +89,7 @@ if (!empty($act['checkdata']) && !empty($rule['edit'][$place])) {
 			}
 		}
 	}
-	if ($conf['delivery']) {
+	if ($conf['deliverychoice']) {
 		if (!User::checkData($order['delivery'],'radio')) return Ans::err($ans, 'Укажите способ доставки'.$page);
 		if ($order['delivery'] == 'delivery') {
 			if (!User::checkData($order['addresdelivery'],'value')) return Ans::err($ans, 'Укажите адрес доставки'.$page);

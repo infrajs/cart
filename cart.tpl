@@ -473,20 +473,34 @@
 			{product:} <nobr><a href="/catalog/{producer}/{article}{:cat.idsl}">{Артикул}</a><sup style="color:gray">{count}</sup>{~last()|:comma}</nobr><wbr>
 	{orderfields:}
 		<div class="form-group">
-			<label>Контактное лицо <span class="req">*</span></label>
-			<input {:isdisabled} type="text" name="name" value="{name}" class="form-control" placeholder="Контактное лицо">
+			<label>Контактное лицо{data.fields.fio?:strФИО} <span class="req">*</span></label>
+			<input {:isdisabled} type="text" name="name" value="{name}" class="form-control" placeholder="{data.fields.fio?:helpFIO?:helpCont}">
 		</div>
 		<div class="form-group">
 			<label>Телефон <span class="req">*</span></label>
-			<input {:isdisabled} type="tel" name="phone"  value="{phone}" class="form-control" placeholder="Телефон">
+			<input {:isdisabled} type="tel" name="phone"  value="{phone}" class="form-control" placeholder="+79270000000">
 		</div>
 		<div class="form-group">
 			<label>Email <span class="req">*</span></label>
 			<input {:isdisabled} type="email" name="email" value="{email}" class="form-control" placeholder="Email">
 		</div>
+		{data.fields.passport?:passprot}
+		{data.fields.address?:address}
 		{~conf.cart.pay?:orderpayinfo}
-		{~conf.cart.delivery?:ordertransportinfo}
-		
+		{~conf.cart.deliverychoice?:ordertransportinfo}
+		{helpCont:}Контактное лицо
+		{helpFIO:}Иванов Иван Иванович
+		{strФИО:} (ФИО)
+		{address:}
+			<div class="form-group">
+				<label>Адресс доставки <span class="req">*</span></label>
+				<input {:isdisabled} type="text" name="address" value="{address}" class="form-control" placeholder="443456, Самарская обл., г. Тольятти, ул. Ивана Грозного 13, офис 12">
+			</div>
+		{passprot:}
+			<div class="form-group">
+				<label>Серия и номер паспорта <span class="req">*</span></label>
+				<input {:isdisabled} type="text" name="passport" value="{passport}" class="form-control" placeholder="88 88 999999">
+			</div>
 		{ordertransportinfo:}
 			<strong>
 					Способ доставки <span class="req">*</span>
@@ -681,20 +695,18 @@
 				<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
 		</div>
 	{orderPageContent:}
-		{order.rule.edit.orders?:clearfields}
+		{order.status=:active?:clearfields}
+		<div class="pull-right" title="Последние измения">{~date(:j F H:i,order.time)}</div>
 		<h1>{order.rule.title}</h1>
 		{order.id?order:ordernum}
-		{order.manage.comment?order:manage}
 		<form>
 			<div class="cartcontacts">
 				{order:orderfields}
 				<div>
-					<strong>Сообщение для менеджера</strong> <br>
-					<i>
-					Опишите вашу задачу, чтобы менеджер мог предложить оптимальный вариант по цене и качеству.<br>
-					Укажите, пожалуйста, как вам удобно оплатить и получить товар, адрес доставки если требуется.<br>
-					С вами свяжется менеджер для уточнения деталей.<br>
-					</i>
+					<strong>Сообщение для менеджера</strong>
+					<div>
+						<i>{data.fields.help}</i>
+					</div>
 					<textarea name="comment" class="form-control" rows="4">{order.comment}</textarea>
 				</div>
 			</div>
@@ -716,9 +728,11 @@
 		</form>
 		
 		{~length(order.basket)?order:tableWidthProduct?order:noProducts}
-		<div style="margin-bottom:10px">Итого: <span class="cartsum">{~sum(order.total,order.manage.deliverycost|:0):itemcost}</span></div>
-		<h3>{order.rule.title}</h3>
-		{data.order.id?order:ordernum}
+		{order.manage.deliverycost?order:widthDivelery}
+		<div style="margin-bottom:10px">Итого: <b class="cartsum">{~sum(order.total,order.manage.deliverycost|:0):itemcost}</b></div>
+		<!--<h3>{order.rule.title}</h3>
+		{data.order.id?order:ordernum}-->
+		{order.manage.comment?order:manage}
 		<div class="myactions" data-place="orders">
 			{order.rule.user:myactions}
 		</div>
@@ -818,7 +832,7 @@
 		</div>
 	{widthDivelery:}
 		<div>
-			Доставка: <span>{manage.deliverycost:itemcost}</span>
+			Доставка: {manage.deliverycost:itemcost}
 		</div>
 
 {ADMIN:}
@@ -895,6 +909,7 @@
 	{:ordercrumb}
 	{data.result?data.order:adm_orderPageContent?:adm_message}
 	{adm_orderPageContent:}
+		<div class="pull-right" title="Последние измения">{~date(:j F H:i,time)}</div>
 		<h1>{rule.title}</h1>
 		{id?:ordernum}
 		{(data.place=:admin&status=:active)?:adm_orderinfo?:adm_orderinputs}
@@ -920,15 +935,16 @@
 					<label>Цена со скидкой<br> 
 					<input name="manage.summary" value="{manage.summary}" type="text"></label><br />
 				-->
-				{~conf.cart.delivery?:mngdelivery}
+				{data.fields.address?:mngdelivery}
 				<label>Сообщение для клиента</label>&nbsp;<small>{data.messages::msg_samples}</small><br>
 				<textarea autosavebreak="1" name="manage.comment" class="form-control" rows="6">{manage.comment}</textarea>
 
 				<div class="answer"><b class="alert">{config.ans.msg}</b></div>
 			</div>
 		</form>
-		<h3>{rule.title}</h3>
-		{data.id?order:ordernum}
+		<p>Письмо клиенту {emailtime?:was?:no}{no:}<b>ещё не отправлялось</b>{was:}было <b>{~date(:j F H:i,emailtime)}</b></p>
+		<!--<h3>{rule.title}</h3>
+		{data.id?order:ordernum}-->
 		{data.rule.freeze?:freezemsg}
 		<!--<div class="checkbox">
 			<label>
@@ -1012,8 +1028,11 @@
 				});
 			});
 		</script>
-	{mngdelivery:}<label>Цена доставки <br> 
-				<input name="manage.deliverycost" value="{manage.deliverycost}" type="text"></label><br />
+	{mngdelivery:}
+	<div class="form-group">
+		<label>Цена доставки</label>
+		<input class="form-control" name="manage.deliverycost" value="{manage.deliverycost}" type="text">
+	</div>
 	{freezemsg:}<br>Цены зафиксированы {~date(manage.freeze)}
 	{adm_orderinfo:}
 		<div>
