@@ -936,13 +936,14 @@
 					<input name="manage.summary" value="{manage.summary}" type="text"></label><br />
 				-->
 				{data.fields.address?:mngdelivery}
+				<div style="margin-bottom:10px">Итого: <b class="cartsum">{~sum(data.order.total,data.order.manage.deliverycost|:0):itemcost}</b></div>
 				<label>Сообщение для клиента</label>&nbsp;<small>{data.messages::msg_samples}</small><br>
 				<textarea autosavebreak="1" name="manage.comment" class="form-control" rows="6">{manage.comment}</textarea>
 
 				<div class="answer"><b class="alert">{config.ans.msg}</b></div>
 			</div>
 		</form>
-		<p>Письмо клиенту {emailtime?:was?:no}{no:}<b>ещё не отправлялось</b>{was:}было <b>{~date(:j F H:i,emailtime)}</b></p>
+		<p>Письмо клиенту {emailtime?:was?:no}</p>
 		<!--<h3>{rule.title}</h3>
 		{data.id?order:ordernum}-->
 		{data.rule.freeze?:freezemsg}
@@ -1028,6 +1029,7 @@
 				});
 			});
 		</script>
+	{no:}<b>ещё не отправлялось</b>{was:}было <b>{~date(:j F H:i,emailtime)}</b>
 	{mngdelivery:}
 	<div class="form-group">
 		<label>Цена доставки</label>

@@ -15,7 +15,7 @@
 		}
 	</style>
 	<div id="basket_text">
-		<a href="/cart/orders/my/list" class="pull-right" style="font-size:42px;line-height:42px; display:block">
+		<a href="/cart/orders" class="pull-right" style="font-size:42px;line-height:42px; display:block">
 			<span class="pe-7s-cart"></span>
 		</a>
 		<span class="bold_basket">{data.user.email?:user?:reg}</span>
@@ -42,6 +42,6 @@
 		});
 	</script>
 {reg:}<a onclick="Cart.goTop()" href="/user/signin">{Cart.lang(:Гость)}</a>
-{user:}{data.order.merch?:icomerch?:icouser} <a onclick="Cart.goTop()" href="/user">{data.user.email}</a>
+{user:}<!--{data.order.merch?:icomerch?:icouser}--> <b><a onclick="Cart.goTop()" href="/user">{data.user.email}</a></b>
 {icouser:}<span title="Розничный покупатель" class="glyphicon glyphicon-user"></span>
 {icomerch:}<span title="Оптовый покупатель" class="glyphicon glyphicon-briefcase"></span>

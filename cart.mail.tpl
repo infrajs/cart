@@ -65,11 +65,11 @@
 Клиент: {name}
 Организация: {org}
 Email: {email}
-Управление заявками: http://{site}/cart/admin
+Телефон: {phone}
 
 {links:}
 
 Заявка {id}: http://{site}/cart/orders/{id}
 Личный кабинет: http://{site}/cart
 Каталог товаров: http://{site}/catalog
-Быстрая авторизация: {link}
+Быстрая авторизация: {link}&src=cart/orders/{id}

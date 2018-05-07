@@ -578,14 +578,27 @@ class Cart {
 		$rules = Load::loadJSON('-cart/rules.json');
 		$order = $ans['order'];
 		$rule = $rules['actions'][$action];
-		if ($ans['place'] != 'admin'  && !empty($order['email'])) { //Админ сам решает когда, что отправлять
+		/*if ($ans['place'] != 'admin'  && !empty($order['email'])) { //Админ сам решает когда, что отправлять
 			if (!empty($rule['usermail'])) {
 				Cart::mail('user', $order['email'], $rule['usermail'], $ans['order']);
 			}
 			if (!empty($rule['mangmail'])) {
 				Cart::mail('manager', $order['email'], $rule['mangmail'], $order);
 			}
+		}*/
+		if (!empty($order['email'])) {
+			if ($ans['place'] == 'admin') {
+				if (!empty($rule['usermail'])) {//Менеджер только клиенту отправляет письма
+					Cart::mail('user', $order['email'], $rule['usermail'], $ans['order']);
+				}
+			}
+			if ($ans['place'] == 'orders') {//Клиент только менеджеру отправляет письма
+				if (!empty($rule['mangmail'])) {
+					Cart::mail('manager', $order['email'], $rule['mangmail'], $order);
+				}
+			}
 		}
+		
 		return Ans::ret($ans);
 	}
 }

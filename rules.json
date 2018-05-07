@@ -50,8 +50,8 @@
 			"caption":"Выполненные заявки",
 			"title":"Заявка выполнена",
 			"user":{
-				"buttons":{"check":"success"},
-				"actions":[]
+				"buttons":{},
+				"actions":["sync"]
 			},
 			"manager":{
 				"buttons":{"email":"danger"},
