@@ -4,22 +4,18 @@
 {pos-sign:}{:orig.pos-sign}
 {pos-item-css:}{:orig.pos-item-css}
 {pos-item:}{:orig.pos-item}
+{orig.priceblockbig:}{:orig.priceblock}
+{itemcost:}{~cost(Цена|...Цена)}&nbsp;<small>руб.</small>
+{itemnocost:}<a href="/contacts">Уточнить</a>
+
 {orig.priceblock:}
-	<div class="cart alert alert-success text-right" style="font-size: 24px; padding:10px">
-		{Цена?:itemcost?:itemnocost}{:orig.nds}
-		{:basket}
-		<div class="gobasket" style="display:none; font-size:16px">
-			<small>Позиция в <a onclick="Cart.goTop();" href="/cart/orders/my/list">корзине</a></small>
+	<span style="font-size: 24px;" class="cart-basket form-inline form-group has-success">
+		{(Цена|...Цена)?:cost}
+		<div class="input-group " title="{producer|...producer} {article|...article}{:cat.idsp}">
+			<input type="number" value="0" min="0" max="999" class="form-control" style="width:100px; font-size:24px">
+			<span data-producer="{producer|...producer}"" data-article="{article|...article}" data-id="{id}" class="add btn btn-success input-group-addon">Добавить в корзину</span>
 		</div>
-	</div>
-	{itemcost:}{~cost(Цена)}<small> руб.</small>
-	{itemnocost:}<a href="/contacts">Уточнить</a>
-{orig.priceblockbig:}
-	{:orig.priceblock}
-{priceblock:}
-	{:orig.priceblock}
-{basket:}
-	<a class="abasket" data-producer="{producer}" data-article="{article}" href="/cart/orders/my/list/add/{producer} {article}">
-		<span class="pe-7s-cart"></span>
-	</a>
-	
+	</span>
+	{cost:}{:itemcost}
+
+{cat::}-catalog/cat.tpl

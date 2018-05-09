@@ -17,6 +17,70 @@ Event.handler('Controller.onshow', function () {
 		var a = $(this);
 		Cart.activate(a)
 	});
+	var activate = function(a){
+		var orderid = a.data('order');
+		if (!orderid) orderid = 'my';
+		
+		var prodart = a.data('producer') + ' ' + a.data('article');
+		var id = a.data('id');
+		if (id) prodart += ' ' + a.data('id');
+
+		var name = ['orders', orderid, 'basket', prodart, 'count'];
+		var r = Session.get(name,0);
+		a.parents('.cart-basket').find('input').val(r);
+
+		var c = a.parents('.cart-basket');
+		if (r || orderid != 'my') {
+			a.text('Оформить заявку');
+			a.addClass('active');
+			//c.addClass('has-warning');c.removeClass('has-success');
+			//a.addClass('btn-warning');a.removeClass('btn-success');
+		} else {
+			a.text('Добавить в корзину');
+			a.removeClass('active');
+			//c.addClass('has-success');c.removeClass('has-warning');
+			//a.addClass('btn-success');a.removeClass('btn-warning');
+		}
+	}
+	$('.cart-basket').filter("[data-basket!=true]").attr("data-basket","true").each(function(){
+		var a = $(this).find('.add');
+		var c = $(this);
+		$(this).find('input').click(function(){
+			a.text('Добавить в корзину');
+			a.removeClass('active');
+			//c.addClass('has-success');c.removeClass('has-warning');
+			//a.addClass('btn-success');a.removeClass('btn-warning');
+		}).change(function(){
+			a.text('Добавить в корзину');
+			a.removeClass('active');
+			//c.addClass('has-success');c.removeClass('has-warning');
+			//a.addClass('btn-success');a.removeClass('btn-warning');
+		});
+		$(this).find('.add').click( function (event) {
+			event.preventDefault();
+			var a = $(this);
+			var count = a.parents('.cart-basket').find('input').val();
+			
+			var prodart = a.data('producer') + ' ' + a.data('article');
+			var id = a.data('id');
+			if (id) prodart += ' ' + a.data('id');
+			
+			var orderid = a.data('order');
+			var place = a.data('place');
+			if (!place) place = 'orders';
+			if (!orderid) orderid = 'my';
+			if ($(this).hasClass('active')) {
+				Crumb.go('/cart/orders/my');
+				return;
+			}
+			Cart.set(place, orderid, prodart, count, function(){
+				activate(a);
+			});
+		}).each(function(){
+			var a = $(this);
+			activate(a);
+		});
+	});
 });
 Event.one('Controller.onshow', function () {
 	var layer = {

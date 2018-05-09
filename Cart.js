@@ -224,8 +224,10 @@ window.Cart = {
 	},
 	set: function (place, orderid, prodart, count, cb) {
 		if (!orderid) orderid = 'my';
-		var name = [place, orderid, 'basket', prodart];	
-		Session.set(name, { count: count }, true, cb);
+		var name = [place, orderid, 'basket', prodart, 'count'];	
+		count = Number(count);
+		if (!count) count = null;
+		Session.set(name, count, true, cb);
 	},
 	add: function (place, orderid, prodart, cb) {
 		var fn = function () {
@@ -285,7 +287,7 @@ window.Cart = {
 			$(this).removeClass('basket_img_over');
 		});
 	}*/
-	,
+	, 
 	activate: function (a) {
 		var orderid = a.data('order');
 		if (!orderid) orderid = 'my';
