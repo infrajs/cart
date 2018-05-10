@@ -15,8 +15,12 @@ return Rest::get( function () {
 }, function ($email, $val = null) {
 	$ans = array();
 	$ans['email'] = $email;
+	
 	if (!User::checkData($email, 'email')) return Ans::err($ans, 'Некорректный email');
 	
+	$user = Session::getUser($email);
+	$ans['user'] = $user;
+
 	if (is_null($val)) {
 		$ans['admin'] = Session::user_get($email, ['safe','manager']);
 		return Ans::ret($ans,'Проверка статуса');
@@ -25,7 +29,8 @@ return Rest::get( function () {
 		Session::user_set($email, ['safe','manager']);
 		return Ans::ret($ans,'Сброс прав менеджера');
 	}
-
+	
+	if (!$user) $user = Session::createUser($email);
 	Session::user_set($email, ['safe','manager'], 1);	
 	return Ans::ret($ans,'Права менеджера установлены');
 });
