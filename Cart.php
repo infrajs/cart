@@ -267,7 +267,8 @@ class Cart {
 	}
 	public static function canI($id, $action = true) { //action true совпадёт с любой строчкой
 		if (!$id) return true;
-		if (Load::isphp()) return true;
+		
+		//if (Load::isphp()) return true;
 		if (Session::get('safe.manager')) return true;
 		if (!Cart::isMy($id)) return false;
 		$order = Cart::loadOrder($id);

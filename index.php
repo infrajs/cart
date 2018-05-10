@@ -22,7 +22,7 @@ $orderid = Ans::REQ('id');
 if ($orderid == 'my') $orderid = '';
 
 
-if (!Cart::canI($orderid)) return Ans::err($ans,'Действие не разрешено!');
+if (!Cart::canI($orderid)) return Ans::err($ans, 'У вас нет доступа к этому разделу. Вы не являетесь Менеджером!');
 //Session::set(['safe','orders'],['1473553045','1473369982']);
 if ($type == 'user') {
 	$ans = User::get();
@@ -62,7 +62,7 @@ if ($type == 'user') {
 	$ans['email']=Session::getEmail();
 	$ans['manager']=Session::get('safe.manager');
 } else if ($type == 'order') {
-	if ($place == 'admin' && !Session::get('safe.manager')) return Ans::err($ans,'Действие не разрешено!');
+	if ($place == 'admin' && !Session::get('safe.manager')) return Ans::err($ans, 'У вас нет доступа к этому разделу. Вы не являетесь Менеджером.');
 	$ans['fields'] = Load::loadJSON('-cart/fields.json');
 	if ($orderid) {
 		//работаем с сохранённой заявкой
@@ -90,7 +90,7 @@ if ($type == 'user') {
 
 	$ans['manager'] = Session::get('safe.manager'); 
 } else if ($type == 'admin') {
-	if (!Session::get('safe.manager') && $place == 'admin') return Ans::err($ans, 'У вас нет доступа к этому разделу. Вы не являетесь Менеджером.');
+	if (!Session::get('safe.manager')) return Ans::err($ans, 'У вас нет доступа к этому разделу. Вы не являетесь Менеджером.');
 
 	if ($orderid) {
 		$ans['id'] = $orderid;
