@@ -27,6 +27,13 @@
 						"global":["user", "cart"],
 						"jsontpl":"-cart/?type=list&id={crumb.parent.name}&add={crumb.child.child.name}",
 						"autosavenametpl":"{crumb.parent.parent.name}.{crumb.parent.name}"
+					},
+					"print":{
+						"jsontpl":"-cart/?type=order&id={crumb.parent.name}",
+						"tpl":"-cart/cart.tpl",
+						"global":["user", "cart"],
+						"tplroot":"PRINT",
+						"dataroot":"data.order"
 					}
 				}
 			}
