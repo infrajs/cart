@@ -86,7 +86,7 @@ window.Cart = {
 						
 						if (ans.result) {
 							if (act.goal) Goal.reach(act.goal)
-							if (!act.silent) {
+							if (!act.silent && act.result) {
 								var msg = Template.parse([act.result], order);
 								var link = Cart.getLink(order, place);
 								popup.alert(link+'<br>'+msg);

@@ -44,6 +44,13 @@
 				"global":["user", "cart"],
 				"tplroot":"ADMORDER",
 				"childs":{
+					"print":{
+						"jsontpl":"-cart/?type=order&id={crumb.parent.name}",
+						"tpl":"-cart/cart.tpl",
+						"global":["user", "cart"],
+						"tplroot":"PRINT",
+						"dataroot":"data.order"
+					},
 					"list":{
 						"tpl":"-cart/cart.tpl",
 						"tplroot":"LIST",

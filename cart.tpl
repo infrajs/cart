@@ -922,7 +922,7 @@
 				<div class="cartcontacts">
 					{:orderfields}
 					<label>Сообщение для менеджера</label><br> 
-					<textarea disabled name="comment" class="form-control" rows="6">{comment}</textarea>
+					<textarea name="comment" class="form-control" rows="6">{comment}</textarea>
 				</div>
 				
 				<br>
@@ -1076,3 +1076,35 @@
 	{msgpaidorder:}. Оплата <b>{~cost(manage.paid)} руб.</b> отметка {manage.paidtype=:bank?:банка?:менеджера} {~date(:d.m.Y H:i,manage.paidtime)}
 {adm_message:}
 		<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>
+{PRINT:}
+<ol class="breadcrumb noprint">
+	<li><a href="/">Главная</a></li>
+	<li><a href="/catalog">Каталог</a></li>
+	<li><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
+	<li><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заявки</a></li>
+	<li><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заявка {crumb.parent.name=:my?:Активная?crumb.parent.name}</a></li>
+	<li class="active">Версия для печати</li>
+</ol>
+<pre style="border:none;"><h1 style="margin-bottom:0px">Заявка {id}</h1>
+ФИО: {name}
+Почта: {email}
+Телефон: {phone}
+Паспорт: {passport}
+Адрес: {address}
+Дата изменений: {~date(:H:i j F Y,time)}
+
+===== {count} {~words(count,:позиция,:позиции,:позиций)} ====={basket::pritem}
+
+Итого: {~cost(sum)}&nbsp;руб.
+Доставка: {~cost(manage.deliverycost)}&nbsp;руб.
+Всего: {~cost(alltotal)}&nbsp;руб.
+
+==== Сообщение =====
+<span style="white-space: pre-wrap;">{comment}</span>
+
+====================
+<span style="white-space: pre-wrap;">{manage.comment}</span>
+</pre>
+{pritem:}
+{~key}
+{count} по {~cost(cost)}&nbsp;руб. = {~cost(sum)}&nbsp;руб.

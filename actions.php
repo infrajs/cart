@@ -121,7 +121,7 @@ if ($action == 'saved') {
 		unset($pos['article']);//Если нет артикула данные при сохранении обновятся
 	});
 	Cart::saveOrder($order, $place);
-} else if($action == 'sync') {
+} else if($action == 'sync' || $action == 'print') {
 	$msg = Cart::sync($place, $orderid);
 } else if($action == 'email') {
 	$order['emailtime'] = time();

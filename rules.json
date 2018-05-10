@@ -18,7 +18,7 @@
 			},
 			"manager":{
 				"buttons":{"wait":"success", "complete":"warning"},
-				"actions":["wait","complete","delete","email","sync"]
+				"actions":["wait","complete","delete","email","sync","print"]
 			}
 		},
 		"wait":{
@@ -36,7 +36,7 @@
 			},
 			"manager":{
 				"buttons":{"complete":"warning","email":"danger", "sync":"success"},
-				"actions":["check","complete","delete","email","sync"]
+				"actions":["check","complete","delete","email","sync","print"]
 			}
 		},
 		"complete":{
@@ -55,7 +55,7 @@
 			},
 			"manager":{
 				"buttons":{"email":"danger"},
-				"actions":["wait","check","delete","email","sync"]
+				"actions":["wait","check","delete","email","sync","print"]
 			}
 		},
 		"active":{
@@ -78,6 +78,13 @@
 		}
 	},
 	"actions":{
+		"print":{
+			"title":"Версия для печати",
+			"go":{
+				"orders":"/cart/orders/{id}/print",
+				"admin":"/cart/admin/{id}/print"
+			}
+		},
 		"delete":{
 			"go":{
 				"orders":"/cart",
