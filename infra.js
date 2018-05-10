@@ -73,7 +73,8 @@ Event.handler('Controller.onshow', function () {
 				Crumb.go('/cart/orders/my');
 				return;
 			}
-			Cart.set(place, orderid, prodart, count, function(){
+			Cart.set(place, orderid, prodart, count, function () {
+				Global.check('cart');
 				activate(a);
 			});
 		}).each(function(){
