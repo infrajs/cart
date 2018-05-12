@@ -4,6 +4,7 @@
 {pos-sign:}{:orig.pos-sign}
 {pos-item-css:}{:orig.pos-item-css}
 {pos-item:}{:orig.pos-item}
+{pos-img:}{:orig.pos-img}
 {priceblockbig:}{:orig.priceblockbig}
 {itemcost:}{~cost((Цена|...Цена))}&nbsp;<small>руб.</small>
 {itemnocost:}<a href="/contacts">Уточнить</a>
