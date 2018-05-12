@@ -79,3 +79,11 @@
 .cart .selected .flash, .cart .flash:hover {
 	animation:none;
 }
+.basketfont {
+	font-size:24px;
+}
+@media (max-width:1199px) {
+	.basketfont {
+		font-size:18px;
+	}
+}
