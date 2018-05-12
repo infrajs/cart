@@ -106,7 +106,7 @@ class Cart {
 			Each::foro($order['basket'], function &(&$pos,$prodart) use (&$order,&$num) {
 				$r = null;
 				$count = $pos['count'];//Сохранили значение из корзины
-
+				if (empty($pos['Цена'])) $pos['Цена'] = 0;
 				if ($count<1) {
 					$r = new Fix('del');
 					return $r;
