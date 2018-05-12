@@ -1090,13 +1090,11 @@
 Почта: {email}
 Телефон: {phone}
 Паспорт: {passport}
-Адрес: {address}
-{time?:pr-time}
+Адрес: {address}{time?:pr-time}
 
 ===== {count} {~words(count,:позиция,:позиции,:позиций)} ====={basket::pritem}
 
-Итого: {~cost(sum)}&nbsp;руб.
-Доставка: {~cost(manage.deliverycost)}&nbsp;руб.
+Итого: {~cost(sum)}&nbsp;руб.{manage.deliverycost?:pr-deliver}
 Всего: {~cost(alltotal)}&nbsp;руб.
 
 ==== Сообщение =====
@@ -1108,4 +1106,7 @@
 {pritem:}
 {~key}
 {count} по {~cost(cost)}&nbsp;руб. = {~cost(sum)}&nbsp;руб.
-{pr-time:}Дата изменений: {~date(:H:i j F Y,time)}
+{pr-time:}
+Дата изменений: {~date(:H:i j F Y,time)}
+{pr-deliver:}
+Доставка: {~cost(manage.deliverycost)}&nbsp;руб.
