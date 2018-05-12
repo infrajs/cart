@@ -14,7 +14,7 @@
 			"title":"Заявка находится на проверке",
 			"user":{
 				"buttons":{"sync":"success"},
-				"actions":["active", "sync"]
+				"actions":["active", "sync","print"]
 			},
 			"manager":{
 				"buttons":{"wait":"success", "complete":"warning"},
@@ -32,7 +32,7 @@
 			"title":"Есть ответ менеджера",
 			"user":{
 				"buttons":{"check":"success"},
-				"actions":["active","check","sync"]
+				"actions":["active","check","sync","print"]
 			},
 			"manager":{
 				"buttons":{"complete":"warning","email":"danger", "sync":"success"},
@@ -51,7 +51,7 @@
 			"title":"Заявка выполнена",
 			"user":{
 				"buttons":{},
-				"actions":["sync"]
+				"actions":["sync","print"]
 			},
 			"manager":{
 				"buttons":{"email":"danger"},
@@ -73,7 +73,7 @@
 				"buttons":{
 					"check":"success"
 				},
-				"actions":["check"]
+				"actions":["check","print"]
 			}
 		}
 	},
@@ -81,8 +81,8 @@
 		"print":{
 			"title":"Версия для печати",
 			"go":{
-				"orders":"/cart/orders/{id}/print",
-				"admin":"/cart/admin/{id}/print"
+				"orders":"/cart/orders/{id|:my}/print",
+				"admin":"/cart/admin/{id|:my}/print"
 			}
 		},
 		"delete":{

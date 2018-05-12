@@ -1091,7 +1091,7 @@
 Телефон: {phone}
 Паспорт: {passport}
 Адрес: {address}
-Дата изменений: {~date(:H:i j F Y,time)}
+{time?:pr-time}
 
 ===== {count} {~words(count,:позиция,:позиции,:позиций)} ====={basket::pritem}
 
@@ -1108,3 +1108,4 @@
 {pritem:}
 {~key}
 {count} по {~cost(cost)}&nbsp;руб. = {~cost(sum)}&nbsp;руб.
+{pr-time:}Дата изменений: {~date(:H:i j F Y,time)}
