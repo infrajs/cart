@@ -13,7 +13,7 @@
 	<span style="font-size: 24px;" class="cart-basket form-inline form-group has-success">
 		{(Цена|...Цена)?:itemcost}
 		<div class="input-group " title="{producer|...producer} {article|...article}{:cat.idsp}">
-			<input type="number" value="0" min="0" max="999" class="form-control" style="width:100px; font-size:24px">
+			<input type="number" value="0" min="0" max="999" class="form-control" style="width:100px; font-size:24px; padding:0 5px">
 			<span data-producer="{producer|...producer}"" data-article="{article|...article}" data-id="{id}" class="add btn btn-success input-group-addon">Добавить в корзину</span>
 		</div>
 	</span>
