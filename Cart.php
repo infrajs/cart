@@ -131,7 +131,7 @@ class Cart {
 						if ($pos['hash'] != $hash) $pos['change'] = true;//Метка что что-то поменялось в описании позиции.
 					}
 				}
-				
+				if (empty($pos['Цена'])) $pos['Цена'] = 0;
 				
 				$pos['num']=++$num;
 				$pos['count']=$count;
@@ -227,6 +227,7 @@ class Cart {
 				$order['sum'] = $order['sumroz'];
 				Each::foro($order['basket'], function &(&$pos) {
 					$r = null;
+					if (empty($pos['Цена'])) $pos['Цена'] = 0;
 					$pos['sum'] = $pos['sumroz'];
 					$pos['cost'] = $pos['Цена'];
 					return $r;
