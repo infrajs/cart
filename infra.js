@@ -34,12 +34,12 @@ Event.handler('Controller.onshow', function () {
 			a.text('Оформить заявку');
 			a.addClass('active');
 			//c.addClass('has-warning');c.removeClass('has-success');
-			//a.addClass('btn-warning');a.removeClass('btn-success');
+			a.addClass('btn-danger');a.removeClass('btn-success');
 		} else {
 			a.text('Добавить в корзину');
 			a.removeClass('active');
 			//c.addClass('has-success');c.removeClass('has-warning');
-			//a.addClass('btn-success');a.removeClass('btn-warning');
+			a.addClass('btn-success');a.removeClass('btn-danger');
 		}
 	}
 	$('.cart-basket').filter("[data-basket!=true]").attr("data-basket","true").each(function(){
@@ -49,12 +49,12 @@ Event.handler('Controller.onshow', function () {
 			a.text('Добавить в корзину');
 			a.removeClass('active');
 			//c.addClass('has-success');c.removeClass('has-warning');
-			//a.addClass('btn-success');a.removeClass('btn-warning');
+			a.addClass('btn-success');a.removeClass('btn-danger');
 		}).change(function(){
 			a.text('Добавить в корзину');
 			a.removeClass('active');
 			//c.addClass('has-success');c.removeClass('has-warning');
-			//a.addClass('btn-success');a.removeClass('btn-warning');
+			a.addClass('btn-success');a.removeClass('btn-danger');
 		});
 		$(this).find('.add').click( function (event) {
 			event.preventDefault();
