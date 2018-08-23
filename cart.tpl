@@ -110,13 +110,13 @@
 							
 							var pos = gorder.basket[prodart];
 							if (!pos) {
-								$(this).parent().addClass('bg-info').removeClass('bg-success');
+								//$(this).parent().addClass('bg-info').removeClass('bg-success');
 							} else if (gorder.merchdyn) {
 								$(this).html(tplcost(pos.sumopt));
-								$(this).parent().addClass('bg-success').removeClass('bg-info');
+								//$(this).parent().addClass('bg-success').removeClass('bg-info');
 							} else {
 								$(this).html(Template.parse('-cart/cart.tpl',pos,'itemcost','sumroz'));
-								$(this).parent().addClass('bg-info').removeClass('bg-success');
+								//$(this).parent().addClass('bg-info').removeClass('bg-success');
 							}
 						});
 
@@ -126,13 +126,13 @@
 							if (id)  prodart += ' ' +id;
 							var pos = gorder.basket[prodart];
 							if (!pos) {
-								$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
+								//$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
 							} else if (gorder.merchdyn) {
 								$(this).find('.cost').html(tplcost(pos['Цена оптовая']));
-								$(this).find('.cost').parent().addClass('bg-success').removeClass('bg-info');
+								//$(this).find('.cost').parent().addClass('bg-success').removeClass('bg-info');
 							} else {
 								$(this).find('.cost').html(tplcost(pos['Цена розничная']));
-								$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
+								//$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
 							}
 						});
 						
@@ -140,13 +140,13 @@
 						div.find('.cartsumopt').html(tplcost(gorder.sumopt));
 						if (gorder.merchdyn) {
 							div.find('.cartsum').html(tplcost(gorder.sumopt));
-							div.find('.cartsum').parent().addClass('bg-success').removeClass('bg-info');
+							//div.find('.cartsum').parent().addClass('bg-success').removeClass('bg-info');
 							if (gorder.sumroz != gorder.sumopt) {
 								div.find('.cartsumdel').html(tplcost(gorder.sumroz));
 							}
 						} else {
 							div.find('.cartsum').html(tplcost(gorder.sumroz));
-							div.find('.cartsum').parent().addClass('bg-info').removeClass('bg-success');
+							//div.find('.cartsum').parent().addClass('bg-info').removeClass('bg-success');
 							div.find('.cartsumdel').html(tplcost(''));
 						}
 					} else {
@@ -163,12 +163,12 @@
 								ordersumroz += sumroz;
 								$(this).find('.sum').html(tplcost(sumroz));
 							}
-							$(this).find('.sum').parent().addClass('bg-info').removeClass('bg-success');
-							$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
+							//$(this).find('.sum').parent().addClass('bg-info').removeClass('bg-success');
+							//$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
 						});
 						div.find('.cartsumroz').html(tplcost(ordersumroz));
 						div.find('.cartsum').html(tplcost(ordersumroz));
-						div.find('.cartsum').parent().addClass('bg-info').removeClass('bg-success');
+						//div.find('.cartsum').parent().addClass('bg-info').removeClass('bg-success');
 						div.find('.cartsumdel').html(tplcost(''));
 					}
 				}
@@ -337,20 +337,20 @@
 		<span onclick="Cart.refresh(this)" class="btn btn-default btn-xs pull-right"><span class="pe-7s-refresh"></span></span>
 	</ul>
 	{breaduser:}
-		<li><a href="/user">{data.email|:Профиль}</a></li>
-		<li><a href="/cart/orders/my/list">Корзина</a></li>
+		<li class="breadcrumb-item"><a href="/user">{data.email|:Профиль}</a></li>
+		<li class="breadcrumb-item"><a href="/cart/orders/my/list">Корзина</a></li>
 	{breadguest:}
-		<li><a href="/user/signin">Вход</a></li>
-		<li><a href="/user/signup">Регистрация</a></li>
-		<li><a href="/user/remind">Напомнить пароль</a></li>
+		<li class="breadcrumb-item"><a href="/user/signin">Вход</a></li>
+		<li class="breadcrumb-item"><a href="/user/signup">Регистрация</a></li>
+		<li class="breadcrumb-item"><a href="/user/remind">Напомнить пароль</a></li>
 {CART:}
 	<ol class="breadcrumb">
-		<li><a href="/">Главная</a></li>
-		<li><a href="/catalog">Каталог</a></li>
-		<li class="{data.manager?:text-danger}" class="active">Сообщения</li>
-		<li><a href="/cart/orders">Мои заявки</a></li>
-		<li><a href="/cart/orders/my">Заявка Активая</a></li>
-		<li><a href="/cart/orders/my/list">Корзина</a></li>
+		<li class="breadcrumb-item"><a href="/">Главная</a></li>
+		<li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
+		<li class="breadcrumb-item active {data.manager?:text-danger}">Сообщения</li>
+		<li class="breadcrumb-item"><a href="/cart/orders">Мои заявки</a></li>
+		<li class="breadcrumb-item"><a href="/cart/orders/my">Заявка Активая</a></li>
+		<li class="breadcrumb-item"><a href="/cart/orders/my/list">Корзина</a></li>
 	</ol>
 	<h1>Сообщения</h1>
 	{data.email?:account?:noaccount}
@@ -420,13 +420,13 @@
 			<div class="mesage">Необходимо <a href="/user/signup">зарегистрироваться</a>, чтобы получить права менеджера</div>
 {ORDERS:}
 	<ol class="breadcrumb">
-		<li><a href="/">Главная</a></li>
-		<li><a href="/catalog">Каталог</a></li>
+		<li class="breadcrumb-item"><a href="/">Главная</a></li>
+		<li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
 		
-		<li><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
-		<li class="active">Мои заявки</li>
-		<li><a href="/cart/orders/my">Заявка Активная</a></li>
-		<li><a href="/cart/orders/my/list">Корзина</a></li>
+		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
+		<li class="breadcrumb-item active">Мои заявки</li>
+		<li class="breadcrumb-item"><a href="/cart/orders/my">Заявка Активная</a></li>
+		<li class="breadcrumb-item"><a href="/cart/orders/my/list">Корзина</a></li>
 	</ol>
 	<h1>Мои заявки</h1>
 	{~length(data.orders)?:ordersList?:noOrders}
@@ -766,7 +766,7 @@
 				</a>
 			</div>
 		{actprint:}
-			<li>
+			<li class="dropdown-item">
 				<a class="act-{act}" style="text-decoration:none"  data-id="{data.order.id}" 
 					data-crumb="false" onclick="return false" href="{link?link?:actact}">
 					{title}
@@ -786,7 +786,7 @@
 	<table class="table table-striped">
 		<tr>
 			<th>Позиция</th>
-			<th class="bg-info"><span>Цена</span></th>
+			<th><span>Цена</span></th>
 			<th>Кол<span class="hidden-xs">ичество</span></th>
 			<th>Сумма</th>
 		</tr>
@@ -837,10 +837,10 @@
 
 {ADMIN:}
 	<ol class="breadcrumb">
-		<li><a href="/">Главная</a></li>
-		<li><a href="/catalog">Каталог</a></li>
-		<li><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
-		<li class="active">Все заявки</li>
+		<li class="breadcrumb-item"><a href="/">Главная</a></li>
+		<li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
+		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
+		<li class="breadcrumb-item active">Все заявки</li>
 	</ol>
 	{data.result?:adm_listPage?:adm_message}
 	{longlistlink:}<a href="/cart/admin/all">Показать готовые</a>
@@ -1053,22 +1053,22 @@
 {listcrumb:}
 	{:usersync}
 	<ol class="breadcrumb">
-		<li><a href="/">Главная</a></li>
-		<li><a href="/catalog">Каталог</a></li>
-		<li><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
-		<li><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заявки</a></li>
-		<li><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заявка {crumb.parent.name=:my?:Активная?crumb.parent.name}</a></li>
-		<li class="active">Корзина</li>
+		<li class="breadcrumb-item"><a href="/">Главная</a></li>
+		<li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
+		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
+		<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заявки</a></li>
+		<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заявка {crumb.parent.name=:my?:Активная?crumb.parent.name}</a></li>
+		<li class="breadcrumb-item active">Корзина</li>
 	</ol>
 {ordercrumb:}
 	{:usersync}
 	<ol class="breadcrumb">
-		<li><a href="/">Главная</a></li>
-		<li><a href="/catalog">Каталог</a></li>
-		<li><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
-		<li><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb.parent}">{crumb.parent.name=:admin?:Все?:Мои} заявки</a></li>
-		<li class="active">Заявка {crumb.name=:my?:Активная?crumb.name}</li>
-		<li><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb}/list">Корзина</a></li>
+		<li class="breadcrumb-item"><a href="/">Главная</a></li>
+		<li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
+		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
+		<li class="breadcrumb-item"><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb.parent}">{crumb.parent.name=:admin?:Все?:Мои} заявки</a></li>
+		<li class="breadcrumb-item active">Заявка {crumb.name=:my?:Активная?crumb.name}</li>
+		<li class="breadcrumb-item"><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb}/list">Корзина</a></li>
 	</ol>
 {itemcost:}{~cost(.)}&nbsp;<small>руб.</small>
 {star:}<span title="Позиция в каталоге изменилась">*</span>
@@ -1078,12 +1078,12 @@
 		<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>
 {PRINT:}
 <ol class="breadcrumb noprint">
-	<li><a href="/">Главная</a></li>
-	<li><a href="/catalog">Каталог</a></li>
-	<li><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
-	<li><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заявки</a></li>
-	<li><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заявка {crumb.parent.name=:my?:Активная?crumb.parent.name}</a></li>
-	<li class="active">Версия для печати</li>
+	<li class="breadcrumb-item"><a href="/">Главная</a></li>
+	<li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
+	<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
+	<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заявки</a></li>
+	<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заявка {crumb.parent.name=:my?:Активная?crumb.parent.name}</a></li>
+	<li class="breadcrumb-item active">Версия для печати</li>
 </ol>
 <pre style="border:none;"><h1 style="margin-bottom:0px">Заявка {id}</h1>
 ФИО: {name}

@@ -77,10 +77,10 @@
 {cat::}-catalog/cat.tpl
 {SUGGESTION:}
 		{images.0?:img}
-		<b><a href="/catalog/{producer}/{article}{:cat.idsl}">{Производитель} {Артикул}</a></b> {Цена?:cost}<br>
+		<b><a href="/catalog/{producer}/{article}{:cat.idsl}">{Производитель} {Артикул}</a></b><wbr> {Цена?:cost}<br>
 		<!--<a href="/catalog?m=:group::.{group}=1">{Группа}</a> <br>-->
 		{itemrow}
 		
 		
 	{cost:}<b>{~cost(Цена)}&nbsp;руб.</b>
-	{img:}<img style="margin-left:5px; float:right" src="/-imager/?src={images.0}&h=60">
+	{img:}<img style="margin-left:5px; float:right; position:relative" src="/-imager/?src={images.0}&h=60">
