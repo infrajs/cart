@@ -42,8 +42,8 @@
 			padding: 5px 10px;
 		}
 		.usercart input {
-			width:50px;
-			padding:1px 5px;
+			width:80px;
+			/*padding:1px 5px;*/
 		}
 		.usercart .img {
 			text-align:center;
@@ -240,7 +240,7 @@
 		</div>
 	{cartlist:}
 		
-		<table class="table cart">
+		<table style="width:auto" class="table cart">
 			{basket::cartpos}
 		</table>
 		<p align="right">
@@ -248,7 +248,7 @@
 			<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-clear a" style="clear:both">Очистить корзину</span>
 		</p>
 		
-		<table style="width:auto">
+		<table>
 			<tr>
 				<td style="padding:5px">
 					Итого: <b class="cartsum"></b>
@@ -264,14 +264,12 @@
 			<tbody class="myprice" data-cost="{cost}" data-count="{count}" data-article="{article}" data-id="{id}" data-producer="{producer}">
 				<tr class="active">
 					<td style="color:gray; vertical-align:middle">{num}</td>
-					<td style="vertical-align:middle; min-width:120px">
+					<td style="vertical-align:middle;" colspan="2">
 						<div class="title">
 							<a href="/catalog/{producer}/{article}{:cat.idsl}">{Производитель} {Артикул}</a>
 						</div>
-					</td>
-					<td colspan="4" style="vertical-align:middle">
-						{Наименование}
-						{itemrow}
+						<!--{Наименование}<br>
+						{itemrow}-->
 					</td>
 					<td style="vertical-align:middle;">
 						<div style="float:right; margin-right:10px" class="cart">
@@ -280,13 +278,15 @@
 							</span>
 						</div>
 					</td>
+
 				</tr>
 				<tr>
-					<td rowspan="3"></td>
-					<td rowspan="3" style="width:1px">
-						<a href="/catalog/{producer}/{article}{:cat.idsl}">
-							<img class="img-responsive" src="/-imager/?w=140&h=100&src={images.0}&or=-imager/empty.png">
-						</a>
+					<td rowspan="3">
+						<div class="d-none d-sm-block" style="min-width:120px">
+							<a href="/catalog/{producer}/{article}{:cat.idsl}">
+								<img class="img-fluid" src="/-imager/?w=140&h=100&src={images.0}&or=-imager/empty.png">
+							</a>
+						</div>
 					</td>
 					<td>
 						Цена:
@@ -300,20 +300,17 @@
 							{Цена?Цена:itemcost?:itemnocost}
 						</span>
 					</td>
-					<td style="width:100%"></td><td></td>
 				</tr>
 				<tr>
-					<td style="vertical-align:middle;">Кол<span class="hidden-xs">ичество</span>:</td>
+					<td style="vertical-align:middle;">Кол<span class="d-none d-sm-inline">ичество</span>:</td>
 					<td style="vertical-align:middle; padding-top:0; padding-bottom:0;">
-						<input value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer} {article}{:cat.idsp}.count"></td>
+						<input class="form-control form-control-lg" value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer} {article}{:cat.idsp}.count"></td>
 					<td style="white-space:nowrap; vertical-align:middle">
 						<span class="sum" data-article="{article}" data-producer="{producer}" data-id="{id}"></span>
 					</td>
 
 				</tr>
-				<tr>
-					<td colspan="4" style="height:100%"></td>
-				</tr>
+				<tr><td colspan="3" style="height:100%"></td></tr>
 			</tbody>
 		{prodart:}{producer} {article}{:cat.idsp}
 {cartmsg:}<p>Корзина пустая. Добавьте в корзину интересующие позиции.
@@ -437,40 +434,32 @@
 	
 	{ordersList:}
 		
-		<!--<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>-->
-		<table class="ordersList table table-striped">
-			<thead>
-			<tr>
-				<th>Номер</th>
-				<th>Статус</th>
-				<th>Сумма</th>
-				<th>Состав</th>
-				<th>Дата</th>
-			</tr>
-			</thead>
-			<tbody>
-				{data.orders::rowOrders}
-			</tbody>
-		</table>
+		
+		{data.orders::rowOrders}
+		
 		
 		{rowOrders:}
-			<tr>
-				<td>
-					<a href="/cart/orders/{status=:active?:my?id}">{status=:active?:Активная?id}</a>
-				</td>
-				<td style="white-space: nowrap;">
-					{rule.short}
-				</td>
-				<td class="{merchdyn?:bg-success?(manage.summary|:bg-info)}">
-					<span>{total:itemcost}</span>
-				</td>
-				<td>
-					{basket::product}
-				</td>
-				<td>{~date(:j F H:i,time)}</td>
-			</tr>
+			<div class="border mb-2 p-2">
+				
+				<a href="/cart/orders/{status=:active?:my?id}">{status=:active?:Активная?id}</a>
+				 &mdash; <nobr>{rule.short}</nobr>
+				 <div class="pull-right">
+				 	{~date(:j F H:i,time)}<br>
+				 	<b>{total:itemcost}</b>
+				 </div>
+				
+				
+				
+				<div style="text-overflow: ellipsis; 
+				overflow: hidden;">
+				{basket::product}
+				</div>
+				<div class="clearfix"></div>
+				
+			</div>
+
+
 			{dateform:}d.m.Y
-			{product:} <nobr><a href="/catalog/{producer}/{article}{:cat.idsl}">{Артикул}</a><sup style="color:gray">{count}</sup>{~last()|:comma}</nobr><wbr>
 	{orderfields:}
 		<div class="form-group">
 			<label>Контактное лицо{data.fields.fio?:strФИО} <span class="req">*</span></label>
@@ -848,60 +837,32 @@
 	{adm_listPage:}
 		<div class="pull-right">{crumb.child.name=:all?:shortlistlink?:longlistlink}</div>
 		<h1>Все заявки</h1>
-		<script>
-			domready( function () {
-				Event.one('Controller.onshow', function () {
-					$('#orderscontrol').tablesorter();
-				});
-			});
-		</script>
-		<table id="orderscontrol" class="table table-striped ordersList tablesorter-bootstrap tablesorter-icon">
-			<thead style="cursor: pointer">
-			<tr>
-				<th>Номер</th>
-				<th>Клиент</th>
-				<th>Статус</th>
-				<th>Цена</th>
-				<th>Оплата</th>
-				<th>Состав</th>
-				<th data-date-format="ddmmyyyy">Дата</th>
-			</tr>
-			</thead>
-			<tbody>
-				{data.products::adm_row}
-			</tbody>
-		</table>
-
+		
+		
+			{data.products::adm_row}
+		
+		
 		{adm_row:}
-			<tr>
-				<td>
-					<a href="/cart/admin/{id}">{id}</a>
-				</td>
-				<td>{email}</td>
-				<td>	
-					{rule.short}
-				</td>
-				<td class="{merchdyn?:bg-success?(manage.summary|:bg-info)}">
-					<span style="cursor:pointer" onclick="$(this).next().toggle()">
-						{total:itemcost}</span>
-						<div style="font-size:10px; text-align:left; display:none;">
-							Доставка <b>{manage.deliverycost:itemcost}</b><br>
-							Цена товаров по прайсу <b>{sum:itemcost}</b><br>
-							Цена товаров со скидкой <b>{manage.summary:itemcost}</b><br>
-							Цена к оплате <b>{alltotal:itemcost}</b>
-						</div>
-				</td>
-				<td><small>{manage.paid?:adm_paidorder}</small></td>
-
-
-				<td>
-					{basket::adm_product}
-				</td>
-				<td>
-					{~date(:d.m.Y H:i,time)}
-				</td>
-			</tr>
-			{adm_product:} <nobr>{count} <a href="/catalog/{producer}/{article}{:cat.idsl}">{Артикул}</a>{~last()|:comma}</nobr>
+		
+			<div class="border mb-2 p-2">
+				
+				<a href="/cart/admin/{id}">{id}</a> &mdash; <nobr>{rule.short}</nobr>
+			
+				<div class="pull-right ">
+					{email}<br>
+					{~date(:d.m.Y H:i,time)}<br>
+					<b>{total:itemcost}</b>
+				</div>
+				
+				
+				<div style="text-overflow: ellipsis; 
+				overflow: hidden;">
+					{basket::product}
+				</div>
+				<div class="clearfix"></div>
+			</div>
+			
+			{product:} <nobr>{count} <a href="/catalog/{producer}/{article}{:cat.idsl}">{Артикул}</a>{~last()|:comma}</nobr><wbr>
 
 			{adm_paidorder:}<b>{~cost(manage.paid)} руб.</b> {manage.paidtype=:bank?:банк?:менеджер} {~date(:d.m.Y H:i,manage.paidtime)}
 {cat::}-catalog/cat.tpl
@@ -1095,7 +1056,7 @@
 ===== {count} {~words(count,:позиция,:позиции,:позиций)} ====={basket::pritem}
 
 Итого: {~cost(sum)}&nbsp;руб.{manage.deliverycost?:pr-deliver}
-Всего: {~cost(alltotal)}&nbsp;руб.
+<!--Всего: {~cost(alltotal)}&nbsp;руб.-->
 
 ==== Сообщение =====
 <span style="white-space: pre-wrap;">{comment}</span>
