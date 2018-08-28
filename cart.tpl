@@ -441,7 +441,7 @@
 		{rowOrders:}
 			<div class="border mb-2 p-2">
 				
-				<a href="/cart/orders/{status=:active?:my?id}">{status=:active?:Активная?id}</a>
+				<b><a href="/cart/orders/{status=:active?:my?id}">{status=:active?:Активная?id}</a></b>
 				 &mdash; <nobr>{rule.short}</nobr>
 				 <div class="pull-right">
 				 	{~date(:j F H:i,time)}<br>
@@ -846,7 +846,7 @@
 		
 			<div class="border mb-2 p-2">
 				
-				<a href="/cart/admin/{id}">{id}</a> &mdash; <nobr>{rule.short}</nobr>
+				<b><a href="/cart/admin/{id}">{id}</a></b> &mdash; <nobr>{rule.short}</nobr>
 			
 				<div class="pull-right ">
 					{email}<br>
