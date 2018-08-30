@@ -13,6 +13,11 @@
 		.cartbasket #basket_text a:hover {
 			
 		}
+		@media (max-width:767px) {
+			.cartbasket {
+				padding:10px 20px;
+			}
+		}
 	</style>
 	<div id="basket_text">
 		<a href="/cart/orders" class="pull-right" style="font-size:42px;line-height:42px; display:block">
@@ -21,7 +26,7 @@
 		<span class="bold_basket">{data.user.email?:user?:reg}</span>
 		<div>
 			{data.user.email?:umenu}
-			В <a href="/cart/orders/my/list">корзине</a> <b><span class="bold_basket">{data.order.count|:str0}</span> {~words(data.order.count,:позиция,:позиции,:позиций)}</b>
+			В <a href="/cart/orders/my/list">корзине</a> <b><span class="bold_basket">{data.order.count|:str0}</span>&nbsp;{~words(data.order.count,:позиция,:позиции,:позиций)}</b>
 		</div>
 		<div style="clear:both"></div>
 	</div>
