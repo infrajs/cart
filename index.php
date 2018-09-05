@@ -131,6 +131,8 @@ if ($type == 'user') {
 			$orders[] = $order;
 		}
 		usort($orders, function ($o1, $o2) {
+			if (!isset($o2['time'])) return;
+			if (!isset($o1['time'])) return;
 			if($o2['time'] > $o1['time']) return 1;
 		});
 		$ans = array("products" => $orders);
