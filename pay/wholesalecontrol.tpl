@@ -22,7 +22,7 @@
 			<label for="whole-name">Имя <span class="req">*</span></label>
 			<input type="text" id="whole-name" name="name" class="form-control" placeholder="Имя">
 		</div>
-		<input class="btn btn-default" type="submit" value="Добавить">
+		<input class="btn btn-secondary" type="submit" value="Добавить">
 	</form><br>
 	<div id="level"></div>
 	<br>
@@ -57,5 +57,5 @@
 			<label for="whole-level">Сумма, при которой начинают действовать оптовые цены, руб.</label>
 			<input value="{data.level}" type="number" id="whole-level" name="level" class="form-control" placeholder="Имя">
 		</div>
-		<input class="btn btn-default" type="submit" value="Сохранить">
+		<input class="btn btn-secondary" type="submit" value="Сохранить">
 	</form>

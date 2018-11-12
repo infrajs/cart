@@ -12,7 +12,7 @@
 	<p>
 		<input value='' autosave="0" type="text" class="formControll input" style="width:100%">
 	</p>
-	<!--<span class="btn btn-default button">Добавить</span>-->
+	<!--<span class="btn btn-secondary button">Добавить</span>-->
 	<script>
 		domready(function () {
 			//https://github.com/devbridge/jQuery-Autocomplete

@@ -331,7 +331,7 @@
 {RBREAD:}
 	<ul class="breadcrumb cart">
 		{data.email?:breaduser?:breadguest}
-		<span onclick="Cart.refresh(this)" class="btn btn-default btn-xs pull-right"><span class="pe-7s-refresh"></span></span>
+		<span onclick="Cart.refresh(this)" class="btn btn-secondary btn-sm pull-right"><span class="pe-7s-refresh"></span></span>
 	</ul>
 	{breaduser:}
 		<li class="breadcrumb-item"><a href="/user">{data.email|:Профиль}</a></li>
@@ -730,7 +730,7 @@
 		<div style="margin:20px 0;" class="cart">
 			<div class="btn-toolbar dropup" role="toolbar">
 				<div class="btn-group">
-					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+					<button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown">
 						<span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu pull-left" role="menu">
