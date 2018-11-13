@@ -848,7 +848,7 @@
 				
 				<b><a href="/cart/admin/{id}">{id}</a></b> &mdash; <nobr>{rule.short}</nobr>
 			
-				<div class="pull-right ">
+				<div class="pull-right text-right">
 					{email}<br>
 					{~date(:d.m.Y H:i,time)}<br>
 					<b>{total:itemcost}</b>
