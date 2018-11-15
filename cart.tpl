@@ -1046,7 +1046,7 @@
 	<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заявка {crumb.parent.name=:my?:Активная?crumb.parent.name}</a></li>
 	<li class="breadcrumb-item active">Версия для печати</li>
 </ol>
-<pre style="border:none;"><h1 style="margin-bottom:0px">Заявка {id}</h1>
+<pre style="border:none;"><h1 style="margin-bottom:0px">Заявка {id|:Активная}</h1>
 ФИО: {name}
 Почта: {email}
 Телефон: {phone}
