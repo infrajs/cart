@@ -317,7 +317,7 @@
 		
 		</p>
 		<p>Чтобы добавить позицию нужно кликнуть по иконке корзины рядом с ценой в <a href="/catalog">каталог</a>.</p>
-		<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a pull-right">Поиск позиций</span>
+		<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a float-right">Поиск позиций</span>
 		<div style="margin-top:10px">
 			<a href="/catalog" style="text-decoration:none" class="btn btn-success">Открыть каталог</a>
 		</div>
@@ -331,7 +331,7 @@
 {RBREAD:}
 	<ul class="breadcrumb cart">
 		{data.email?:breaduser?:breadguest}
-		<span onclick="Cart.refresh(this)" class="btn btn-secondary btn-sm pull-right"><span class="pe-7s-refresh"></span></span>
+		<span onclick="Cart.refresh(this)" class="btn btn-secondary btn-sm float-right"><span class="pe-7s-refresh"></span></span>
 	</ul>
 	{breaduser:}
 		<li class="breadcrumb-item"><a href="/user">{data.email|:Профиль}</a></li>
@@ -443,7 +443,7 @@
 				
 				<b><a href="/cart/orders/{status=:active?:my?id}">{status=:active?:Активная?id}</a></b>
 				 &mdash; <nobr>{rule.short}</nobr>
-				 <div class="pull-right">
+				 <div class="float-right">
 				 	{~date(:j F H:i,time)}<br>
 				 	<b>{total:itemcost}</b>
 				 </div>
@@ -678,14 +678,14 @@
 				Показать заявку
 			</a>
 		</div>
-	{clearfields:}<span class="pull-right a" onclick="$('.cartcontacts input, .cartcontacts textarea').val('').change();">Очистить данные</span>
+	{clearfields:}<span class="float-right a" onclick="$('.cartcontacts input, .cartcontacts textarea').val('').change();">Очистить данные</span>
 	{manage:}
 		<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-info" role="alert"><b>Сообщение менеджера</b>
 				<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
 		</div>
 	{orderPageContent:}
 		{order.status=:active?:clearfields}
-		<div class="pull-right" title="Последние измения">{~date(:j F H:i,order.time)}</div>
+		<div class="float-right" title="Последние измения">{~date(:j F H:i,order.time)}</div>
 		<h1>{order.rule.title}</h1>
 		{order.id?order:ordernum}
 		<form>
@@ -733,7 +733,7 @@
 					<button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown">
 						<span class="caret"></span>
 					</button>
-					<ul class="dropdown-menu pull-left" role="menu">
+					<ul class="dropdown-menu float-left" role="menu">
 						{actions::actprint}
 					</ul>
 				</div>
@@ -835,7 +835,7 @@
 	{longlistlink:}<a href="/cart/admin/all">Показать готовые</a>
 	{shortlistlink:}<a href="/cart/admin">Скрыть готовые</a>
 	{adm_listPage:}
-		<div class="pull-right">{crumb.child.name=:all?:shortlistlink?:longlistlink}</div>
+		<div class="float-right">{crumb.child.name=:all?:shortlistlink?:longlistlink}</div>
 		<h1>Все заявки</h1>
 		
 		
@@ -848,7 +848,7 @@
 				
 				<b><a href="/cart/admin/{id}">{id}</a></b> &mdash; <nobr>{rule.short}</nobr>
 			
-				<div class="pull-right text-right">
+				<div class="float-right text-right">
 					{email}<br>
 					{~date(:d.m.Y H:i,time)}<br>
 					<b>{total:itemcost}</b>
@@ -870,7 +870,7 @@
 	{:ordercrumb}
 	{data.result?data.order:adm_orderPageContent?:adm_message}
 	{adm_orderPageContent:}
-		<div class="pull-right" title="Последние измения">{~date(:j F H:i,time)}</div>
+		<div class="float-right" title="Последние измения">{~date(:j F H:i,time)}</div>
 		<h1>{rule.title}</h1>
 		{id?:ordernum}
 		{(data.place=:admin&status=:active)?:adm_orderinfo?:adm_orderinputs}

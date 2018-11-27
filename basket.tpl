@@ -20,7 +20,7 @@
 		}
 	</style>
 	<div id="basket_text">
-		<a href="/cart/orders" class="pull-right" style="font-size:42px;line-height:42px; display:block">
+		<a href="/cart/orders" class="float-right" style="font-size:42px;line-height:42px; display:block">
 			<span class="pe-7s-cart"></span>
 		</a>
 		<span class="bold_basket">{data.user.email?:user?:reg}</span>
