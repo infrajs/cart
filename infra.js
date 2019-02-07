@@ -26,17 +26,18 @@ Event.handler('Controller.onshow', function () {
 		if (id) prodart += ' ' + a.data('id');
 
 		var name = ['orders', orderid, 'basket', prodart, 'count'];
-		var r = Session.get(name,0);
-		a.parents('.cart-basket').find('input').val(r);
+		var r = Session.get(name, 0);
+		
+		if (r) a.parents('.cart-basket').find('input').val(r);
 
 		var c = a.parents('.cart-basket');
 		if (r || orderid != 'my') {
-			a.text('Оформить заявку');
+			a.text('Оформить');
 			a.addClass('active');
 			//c.addClass('has-warning');c.removeClass('has-success');
 			a.addClass('btn-danger');a.removeClass('btn-success');
 		} else {
-			a.text('Добавить в корзину');
+			a.text('В корзину');
 			a.removeClass('active');
 			//c.addClass('has-success');c.removeClass('has-warning');
 			a.addClass('btn-success');a.removeClass('btn-danger');
@@ -46,12 +47,12 @@ Event.handler('Controller.onshow', function () {
 		var a = $(this).find('.add');
 		var c = $(this);
 		$(this).find('input').click(function(){
-			a.text('Добавить в корзину');
+			a.text('В корзину');
 			a.removeClass('active');
 			//c.addClass('has-success');c.removeClass('has-warning');
 			a.addClass('btn-success');a.removeClass('btn-danger');
 		}).change(function(){
-			a.text('Добавить в корзину');
+			a.text('В корзину');
 			a.removeClass('active');
 			//c.addClass('has-success');c.removeClass('has-warning');
 			a.addClass('btn-success');a.removeClass('btn-danger');
