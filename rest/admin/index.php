@@ -1,6 +1,5 @@
 <?php
 use infrajs\rest\Rest;
-use infrajs\catalog\Catalog;
 use infrajs\excel\Xlsx;
 use infrajs\ans\Ans;
 use infrajs\access\Access;

@@ -1,8 +1,7 @@
 {
     "name": "infrajs/cart",
-    "description": "Catalog Cart",
+    "description": "Showcase Cart",
     "require":{
-        "infrajs/catalog":"~1",
         "infrajs/user":"~1",
         "infrajs/ans":"~1",
         "infrajs/access":"~1",

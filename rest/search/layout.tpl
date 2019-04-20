@@ -31,7 +31,7 @@
 				},
 				onSelect: function (suggestion) {
 					var pos = suggestion.data;
-					prodart = pos['producer'] + ' ' + pos['article'];
+					prodart = pos['producer_nick'] + ' ' + pos['article_nick'];
 					if (pos['id']) prodart += ' ' + pos['id'];
 					Popup.confirm('Количество: <input name="count" type="number">', function(div){
 						var count = div.find('[name=count]').val();
@@ -40,7 +40,7 @@
 							Global.check('cart');	
 						});
 						
-					}, pos['Производитель'] + ' ' + pos['Артикул'] + '<br><small>' + pos['itemrow']+'</small>');
+					}, pos['producer'] + ' ' + pos['article'] + '<br><small>' + pos['item_nick']+'</small>');
 					
 				},
 				transformResult: function (ans) {
@@ -65,7 +65,6 @@
 					if (!currentValue) return suggestion;
 					//var pattern = '(' + $.Autocomplete.utils.escapeRegExChars(currentValue) + ')';
 					//var res = suggestion.value;
-					suggestion.data.itemrow = Catalog.getItemRowValue(suggestion.data);
 					var res = Template.parse('-cart/rest/search/layout.tpl',suggestion.data, 'SUGGESTION');
 
 					return res;
@@ -77,9 +76,9 @@
 {cat::}-catalog/cat.tpl
 {SUGGESTION:}
 		{images.0?:img}
-		<b><a href="/catalog/{producer}/{article}{:cat.idsl}">{Производитель} {Артикул}</a></b><wbr> {Цена?:cost}<br>
+		<b><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{producer} {article}</a></b><wbr> {Цена?:cost}<br>
 		<!--<a href="/catalog?m=:group::.{group}=1">{Группа}</a> <br>-->
-		{itemrow}
+		{item_nick}
 		
 		
 	{cost:}<b>{~cost(Цена)}&nbsp;руб.</b>

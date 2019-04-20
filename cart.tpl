@@ -104,7 +104,7 @@
 							div.find('.cartneed').html(tplcost(gorder.need));
 						}
 						div.find('.sum').each( function () {
-							var prodart = $(this).data('producer')+' '+$(this).data('article');
+							var prodart = $(this).data('producer_nick')+' '+$(this).data('article_nick');
 							var id =  $(this).data('id');
 							if (id)  prodart += ' ' +id;
 							
@@ -121,7 +121,7 @@
 						});
 
 						div.find('.myprice').each( function () {
-							var prodart = $(this).data('producer')+' '+$(this).data('article');
+							var prodart = $(this).data('producer_nick')+' '+$(this).data('article_nick');
 							var id =  $(this).data('id');
 							if (id)  prodart += ' ' +id;
 							var pos = gorder.basket[prodart];
@@ -261,19 +261,19 @@
 		</div>
 		{cartname:}
 		{cartpos:}
-			<tbody class="myprice" data-cost="{cost}" data-count="{count}" data-article="{article}" data-id="{id}" data-producer="{producer}">
+			<tbody class="myprice" data-cost="{cost}" data-count="{count}" data-article="{article_nick}" data-id="{id}" data-producer="{producer_nick}">
 				<tr class="active">
 					<td style="color:gray; vertical-align:middle">{num}</td>
 					<td style="vertical-align:middle;" colspan="2">
 						<div class="title">
-							<a href="/catalog/{producer}/{article}{:cat.idsl}">{Производитель} {Артикул}</a>
+							<a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{producer} {article}</a>
 						</div>
 						<!--{Наименование}<br>
 						{itemrow}-->
 					</td>
 					<td style="vertical-align:middle;">
 						<div style="float:right; margin-right:10px" class="cart">
-							<span class="abasket bg-danger" data-place="{crumb.parent.parent.name}" data-order="{data.order.id}" data-producer="{producer}" data-article="{article}" data-id="{id}">
+							<span class="abasket bg-danger" data-place="{crumb.parent.parent.name}" data-order="{data.order.id}" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{id}">
 								<span class="pe-7s-close-circle"></span>
 							</span>
 						</div>
@@ -283,7 +283,7 @@
 				<tr>
 					<td rowspan="3">
 						<div class="d-none d-sm-block" style="min-width:120px">
-							<a href="/catalog/{producer}/{article}{:cat.idsl}">
+							<a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">
 								<img class="img-fluid" src="/-imager/?w=140&h=100&src={images.0}&or=-imager/empty.png">
 							</a>
 						</div>
@@ -304,15 +304,15 @@
 				<tr>
 					<td style="vertical-align:middle;">Кол<span class="d-none d-sm-inline">ичество</span>:</td>
 					<td style="vertical-align:middle; padding-top:0; padding-bottom:0;">
-						<input class="form-control form-control-lg" value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer} {article}{:cat.idsp}.count"></td>
+						<input class="form-control form-control-lg" value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer_nick} {article_nick}{:cat.idsp}.count"></td>
 					<td style="white-space:nowrap; vertical-align:middle">
-						<span class="sum" data-article="{article}" data-producer="{producer}" data-id="{id}"></span>
+						<span class="sum" data-article="{article_nick}" data-producer="{producer_nick}" data-id="{id}"></span>
 					</td>
 
 				</tr>
 				<tr><td colspan="3" style="height:100%"></td></tr>
 			</tbody>
-		{prodart:}{producer} {article}{:cat.idsp}
+		{prodart:}{producer_nick} {article_nick}{:cat.idsp}
 {cartmsg:}<p>Корзина пустая. Добавьте в корзину интересующие позиции.
 		
 		</p>
@@ -809,7 +809,7 @@
 	
 	{positionRow:}
 		<tr>
-			<td><a href="/catalog/{producer}/{article}{:cat.idsl}">{Производитель} {Артикул}</a>{change?:star}<br>{itemrow}</td>
+			<td><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{producer} {article}</a>{change?:star}<br>{itemrow}</td>
 			<td>{cost:itemcost}</td>
 			<td>{count}</td>
 			<td>{sum:itemcost}</td>
@@ -862,7 +862,7 @@
 				<div class="clearfix"></div>
 			</div>
 			
-			{product:} <nobr>{count} <a href="/catalog/{producer}/{article}{:cat.idsl}">{Артикул}</a>{~last()|:comma}</nobr><wbr>
+			{product:} <nobr>{count} <a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{article}</a>{~last()|:comma}</nobr><wbr>
 
 			{adm_paidorder:}<b>{~cost(manage.paid)} руб.</b> {manage.paidtype=:bank?:банк?:менеджер} {~date(:d.m.Y H:i,manage.paidtime)}
 {cat::}-catalog/cat.tpl

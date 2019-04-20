@@ -10,7 +10,6 @@ use infrajs\once\Once;
 use infrajs\load\Load;
 use infrajs\template\Template;
 use infrajs\each\Each;
-use infrajs\catalog\Catalog;
 use infrajs\mail\Mail;
 use infrajs\config\Config;
 use infrajs\path\Path;
@@ -48,28 +47,11 @@ class Cart {
 		});
 	}
 	public static function getByProdart($prodart) {
-		$data = Catalog::init();
+		$query = explode(" ",$prodart);
+		$query = implode("/", $query);
 
-		/*$r = preg_match("/.*\s(\d+)/",$prodart,$match);
-		if ($r) $index = $match[1];
-		else $index = 0;*/
-
-		$pos = Xlsx::runPoss($data, function &($pos) use ($prodart) {
-			$r = null;
-
-		    $realprodart = $pos['producer'].' '.$pos['article'];
-		    if ($realprodart == $prodart) return $pos;
-		    if (!empty($pos['id']) && $realprodart.' '.$pos['id'] == $prodart) return $pos;
-		    if (isset($pos['items'])) foreach ($pos['items'] as $item) {
-		    	if ($realprodart.' '.$item['id'] == $prodart) {
-		    		Xlsx::setItem($pos, $item['id']);
-		    		return $pos;
-		    	}
-		    }
-		    return $r;
-		});
-		if (!$pos) return false;
-		$pos = Catalog::getPos($pos);
+		$data = Load::loadJSON('-showcase/api/pos/'.$query);
+		$pos = $data['pos'];
 		return $pos;
 	}
 	public static function getGoodOrder($id = '')
@@ -105,6 +87,7 @@ class Cart {
 
 			Each::foro($order['basket'], function &(&$pos,$prodart) use (&$order,&$num) {
 				$r = null;
+				if(!isset($pos['count'])) $pos['count'] = 0;
 				$count = $pos['count'];//Сохранили значение из корзины
 				if (empty($pos['Цена'])) $pos['Цена'] = 0;
 				if ($count<1) {
@@ -119,7 +102,7 @@ class Cart {
 					}
 				} else {
 					$p = Cart::getByProdart($prodart);
-					if (empty($pos['article'])) {//Такое может быть со старыми заявками... deprcated удалить потом.
+					if (empty($pos['article_nick'])) {//Такое может быть со старыми заявками... deprcated удалить потом.
 						//Значит позиция некорректно заморожена
 						$pos = Cart::getByProdart($prodart);
 						if (!$pos) {
@@ -565,9 +548,6 @@ class Cart {
 	}
 	public static function getPosHash($pos) {
 		$conf = Config::get('cart');
-		if(!isset($pos['Цена оптовая'])) $pos['Цена оптовая'] = '';
-		if(!isset($pos['Цена розничная'])) $pos['Цена розничная'] = '';
-		if ($conf['opt']) return md5($pos['Цена оптовая'].':'.$pos['Цена розничная']);
 		if(!isset($pos['Цена'])) $pos['Цена'] = '';
 		else return md5($pos['Цена']);
 	}
