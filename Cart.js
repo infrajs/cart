@@ -299,13 +299,13 @@ window.Cart = {
 		var name = ['orders', orderid, 'basket', prodart];
 		var r = Session.get(name);
 		if (r || orderid != 'my') {
-			a.next().stop().show();
+			a.parent().find('.bbasket').stop().show();
 			a.parent().find('.basketdescr').stop().hide();
 			
 			a.addClass('selected');
 			a.attr('title','Удалить из корзины');
 		} else {
-			a.next().stop().hide();	
+			a.parent().find('.bbasket').stop().hide();
 			a.parent().find('.basketdescr').stop().show();
 			a.removeClass('selected');
 			a.attr('title','Добавить в корзину');
