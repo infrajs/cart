@@ -66,7 +66,6 @@ class Cart {
 		} else {
 			$order = false;
 		}
-
 		return Once::func(function &($id) use (&$order) {
 			
 			if (!$order) $order = Cart::loadOrder($id);
@@ -84,7 +83,6 @@ class Cart {
 			$order['sumroz'] = 0;
 			$order['count'] = 0;
 			$num = 0;
-
 			Each::foro($order['basket'], function &(&$pos,$prodart) use (&$order,&$num) {
 				$r = null;
 				if(!isset($pos['count'])) $pos['count'] = 0;

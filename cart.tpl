@@ -261,7 +261,7 @@
 		</div>
 		{cartname:}
 		{cartpos:}
-			<tbody class="myprice" data-cost="{cost}" data-count="{count}" data-article="{article_nick}" data-id="{id}" data-producer="{producer_nick}">
+			<tbody class="myprice" data-cost="{cost}" data-count="{count}" data-article="{article_nick}" data-id="{item_nick}" data-producer="{producer_nick}">
 				<tr class="active">
 					<td style="color:gray; vertical-align:middle">{num}</td>
 					<td style="vertical-align:middle;" colspan="2">
@@ -273,7 +273,7 @@
 					</td>
 					<td style="vertical-align:middle;">
 						<div style="float:right; margin-right:10px" class="cart">
-							<span class="abasket bg-danger" data-place="{crumb.parent.parent.name}" data-order="{data.order.id}" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{id}">
+							<span class="abasket bg-danger" data-place="{crumb.parent.parent.name}" data-order="{data.order.id}" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}">
 								<span class="pe-7s-close-circle"></span>
 							</span>
 						</div>
@@ -306,7 +306,7 @@
 					<td style="vertical-align:middle; padding-top:0; padding-bottom:0;">
 						<input class="form-control form-control-lg" value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer_nick} {article_nick}{:cat.idsp}.count"></td>
 					<td style="white-space:nowrap; vertical-align:middle">
-						<span class="sum" data-article="{article_nick}" data-producer="{producer_nick}" data-id="{id}"></span>
+						<span class="sum" data-article="{article_nick}" data-producer="{producer_nick}" data-id="{item_nick}"></span>
 					</td>
 
 				</tr>
@@ -728,16 +728,21 @@
 		
 	{myactions:}
 		<div style="margin:20px 0;" class="cart">
-			<div class="btn-toolbar dropup" role="toolbar">
-				<div class="btn-group">
-					<button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown">
-						<span class="caret"></span>
+			<div class="btn-toolbar" role="toolbar">
+				<div class="btn-group dropup">
+					<button class="btn btn-secondary dropdown-toggle" id="dropdownActionMenu" type="button" data-toggle="dropdown">
+						
 					</button>
-					<ul class="dropdown-menu float-left" role="menu">
+					<div class="dropdown-menu" role="menu" aria-labelledby="dropdownActionMenu">
 						{actions::actprint}
-					</ul>
+					</div>
+					
+						
+					
 				</div>
-				{buttons::mybtns}
+				<div class="btn-group ml-2">
+					{buttons::mybtns}
+				</div>
 			</div>
 			<script>
 				domready( function () {
@@ -748,19 +753,13 @@
 			</script>
 		</div>
 		{mybtns:}
-			<div class="btn-group">
-				<a class="act-{act} btn btn-{cls}" data-id="{data.order.id}" data-crumb="false" onclick="return false"
-					href="{link?:link?:actact}" style="text-decoration:none">
-					{title}
-				</a>
+			<div class="act-{act} btn btn-{cls}" data-id="{data.order.id}">
+				{title}
 			</div>
 		{actprint:}
-			<li class="dropdown-item">
-				<a class="act-{act}" style="text-decoration:none"  data-id="{data.order.id}" 
-					data-crumb="false" onclick="return false" href="{link?link?:actact}">
-					{title}
-				</a>
-			</li>
+			<div class="dropdown-item act-{act}" style="cursor:pointer" data-id="{data.order.id}">
+				{title}
+			</div>
 			{actact:}/{crumb}
 	{b:}<b>
 	{/b:}</b>

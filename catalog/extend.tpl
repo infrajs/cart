@@ -12,9 +12,11 @@
 {orig.priceblockbig:}
 	<span style="font-size: 24px;" class="cart-basket form-inline form-group has-success">
 		{(Цена|...Цена)?:itemcost}&nbsp;&nbsp;&nbsp;
-		<div class="input-group " title="{producer|...producer} {article|...article}{:cat.idsp}">
-			<input type="number" value="1" min="0" max="999" class="form-control" style="width:100px; font-size:24px; padding:0 5px">
-			<span data-producer="{producer|...producer}" data-article="{article|...article}" data-id="{id}" class="add btn btn-success input-group-addon">В корзину</span>
+		<div class="input-group " title="{producer_nick|...producer_nick} {article_nick|...article_nick}{:cat.idsp}">
+			<input type="number" value="1" min="0" max="999" class="form-control">
+			<div class="input-group-append">
+				<span data-producer="{producer_nick|...producer_nick}" data-article="{article_nick|...article_nick}" data-id="{item_nick}" class="add btn btn-success input-group-addon">В корзину</span>
+			</div>
 		</div>
 	</span>
 {priceblock:}{:orig.priceblock}
@@ -25,5 +27,5 @@
 		</div>
 		</div>
 	{basket:}
-		<a class="abasket" data-producer="{producer}" data-article="{article}" data-id="{id}" href="/cart/orders/my/list/add/{producer} {article}{:cat.idsp}"><span class="pe-7s-cart flash"></span></a>
+		<a class="abasket" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}" href="/cart/orders/my/list/add/{producer_nick} {article_nick}{:cat.idsp}"><span class="pe-7s-cart flash"></span></a>
 {cat::}-catalog/cat.tpl
