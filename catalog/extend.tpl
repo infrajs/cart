@@ -20,6 +20,12 @@
 		</div>
 	</span>
 {priceblock:}{:orig.priceblock}
+{orig.price:}{:price}
+{price:}
+		<div class="cart text-left basketfont" style="padding:6px">
+			{(Цена|...Цена)?:itemcost}{:basket}<div style="display:none; font-size:16px">
+			<small>Позиция в <a href="/cart/orders/my/list">корзине</a></small></div>
+		</div>
 {orig.priceblock:}
 	<div class="cart alert alert-success text-right basketfont" style="padding:6px">
 			{(Цена|...Цена)?:itemcost}{:orig.nds}&nbsp;{:basket}<div style="display:none; font-size:16px">
