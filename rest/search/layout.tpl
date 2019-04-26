@@ -77,7 +77,7 @@
 {SUGGESTION:}
 		{images.0?:img}
 		<b><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{producer} {article}</a></b><wbr> {Цена?:cost}<br>
-		<!--<a href="/catalog?m=:group::.{group}=1">{Группа}</a> <br>-->
+		<!--<a href="/catalog?m=:group::.{group_nick}=1">{group}</a> <br>-->
 		{item_nick}
 		
 		

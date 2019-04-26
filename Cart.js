@@ -14,6 +14,11 @@ window.Cart = {
 			if (el) $(el).removeClass('btn-danger').addClass('btn-default').find('span').removeClass('spin');
 		},100);
 	},
+	logout: function () {
+		Session.logout();
+		Session.syncNow();
+		Global.check(['cart','user']);
+	},
 	unblockform: function (layer) {
 		var div=$("#"+layer.div).find('form');
 		div.find("input").removeAttr("disabled");
