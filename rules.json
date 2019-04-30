@@ -151,6 +151,8 @@
 		"sync":{
 			"checkdata":false,
 			"title":"Сохранить",
+			"noscroll":true,
+			"silent":true,
 			"confirm2":"Сохранить данные заявки?",
 			"result":"Данные заявки сохранены."
 		}

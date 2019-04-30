@@ -138,7 +138,6 @@ window.Cart = {
 				var name = $(this).attr('cartinit');
 				var place = $(this).parents('.myactions').data('place');
 				var id = $(this).data('id');
-
 				Cart.action(place, name, id);
 				return false;
 			});

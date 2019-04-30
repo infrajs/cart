@@ -243,11 +243,18 @@
 		<table style="width:auto" class="table cart">
 			{basket::cartpos}
 		</table>
-		<p align="right">
-			<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a">Поиск позиций</span><br>
-			<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-clear a" style="clear:both">Очистить корзину</span>
-		</p>
-		
+
+	
+
+		<div class="d-flex justify-content-between mb-3">
+			<div style="padding-left:5px">
+				
+			</div>
+			<div class="text-right">
+				<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a">Поиск позиций</span><br>
+				<span data-orderid="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-clear a" style="clear:both">Очистить корзину</span>
+			</div>
+		</div>
 		<table>
 			<tr>
 				<td style="padding:5px">
@@ -380,7 +387,7 @@
 		</div>
 	{mngControl:}
 		<div class="alert alert-success" role="alert">
-			<p style="font-weight:bold">Вы менеджер - <a href="/cart/admin">все заявки</a></p>
+			<b>Вы менеджер - <a href="/cart/admin">все заявки</a></b>
 		</div>
 	{adminControl:}
 		<div class="alert alert-{data.manager?:success?:danger}" role="alert">
@@ -714,11 +721,14 @@
 					});
 				});
 			</script>
-		</form>
+		
 		
 		{~length(order.basket)?order:tableWidthProduct?order:noProducts}
 		{order.manage.deliverycost?order:widthDivelery}
-		<div style="margin-bottom:10px">Итого: <b class="cartsum">{~sum(order.total,order.manage.deliverycost|:0):itemcost}</b></div>
+		
+		
+</form>
+		<div style="margin-bottom:10px">Итого: <b class="cartsum">{~sum(order.total,order.manage.deliverycost|:0):itemcost}</b>{data.order.manage.summary?:totalwarn}</div>
 		<!--<h3>{order.rule.title}</h3>
 		{data.order.id?order:ordernum}-->
 		{order.manage.comment?order:manage}
@@ -785,6 +795,15 @@
 	<div style="margin-bottom:10px">
 		{data.order.rule.edit[crumb.parent.name]?:basketedit}
 	</div>
+	<div style="max-width:300px" class="input-group">
+		<input name="coupon" type="text" class="form-control" id="coupon" placeholder="Укажите купон">
+		<div class="input-group-append">
+		    <button onclick="Cart.action('{crumb.parent.name}', 'sync', {data.order.id});" class="btn btn-outline-secondary" type="button">Применить</button>
+		</div>
+	</div>
+	<div class="py-2">
+		{data.order.coupon_msg}
+	</div>
 {basketedit:}
 	<p align="right">
 		<a href="/{crumb}/list">Редактировать корзину</a><br>
@@ -831,8 +850,8 @@
 		<li class="breadcrumb-item active">Все заявки</li>
 	</ol>
 	{data.result?:adm_listPage?:adm_message}
-	{longlistlink:}<a href="/cart/admin/all">Показать готовые</a>
-	{shortlistlink:}<a href="/cart/admin">Скрыть готовые</a>
+	{longlistlink:}<a href="/cart/admin/all">Готовые заявки</a>
+	{shortlistlink:}<a href="/cart/admin">В работе</a>
 	{adm_listPage:}
 		<div class="float-right">{crumb.child.name=:all?:shortlistlink?:longlistlink}</div>
 		<h1>Все заявки</h1>
@@ -889,14 +908,17 @@
 				{count?:tableWidthProduct?:noProducts}
 				
 
-
-
-				<!--
-					<label>Цена со скидкой<br> 
-					<input name="manage.summary" value="{manage.summary}" type="text"></label><br />
-				-->
+				<div class="py-2">Итоговая цена, руб</div>
+				<div style="max-width:300px" class="input-group pb-3">
+					<input class="form-control" name="manage.summary" value="{manage.summary}" type="text">
+					<div class="input-group-append">
+					    <button onclick="Cart.action('{crumb.parent.name}', 'sync', {data.order.id});" class="btn btn-outline-secondary" type="button">Применить</button>
+					</div>
+				</div>
+				
+				
 				{data.fields.address?:mngdelivery}
-				<div style="margin-bottom:10px">Итого: <b class="cartsum">{~sum(data.order.total,data.order.manage.deliverycost|:0):itemcost}</b></div>
+				<div style="margin-bottom:10px">Итого: <b class="cartsum">{~sum(data.order.total,data.order.manage.deliverycost|:0):itemcost}</b>{data.order.manage.summary?:totalwarn}</div>
 				<label>Сообщение для клиента</label>&nbsp;<small>{data.messages::msg_samples}</small><br>
 				<textarea autosavebreak="1" name="manage.comment" class="form-control" rows="6">{manage.comment}</textarea>
 
@@ -989,6 +1011,7 @@
 				});
 			});
 		</script>
+	{totalwarn:} <i title="установлено менеджером">*</i>
 	{no:}<b>ещё не отправлялось</b>{was:}было <b>{~date(:j F H:i,emailtime)}</b>
 	{mngdelivery:}
 	<div class="form-group">

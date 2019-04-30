@@ -125,6 +125,7 @@ if ($type == 'user') {
 			$order = Cart::getGoodOrder($id);
 			
 			if (!$isall && !in_array($order['status'], $rules['list'])) continue;
+			if ($isall && in_array($order['status'], $rules['list'])) continue;
 
 			$order['place'] = $place;
 

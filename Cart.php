@@ -206,6 +206,7 @@ class Cart {
 			} else {
 				//$pos['cost'] = $pos['Цена'];
 				$order['sum'] = $order['sumroz'];
+				
 				Each::foro($order['basket'], function &(&$pos) {
 					$r = null;
 					if (empty($pos['Цена'])) $pos['Цена'] = 0;
@@ -214,12 +215,33 @@ class Cart {
 					return $r;
 				});
 			}
-			$order['total']=$order['sum'];
+
+			
+			$order['total'] = $order['sum'];
+			
+
+			if (!empty($order['coupon'])) {
+				$data = Load::loadJSON('-excel/get/group/Купоны/?src=~pages/Параметры.xlsx');
+				if (sizeof($data['data'])) {
+					$coupons = [];
+					foreach ($data['data']['data'] as $row) {
+						$coupons[$row['Купон']] = $row['Скидка'];
+					}
+					if (isset($coupons[$order['coupon']])) {
+						$discount = $coupons[$order['coupon']];
+						$fncost = Template::$scope['~cost'];
+						$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> даёт скидку <b>'.($discount*100).'%</b>.<br>Скидка действует не на все товары.<br>Точную сумму укажет менеджер после проверки.';//' <s>'.$fncost($order['total']).'</s>&nbsp;руб.';
+						$order['total'] = $order['total'] * (1 - $discount);
+					} else {
+						$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> не найден или устарел';
+						//$order['sum'] = $order['sum'] * 0.95;
+					}
+				}
+			}
 			if (!empty($order['manage']['summary'])) {
 				$order['manage']['summary']=preg_replace('/\s/','',$order['manage']['summary']);
 				$order['total']=$order['manage']['summary'];
 			}
-
 			//Стоимость с доставкой
 			$order['alltotal']=$order['total'];
 			if (!empty($order['manage']['deliverycost'])) {
