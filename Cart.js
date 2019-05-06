@@ -58,6 +58,7 @@ window.Cart = {
 		Cart.getJSON(path, function (ans) {
 			Session.syncNow();
 			Global.set('cart');
+			Global.set('user');
 			cb(ans);
 		});
 	},
@@ -188,6 +189,8 @@ window.Cart = {
 		if (!orderid) orderid = '';
 		//генерирует объект описывающий все цены... передаётся basket на случай если count актуальный именно в basket
 		var path='-cart/?type=order&id='+orderid;
+		Global.unload('cart', path);
+		var path='-cart?type=order&id='+orderid;
 		Global.unload('cart', path);
 		//Load.unload(path);
 		//Session.syncNow();
