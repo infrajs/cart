@@ -47,9 +47,10 @@ class Cart {
 		});
 	}
 	public static function getByProdart($prodart) {
+		$prodart = trim($prodart);
+		if (!$prodart) return [];
 		$query = explode(" ",$prodart);
 		$query = implode("/", $query);
-
 		$data = Load::loadJSON('-showcase/api/pos/'.$query);
 		$pos = $data['pos'];
 		return $pos;

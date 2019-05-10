@@ -306,14 +306,14 @@ window.Cart = {
 		var name = ['orders', orderid, 'basket', prodart];
 		var r = Session.get(name);
 		if (r || orderid != 'my') {
-			a.parent().find('.bbasket').stop().show();
-			a.parent().find('.basketdescr').stop().hide();
+			a.parent().find('.bbasket').stop().slideDown();
+			a.parent().find('.basketdescr').stop().slideUp();
 			
 			a.addClass('selected');
 			a.attr('title','Удалить из корзины');
 		} else {
-			a.parent().find('.bbasket').stop().hide();
-			a.parent().find('.basketdescr').stop().show();
+			a.parent().find('.bbasket').stop().slideUp();
+			a.parent().find('.basketdescr').stop().slideDown();
 			a.removeClass('selected');
 			a.attr('title','Добавить в корзину');
 		}

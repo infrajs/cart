@@ -30,10 +30,11 @@
 		</div>
 {orig.priceblock:}
 	<div class="cart alert alert-success text-right basketfont" style="padding:6px">
-			{(Цена|...Цена)?:itemcost}{:orig.nds}&nbsp;{:basket}<div style="display:none; font-size:16px">
+		{(Цена|...Цена)?:itemcost}{:orig.nds}&nbsp;{:basket}
+		<div class="bbasket" style="display:none; font-size:16px">
 			<small>Позиция в <a href="/cart/orders/my/list">корзине</a></small>
 		</div>
-		</div>
+	</div>
 	{basket:}
 		<a class="abasket" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}" href="/cart/orders/my/list/add/{producer_nick} {article_nick}{:cat.idsp}"><span class="pe-7s-cart flash"></span></a>
 {cat::}-catalog/cat.tpl
