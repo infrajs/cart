@@ -328,7 +328,6 @@
 		<div style="margin-top:10px">
 			<a href="/catalog" style="text-decoration:none" class="btn btn-success">Открыть каталог</a>
 		</div>
-{itemcost:}{~cost(.)} <small>руб.</small>
 {itemnocost:}<a href="/contacts">Уточнить</a>
 {basket:}
 	<div id="basket_text">
@@ -452,7 +451,7 @@
 				 &mdash; <nobr>{rule.short}</nobr>
 				 <div class="float-right">
 				 	{~date(:j F H:i,time)}<br>
-				 	<b>{total:itemcost}</b>
+				 	<b>{total:itemcostrub}</b>
 				 </div>
 				
 				
@@ -728,7 +727,7 @@
 		
 		
 </form>
-		<div style="margin-bottom:10px">Итого: <b class="cartsum">{~sum(order.total,order.manage.deliverycost|:0):itemcost}</b>{data.order.manage.summary?:totalwarn}</div>
+		<div style="margin-bottom:10px">Итого: <b class="cartsum">{~sum(order.total,order.manage.deliverycost|:0):itemcostrub}</b>{data.order.manage.summary?:totalwarn}</div>
 		<!--<h3>{order.rule.title}</h3>
 		{data.order.id?order:ordernum}-->
 		{order.manage.comment?order:manage}
@@ -784,13 +783,12 @@
 	<table class="table table-striped">
 		<tr>
 			<th>Позиция</th>
-			<th><span>Цена</span></th>
-			<th>Кол<span class="hidden-xs">ичество</span></th>
-			<th>Сумма</th>
+			<th>Цена</th>
+			<th>Кол<span class="d-none d-sm-inline">ичество</span></th>
+			<th class="d-none d-sm-table-cell">Сумма</th>
 		</tr>
 		{basket::positionRow}
-		<tr><th colspan="3">
-		</td><td>{sum:itemcost}</td></tr>
+		<tr><td class="d-none d-sm-table-cell"></td><td colspan=3 style="text-align:right">{sum:itemcostrub}</td></tr>
 	</table>
 	<div style="margin-bottom:10px">
 		{data.order.rule.edit[crumb.parent.name]?:basketedit}
@@ -815,11 +813,11 @@
 		<tr>
 			<th>Позиция</th>
 			<th class="{merchdyn?:bg-success?:bg-info}"><span>Цена {merchdyn?: оптовая?: розничная}</span></th>
-			<th>Количество</th>
+			<th>Кол<span class="d-none d-sm-inline">ичество</span></th>
 			<th>Сумма</th>
 		</tr>
 		{basket::positionRow}
-		<tr><td></td><td></td><td></td><td>{sum:itemcost}</td></tr>
+		<tr><td class="d-none d-sm-table-cell"></td><td colspan=3 style="text-align:right">{sum:itemcostrub}</td></tr>
 	</table>
 	{manage.summary?:widthSummary}
 	{manage.deliverycost?:widthDivelery}
@@ -830,16 +828,16 @@
 			<td><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{producer} {article}</a>{change?:star}<br>{itemrow}</td>
 			<td>{cost:itemcost}</td>
 			<td>{count}</td>
-			<td>{sum:itemcost}</td>
+			<td class="d-none d-sm-table-cell">{sum:itemcost}</td>
 		</tr>
 
 	{widthSummary:}
 		<div>
-			Сумма подтверждёная менеджером: <span>{manage.summary:itemcost}</span>
+			Сумма подтверждёная менеджером: <span>{manage.summary:itemcostrub}</span>
 		</div>
 	{widthDivelery:}
 		<div>
-			Доставка: {manage.deliverycost:itemcost}
+			Доставка: {manage.deliverycost:itemcostrub}
 		</div>
 
 {ADMIN:}
@@ -869,7 +867,7 @@
 				<div class="float-right text-right">
 					{email}<br>
 					{~date(:d.m.Y H:i,time)}<br>
-					<b>{total:itemcost}</b>
+					<b>{total:itemcostrub}</b>
 				</div>
 				
 				
@@ -918,7 +916,7 @@
 				
 				
 				{data.fields.address?:mngdelivery}
-				<div style="margin-bottom:10px">Итого: <b class="cartsum">{~sum(data.order.total,data.order.manage.deliverycost|:0):itemcost}</b>{data.order.manage.summary?:totalwarn}</div>
+				<div style="margin-bottom:10px">Итого: <b class="cartsum">{~sum(data.order.total,data.order.manage.deliverycost|:0):itemcostrub}</b>{data.order.manage.summary?:totalwarn}</div>
 				<label>Сообщение для клиента</label>&nbsp;<small>{data.messages::msg_samples}</small><br>
 				<textarea autosavebreak="1" name="manage.comment" class="form-control" rows="6">{manage.comment}</textarea>
 
@@ -1053,7 +1051,8 @@
 		<li class="breadcrumb-item active">Заявка {crumb.name=:my?:Активная?crumb.name}</li>
 		<li class="breadcrumb-item"><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb}/list">Корзина</a></li>
 	</ol>
-{itemcost:}{~cost(.)}&nbsp;<small>руб.</small>
+{itemcost:}{~cost(.)}<span class="d-none d-sm-inline">&nbsp;<small>руб.</small></span>
+{itemcostrub:}{~cost(.)}&nbsp;<small>руб.</small>
 {star:}<span title="Позиция в каталоге изменилась">*</span>
 {ordernum:}Номер заявки: <b>{id}</b>{manage.paid?:msgpaidorder}
 	{msgpaidorder:}. Оплата <b>{~cost(manage.paid)} руб.</b> отметка {manage.paidtype=:bank?:банка?:менеджера} {~date(:d.m.Y H:i,manage.paidtime)}
