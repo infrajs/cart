@@ -6,11 +6,11 @@
 {pos-item:}{:orig.pos-item}
 {pos-img:}{:orig.pos-img}
 {priceblockbig:}{:orig.priceblockbig}
-{itemcost:}{~cost((Цена|...Цена))}&nbsp;<small>руб.</small>
+{itemcost:}<span class="cost">{~cost((Цена|...Цена))}{:orig.unit}</span>
 {itemnocost:}<a href="/contacts">Уточнить</a>
 {nalichie:}{:orig.nalichie}
 {orig.priceblockbig:}
-	<span style="font-size: 24px;" class="mt-4 cart-basket form-inline form-group has-success">
+	<span style="font-size: 24px;" class="mt-2 cart-basket form-inline form-group has-success">
 		{(Цена|...Цена)?:itemcost}&nbsp;&nbsp;&nbsp;
 		<div class="input-group " title="{producer_nick|...producer_nick} {article_nick|...article_nick}{:cat.idsp}">
 			<input type="number" value="1" min="0" max="999" class="form-control">
