@@ -74,12 +74,11 @@
 	</script>
 </div>
 {cat::}-catalog/cat.tpl
+{extend::}-catalog/extend.tpl
 {SUGGESTION:}
 		{images.0?:img}
 		<b><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{producer} {article}</a></b><wbr> {Цена?:cost}<br>
-		<!--<a href="/catalog?m=:group::.{group_nick}=1">{group}</a> <br>-->
-		{item_nick}
-		
-		
-	{cost:}<b>{~cost(Цена)}&nbsp;руб.</b>
+		<a href="/catalog/{group_nick}">{group}</a>
+		{item_nick}	
+	{cost:}<b>{~cost(Цена)}{:extend.unit}</b>
 	{img:}<img style="margin-left:5px; float:right; position:relative" src="/-imager/?src={images.0}&h=60">
