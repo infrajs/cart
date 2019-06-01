@@ -5,6 +5,7 @@
 {pos-item-css:}{:orig.pos-item-css}
 {pos-item:}{:orig.pos-item}
 {pos-img:}{:orig.pos-img}
+{unit:}{:orig.unit}
 {priceblockbig:}{:orig.priceblockbig}
 {itemcost:}<span class="cost">{~cost((Цена|...Цена))}{:orig.unit}</span>
 {itemnocost:}<a href="/contacts">Уточнить</a>
