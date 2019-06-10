@@ -1,6 +1,60 @@
 {
-	"fio":false,
-	"passport":false,
-	"address":false,
-	"help":"Опишите вашу задачу, чтобы менеджер мог предложить оптимальный вариант по цене и качеству.<br>Укажите, пожалуйста, как вам удобно оплатить и получить товар, адрес доставки если требуется.<br>С вами свяжется менеджер для уточнения деталей."
+	"transport":{
+		"Почта России":{
+			"cost":"от 220 руб.",
+			"ico":"-cart/images/pochta.png",
+			"tpl":"POCHTA",
+			"term":"Срок 2-17 дней"
+		},
+		"Почта России 1&nbsp;класс":{
+			"cost":"от 260 руб.",
+			"ico":"-cart/images/pochta.png",
+			"tpl":"POCHTA1",
+			"term":"Срок 2-10 дней"
+		},
+		"Транспортные компании":{
+			"cost":"от 250 руб.",
+			"ico":"-cart/images/cargo.png",
+			"tpl":"CARGO",
+			"term":"Срок 3-7 дней"
+		},
+		"Доставка курьером":{
+			"cost":"от 0 руб.",
+			"ico":"-cart/images/men.png",
+			"tpl":"MEN",
+			"term":"Срок 2-5 дней"
+		},
+		"Пункты самовывоза в г.&nbsp;Тольятти":{
+			"cost":"бесплатно",
+			"ico":"-cart/images/self.png",
+			"tpl":"SELF",
+			"term":"Срок 0-3 часа"
+		}
+	},
+	"pay":{
+		"Оплата при получении заказа":{
+			"ico":"-cart/images/recive.jpg",
+			"tpl":"PAYRECIVE"
+		},
+		"Оплата по квитанции в банке":{
+			"ico":"-cart/images/check.png",
+			"tpl":"PAYCHECK"
+		},
+		"На карту Сбербанка":{
+			"ico":"-cart/images/sber.png",
+			"tpl":"PAYSBER"	
+		},
+		"Яндекс Деньги":{
+			"ico":"-cart/images/yandex.png",
+			"tpl":"PAYYANDEX"	
+		},
+		"На карту Tinkoff":{
+			"ico":"-cart/images/tinkoff.png",
+			"tpl":"PAYTINKOFF"	
+		},
+		"QIWI Кошелёк":{
+			"ico":"-cart/images/qiwi.png",
+			"tpl":"PAYQIWI"	
+		}
+	}
 }

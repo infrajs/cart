@@ -10,113 +10,65 @@
 		   #COLUMN {
 				display:none;
 			}
-		}
-		.cart .req {
-			color:red;
-		}
-		.cart .myactions {
-			float:right;
-		}
-		.cart .card {
-			border-color:#fbb765;
-		}
-		.cart .card-header {
-			cursor:pointer; 
-			border-color:#fbdb65; 
-			background-color: #fbdb65;
-		}
-		.cart .item {
-			width:150px;
-			cursor: pointer;
-		}
-		.cart .item.active {
-			background-color: #fbdb65;
-		}
-		.cart .item.active .title {
-			font-weight: bold;
-		}
-		.cart .item:hover {
-			background-color:#fff37d;
-		}
-		.cart .iteminfo {
-			display: none;
-		}
-		.cart .more {
-			display: none;
-		}
+		}	
+		
 	</style>
 {js:}
 	<script>
 		domready(function(){
-			Event.one('Controller.onshow', function () {
-				Cart.init();
-			});
+			Cart.init();
 		});
 	</script>
 {LIST:}
 	{:css}
 	{:listcrumb}
 	<div class="cart">
-		<h1>{data.order.id?:numbasket?(data.result?:mybasket?:numbasket)}</h1>
-		{data.result?data.order:showlist?:adm_message}
+		<h1>{data.order.id?:numorder?:myorder}</h1>
+		{data.result?:showlist?:adm_message}
 	</div>
 	{:js}
 	{showlist:}
-		{:cartlistborder}
-		{:couponinfolist}
-	{couponinfolist:}
-		<div class="d-flex flex-column flex-sm-row justify-content-between mt-3">
-			<div class="mr-sm-3 mx-auto mx-sm-0">{:couponinp}</div>
-			<div class="flex-grow-1">
-				<p class="text-center text-sm-right {coupon_discount??:d-none}">
-					Итого: <b class="carttotal" style="font-size:140%">{total:itemcostrub}</b> 
-					<!--<del style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel">{total!sum?sum:itemcostrub}</del>-->
-				</p>
-				<div class="d-flex text-center text-sm-right flex-column">
-					<div><a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-warning">Перейти к {data.order.id?:заказу {data.order.id}?:оформлению заказа}</a></div>
-					<div>Займёт не более 3 минут.</div>
-				</div>
-			</div>
-		</div>
-	{couponinfoorder:}
-		<div class="d-flex flex-column flex-sm-row justify-content-between mt-3">
-			<div class="mr-sm-3 mx-auto mx-sm-0">{:couponinp}</div>
-			<div class="flex-grow-1">
-				<p class="text-center text-sm-right {coupon_discount??:d-none}">
-					Итого: <b class="carttotal" style="font-size:140%">{total:itemcostrub}</b> 
-					<!--<del style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel">{total!sum?sum:itemcostrub}</del>-->
-				</p>
-				<div class="d-flex text-center text-sm-right flex-column">
-					
-				</div>
-			</div>
-		</div>
+		{data.order:cartlist}
 	{cartlist:}
-		<div style="{:ishidedisabled}">
+		<div class="border rounded p-3">
 			<div class="d-flex justify-content-between">
 				<div>
 					<div class="custom-control custom-checkbox">
 						<input onclick="$('.showlist :checkbox').prop('checked',$(this).is(':checked')).change();" type="checkbox" class="custom-control-input" name="checkall" id="checkall">
 						<label class="custom-control-label" for="checkall">
 							Выделенное: </label>
-							<span data-param='prodart=' data-id="{data.order.id}" data-place="{data.place}" class="act-clear a">
+							<span data-param='prodart=' data-id="{data.id}" data-place="{crumb.parent.parent.name}" class="act-clear a">
 								Удалить
 							</span>
 						
 					</div>		
 				</div>
 				<div class="text-right">
-					<span data-id="{data.order.id}" data-place="{data.place}" class="cart-search a">Добавить</span>
+					<span data-id="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a">Добавить</span>
 				</div>
+			</div>
+			
+			<hr>
+			<div class="showlist">
+				{basket::cartpos}
+			</div>
+			<div class="d-flex align-items-center justify-content-center justify-content-sm-end">
+				<div class="mr-2">Сумма: </div><div style="font-size:120%; font-weight:bold" class="cartsum">{sum:itemcostrub}</div>
 			</div>
 		</div>
 		
-		<hr>
-		<div class="showlist">
-			{basket::cartpos}
-		</div>
-		<div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-			<div class="mr-2">Сумма: </div><div style="font-size:120%; font-weight:bold" class="cartsum">{sum:itemcostrub}</div>
+		<div class="d-flex flex-column flex-sm-row justify-content-between mt-3">
+			<div class="mr-sm-3 mx-auto mx-sm-0">{:couponinp}</div>
+			<div class="flex-grow-1">
+				<p class="text-center text-sm-right {coupon_discount??:d-none}">
+					Итого: <b class="carttotal" style="font-size:140%">{total:itemcostrub}</b> 
+					<!--<del style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel">{total!sum?sum:itemcostrub}</del>-->
+				</p>
+				<div class="d-flex text-center text-sm-right flex-column">
+					<div><a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-warning">Перейти к {data.order.id?:заявке {data.order.id}?:оформлению заявки}</a></div>
+					<div>Займёт не более 3 минут.</div>
+				</div>
+			</div>
 		</div>
 		<script>
 			domready( function () {
@@ -134,7 +86,7 @@
 					el = $(el);
 					el.stop();
 					var lastsum = el.data('lastsum');
-					//el.width(el.width()).css('display','inline-block');
+					el.width(el.width()).css('display','inline-block');
 					$({ 
 						n: lastsum
 					}).animate({
@@ -142,11 +94,10 @@
 					}, {
 						duration: 500,
 						step: function (a) {
-							$(el).html(tplcost(Math.round(a)));
+							$(el).html(tplcost(a));
 						},
 						complete:  function(){
-							$(el).html(tplcost(to));
-							//el.width('auto');
+							el.width('auto');
 						}
 					});
 					el.data('lastsum',to);
@@ -174,16 +125,12 @@
 				$('.cart [type=number]').change(calc);
 			});
 		</script>
-	{cartlistborder:}
-		<div class="border rounded p-3">
-			{:cartlist}
-		</div>
 	{cartpos:}
 		<div class="d-flex align-items-sm-center">
-			<div style="{:ishidedisabled}">
+			<div>
 				<div class="custom-control custom-checkbox">
 					<input onchange="$('.act-clear').attr('data-param','prodart='+$('.showlist :checkbox:checked').reduce(function (ak, el){ ak.push($(el).attr('data-prodart')); return ak },[]).join(','))" 
-					data-prodart="{:prodart}" type="checkbox" class="custom-control-input" name="check[{~key}]" id="check{~key}">
+					data-prodart="{:prodart}" type="checkbox" class="custom-control-input" name="check{~key}" id="check{~key}">
 					<label class="custom-control-label" for="check{~key}"></label>
 				</div>
 			</div>
@@ -191,14 +138,14 @@
 				{images.0?:cartposimg}
 			</div>
 			<div class="flex-grow-1">
-				<div class="">{change:star}<b><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{Наименование}</a></b></div>
+				<div class=""><b><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{Наименование}</a></b></div>
 				<div class="d-flex align-items-center flex-column flex-sm-row">
 					{images.0?:cartposimgm}
 					<div class="my-2 flex-grow-1">
 						{:basket.props}
 					</div>
 					<div class="my-2 d-flex align-items-center ml-sm-3">
-						<div class="mr-2"><input {:isdisabled} data-cost="{Цена}" style="width:60px" value="{basket[{:prodart}]count}" type="number" min="0" max="999" name="basket.{producer_nick} {article_nick}{:cat.idsp}.count" class="form-control" type="number"></div>
+						<div class="mr-2"><input data-cost="{Цена}" style="width:60px" value="{basket[{:prodart}]count}" type="number" min="0" max="999" name="basket.{producer_nick} {article_nick}{:cat.idsp}.count" class="form-control" type="number"></div>
 						<div style="min-width:70px;"><b>{Цена:itemcostrub}</b>{*...coupon_discount?:nodiscount}</div>
 					</div>
 				</div>
@@ -212,21 +159,6 @@
 			<div class="my-2 mr-3 d-bock d-sm-none">
 				<img class="img-thumbnail" src="/-imager/?h=100&src={images.0}&or=-imager/empty.png">
 			</div>
-{ADMORDER:}
-	{:css}
-	{:ordercrumb}
-	<div class="cart">
-		{data.result?data:orderPageContent?:ordermessage}
-	</div>
-	{:js}
-	{*adm_orderPageContent:}
-		<div class="float-right" title="Последние измения">{~date(:j F H:i,time)}</div>
-		<h1>{rule.title}</h1>
-		{id?:ordernum}
-		{(data.place=:admin&status=:active)?:adm_orderinfo?:adm_orderinputs}
-	{*msg_samples:}
-		<span class="a" onclick="var t=$('[name=\'manage.comment\']'); t.val(t.val()+$(this).next().html()).change();">{~key}</span><pre style="display:none">{.}
-</pre>{~last()|:comma}
 {ORDER:}
 	{:css}
 	{:ordercrumb}
@@ -235,224 +167,69 @@
 	</div>
 	{:js}
 	{ordermessage:}
-		<h1>{data.order.id}</h1>
-		<h1>{data.order.id?:numorder?:myorder}</h1>
+		<h1>{data.id}</h1>
+		<h1>{data.order.id?:numbasket?:mybasket}</h1>
 		<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>
 		{data.ismy?:activebutton}
 	{activebutton:}
 		<div style="margin-top:10px">
 			<a href="/cart/orders/my" class="btn btn-success">
-				Показать заказ
+				Показать заявку
 			</a>
 		</div>
-	{showManageComment:}
+	{clearfields:}<span class="float-right a" onclick="$('.cartcontacts input, .cartcontacts textarea').val('').change();">Очистить данные</span>
+	{manage:}
 		<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-info" role="alert"><b>Сообщение менеджера</b>
 				<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
 		</div>
-	{accordCard:}
-		<div class="card" data-num="{num}">
-			<div onclick="Ascroll.go('#heading{num}')" 
-			class="card-header {show?:font-weight-bold}" id="heading{num}" data-toggle="collapse" data-target="#collapse{num}">
-				<span class="badge badge-light text-dark badge-pill">{num}</span> <span class="a" aria-expanded="true" aria-controls="collapse{num}">
-				{title}
-				</span>
-
-			</div>
-			<div id="collapse{num}" class="collapse {show?:show}" aria-labelledby="heading{num}" data-*parent="#accordionorder">
-				<div class="card-body">
-					{content}
-				</div>
-			</div>
-		</div>
 	{orderPageContent:}
+		<h1>{order.rule.title}</h1>
+		{data.result?:showlist?:adm_message}
+		{order.status=:active?:clearfields}
 		<div class="float-right" title="Последние измения">{~date(:j F H:i,order.time)}</div>
-		<h1>{order.rule.title} {order.id}</h1>
 		
-		{order.manage.comment?order:showManageComment}
+		{order.id?order:ordernum}
 		<form>
-			<div class="accordion" id="accordionorder">
-				{~obj(:title,:Корзина,:content,order:cartlist,:num,:1):accordCard}
-				{~obj(:title,:Купон,:content,order:couponinfoorder,:num,:2):accordCard}
-				{~obj(:title,:Получатель,:content,:fiocard,:num,:3):accordCard}
-				{~obj(:title,:Доставка,:content,:transcard,:num,:4):accordCard}
-				{~obj(:title,:Оплата,:content,:paycard,:num,:5):accordCard}
+			<div class="cartcontacts">
+				{order:orderfields}
+				<div>
+					<strong>Сообщение для менеджера</strong>
+					<div>
+						<i>{data.fields.help}</i>
+					</div>
+					<textarea name="comment" class="form-control" rows="4">{order.comment}</textarea>
+				</div>
 			</div>
-		</form>
-		<script>
-			domready( function (){
-				Event.one('Controller.onshow', function (){
-					var layer = Controller.ids["{id}"];
-					$('.accordion .collapse').on('show.bs.collapse', function(){
-						var tab = $(this).parent();
-						tab.find('.card-header').addClass('font-weight-bold');
-						var num = tab.attr('data-num');	
-						if (Session.is()) Autosave.set(layer,'accordion.'+num, true);
+			<div class="answer"><b class="alert">{config.ans.msg}</b></div>
+			<script>
+				domready ( function () {
+					Event.one('Controller.oncheck', function () {
+						var layer = Controller.ids["{..id}"];
+						Event.one('Layer.onshow', function () {
+							var div=$('#'+layer.div);
+							var id="{crumb.name}";
+							if (id == 'my') id = null;
+							var order = Cart.getGoodOrder(id);
+							var place = div.find('.myactions').data('place');
+						}, '', layer);
 					});
-					$('.accordion .collapse').on('hide.bs.collapse', function(){
-						var tab = $(this).parent();
-						tab.find('.card-header').removeClass('font-weight-bold');
-						var num = tab.attr('data-num');
-						if (Session.is()) Autosave.set(layer,'accordion.'+num);
-					});
-					var layer = Controller.ids["{id}"];
-					var list = Autosave.get(layer,'accordion',{~json(order.accordion)});
-					if (!list) {
-						list = { };
-						list[3] = true;
-					}
-					var first = true;
-					for (num in list) {
-						if (!first) Ascroll.once=false;
-						first = false;
-
-
-						$('.accordion').find('[data-num='+num+'] .card-header').click();
-					}
 				});
-			})
-		</script>
-		<div class="my-2 row">
-			<div class="col-sm-6">
-				<div>Комментарий к заказу</div>
-				<textarea name="comment" class="form-control" rows="3">{order.comment}</textarea>
-			</div>
-			<div class="col-sm-6">
-				<div>Звонок менеджера <span class="req">*</span></div>
-				<div class="form-check mt-1">
-					<input class="form-check-input" type="radio" name="call" {order.call=:yes?:checked} id="exampleRadios1" value="yes">
-					<label class="form-check-label" for="exampleRadios1">
-						Мне нужен звонок менеджера для уточнения деталей заказа.
-					</label>
-				</div>
-				<div class="form-check">
-					<input class="form-check-input" type="radio" name="call" {order.call=:no?:checked} id="exampleRadios2" value="no">
-					<label class="form-check-label" for="exampleRadios2">
-						Звонок не нужен, информация по заказу понятна.
-					</label>
-				</div>
-			</div>
-		</div>
-		<div class="alert alert-secondary">Информация по зказау будет отправлена на Email.</div>
-		{crumb.parent.name=:admin?:adminactions?:useractions}
+			</script>
 		
-	{useractions:}
+		
+		{~length(order.basket)?order:tableWidthProduct?order:noProducts}
+		{order.manage.deliverycost?order:widthDivelery}
+		
+		
+		</form>
+		<div style="margin-bottom:10px">Итого: <b class="cartsum">{~sum(order.total,order.manage.deliverycost|:0):itemcostrub}</b>{data.order.manage.summary?:totalwarn}</div>
+		<!--<h3>{order.rule.title}</h3>
+		{data.order.id?order:ordernum}-->
+		{order.manage.comment?order:manage}
 		<div class="myactions" data-place="orders">
 			{order.rule.user:myactions}
 		</div>
-	{adminactions:}
-
-		<div class="myactions" data-place="admin">
-			<p>Письмо клиенту {order.emailtime?:wasemail?:noemail}</p>
-			{order.rule.manager:myactions}
-		</div>
-	{transcard:}
-		<div class="transportcard">
-			<div class="d-flex flex-wrap" style="font-size:11px">
-				{fields.transport::trans}
-			</div>
-			{fields.transport::transinfo}
-		</div>
-		<script>
-			domready(function (){
-				var name = 'transport';
-				{:jsitem}
-			})
-		</script>
-		{trans:}
-		<div data-value="{~key}" class="item d-flex flex-column border rounded m-1 p-1">
-			<div class="d-flex mb-auto title">
-				<div><img class="mr-1" src="/-imager/?w=40&src={ico}"></div><div style="text-transform: uppercase;">{~key}</div>
-			</div>
-			<div>
-				<b>{cost}</b><br>
-				{term} 
-				<span class="morelink ml-1 a float-right">Подробней</span>
-			</div>
-		</div>
-		{transinfo:}
-			<div data-value="{~key}" class="iteminfo">{:basket.fields.{tpl}}</div>
-{paycard:}
-	<div class="paycard">
-		<div class="d-flex flex-wrap" style="font-size:11px">
-			{fields.pay::pay}
-		</div>
-		{fields.pay::payinfo}
-	</div>
-	<script>
-		domready(function (){
-			var name = 'pay';
-			{:jsitem}
-		})
-	</script>
-	{pay:}
-	<div data-value="{~key}" class="item d-flex flex-column border rounded m-1 p-1">
-		<div style="height:60px" class="d-flex align-items-center"><div><img class="img-fluid" src="/-imager/?h=60&src={ico}"></div></div>
-		<div class="mb-auto title"><big>{~key}</big></div>
-		<div class="text-right">
-			<span class="morelink ml-1 a">Подробней</span>
-		</div>
-	</div>
-	
-	{payinfo:}
-		<div data-value="{~key}" class="iteminfo"><div class="alert border more">{:basket.fields.{tpl}}</div></div>
-{fiocard:}
-	<div class="cartcontacts row">
-		<div class="col-sm-4 order-sm-2">
-			{data.user.email?:fiouser?:fioguest}
-		</div>
-		<div class="col-sm-8 order-sm-1">
-			{order:orderfields}
-		</div>
 		
-	</div>
-	{ans:config.ans}
-	{fiouser:}<b>Вы авторизованы</b><p>Ваш аккаунт <b>{data.user.email}</b></p>
-	{fioguest:}<b>Уже покупали у нас?</b>
-	<p><a href="/user/signin?back=ref">Авторизуйтесь</a>, чтобы не заполнять форму повторно.</p>
-{jsitem:}
-	//< script>
-	Event.one('Controller.onshow', function (){
-		var div = $('.'+name+'card');
-		var layer = Controller.ids["{id}"];
-		var value = Autosave.get(layer,name+'.choice','{order.'+name+'.choice}');
-		div.find('.item').click( function (){
-			div.find('.item').not(this).removeClass('active');
-
-			if ($(this).is('.active')) {
-				$(this).removeClass('active');
-				Autosave.set(layer,name+'.choice');	
-			} else {
-				var value = $(this).data('value');
-				$(this).addClass('active');
-				Autosave.set(layer,name+'.choice',value);	
-			}
-			div.find('.iteminfo').hide();
-			if (value) div.find('.iteminfo').each( function () {
-				if ($(this).data('value') == value) {
-					$(this).fadeIn();
-				}
-			});
-			Autosave.loadAll(layer);
-		}).each(function(){
-			if ($(this).data('value') == value) {
-				$(this).click();
-			}
-		});
-		div.find('.morelink').click( function (event){
-			var item = $(this).parents('.item');
-			var value = item.data('value');
-			if (item.is('.active')) {
-				event.stopPropagation();
-			} 
-			div.find('.iteminfo').each( function () {
-				if ($(this).data('value') == value) {
-					if (item.is('.active')) $(this).find('.more').slideToggle();
-					else $(this).find('.more').show();
-				}
-			});
-			
-		});
-	});
 	{myactions:}
 		<div style="margin:20px 0;" class="cart">
 			<div class="btn-toolbar" role="toolbar">
@@ -462,12 +239,22 @@
 					</button>
 					<div class="dropdown-menu" role="menu" aria-labelledby="dropdownActionMenu">
 						{actions::actprint}
-					</div>	
+					</div>
+					
+						
+					
 				</div>
 				<div class="btn-group ml-2">
 					{buttons::mybtns}
 				</div>
 			</div>
+			<script>
+				domready( function () {
+					Event.one('Controller.onshow', function () {
+						Cart.init();
+					});
+				});
+			</script>
 		</div>
 		{mybtns:}
 			<div class="act-{act} btn btn-{cls}" data-id="{data.order.id}">
@@ -481,15 +268,31 @@
 	{b:}<b>
 	{/b:}</b>
 	{noProducts:}
-		<h3>В заказе нет товаров</h3>
+		<h3>В заявке нет товаров</h3>
 		<p align="right">
 			<a href="/{crumb}/list">Редактировать корзину</a><br>
 			<span data-id="{data.order.id}" data-place="{crumb.parent.name}" class="cart-search a">Поиск позиций</span>
 		</p>
 {dateFormat:}d.m.Y h:i:s
+{tableWidthProduct:}
+	<table class="table table-striped">
+		<tr>
+			<th>Позиция</th>
+			<th>Цена</th>
+			<th>Кол<span class="d-none d-sm-inline">ичество</span></th>
+			<th class="d-none d-sm-table-cell">Сумма</th>
+		</tr>
+		{basket::positionRow}
+		<tr><td class="d-none d-sm-table-cell"></td><td colspan=3 style="text-align:right">{sum:itemcostrub}</td></tr>
+	</table>
+	<div style="margin-bottom:10px">
+		{data.order.rule.edit[crumb.parent.name]?:basketedit}
+	</div>
+	{:couponinp}
+	
 {couponinp:}
 	<div style="max-width:250px" class="input-group">
-		<input name="coupon" {:isdisabled} value="{coupon}" type="text" class="form-control" id="coupon" placeholder="Укажите купон">
+		<input name="coupon" type="text" class="form-control" id="coupon" placeholder="Укажите купон">
 		<div class="input-group-append">
 		    <button onclick="Cart.action('{crumb.parent.name}', 'sync', {data.order.id});" class="btn btn-secondary" type="button">Активировать</button>
 		</div>
@@ -497,20 +300,307 @@
 	<div class="py-2">
 		{data.order.coupon_msg}
 	</div>
-	{prodart:}{producer_nick} {article_nick}{:cat.idsp}
+	{*showlist:}
+		<div class="usercart" style="margin-top:15px;">		
+			{data.order.count?data.order:cartlist?:cartmsg}
+		</div>
+	{*cartlist:}
+		<table style="width:auto" class="table cart">
+			{basket::cartpos}
+		</table>
+		<div class="d-flex justify-content-between mb-3">
+			<div style="padding-left:5px"></div>
+			<div class="text-right">
+				<span data-id="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a">Поиск позиций</span><br>
+				<span data-id="{data.id}" data-place="{crumb.parent.parent.name}" class="act-clear a" style="clear:both">Очистить корзину</span>
+			</div>
+		</div>
+		<table>
+			<tr>
+				<td style="padding:5px">
+					Итого: <b class="cartsum"></b>
+					<del title="Розничная цена" style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel"></del>
+				</td>
+			</tr>
+		</table>
+		<div style="margin-top:10px">
+			<a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-success">Перейти к {data.order.id?:заявке {data.order.id}?:оформлению заявки}</a>
+		</div>
+		{*cartpos:}
+			<tbody class="myprice" data-cost="{cost}" data-count="{count}" data-article="{article_nick}" data-id="{item_nick}" data-producer="{producer_nick}">
+				<tr class="active">
+					<td style="color:gray; vertical-align:middle">{num}</td>
+					<td style="vertical-align:middle;" colspan="2">
+						<div class="title">
+							<a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{producer} {article}</a>
+						</div>
+						<!--{Наименование}<br>
+						{itemrow}-->
+					</td>
+					<td style="vertical-align:middle;">
+						<div style="float:right; margin-right:10px" class="cart">
+							<span class="abasket bg-danger" data-place="{crumb.parent.parent.name}" data-order="{data.order.id}" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}">
+								<span class="pe-7s-close-circle"></span>
+							</span>
+						</div>
+					</td>
+
+				</tr>
+				<tr>
+					<td rowspan="3">
+						<div class="d-none d-sm-block" style="min-width:120px">
+							<a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">
+								<img class="img-fluid" src="/-imager/?w=140&h=100&src={images.0}&or=-imager/empty.png">
+							</a>
+						</div>
+					</td>
+					<td>
+						Цена:
+					</td>
+					<td style="text-align:center">
+						<div class="spin"><span class="pe-7s-refresh refresh"></span></div>
+
+					</td>
+					<td style="white-space:nowrap;">
+						<span class="cost">
+							{Цена?Цена:itemcost?:itemnocost}
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<td style="vertical-align:middle;">Кол<span class="d-none d-sm-inline">ичество</span>:</td>
+					<td style="vertical-align:middle; padding-top:0; padding-bottom:0;">
+						<input class="form-control form-control-lg" value="{basket[{:prodart}]count}" type="number" min="0" name="basket.{producer_nick} {article_nick}{:cat.idsp}.count"></td>
+					<td style="white-space:nowrap; vertical-align:middle">
+						<span class="sum" data-article="{article_nick}" data-producer="{producer_nick}" data-id="{item_nick}"></span>
+					</td>
+
+				</tr>
+				<tr><td colspan="3" style="height:100%"></td></tr>
+			</tbody>
+		{prodart:}{producer_nick} {article_nick}{:cat.idsp}
+{*LIST:}
+	{:listcrumb}
+	<style scoped>
+		.usercart label {
+			margin-top:5px;
+			text-align: left;
+			font-size: 14px;
+			padding-top: 5px;
+		}
+		.usercart label span {
+			color:red;
+		}
+		.usercart form {
+			padding-bottom: 5px;
+		}
+		.usercart .answer {
+			width: 290px;
+		}
+		.usercart .cartcontacts input {
+			width: 290px;
+			height: 18px;
+			padding-top: 2px;
+			border: 1px solid #7f9db9;
+			margin: 0 auto;
+			margin-bottom:10px;
+			margin-top:2px;
+		}
+		.usercart .cartcontacts textarea {
+			width: 290px;
+			height:102px;
+			border: 1px solid #7f9db9;
+		}
+		.usercart .submit {
+			margin-top:20px;			
+			font-size:14px;
+			padding: 5px 10px;
+		}
+		.usercart input {
+			width:80px;
+			/*padding:1px 5px;*/
+		}
+		.usercart .img {
+			text-align:center;
+			vertical-align:top;
+			padding:5px 2px;
+		}
+		.usercart .refresh {
+			color:black;
+			display:none;
+			cursor: pointer;
+		}
+		.usercart .cartparam {
+			margin-bottom:20px;
+		}
+		.usercart .cartparam td {
+			vertical-align: middle;
+		}
+	</style>
+	
+	<h1>{crumb.parent.name=:my?:mybasket?:numbasket}</h1>
+
+	{data.result?:showlist?:adm_message}
 	{mybasket:}Ваша корзина
 	{numbasket:}Корзина {data.order.id}
 	{myorder:}Оформление заказа
 	{numorder:}Заказ {data.order.id}
+	{*showlist:}
+		<div class="usercart" style="margin-top:15px;">		
+			{data.order.count?data.order:cartlist?:cartmsg}
+		</div>		
+		
+		<script>
+
+			domready(function(){
+
+				
+				var tplcost = function (val) {
+					return Template.parse('-cart/cart.tpl', val, 'itemcost')
+				}
+				var calc = function (div, layer) {
+					var orderid = layer.crumb.parent.name;
+					var place = layer.crumb.parent.parent.name;
+					if (orderid == 'my') orderid = '';
+					/*var goodorder = Cart.getGoodOrder(orderid);
+					Брать данные из разметки HTML
+					*/
+
+					var order = Autosave.get(layer, '', { });
+					if (!order.basket) order.basket = { };
+					var conf = Config.get('cart');
+					if (conf.opt) {
+						var gorder = Cart.getGoodOrder(orderid);
+						if (!gorder.merch) {
+							if (gorder.merchdyn) {
+								div.find('.cartinfo').html('оптовые цены');
+								div.find('.cartblockinfo').removeClass('alert-info').addClass('alert-success');
+							} else {
+								div.find('.cartinfo').html('розничные цены');
+								div.find('.cartblockinfo').removeClass('alert-success').addClass('alert-info');
+							}
+							div.find('.cartneed').html(tplcost(gorder.need));
+						}
+						div.find('.sum').each( function () {
+							var prodart = $(this).data('producer_nick')+' '+$(this).data('article_nick');
+							var id =  $(this).data('id');
+							if (id)  prodart += ' ' +id;
+							
+							var pos = gorder.basket[prodart];
+							if (!pos) {
+								//$(this).parent().addClass('bg-info').removeClass('bg-success');
+							} else if (gorder.merchdyn) {
+								$(this).html(tplcost(pos.sumopt));
+								//$(this).parent().addClass('bg-success').removeClass('bg-info');
+							} else {
+								$(this).html(Template.parse('-cart/cart.tpl',pos,'itemcost','sumroz'));
+								//$(this).parent().addClass('bg-info').removeClass('bg-success');
+							}
+						});
+
+						div.find('.myprice').each( function () {
+							var prodart = $(this).data('producer_nick')+' '+$(this).data('article_nick');
+							var id =  $(this).data('id');
+							if (id)  prodart += ' ' +id;
+							var pos = gorder.basket[prodart];
+							if (!pos) {
+								//$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
+							} else if (gorder.merchdyn) {
+								$(this).find('.cost').html(tplcost(pos['Цена оптовая']));
+								//$(this).find('.cost').parent().addClass('bg-success').removeClass('bg-info');
+							} else {
+								$(this).find('.cost').html(tplcost(pos['Цена розничная']));
+								//$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
+							}
+						});
+						
+						div.find('.cartsumroz').html(tplcost(gorder.sumroz));
+						div.find('.cartsumopt').html(tplcost(gorder.sumopt));
+						if (gorder.merchdyn) {
+							div.find('.cartsum').html(tplcost(gorder.sumopt));
+							//div.find('.cartsum').parent().addClass('bg-success').removeClass('bg-info');
+							if (gorder.sumroz != gorder.sumopt) {
+								div.find('.cartsumdel').html(tplcost(gorder.sumroz));
+							}
+						} else {
+							div.find('.cartsum').html(tplcost(gorder.sumroz));
+							//div.find('.cartsum').parent().addClass('bg-info').removeClass('bg-success');
+							div.find('.cartsumdel').html(tplcost(''));
+						}
+					} else {
+						var ordersumroz = 0;
+						div.find('.myprice').each( function () {
+							var pos = $(this).data();
+							if (pos) {
+								var prodart = pos.producer+' '+pos.article;
+								if(pos.id)  prodart += ' ' +pos.id;
+								var count = pos.count;
+								if(order.basket[prodart]) count = order.basket[prodart].count;
+								var sumroz = pos.cost * count;
+								if (!sumroz) sumroz = 0;
+								ordersumroz += sumroz;
+								$(this).find('.sum').html(tplcost(sumroz));
+							}
+							//$(this).find('.sum').parent().addClass('bg-info').removeClass('bg-success');
+							//$(this).find('.cost').parent().addClass('bg-info').removeClass('bg-success');
+						});
+						div.find('.cartsumroz').html(tplcost(ordersumroz));
+						div.find('.cartsum').html(tplcost(ordersumroz));
+						//div.find('.cartsum').parent().addClass('bg-info').removeClass('bg-success');
+						div.find('.cartsumdel').html(tplcost(''));
+					}
+				}
+				Event.one('Controller.oncheck', function () {
+					var layer = Controller.ids['{id}'];
+					//history.replaceState(null,null,'/'+layer.crumb);
+					if (layer.crumb.child) Crumb.go('/'+layer.crumb, false);
+					
+					Event.handler('Layer.onshow', function () {
+						var div = $('#'+layer.div);
+						var timer;
+						calc(div, layer);
+						div.find('[type=number]').change( function () {
+							div.find('.refresh').show();
+							clearTimeout(timer);
+							timer = setTimeout( function () {
+								div.find('.refresh').click();	
+							}, 2000);
+						});
+						div.find('.refresh').click( function () {
+							clearTimeout(timer);
+							div.find('.refresh').hide();
+							Global.set('cart');
+							calc(div, layer);
+						});
+					}, 'cart', layer);
+				});
+				Once.exec('{tpl}{tplroot}', function () {
+					Event.one('Controller.onshow', function () {
+						Event.handler('Session.onsync', function () {
+							var layer = Controller.ids['{id}'];
+							var orderid = layer.crumb.parent.name;
+							var place = layer.crumb.parent.parent.name;
+							Cart.sync(place, orderid);
+						});
+					});
+				})
+			});
+		</script>
 {cartmsg:}<p>Корзина пустая. Добавьте в корзину интересующие позиции.
 		
 		</p>
 		<p>Чтобы добавить позицию нужно кликнуть по иконке корзины рядом с ценой в <a href="/catalog">каталог</a>.</p>
-		<span data-id="{data.order.id}" data-place="{crumb.parent.parent.name}" class="cart-search a float-right">Поиск позиций</span>
+		<span data-id="{data.id}" data-place="{crumb.parent.parent.name}" class="cart-search a float-right">Поиск позиций</span>
 		<div style="margin-top:10px">
 			<a href="/catalog" style="text-decoration:none" class="btn btn-success">Открыть каталог</a>
 		</div>
 {itemnocost:}<a href="/contacts">Уточнить</a>
+
+{basket*:}
+	<div id="basket_text">
+		В <a href="/cart/order">корзине</a>
+		<!--<span class="bold_basket">{data.allcount}</span> {~words(data.allcount,:позиция,:позиции,:позиций)}<br> Сумма <span class="bold_basket">{~cost(data.allsum)} руб.</span>-->
+	</div>
 {RBREAD:}
 	<ul class="breadcrumb cart">
 		{data.email?:breaduser?:breadguest}
@@ -524,13 +614,20 @@
 		<li class="breadcrumb-item"><a href="/user/signup">Регистрация</a></li>
 		<li class="breadcrumb-item"><a href="/user/remind">Напомнить пароль</a></li>
 {CART:}
-	{:usercrumb}
-	<h1>Личный кабинет</h1>
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">Главная</a></li>
+		<li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
+		<li class="breadcrumb-item active {data.manager?:text-danger}">Сообщения</li>
+		<li class="breadcrumb-item"><a href="/cart/orders">Мои заявки</a></li>
+		<li class="breadcrumb-item"><a href="/cart/orders/my">Оформление заказа</a></li>
+		<li class="breadcrumb-item"><a href="/cart/orders/my/list">Содержимое корзины</a></li>
+	</ol>
+	<h1>Сообщения</h1>
 	{data.email?:account?:noaccount}
 
-	<p>{~length(data.list)?:showinfo}</p>
+	<p>{~length(data.list)?:showinfo?:Для вас нет важных сообщений.}</p>
 	<p>
-		В вашей <a href="/cart/orders/my/list">корзине</a> <b>{data.order.count}</b> {~words(data.order.count,:позиция,:позиции,:позиций)}.
+		В <a href="/cart/orders/my/list">корзине</a> активной заявки <b>{data.order.count}</b> {~words(data.order.count,:позиция,:позиции,:позиций)}.
 	</p>
 	
 	{data.admin?:adminControl}
@@ -544,7 +641,7 @@
 		{prorder:}{~key?:comma}<a href="/cart/orders/{id}">{id}</a>
 	{noaccount:}
 		<p>
-			<b><a href="/user/signin">Вход</a> не выполнен!</b>
+			<b><a href="/user">Вход</a> не выполнен!</b>
 		</p>
 	{account:}
 		<p>
@@ -556,7 +653,7 @@
 		</div>
 	{mngControl:}
 		<div class="alert alert-success" role="alert">
-			<b>Вы менеджер - <a href="/cart/admin">все заказы</a></b>
+			<b>Вы менеджер - <a href="/cart/admin">все заявки</a></b>
 		</div>
 	{adminControl:}
 		<div class="alert alert-{data.manager?:success?:danger}" role="alert">
@@ -593,18 +690,20 @@
 			<div class="mesage">Необходимо <a href="/user/signup">зарегистрироваться</a>, чтобы получить права менеджера</div>
 {ORDERS:}
 	<ol class="breadcrumb">
-		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
-		<li class="breadcrumb-item active">Мои заказы</li>
-		<li class="breadcrumb-item"><a href="/cart/orders/my/list">Содержимое корзины</a></li>
-		<li class="breadcrumb-item"><a href="/cart/orders/my">Оформление заказа</a></li>
+		<li class="breadcrumb-item"><a href="/">Главная</a></li>
+		<li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
 		
+		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
+		<li class="breadcrumb-item active">Мои заявки</li>
+		<li class="breadcrumb-item"><a href="/cart/orders/my">Заказ</a></li>
+		<li class="breadcrumb-item"><a href="/cart/orders/my/list">Корзина</a></li>
 	</ol>
-	<h1>Мои заказы</h1>
+	<h1>Мои заявки</h1>
 	{~length(data.orders)?:ordersList?:noOrders}
 	<div style="margin-top:10px">
 		<a href="/cart/orders/my/list" style="text-decoration:none" class="btn btn-success">Заказ ({data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)})</a>
 	</div>
-	{noOrders:} <div>В данный момент у вас нет сохранённых заказов с товарами.</div>
+	{noOrders:} <div>В данный момент у вас нет сохранённых заявок с товарами.</div>
 	
 	{ordersList:}
 		
@@ -636,7 +735,7 @@
 			{dateform:}d.m.Y
 	{orderfields:}
 		<div class="form-group">
-			<label>ФИО <span class="req">*</span></label>
+			<label>Контактное лицо{data.fields.fio?:strФИО} <span class="req">*</span></label>
 			<input {:isdisabled} type="text" name="name" value="{name}" class="form-control" placeholder="{data.fields.fio?:helpFIO?:helpCont}">
 		</div>
 		<div class="form-group">
@@ -647,7 +746,6 @@
 			<label>Email <span class="req">*</span></label>
 			<input {:isdisabled} type="email" name="email" value="{email}" class="form-control" placeholder="Email">
 		</div>
-		{*hide:}
 		{data.fields.passport?:passprot}
 		{data.fields.address?:address}
 		{~conf.cart.pay?:orderpayinfo}
@@ -838,14 +936,13 @@
 			<div class="radio">
 				<label><input {:isdisabled} name="paymenttype" {paymenttype=:cash?:checked} type="radio" value="cash"> Оплата наличными курьеру или в магазине</label>
 			</div>
-	{isdisabled:}{data.order.rule.edit[data.place]|:disabled}
-	{ishidedisabled:}{data.order.rule.edit[data.place]|:disabledhide}
-	{disabledhide:}display:none
+	{isdisabled:}{rule.edit[crumb.parent.name]|:disabled}
+
 {basketedit:}
 	<p align="right">
 		<a href="/{crumb}/list">Редактировать корзину</a><br>
 		<span data-id="{data.order.id}" data-place="{crumb.parent.name}" class="cart-search a">Поиск позиций</span><br>
-		<span data-id="{data.order.id}" data-place="{crumb.parent.name}" class="act-clear a">Очистить</span>
+		<span data-id="{data.order.id}" data-place="{crumb.parent.name}" class="act-clear a">Очистить корзину</span>
 	</p>
 {tableWidthProductopt:}
 	<table class="table table-striped">
@@ -881,15 +978,17 @@
 
 {ADMIN:}
 	<ol class="breadcrumb">
-		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
-		<li class="breadcrumb-item active">Все заказы</li>
+		<li class="breadcrumb-item"><a href="/">Главная</a></li>
+		<li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
+		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
+		<li class="breadcrumb-item active">Все заявки</li>
 	</ol>
 	{data.result?:adm_listPage?:adm_message}
-	{longlistlink:}<a href="/cart/admin/all">Готовые заказы</a>
+	{longlistlink:}<a href="/cart/admin/all">Готовые заявки</a>
 	{shortlistlink:}<a href="/cart/admin">В работе</a>
 	{adm_listPage:}
 		<div class="float-right">{crumb.child.name=:all?:shortlistlink?:longlistlink}</div>
-		<h1>Все заказы</h1>
+		<h1>Все заявки</h1>
 		
 		
 			{data.products::adm_row}
@@ -920,10 +1019,19 @@
 			{adm_paidorder:}<b>{~cost(manage.paid)} руб.</b> {manage.paidtype=:bank?:банк?:менеджер} {~date(:d.m.Y H:i,manage.paidtime)}
 {cat::}-catalog/cat.tpl
 {extend::}-catalog/extend.tpl
-
 {basket::}-cart/basket.tpl
-
-	{*adm_orderinputs:}
+{ADMORDER:}
+	{:ordercrumb}
+	{data.result?data.order:adm_orderPageContent?:adm_message}
+	{adm_orderPageContent:}
+		<div class="float-right" title="Последние измения">{~date(:j F H:i,time)}</div>
+		<h1>{rule.title}</h1>
+		{id?:ordernum}
+		{(data.place=:admin&status=:active)?:adm_orderinfo?:adm_orderinputs}
+	{msg_samples:}
+		<span class="a" onclick="var t=$('[name=\'manage.comment\']'); t.val(t.val()+$(this).next().html()).change();">{~key}</span><pre style="display:none">{.}
+</pre>{~last()|:comma}
+	{adm_orderinputs:}
 		<form method="post">
 			<div class="disabled">
 				<div class="cartcontacts">
@@ -953,7 +1061,7 @@
 				<div class="answer"><b class="alert">{config.ans.msg}</b></div>
 			</div>
 		</form>
-		<p>Письмо клиенту {emailtime?:wasemail?:noemail}</p>
+		<p>Письмо клиенту {emailtime?:was?:no}</p>
 		<!--<h3>{rule.title}</h3>
 		{data.id?order:ordernum}-->
 		{data.rule.freeze?:freezemsg}
@@ -997,7 +1105,7 @@
 						Ascroll.go();
 					}, '', layer);
 					
-					if (Session.get('manager{data.order.id}')) {
+					if (Session.get('manager{data.id}')) {
 						$('.clearMyDelta').css('fontWeight', 'bold');
 					} else {
 						$('.clearMyDelta').css('fontWeight', 'normal');
@@ -1005,7 +1113,7 @@
 					
 					Event.handler('Session.onsync', function () {
 						if (!layer.showed || counter != layer.counter) return;
-						if (Session.get('manager{data.order.id}')) {
+						if (Session.get('manager{data.id}')) {
 							$('.clearMyDelta').css('fontWeight', 'bold');
 						} else {
 							$('.clearMyDelta').css('fontWeight', 'normal');
@@ -1040,7 +1148,7 @@
 			});
 		</script>
 	{totalwarn:} <i title="установлено менеджером">*</i>
-	{noemail:}<b>ещё не отправлялось</b>{wasemail:}было <b>{~date(:j F H:i,order.emailtime)}</b>
+	{no:}<b>ещё не отправлялось</b>{was:}было <b>{~date(:j F H:i,emailtime)}</b>
 	{mngdelivery:}
 	<div class="form-group">
 		<label>Цена доставки</label>
@@ -1061,43 +1169,38 @@
 			Cart.usersync();
 		});
 	</script>
-{usercrumb:}
-	<ol class="breadcrumb">
-		<li class="breadcrumb-item active {data.manager?:text-danger}">Личный кабинет</li>
-		<li class="breadcrumb-item"><a href="/cart/orders">Мои заказы</a></li>
-	</ol>
 {listcrumb:}
 	{:usersync}
 	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">Главная</a></li>
 		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
-		{data.place=:admin?:liallorder}
 		<!--<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заявки</a></li>-->
 		<!--<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заявка {crumb.parent.name=:my?:Активная?crumb.parent.name}</a></li>-->
 		<li class="breadcrumb-item active">Содержимое корзины</li>
-		<li class="breadcrumb-item"><a href="/cart/orders/my">Оформление заказа {data.order.id}</a></li>
 	</ol>
 {ordercrumb:}
 	{:usersync}
 	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">Главная</a></li>
 		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
 		<!--<li class="breadcrumb-item"><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb.parent}">{crumb.parent.name=:admin?:Все?:Мои} заявки</a></li>-->
 		<!--<li class="breadcrumb-item active">Заявка {crumb.name=:my?:Активная?crumb.name}</li>-->
-		{data.place=:admin?:liallorder}
 		<li class="breadcrumb-item"><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb}/list">Содержимое корзины</a>
-		<li class="breadcrumb-item active">Оформление заказа {data.order.id}</li></li>
+		<li class="breadcrumb-item active">Оформление заказа</li></li>
 	</ol>
-{liallorder:}<li class="breadcrumb-item"><a class="{data.place=:admin?:text-danger}" href="/{crumb.parent}">{data.place=:admin?:Все?:Мои} заявки</a></li>
 {itemcost:}{~cost(.)}<span class="d-none d-sm-inline">&nbsp;<small>{:extend.unit}</small></span>
 {itemcostrub:}{~cost(.)}&nbsp;<small>{:extend.unit}</small>
-{star:}<span class="req" title="Позиция в каталоге изменилась">*</span> 
-{ordernum:}Номер заказа: <b>{id}</b>{manage.paid?:msgpaidorder}
+{star:}<span title="Позиция в каталоге изменилась">*</span>
+{ordernum:}Номер заявки: <b>{id}</b>{manage.paid?:msgpaidorder}
 	{msgpaidorder:}. Оплата <b>{~cost(manage.paid)} руб.</b> отметка {manage.paidtype=:bank?:банка?:менеджера} {~date(:d.m.Y H:i,manage.paidtime)}
 {adm_message:}
 	<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>
 {PRINT:}
 <ol class="breadcrumb noprint">
-	<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
-	<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заказы</a></li>
+	<li class="breadcrumb-item"><a href="/">Главная</a></li>
+	<li class="breadcrumb-item"><a href="/catalog">Каталог</a></li>
+	<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Сообщения</a></li>
+	<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заявки</a></li>
 	<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заказ {crumb.parent.name=:my??crumb.parent.name}</a></li>
 	<li class="breadcrumb-item active">Версия для печати</li>
 </ol>
@@ -1105,15 +1208,13 @@
 ФИО: {name}
 Почта: {email}
 Телефон: {phone}
-Перезвонить: {call=:yes?:да?(call=:no?:нет)}{time?:pr-time}
-{transport::iprint}
-{pay::iprint}
+Паспорт: {passport}
+Адрес: {address}{time?:pr-time}
 
-===== {count} {~words(count,:позиция,:позиции,:позиций)} =====
-{basket::basket.pritem}
+===== {count} {~words(count,:позиция,:позиции,:позиций)} ====={basket::pritem}
 
-Сумма: {~cost(sum)}&nbsp;руб.
-{coupon?:prcoupon} 
+Итого: {~cost(sum)}&nbsp;руб.{manage.deliverycost?:pr-deliver}
+<!--Всего: {~cost(alltotal)}&nbsp;руб.-->
 
 ==== Сообщение =====
 <span style="white-space: pre-wrap;">{comment}</span>
@@ -1121,10 +1222,9 @@
 ====================
 <span style="white-space: pre-wrap;">{manage.comment}</span>
 </pre>
-{iprint:}
-{~key}: {.}
-{prcoupon:}Купон: {coupon}
-Итого: {~cost(total)}&nbsp;руб.
+{pritem:}
+{~key}
+{count} по {~cost(cost)}&nbsp;руб. = {~cost(sum)}&nbsp;руб.
 {pr-time:}
 Дата изменений: {~date(:H:i j F Y,time)}
 {pr-deliver:}

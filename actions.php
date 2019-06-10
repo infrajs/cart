@@ -71,8 +71,8 @@ if (!empty($act['checkdata']) && !empty($rule['edit'][$place])) {
 	if (empty($order['phone'])||!User::checkData($order['phone'],'value')) return Ans::err($ans, 'Укажите корректный телефон'.$page);
 	if (empty($order['name'])||!User::checkData($order['name'],'value')) return Ans::err($ans, 'Укажите корректное имя контактного лица'.$page);
 	
-	if ($ans['fields']['passport'] && (empty($order['passport'])||!User::checkData($order['passport'],'value')))  return Ans::err($ans, 'Укажите серию и номер паспорта'.$page);
-	if ($ans['fields']['address'] && (empty($order['address'])||!User::checkData($order['address'],'value')))  return Ans::err($ans, 'Укажите адрес доставки'.$page);
+	//if ($ans['fields']['passport'] && (empty($order['passport'])||!User::checkData($order['passport'],'value')))  return Ans::err($ans, 'Укажите серию и номер паспорта'.$page);
+	//if ($ans['fields']['address'] && (empty($order['address'])||!User::checkData($order['address'],'value')))  return Ans::err($ans, 'Укажите адрес доставки'.$page);
 
 	if (!empty($conf['pay'])) {
 		if (!User::checkData($order['entity'],'radio')) return Ans::err($ans, 'Укажите кто будет оплачивать'.$page);
@@ -169,7 +169,7 @@ if ($action == 'saved') {
 	$noworder = Cart::loadOrder();
 	if ($noworder['basket']) {
 		return Ans::err($ans,
-			'У вас уже есть <a onclick="Popup.close()" href="/cart/orders/my">активная непустая заявка</a>.<br>
+			'У вас уже есть <a onclick="Popup.close()" href="/cart/orders/my">непустая заявка</a>.<br>
 			Чтобы сделать копию заявки нужно<br>
 			очистить или сохранить текущую активную заявку!');
 	}
@@ -221,13 +221,22 @@ if ($action == 'saved') {
 	if ($src) unlink($src);
 
 } else if ($action == 'clear') {
-	if (!$order['basket']) return Ans::err($ans, 'Корзина уже пустая');
-	unset($order['basket']);
-	if ($order['status'] == 'active') {
-		Session::set('orders.my.basket');
+	if (empty($order['basket'])) return Ans::err($ans, 'Корзина уже пустая');
+	$prodart = Ans::GET('prodart');
+	if ($prodart) {
+		$r = explode(',',$prodart);
+		foreach ($r as $v) {
+			if (isset($order['basket'][$v])) unset($order['basket'][$v]);
+		}
 	} else {
+		return Ans::err($ans, 'Выберите позиции, которые надо удалить из заказа.');
+		//unset($order['basket']);	
+	}
+	//if ($order['status'] == 'active') {
+	//	Session::set('orders.my.basket');
+	//} else {
 		Cart::saveOrder($order, $place);
-	} 
+	//} 
 } else if ($action == 'refuseable') {
 	$order['status'] = 'refunds';
 	Cart::saveOrder($order, $place);

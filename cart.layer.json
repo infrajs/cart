@@ -16,17 +16,18 @@
 			"child":{
 				"id":"order",
 				"jsontpl":"-cart/?type=order&id={crumb.name=:my|crumb.name}&place=orders",
-				"autosavenametpl":"{crumb.parent.name}.{crumb.name}",
+				"autosavenametpl":"orders.{crumb.name}",
 				"tpl":"-cart/cart.tpl",
 				"global":["user", "cart"],
 				"tplroot":"ORDER",
 				"childs":{
-					"list":{
+					"list":{					
 						"tpl":"-cart/cart.tpl",
 						"tplroot":"LIST",
 						"global":["user", "cart"],
-						"jsontpl":"-cart/?type=list&id={crumb.parent.name}&add={crumb.child.child.name}",
-						"autosavenametpl":"{crumb.parent.parent.name}.{crumb.parent.name}"
+						"jsontpl":"-cart/?type=order&id={crumb.parent.name}&place=orders",
+						"*jsontpl":"-cart/?type=list&id={crumb.parent.name}&add={crumb.child.child.name}",
+						"autosavenametpl":"orders.{crumb.parent.name}"
 					},
 					"print":{
 						"jsontpl":"-cart/?type=order&id={crumb.parent.name}",
@@ -62,8 +63,9 @@
 						"tpl":"-cart/cart.tpl",
 						"tplroot":"LIST",
 						"global":["user", "cart"],
-						"jsontpl":"-cart/?type=list&id={crumb.parent.name}",
-						"autosavenametpl":"{crumb.parent.parent.name}.{crumb.parent.name}"
+						"jsontpl":"-cart/?type=order&id={crumb.parent.name}&place=admin",
+						"*jsontpl":"-cart/?type=list&id={crumb.parent.name}",
+						"autosavenametpl":"admin.{crumb.parent.name}"
 					}
 				}
 			}

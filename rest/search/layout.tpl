@@ -7,10 +7,10 @@
 		.autocomplete-group { padding: 2px 5px; }
 		.autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
 	</style>
-	<h1>Добавить позицию</h1>
-	<p>Заявка: <a href="/cart/{config.place}/{config.orderid|:my}/list">{config.orderid|:Активная}</a></p>
+	<h1>Добавить в корзину</h1>
+	<!--<p><a href="/cart/{config.place}/{config.id|:my}/list">Оформление заказа {config.id}</a></p>-->
 	<p>
-		<input value='' autosave="0" type="text" class="formControll input" style="width:100%">
+		<input value='' min="0" max="999" autosave="0" type="text" class="formControll input" style="width:100%">
 	</p>
 	<!--<span class="btn btn-secondary button">Добавить</span>-->
 	<script>
@@ -20,7 +20,7 @@
 			var div = $('.cart-search-complete');
 			div.find('.button').click( function () {
 				if (!prodart) return;
-				Cart.add('{config.place}', '{config.orderid}', prodart);
+				Cart.add('{config.place}', '{config.id}', prodart);
 				div.find('.input').val('');
 			});
 			var query = '';
@@ -35,8 +35,10 @@
 					if (pos['id']) prodart += ' ' + pos['id'];
 					Popup.confirm('Количество: <input name="count" type="number">', function(div){
 						var count = div.find('[name=count]').val();
-						Cart.set('{config.place}', '{config.orderid}', prodart, count, function(){
-							Cart.act('{config.place}', 'sync', '{config.orderid}');
+						Cart.set('{config.place}', '{config.id}', prodart, count, function(){
+							Cart.act('{config.place}', 'sync', '{config.id}', function(ans){
+								console.log(ans);
+							});
 							Global.check('cart');	
 						});
 						

@@ -93,15 +93,16 @@ Event.one('Controller.onshow', function () {
 			var el = this;
 			$(el).click( function () {
 				layer.config = $(el).data();
+				console.log(layer.config);
 				Popup.open(layer);
 			});
 		});
-		$('.cart-clear').filter("[data-clear!=false]").attr("data-clear","false").click( function () {
+		/*$('.cart-clear').filter("[data-clear!=false]").attr("data-clear","false").click( function () {
 			var el = this;
 			var orderid = $(el).data('orderid');
 			var place = $(el).data('place');
 			Cart.clear(place, orderid);
-		});
+		});*/
 	});
 });
 

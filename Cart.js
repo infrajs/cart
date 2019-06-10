@@ -1,4 +1,4 @@
-
+if (!$.fn.reduce) $.fn.reduce = [].reduce;
 window.Cart = {
 	blockform: function (layer) {
 		var form=$("#"+layer.div).find('form');
@@ -31,7 +31,7 @@ window.Cart = {
 			var link = '<a onclick = "Popup.closeAll();" href="/cart/'+place+'/{id}">{id}</a>';
 		} else {//place =='orders'
 			if (!order.id) {
-				var link = '<a onclick = "Popup.closeAll();" href="/cart/'+place+'/my">Активная заявка</a>';
+				var link = '<a onclick = "Popup.closeAll();" href="/cart/'+place+'/my/list">Оформление заказа</a>';
 			} else {
 				var link = '<a onclick = "Popup.closeAll();" href="/cart/'+place+'/{id}">{id}</a>';
 			}			
@@ -125,7 +125,7 @@ window.Cart = {
 		};
 		if (act.confirm) {
 			var ask = Template.parse([act.confirm], order);
-			ask = 'Заявка '+link+'<br>'+ask;
+			ask = 'Заказ '+link+'<br>'+ask;
 			popup.confirm(ask, justdo);
 		} else {
 			justdo();
@@ -134,12 +134,14 @@ window.Cart = {
 	init: function () {
 		var rules = Load.loadJSON('-cart/rules.json');
 		var layer = Controller.ids['order'];
+
 		for (var name in rules.actions) {
 			$(".cart .act-"+name).not('[cartinit]').attr('cartinit', name).click( function () {
 				var name = $(this).attr('cartinit');
-				var place = $(this).parents('.myactions').data('place');
-				var id = $(this).data('id');
-				Cart.action(place, name, id);
+				var place = $(this).parents('.myactions').attr('data-place');
+				var param = $(this).attr('data-param');
+				var id = $(this).attr('data-id');
+				Cart.action(place, name, id, function(){ }, param);
 				return false;
 			});
 		}
@@ -209,7 +211,7 @@ window.Cart = {
 		}
 		return !r;
 	},
-	clear: function (place, orderid, cb) {
+	/*clear: function (place, orderid, cb, param) {
 		var fn = function () {
 			if (cb) cb();
 			Global.check('cart');
@@ -218,7 +220,7 @@ window.Cart = {
 			var name = [place, orderid, 'basket'];
 			Session.set(name, null, true, fn);
 		});
-	},
+	},*/
 	remove: function (place, orderid, prodart, cb) {
 		var fn = function () {
 			if (cb) cb();

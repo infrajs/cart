@@ -20,6 +20,7 @@ use infrajs\view\View;
 use infrajs\lang\Lang;
 
 class Cart {
+	public static $conf = [];
 	public static function getPath($id = '') 
 	{
 		if (!$id) return '~auto/.cart/';	
@@ -233,6 +234,7 @@ class Cart {
 						$fncost = Template::$scope['~cost'];
 						$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> даёт скидку <b>'.($discount*100).'%</b>.<br>Скидка действует не на все товары.<br>Точную сумму укажет менеджер после проверки.';//' <s>'.$fncost($order['total']).'</s>&nbsp;руб.';
 						$order['total'] = $order['total'] * (1 - $discount);
+						$order['coupon_discount'] = $discount;
 					} else {
 						$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> не найден или устарел';
 						//$order['sum'] = $order['sum'] * 0.95;
@@ -255,7 +257,8 @@ class Cart {
 	public static function sync($place, $orderid) {
 		$order = Cart::loadOrder($orderid);
 		$rule = Cart::getRule($order);
-		if (Session::get('safe.manager') || !empty($rule['edit'][$place])) { //Place - orders admin wholesale
+		if (($place == 'admin' && Session::get('safe.manager')) || !empty($rule['edit'][$place])) { //Place - orders admin wholesale
+
 			$r = Cart::mergeOrder($order, $place);
 			//if ($r) 
 			Cart::saveOrder($order, $place);
@@ -454,8 +457,13 @@ class Cart {
 			unset($actualdata['manage']); //Только админ на странице admin может менять manage
 		}
 		if (!$actualdata) return false;
-		if (!empty($actualdata['manage']) && !empty($order['manage'])) $actualdata['manage'] = array_merge($order['manage'], $actualdata['manage']);
-		if (!empty($actualdata['basket']) && !empty($order['basket'])) $actualdata['basket'] = array_merge($order['basket'], $actualdata['basket']);
+
+		
+		foreach (['manage','basket','transport','pay'] as $name) {
+			if (empty($actualdata[$name])) continue;
+			if (empty($order[$name])) continue;
+			$actualdata[$name] = array_merge($order[$name], $actualdata[$name]);
+		}
 		$order = array_merge($order, $actualdata);
 		return true;
 	}
