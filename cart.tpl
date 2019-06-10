@@ -314,18 +314,18 @@
 		<div class="my-2 row">
 			<div class="col-sm-6">
 				<div>Комментарий к заказу</div>
-				<textarea name="comment" class="form-control" rows="3">{order.comment}</textarea>
+				<textarea {:isdisabled} name="comment" class="form-control" rows="3">{order.comment}</textarea>
 			</div>
 			<div class="col-sm-6">
 				<div>Звонок менеджера <span class="req">*</span></div>
 				<div class="form-check mt-1">
-					<input class="form-check-input" type="radio" name="call" {order.call=:yes?:checked} id="exampleRadios1" value="yes">
+					<input {:isdisabled} class="form-check-input" type="radio" name="call" {order.call=:yes?:checked} id="exampleRadios1" value="yes">
 					<label class="form-check-label" for="exampleRadios1">
 						Мне нужен звонок менеджера для уточнения деталей заказа.
 					</label>
 				</div>
 				<div class="form-check">
-					<input class="form-check-input" type="radio" name="call" {order.call=:no?:checked} id="exampleRadios2" value="no">
+					<input {:isdisabled} class="form-check-input" type="radio" name="call" {order.call=:no?:checked} id="exampleRadios2" value="no">
 					<label class="form-check-label" for="exampleRadios2">
 						Звонок не нужен, информация по заказу понятна.
 					</label>
@@ -415,9 +415,11 @@
 		var div = $('.'+name+'card');
 		var layer = Controller.ids["{id}"];
 		var value = Autosave.get(layer,name+'.choice','{order.'+name+'.choice}');
+		var first = false;
 		div.find('.item').click( function (){
+			if (first && !{data.order.rule.edit[data.place]?:true?:false}) return;
+			first = true;
 			div.find('.item').not(this).removeClass('active');
-
 			if ($(this).is('.active')) {
 				$(this).removeClass('active');
 				Autosave.set(layer,name+'.choice');	
@@ -438,6 +440,7 @@
 				$(this).click();
 			}
 		});
+		first = true;
 		div.find('.morelink').click( function (event){
 			var item = $(this).parents('.item');
 			var value = item.data('value');

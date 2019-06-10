@@ -70,7 +70,7 @@
 	</div>
 	<div class="form-group">
 		<label>Пункты выдачи <span class="req">*</span></label>
-		<select onchange="
+		<select {:isdisabled} onchange="
 				var row = $(this).parent();
 				row.find('[data-value]').hide();
 				row.find('[data-value=\''+this.value+'\']').fadeIn();
@@ -127,7 +127,7 @@
 		<div class="col-sm-12">
 			<div class="form-group">
 				<label>Служба доставки <span class="req">*</span></label>
-				<select onchange="
+				<select {:isdisabled} onchange="
 					var row = $(this).parents('.row:first');
 					row.find('[data-value]').hide();
 					row.find('[data-value=\''+this.value+'\']').fadeIn();
@@ -180,7 +180,7 @@
 		</div>
 	</div>
 {isdisabled:}{data.order.rule.edit[data.place]|:disabled}
-
+{disabled:}disabled
 	
 {maininputs:}
 	{~obj(:title,:Почтовый индекс,:name,:index):inp}
