@@ -386,7 +386,7 @@
 	</script>
 	{pay:}
 	<div data-value="{~key}" class="item d-flex flex-column border rounded m-1 p-1">
-		<div style="height:60px" class="d-flex align-items-center"><div><img class="img-fluid" src="/-imager/?h=60&src={ico}"></div></div>
+		<div style="height:60px" class="d-flex align-items-center justify-content-center"><div><img class="img-fluid" src="/-imager/?h=60&src={ico}"></div></div>
 		<div class="mb-auto title"><big>{~key}</big></div>
 		<div class="text-right">
 			<span class="morelink ml-1 a">Подробней</span>

@@ -60,5 +60,6 @@
 	</table>
 {pritem:}
 {Наименование}
-{producer} {article} {item}<br>
+{producer} {article} {item}
+{count} по {~cost(cost)}&nbsp;руб. = {~cost(sum)}&nbsp;руб.<br>
 {fields::}-cart/fields.tpl
