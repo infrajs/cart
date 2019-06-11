@@ -598,12 +598,13 @@ class Cart {
 			}
 		}*/
 		if (!empty($order['email'])) {
-			if ($ans['place'] == 'admin') {
-				if (!empty($rule['usermail'])) {//Менеджер только клиенту отправляет письма
-					Cart::mail('user', $order['email'], $rule['usermail'], $ans['order']);
-				}
+			//Клиент отправляет письма менеджеру и себе
+			//Менеджер только клиенту отправляет письма
+			if (!empty($rule['usermail'])) {
+				Cart::mail('user', $order['email'], $rule['usermail'], $ans['order']);
 			}
-			if ($ans['place'] == 'orders') {//Клиент только менеджеру отправляет письма
+
+			if ($ans['place'] == 'orders') {
 				if (!empty($rule['mangmail'])) {
 					Cart::mail('manager', $order['email'], $rule['mangmail'], $order);
 				}
