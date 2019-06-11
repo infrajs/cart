@@ -96,7 +96,7 @@
 		},
 		"email":{
 			"title":"Отправить письмо",
-			"confirm":"<p>Отправить клиенту на <b>{email}</b> письмо об изменении заказа?</p><p>Письмо {emailtime?:was?:no}{no:}<b>ещё не отправлялось</b>{was:}было <b>{~date(:j F H:i,emailtime)}</b></p>",
+			"confirm":"<p>Отправить клиенту на <b>{email}</b> письмо об изменении заказа?</p><textarea class='w-100' onchange='Session.set(\"{place}.{id}.manage.comment\",$(this).val())'>{Session.get(:name)|manage.comment}</textarea><p>Письмо {emailtime?:was?:no}{no:}<b>ещё не отправлялось</b>{was:}было <b>{~date(:j F H:i,emailtime)}</b></p>{name:}{place}.{id}.manage.comment",
 			"result":"Письмо отправлено!",
 			"usermail":"edit",
 			"mangmail":"AdmEdit"

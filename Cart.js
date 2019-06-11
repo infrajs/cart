@@ -124,9 +124,11 @@ window.Cart = {
 			}, param);
 		};
 		if (act.confirm) {
+			
 			var ask = Template.parse([act.confirm], order);
 			ask = 'Заказ '+link+'<br>'+ask;
 			popup.confirm(ask, justdo);
+
 		} else {
 			justdo();
 		}
