@@ -414,7 +414,10 @@
 	Event.one('Controller.onshow', function (){
 		var div = $('.'+name+'card');
 		var layer = Controller.ids["{id}"];
-		var value = Autosave.get(layer,name+'.choice','{order.'+name+'.choice}');
+		var value1 = Autosave.get(layer,name+'.choice','{data.order.pay.choice}');
+		var value2 = Autosave.get(layer,name+'.choice','{data.order.transport.choice}');
+		if(name == 'pay') var value = value1;
+		else var value = value2;
 		var first = false;
 		div.find('.item').click( function (){
 			if (first && !{data.order.rule.edit[data.place]?:true?:false}) return;
