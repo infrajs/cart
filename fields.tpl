@@ -34,6 +34,11 @@
 				<option></option>
 				<option {(:Деловые линии):caropt}>Деловые линии</option>
 				<option {(:ПЭК):caropt}>ПЭК</option>
+				<option {(:СДЭК):caropt}>СДЭК</option>
+				<option {(:DPD):caropt}>DPD</option>
+				<option {(:КИТ):caropt}>КИТ</option>
+				<option {(:Байкал Сервис):caropt}>Байкал Сервис</option>
+				<option {(:Энергия):caropt}>Энергия</option>
 			</select>
 		</div>
 		{~obj(:title,:Регион,:name,:region):inp}
@@ -51,7 +56,11 @@
 	{caropt:}{data.order.transport.cargo=.?:selected} value="{.}" 
 	{Деловые линии:}Деловые линии
 	{ПЭК:}ПЭК
-	
+	{СДЭК:}СДЭК
+	{DPD:}DPD
+	{КИТ:}КИТ
+	{Байкал Сервис:}Байкал Сервис
+	{Энергия:}Энергия
 {SELF:}
 	<h1>Самовывоз из пунктов выдачи в г. Тольятти</h1>
 	<div class="more alert border">

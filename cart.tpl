@@ -356,6 +356,40 @@
 			domready(function (){
 				var name = 'transport';
 				{:jsitem}
+				Event.one('Controller.onshow', function (){
+					var tcard = $('.transportcard');
+					var pcard = $('.paycard');
+					tcard.find('.item').click( function (){
+						var layer = Controller.ids["{id}"];
+						var value = Autosave.get(layer, 'transport.choice');
+						pcard.find('.item').css('display','flex');
+						if (!value) return;
+						var data = Load.loadJSON(layer.json);
+						if (!data) return;
+						
+						if (!data.fields.transport[value] || !data.fields.transport[value].hide) return;
+						var hide = data.fields.transport[value].hide;
+						var payvalue = Autosave.get(layer, 'pay.choice');
+
+						
+						if (~hide.indexOf(payvalue)) {
+							pcard.find('.item').each(function(){
+								var val = $(this).data('value');
+								console.log(val);
+								if (val == payvalue) $(this).click(); //отменили выбор
+							});
+						}
+						
+						pcard.find('.item').each(function(){
+							var val = $(this).data('value');
+							console.log(val);
+							if (~hide.indexOf(val)) {
+								$(this).hide();//Скрыли кнопку
+							}
+						});
+						
+					});
+				});
 			})
 		</script>
 		{trans:}
@@ -385,7 +419,7 @@
 		})
 	</script>
 	{pay:}
-	<div data-value="{~key}" class="item d-flex flex-column border rounded m-1 p-1">
+	<div data-value="{~key}" style="display:flex" class="item flex-column border rounded m-1 p-1">
 		<div style="height:60px" class="d-flex align-items-center justify-content-center"><div><img class="img-fluid" src="/-imager/?h=60&src={ico}"></div></div>
 		<div class="mb-auto title"><big>{~key}</big></div>
 		<div class="text-right">
