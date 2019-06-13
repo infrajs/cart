@@ -375,14 +375,12 @@
 						if (~hide.indexOf(payvalue)) {
 							pcard.find('.item').each(function(){
 								var val = $(this).data('value');
-								console.log(val);
 								if (val == payvalue) $(this).click(); //отменили выбор
 							});
 						}
 						
 						pcard.find('.item').each(function(){
 							var val = $(this).data('value');
-							console.log(val);
 							if (~hide.indexOf(val)) {
 								$(this).hide();//Скрыли кнопку
 							}
