@@ -1,3 +1,4 @@
+{root:}
 <div class="cart-search-complete">
 	<style>
 		.autocomplete-suggestions { border: 1px solid #999; background: #FFF; overflow: auto; }
@@ -75,12 +76,11 @@
 		});
 	</script>
 </div>
-{cat::}-catalog/cat.tpl
 {extend::}-catalog/extend.tpl
 {SUGGESTION:}
 		{images.0?:img}
-		<b><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{producer} {article}</a></b><wbr> {Цена?:cost}<br>
+		<b><a href="/catalog/{producer_nick}/{article_nick}{:extend.cat.idsl}">{producer} {article}</a></b><wbr> {Цена?:cost}<br>
 		<a href="/catalog/{group_nick}">{group}</a>
 		{item_nick}	
 	{cost:}<b>{~cost(Цена)}{:extend.unit}</b>
-	{img:}<img style="margin-left:5px; float:right; position:relative" src="/-imager/?src={images.0}&h=60">
+	{img:}<img style="clear:both; margin-left:5px; float:right; position:relative" src="/-imager/?src={images.0}&h=60">

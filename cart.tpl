@@ -332,7 +332,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="alert alert-secondary">Информация по зказау будет отправлена на Email.</div>
+		<div class="alert alert-secondary">Вся информация по зказау, сроки, стоимость доставки, сумма с учётом скидки и доставки, а также данные для оплаты, будет отправлена в SMS по указанному номеру и на электронную почту.</div>
 		{crumb.parent.name=:admin?:adminactions?:useractions}
 		
 	{useractions:}

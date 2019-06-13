@@ -80,7 +80,7 @@
 	<div class="form-group">
 		<label>Пункты выдачи <span class="req">*</span></label>
 		<select {:isdisabled} onchange="
-				var row = $(this).parent();
+				var row = $(this).parent().parent();
 				row.find('[data-value]').hide();
 				row.find('[data-value=\''+this.value+'\']').fadeIn();
 			" {:isdisabled} name="transport.self" class="custom-select form-control">
@@ -174,7 +174,9 @@
 			</div>
 		</div>
 	
-		{:maininputs}
+		{~obj(:title,:Улица,:name,:street):inp}
+		{~obj(:title,:Дом,:name,:house):inp}
+		{~obj(:title,:Квартира/офис,:name,:kv):inp}
 	</div>
 	{curopt:}{data.order.transport.courier=.?:selected} value="{.}" 
 	{curinfo:}style="display:{data.order.transport.courier=.??:none}" data-value="{.}" class="alert border"
