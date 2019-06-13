@@ -173,7 +173,9 @@
 				{:whencost}
 			</div>
 		</div>
-	
+		{~obj(:title,:Почтовый индекс,:name,:index):inp}
+		{~obj(:title,:Регион,:name,:region):inp}
+		{~obj(:title,:Город/Населённый пункт,:name,:city):inp}
 		{~obj(:title,:Улица,:name,:street):inp}
 		{~obj(:title,:Дом,:name,:house):inp}
 		{~obj(:title,:Квартира/офис,:name,:kv):inp}
