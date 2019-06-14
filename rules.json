@@ -17,7 +17,7 @@
 				"actions":["active", "sync","print"]
 			},
 			"manager":{
-				"buttons":{"sync":"success","complete":"warning"},
+				"buttons":{"sync":"secondary","complete":"success"},
 				"actions":["complete","delete","email","sync","print"]
 			}
 		},
@@ -71,7 +71,7 @@
 			"title":"Оформление заказа",
 			"user":{
 				"buttons":{
-					"check":"warning"
+					"check":"success"
 				},
 				"actions":["check","print"]
 			}

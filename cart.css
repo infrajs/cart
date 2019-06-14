@@ -25,26 +25,44 @@
 .cart .myactions {
 	float:right;
 }
+
 .cart .card {
-	border-color:#fbb765;
+	border-color: rgba(128, 128, 128, 0.8);
+}
+.cart .card-header {
+	border-color: rgba(128, 128, 128, 0.8);
+	border-bottom:none;
+	background-color: rgba(128, 128, 128, 0.6);
+}
+.cart .card-header span {
+	color:white;
+}
+.cart .item.active {
+	background-color: rgba(128, 128, 128, 0.2);
+}
+.cart .item:hover {
+	background-color: rgba(128, 128, 128, 0.4);
+}
+
+.cart .card {
+	
 }
 .cart .card-header {
 	cursor:pointer; 
-	border-color:#fbdb65; 
-	background-color: #fbdb65;
+	
 }
 .cart .item {
 	width:149px;
 	cursor: pointer;
 }
 .cart .item.active {
-	background-color: #fbdb65;
+	
 }
 .cart .item.active .title {
 	font-weight: bold;
 }
 .cart .item:hover {
-	background-color:#fff37d;
+	
 }
 .cart .iteminfo {
 	display: none;

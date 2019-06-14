@@ -289,19 +289,19 @@
 	<div class="row">
 		<div class="col-12">
 			<div class="form-group">
-				<label>Адресс <span class="req">*</span></label>
+				<label>Адресс</label>
 				<input {:isdisabled} type="text" name="transport.address" value="{data.order.transport.address}" class="form-control" placeholder="">
 			</div>
 		</div>
 		<div class="col-6">
 			<div class="form-group">
-				<label>Серия паспорта <span class="req">*</span></label>
+				<label>Серия паспорта</label>
 				<input {:isdisabled} type="text" name="transport.passeriya"  value="{data.order.transport.passeriya}" class="form-control">
 			</div>
 		</div>
 		<div class="col-6">
 			<div class="form-group">
-				<label>Номер паспорта <span class="req">*</span></label>
+				<label>Номер паспорта</label>
 				<input {:isdisabled} type="text" name="transport.pasnumber" value="{data.order.transport.pasnumber}" class="form-control">
 			</div>
 		</div>
@@ -310,7 +310,7 @@
 		<div class="row">
 			<div class="col-12">
 				<div class="form-group">
-					<label>Выберите способ оплаты <span class="req">*</span></label>
+					<label>Выберите способ оплаты{:req}</label>
 					<select {:isdisabled} value="{transport.cargo}" name="transport.cargo" class="custom-select form-control">
 						<option></option>
 						<option {(:Банк):caropt}>Банковский перевод для юр.лиц</option>
@@ -657,15 +657,15 @@
 			{dateform:}d.m.Y
 	{orderfields:}
 		<div class="form-group">
-			<label>ФИО <span class="req">*</span></label>
+			<label>ФИО{:req}</label>
 			<input {:isdisabled} type="text" name="name" value="{name}" class="form-control" placeholder="">
 		</div>
 		<div class="form-group">
-			<label>Телефон <span class="req">*</span></label>
+			<label>Телефон{:req}</label>
 			<input {:isdisabled} type="tel" name="phone"  value="{phone}" class="form-control" placeholder="+79270000000">
 		</div>
 		<div class="form-group">
-			<label>Email <span class="req">*</span></label>
+			<label>Email{:req}</label>
 			<input {:isdisabled} type="email" name="email" value="{email}" class="form-control" placeholder="Email">
 		</div>
 	{isdisabled:}{data.order.rule.edit[data.place]|:disabled}
@@ -920,6 +920,7 @@
 {itemcost:}{~cost(.)}<span class="d-none d-sm-inline">&nbsp;<small>{:extend.unit}</small></span>
 {itemcostrub:}{~cost(.)}&nbsp;<small>{:extend.unit}</small>
 {star:}<span class="req" title="Позиция в каталоге изменилась">*</span> 
+{req:} <span class="req">*</span>
 {ordernum:}Номер заказа: <b>{id}</b>{manage.paid?:msgpaidorder}
 	{msgpaidorder:}. Оплата <b>{~cost(manage.paid)} руб.</b> отметка {manage.paidtype=:bank?:банка?:менеджера} {~date(:d.m.Y H:i,manage.paidtime)}
 {adm_message:}
