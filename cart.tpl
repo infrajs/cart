@@ -26,7 +26,7 @@
 		<div class="d-flex flex-column flex-sm-row justify-content-between mt-3">
 			<div class="mr-sm-3 mx-auto mx-sm-0">{:couponinp}</div>
 			<div class="flex-grow-1">
-				<p class="text-center text-sm-right {coupon_discount??:d-none}">
+				<p class="text-center text-sm-right {data.order.coupon_discount??:d-none}">
 					Итого: <b class="carttotal" style="font-size:140%">{total:itemcostrub}</b> 
 					<!--<del style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel">{total!sum?sum:itemcostrub}</del>-->
 				</p>
@@ -38,10 +38,10 @@
 		</div>
 	{couponinfoorder:}
 		<div class="d-flex flex-column flex-sm-row justify-content-between mt-3">
-			<div class="mr-sm-3 mx-auto mx-sm-0">{order:couponinp}</div>
+			<div class="mr-sm-3 mx-auto mx-sm-0">{data.order.:couponinp}</div>
 			<div class="flex-grow-1">
-				<p class="text-center text-sm-right {coupon_discount??:d-none}">
-					Итого: <b class="carttotal" style="font-size:140%">{order.total:itemcostrub}</b> 
+				<p class="text-center text-sm-right {data.order.coupon_discount??:d-none}">
+					Итого: <b class="carttotal" style="font-size:140%">{data.order.total:itemcostrub}</b> 
 					<!--<del style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel">{total!sum?sum:itemcostrub}</del>-->
 				</p>
 				<div class="d-flex text-center text-sm-right flex-column">
