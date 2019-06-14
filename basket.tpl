@@ -67,7 +67,7 @@
 	{~obj(:title,:Корзина,:content,:showcartlist,:num,:1):accordCard}
 	{~obj(:title,:Купон,:content,:couponinfoorder,:num,:2):accordCard}
 	{~obj(:title,:Получатель,:content,:fiocard,:num,:3):accordCard}
-	{~obj(:title,:Доставка,:content,:transcard,:num,:4):accordCard}
+	{~obj(:title,:Доставка,:content,:transcardsimple,:num,:4):accordCard}
 	{~obj(:title,:Оплата,:content,:paycard,:num,:5):accordCard}
 	{accordCard:}
 		<div class="card" data-num="{num}">
