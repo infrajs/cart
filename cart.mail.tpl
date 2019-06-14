@@ -65,7 +65,6 @@
 
 Заказ: http://{site}/cart/admin/{id}
 Клиент: {name}
-Организация: {org}
 Email: {email}
 Телефон: {phone}
 

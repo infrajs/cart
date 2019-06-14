@@ -14,6 +14,7 @@
 			.cartbasket #basket_text a:hover {
 				
 			}
+			
 			@media (max-width:767px) {
 				.cartbasket {
 					padding:10px 20px;

@@ -913,7 +913,7 @@
 			<li class="breadcrumb-item"><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb}/list">Содержимое корзины</a>
 			<li class="breadcrumb-item active">Оформление заказа {data.order.id}</li></li>
 		</ol>
-	{liallorder:}<li class="breadcrumb-item"><a class="{data.place=:admin?:text-danger}" href="/{crumb.parent}">{data.place=:admin?:Все?:Мои} заявки</a></li>
+	{liallorder:}<li class="breadcrumb-item"><a class="{data.place=:admin?:text-danger}" href="/{crumb.parent}">{data.place=:admin?:Все?:Мои} заказы</a></li>
 	{itemcost:}{~cost(.)}<span class="d-none d-sm-inline">&nbsp;<small>{:extend.unit}</small></span>
 	{itemcostrub:}{~cost(.)}&nbsp;<small>{:extend.unit}</small>
 	{star:}<span class="req" title="Позиция в каталоге изменилась">*</span> 
