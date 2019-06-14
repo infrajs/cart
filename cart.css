@@ -19,6 +19,40 @@
 }
 
 
+.cart .req {
+	color:red;
+}
+.cart .myactions {
+	float:right;
+}
+.cart .card {
+	border-color:#fbb765;
+}
+.cart .card-header {
+	cursor:pointer; 
+	border-color:#fbdb65; 
+	background-color: #fbdb65;
+}
+.cart .item {
+	width:149px;
+	cursor: pointer;
+}
+.cart .item.active {
+	background-color: #fbdb65;
+}
+.cart .item.active .title {
+	font-weight: bold;
+}
+.cart .item:hover {
+	background-color:#fff37d;
+}
+.cart .iteminfo {
+	display: none;
+}
+.cart .more {
+	display: none;
+}
+
 .cart .spin {
 	animation-name: cart-spin;
 	animation-duration: 600ms;
@@ -46,7 +80,11 @@
     }
 }
 
-
+@media (max-width: 992px) {
+   #COLUMN {
+		display:none;
+	}
+}
 
 .cart .a.pay > a {
 	color: inherit;

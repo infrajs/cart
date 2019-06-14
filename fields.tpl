@@ -222,6 +222,8 @@
 {PAYRECIVE:}Оплата в момент получения товара
 {PAYCHECK:}Реквизиты сообщит менеджер после оформления заказа
 {PAYSBER:}{:PAYCHECK}
+{PAYCARD:}{:PAYCHECK}
 {PAYYANDEX:}{:PAYCHECK}
 {PAYTINKOFF:}{:PAYCHECK}
 {PAYQIWI:}{:PAYCHECK}
+{PAYBANK:}{:PAYCHECK}

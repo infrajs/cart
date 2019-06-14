@@ -40,10 +40,10 @@
 			domready(function(){
 				$('.signout').click(function(){
 					Session.logout();
-					Global.set(['cat_basket',"sign"]);
+					Global.set(["user"]);
 					Session.syncNow();
 					Cart.goTop();
-
+					return false;
 				});
 			});
 		</script>
@@ -63,3 +63,24 @@
 {producer} {article} {item}
 {count} по {~cost(cost)}&nbsp;руб. = {~cost(sum)}&nbsp;руб.<br>
 {fields::}-cart/fields.tpl
+{ORDER:}
+	{~obj(:title,:Корзина,:content,:showcartlist,:num,:1):accordCard}
+	{~obj(:title,:Купон,:content,:couponinfoorder,:num,:2):accordCard}
+	{~obj(:title,:Получатель,:content,:fiocard,:num,:3):accordCard}
+	{~obj(:title,:Доставка,:content,:transcard,:num,:4):accordCard}
+	{~obj(:title,:Оплата,:content,:paycard,:num,:5):accordCard}
+	{accordCard:}
+		<div class="card" data-num="{num}">
+			<div onclick="Ascroll.go('#heading{num}')" 
+			class="card-header {show?:font-weight-bold}" id="heading{num}" data-toggle="collapse" data-target="#collapse{num}">
+				<span class="badge badge-light text-dark badge-pill">{num}</span> <span class="a" aria-expanded="true" aria-controls="collapse{num}">
+				{title}
+				</span>
+
+			</div>
+			<div id="collapse{num}" class="collapse {show?:show}" aria-labelledby="heading{num}" data-*parent="#accordionorder">
+				<div class="card-body">
+					{content}
+				</div>
+			</div>
+		</div>

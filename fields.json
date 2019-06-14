@@ -37,25 +37,13 @@
 			"ico":"-cart/images/recive.jpg",
 			"tpl":"PAYRECIVE"
 		},
-		"Оплата по квитанции в банке":{
-			"ico":"-cart/images/check.png",
-			"tpl":"PAYCHECK"
+		"Оплата по счёту для юридических лиц":{
+			"ico":"-cart/images/bank.png",
+			"tpl":"PAYBANK"
 		},
-		"На карту Сбербанка":{
-			"ico":"-cart/images/sber.png",
-			"tpl":"PAYSBER"	
-		},
-		"Яндекс Деньги":{
-			"ico":"-cart/images/yandex.png",
-			"tpl":"PAYYANDEX"	
-		},
-		"На карту Tinkoff":{
-			"ico":"-cart/images/tinkoff.png",
-			"tpl":"PAYTINKOFF"	
-		},
-		"QIWI Кошелёк":{
-			"ico":"-cart/images/qiwi.png",
-			"tpl":"PAYQIWI"	
+		"Оплата банковской картой":{
+			"ico":"-cart/images/visa-master.jpg",
+			"tpl":"PAYCARD"	
 		}
 	}
 }

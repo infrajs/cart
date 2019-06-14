@@ -4,47 +4,6 @@
 	</div>
 {cartanswer:}
 	<pre>{mail}</pre>
-{css:}
-	<style>
-		@media (max-width: 992px) {
-		   #COLUMN {
-				display:none;
-			}
-		}
-		.cart .req {
-			color:red;
-		}
-		.cart .myactions {
-			float:right;
-		}
-		.cart .card {
-			border-color:#fbb765;
-		}
-		.cart .card-header {
-			cursor:pointer; 
-			border-color:#fbdb65; 
-			background-color: #fbdb65;
-		}
-		.cart .item {
-			width:150px;
-			cursor: pointer;
-		}
-		.cart .item.active {
-			background-color: #fbdb65;
-		}
-		.cart .item.active .title {
-			font-weight: bold;
-		}
-		.cart .item:hover {
-			background-color:#fff37d;
-		}
-		.cart .iteminfo {
-			display: none;
-		}
-		.cart .more {
-			display: none;
-		}
-	</style>
 {js:}
 	<script>
 		domready(function(){
@@ -54,7 +13,6 @@
 		});
 	</script>
 {LIST:}
-	{:css}
 	{:listcrumb}
 	<div class="cart">
 		<h1>{data.order.id?:numbasket?(data.result?:mybasket?:numbasket)}</h1>
@@ -80,10 +38,10 @@
 		</div>
 	{couponinfoorder:}
 		<div class="d-flex flex-column flex-sm-row justify-content-between mt-3">
-			<div class="mr-sm-3 mx-auto mx-sm-0">{:couponinp}</div>
+			<div class="mr-sm-3 mx-auto mx-sm-0">{order:couponinp}</div>
 			<div class="flex-grow-1">
 				<p class="text-center text-sm-right {coupon_discount??:d-none}">
-					Итого: <b class="carttotal" style="font-size:140%">{total:itemcostrub}</b> 
+					Итого: <b class="carttotal" style="font-size:140%">{order.total:itemcostrub}</b> 
 					<!--<del style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel">{total!sum?sum:itemcostrub}</del>-->
 				</p>
 				<div class="d-flex text-center text-sm-right flex-column">
@@ -91,6 +49,8 @@
 				</div>
 			</div>
 		</div>
+	{showcartlist:}
+		{order:cartlist}
 	{cartlist:}
 		<div style="{:ishidedisabled}">
 			<div class="d-flex justify-content-between">
@@ -213,7 +173,6 @@
 				<img class="img-thumbnail" src="/-imager/?h=100&src={images.0}&or=-imager/empty.png">
 			</div>
 {ADMORDER:}
-	{:css}
 	{:ordercrumb}
 	<div class="cart">
 		{data.result?data:orderPageContent?:ordermessage}
@@ -228,7 +187,6 @@
 		<span class="a" onclick="var t=$('[name=\'manage.comment\']'); t.val(t.val()+$(this).next().html()).change();">{~key}</span><pre style="display:none">{.}
 </pre>{~last()|:comma}
 {ORDER:}
-	{:css}
 	{:ordercrumb}
 	<div class="cart">
 		{data.result?data:orderPageContent?:ordermessage}
@@ -249,21 +207,7 @@
 		<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-info" role="alert"><b>Сообщение менеджера</b>
 				<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
 		</div>
-	{accordCard:}
-		<div class="card" data-num="{num}">
-			<div onclick="Ascroll.go('#heading{num}')" 
-			class="card-header {show?:font-weight-bold}" id="heading{num}" data-toggle="collapse" data-target="#collapse{num}">
-				<span class="badge badge-light text-dark badge-pill">{num}</span> <span class="a" aria-expanded="true" aria-controls="collapse{num}">
-				{title}
-				</span>
-
-			</div>
-			<div id="collapse{num}" class="collapse {show?:show}" aria-labelledby="heading{num}" data-*parent="#accordionorder">
-				<div class="card-body">
-					{content}
-				</div>
-			</div>
-		</div>
+	
 	{orderPageContent:}
 		<div class="float-right" title="Последние измения">{~date(:j F H:i,order.time)}</div>
 		<h1>{order.rule.title} {order.id}</h1>
@@ -271,11 +215,7 @@
 		{order.manage.comment?order:showManageComment}
 		<form>
 			<div class="accordion" id="accordionorder">
-				{~obj(:title,:Корзина,:content,order:cartlist,:num,:1):accordCard}
-				{~obj(:title,:Купон,:content,order:couponinfoorder,:num,:2):accordCard}
-				{~obj(:title,:Получатель,:content,:fiocard,:num,:3):accordCard}
-				{~obj(:title,:Доставка,:content,:transcard,:num,:4):accordCard}
-				{~obj(:title,:Оплата,:content,:paycard,:num,:5):accordCard}
+				{:basket.ORDER}
 			</div>
 		</form>
 		<script>
@@ -332,7 +272,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="alert alert-secondary">Вся информация по зказау, сроки, стоимость доставки, сумма с учётом скидки и доставки, а также данные для оплаты, будет отправлена в SMS по указанному номеру и на электронную почту.</div>
+		<div class="alert alert-secondary">Вся информация по заказу сроки и стоимость доставки, а также данные для оплаты, будет отправлена на указанную электронную почту.</div>
 		{crumb.parent.name=:admin?:adminactions?:useractions}
 		
 	{useractions:}
@@ -345,6 +285,49 @@
 			<p>Письмо клиенту {order.emailtime?:wasemail?:noemail}</p>
 			{order.rule.manager:myactions}
 		</div>
+	{transcardsimple:}
+	<div class="row">
+		<div class="col-12">
+			<div class="form-group">
+				<label>Адресс <span class="req">*</span></label>
+				<input {:isdisabled} type="text" name="transport.address" value="{data.order.transport.address}" class="form-control" placeholder="">
+			</div>
+		</div>
+		<div class="col-6">
+			<div class="form-group">
+				<label>Серия паспорта <span class="req">*</span></label>
+				<input {:isdisabled} type="text" name="transport.passeriya"  value="{data.order.transport.passeriya}" class="form-control">
+			</div>
+		</div>
+		<div class="col-6">
+			<div class="form-group">
+				<label>Номер паспорта <span class="req">*</span></label>
+				<input {:isdisabled} type="text" name="transport.pasnumber" value="{data.order.transport.pasnumber}" class="form-control">
+			</div>
+		</div>
+	</div>
+	{paycardsimple:}
+		<div class="row">
+			<div class="col-12">
+				<div class="form-group">
+					<label>Выберите способ оплаты <span class="req">*</span></label>
+					<select {:isdisabled} value="{transport.cargo}" name="transport.cargo" class="custom-select form-control">
+						<option></option>
+						<option {(:Банк):caropt}>Банковский перевод для юр.лиц</option>
+						<option {(:Наличные):caropt}>Оплата картой VISA или MASTERCARD</option>
+						<option {(:Самовывоз):caropt}>Оплата при получении товара</option>
+						<option {(:Самовывоз):caropt}>Оплата в магазине</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-12">
+				<div class="form-group">
+					<label>Дополнительная информация</label>
+					<textarea name="pay.paycomment" class="form-control">{data.order.pay.paycomment}</textarea>
+				</div>
+			</div>
+		</div>
+		{caropt:}{data.order.transport.cargo=.?:selected} value="{.}" 
 	{transcard:}
 		<div class="transportcard">
 			<div class="d-flex flex-wrap" style="font-size:11px">
@@ -675,7 +658,7 @@
 	{orderfields:}
 		<div class="form-group">
 			<label>ФИО <span class="req">*</span></label>
-			<input {:isdisabled} type="text" name="name" value="{name}" class="form-control" placeholder="{data.fields.fio?:helpFIO?:helpCont}">
+			<input {:isdisabled} type="text" name="name" value="{name}" class="form-control" placeholder="">
 		</div>
 		<div class="form-group">
 			<label>Телефон <span class="req">*</span></label>
@@ -685,197 +668,6 @@
 			<label>Email <span class="req">*</span></label>
 			<input {:isdisabled} type="email" name="email" value="{email}" class="form-control" placeholder="Email">
 		</div>
-		{*hide:}
-		{data.fields.passport?:passprot}
-		{data.fields.address?:address}
-		{~conf.cart.pay?:orderpayinfo}
-		{~conf.cart.deliverychoice?:ordertransportinfo}
-		{helpCont:}Контактное лицо
-		{helpFIO:}Иванов Иван Иванович
-		{strФИО:} (ФИО)
-		{address:}
-			<div class="form-group">
-				<label>Адресс доставки <span class="req">*</span></label>
-				<input {:isdisabled} type="text" name="address" value="{address}" class="form-control" placeholder="443456, Самарская обл., г. Тольятти, ул. Ивана Грозного 13, офис 12">
-			</div>
-		{passprot:}
-			<div class="form-group">
-				<label>Серия и номер паспорта <span class="req">*</span></label>
-				<input {:isdisabled} type="text" name="passport" value="{passport}" class="form-control" placeholder="88 88 999999">
-			</div>
-		{ordertransportinfo:}
-			<strong>
-					Способ доставки <span class="req">*</span>
-			</strong>
-			<div class="radio">
-				<label><input {:isdisabled} name="delivery" {delivery=:pickup?:checked} type="radio" value="pickup"> Самовывоз</label>
-			</div>
-			<div class="radio">
-				<label><input id="delivery" {:isdisabled} name="delivery" {delivery=:delivery?:checked} type="radio" value="delivery"> Доставка транспортной компанией</label>
-			</div>
-			<div class="delivery">
-				<script>
-					domready( function () {
-						Event.one('Controller.onshow', function () {
-							var div = $('#{div}');
-							if(div.find("input[name=delivery]:checked").val()!='delivery'){
-								div.find('.delivery').hide();
-							}
-							div.find("input[name=delivery]:radio").change(function() {
-								if ($(this).val()=='delivery') {
-									$('.delivery').slideDown();
-								} else {
-									$('.delivery').slideUp();
-								}
-							});
-						});
-					});
-				</script>
-				<div class="form-group">
-					<label>Адрес доставки <span class="req">*</span></label>
-					<input {:isdisabled} type="text" name="addresdelivery" value="{addresdelivery}" class="form-control" placeholder="Адрес доставки">
-				</div>
-			</div>
-		{orderpayinfo:}
-			<strong>
-				Кто будет оплачивать <span class="req">*</span>
-			</strong>
-			<div class="radio">
-				<label>
-					<input {:isdisabled} name="entity" {entity=:individual?:checked} type="radio" value="individual">
-					Физическое лицо
-				</label>
-			</div>
-			<div class="radio">
-				<label>
-					<input {:isdisabled} name="entity" {entity=:legal?:checked} type="radio" value="legal">
-					Юридическое лицо
-				</label>
-			</div>
-			<div class="entitylegal">
-				<script>
-					domready( function () {
-						Event.one('Controller.onshow', function () {
-							var div=$('#{div}');
-							if(div.find("input[name=entity]:checked").val()!='legal'){
-								div.find('.entitylegal').hide();
-							}
-							div.find("input[name=entity]:radio").change(function() {
-								if ($(this).val()=='legal') {
-									$('.entitylegal').slideDown('slow');
-								} else {
-									$('.entitylegal').slideUp('slow');
-								}
-							});
-						});
-					});
-				</script>
-				<strong>Реквизиты <span class="req">*</span></strong>
-				<div class="radio">
-					<label>
-						<input {:isdisabled} name="details" {details=:here?:checked} type="radio" value="here">
-						Указать реквизиты в полях для ввода
-					</label>
-				</div>
-				<div class="radio">
-					<label>
-						<input {:isdisabled} name="details" {details=:allentity?:checked} type="radio" value="allentity">
-						Указать все реквизиты в одном поле для ввода
-					</label>
-				</div>
-				<div class="allentity">
-					<script>
-						domready( function () {
-							Event.one('Controller.onshow', function () {
-								var div = $('#{div}');
-								if(div.find("input[name=details]:checked").val()!='allentity'){
-									div.find('.allentity').hide();
-								}
-								div.find("input[name=details]:radio").change(function() {
-									if ($(this).val()=='allentity') {
-										$('.allentity').slideDown('slow');
-									} else {
-										$('.allentity').slideUp('slow');
-									}
-								});
-								
-							});
-						});
-					</script>
-					<div class="form-group">
-						<label>
-							Скопируйте реквизиты из карточки компании
-						</label>
-						<textarea {:isdisabled} class="form-control" rows="8" name="allentity"></textarea>
-					</div>
-					
-				</div>
-				<div class="detailshere">
-					<script>
-						domready( function () {
-							Event.one('Controller.onshow', function () {
-								var div=$('#{div}');
-								if(div.find("input[name=details]:checked").val()!='here'){
-									div.find('.detailshere').hide();
-								}
-								
-								div.find("input[name=details]:radio").change(function() {
-									if ($(this).val()=='here') {
-										$('.detailshere').slideDown('slow');
-									} else {
-										$('.detailshere').slideUp('slow');
-									}
-								});
-								
-							});
-						});
-					</script>
-					<div class="form-group">
-						<label>Название организации <span class="req">*</span></label>
-						<input {:isdisable} type="text" name="company" value="{company}" class="form-control" placeholder='Название организации'>
-					</div>
-					<div class="form-group">
-						<label>ИНН <span class="req">*</span></label>
-						<input {:isdisabled} type="text" name="inn" value="{inn}" class="form-control" placeholder="ИНН">
-					</div>
-					<div class="form-group">
-						<label>Юридический адрес <span class="req">*</span></label>
-						<input {:isdisabled} type="text" name="addreslegal" value="{addreslegal}" class="form-control" placeholder="Юридический адрес">
-					</div>
-					<div class="form-group">
-						<label>Почтовый адрес <span class="req">*</span></label>
-						<input {:isdisabled} type="text" name="addrespochta" value="{addrespochta}" class="form-control" placeholder="Почтовый адрес">
-					</div>
-					<div class="form-group">
-						<label>Наименование банка <span class="req">*</span></label>
-						<input {:isdisabled} type="text" name="bankname" value="{bankname}" class="form-control" placeholder="Наименование банка">
-					</div>
-					<div class="form-group">
-						<label>Бик <span class="req">*</span></label>
-						<input {:isdisabled} type="text" name="bik" value="{bik}" class="form-control" placeholder="Бик">
-					</div>
-					<div class="form-group">
-						<label>Расчётный счёт <span class="req">*</span></label>
-						<input {:isdisabled} type="text" name="rasaccount" value="{rasaccount}" class="form-control" placeholder="Расчётный счёт">
-					</div>
-					<div class="form-group">
-						<label>Корреспондентский счёт <span class="req">*</span></label>
-						<input {:isdisabled} type="text" name="coraccount" value="{coraccount}" class="form-control" placeholder="Корреспондентский счёт">
-					</div>
-					
-				</div>
-				
-			</div>
-			
-			<strong>
-					Способ оплаты <span class="req">*</span>
-			</strong>
-			<div class="radio">
-				<label><input {:isdisabled} name="paymenttype" {paymenttype=:card?:checked} type="radio" value="card"> Оплата картой</label>
-			</div>
-			<div class="radio">
-				<label><input {:isdisabled} name="paymenttype" {paymenttype=:cash?:checked} type="radio" value="cash"> Оплата наличными курьеру или в магазине</label>
-			</div>
 	{isdisabled:}{data.order.rule.edit[data.place]|:disabled}
 	{ishidedisabled:}{data.order.rule.edit[data.place]|:disabledhide}
 	{disabledhide:}display:none
