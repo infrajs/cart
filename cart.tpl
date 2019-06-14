@@ -289,7 +289,7 @@
 	<div class="row">
 		<div class="col-12">
 			<div class="form-group">
-				<label>Адресс</label>
+				<label>Адрес</label>
 				<input {:isdisabled} type="text" name="transport.address" value="{data.order.transport.address}" class="form-control" placeholder="">
 			</div>
 		</div>
