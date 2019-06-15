@@ -413,10 +413,21 @@
 {fiocard:}
 	<div class="cartcontacts row">
 		<div class="col-sm-4 order-sm-2">
-			{data.user.email?:fiouser?:fioguest}
+			{data.place=:orders?(data.user.email?:fiouser?:fioguest)}
 		</div>
 		<div class="col-sm-8 order-sm-1">
-			{order:orderfields}
+			<div class="form-group">
+				<label>ФИО{:req}</label>
+				<input {:isdisabled} type="text" name="name" value="{name}" class="form-control" placeholder="">
+			</div>
+			<div class="form-group">
+				<label>Телефон{:req}</label>
+				<input {:isdisabled} type="tel" name="phone"  value="{phone}" class="form-control" placeholder="+79270000000">
+			</div>
+			<div class="form-group">
+				<label>Email{:req}</label>
+				<input {:isdisabled} type="email" name="email" value="{email}" class="form-control" placeholder="Email">
+			</div>
 		</div>
 		
 	</div>
@@ -655,19 +666,7 @@
 
 
 			{dateform:}d.m.Y
-	{orderfields:}
-		<div class="form-group">
-			<label>ФИО{:req}</label>
-			<input {:isdisabled} type="text" name="name" value="{name}" class="form-control" placeholder="">
-		</div>
-		<div class="form-group">
-			<label>Телефон{:req}</label>
-			<input {:isdisabled} type="tel" name="phone"  value="{phone}" class="form-control" placeholder="+79270000000">
-		</div>
-		<div class="form-group">
-			<label>Email{:req}</label>
-			<input {:isdisabled} type="email" name="email" value="{email}" class="form-control" placeholder="Email">
-		</div>
+
 	{isdisabled:}{data.order.rule.edit[data.place]|:disabled}
 	{ishidedisabled:}{data.order.rule.edit[data.place]|:disabledhide}
 	{disabledhide:}display:none
@@ -753,122 +752,6 @@
 
 {basket::}-cart/basket.tpl
 
-	{*adm_orderinputs:}
-		<form method="post">
-			<div class="disabled">
-				<div class="cartcontacts">
-					{:orderfields}
-					<label>Сообщение для менеджера</label><br> 
-					<textarea name="comment" class="form-control" rows="6">{comment}</textarea>
-				</div>
-				
-				<br>
-				{count?:tableWidthProduct?:noProducts}
-				
-
-				<div class="py-2">Итоговая цена, руб</div>
-				<div style="max-width:300px" class="input-group pb-3">
-					<input class="form-control" name="manage.summary" value="{manage.summary}" type="text">
-					<div class="input-group-append">
-					    <button onclick="Cart.action('{crumb.parent.name}', 'sync', {data.order.id});" class="btn btn-outline-secondary" type="button">Применить</button>
-					</div>
-				</div>
-				
-				
-				{data.fields.address?:mngdelivery}
-				<div style="margin-bottom:10px">Итого: <b class="cartsum">{~sum(data.order.total,data.order.manage.deliverycost|:0):itemcostrub}</b>{data.order.manage.summary?:totalwarn}</div>
-				<label>Сообщение для клиента</label>&nbsp;<small>{data.messages::msg_samples}</small><br>
-				<textarea autosavebreak="1" name="manage.comment" class="form-control" rows="6">{manage.comment}</textarea>
-
-				<div class="answer"><b class="alert">{config.ans.msg}</b></div>
-			</div>
-		</form>
-		<p>Письмо клиенту {emailtime?:wasemail?:noemail}</p>
-		<!--<h3>{rule.title}</h3>
-		{data.id?order:ordernum}-->
-		{data.rule.freeze?:freezemsg}
-		<!--<div class="checkbox">
-			<label>
-				<input type="checkbox" "autosave"="0" onclick="Session.set('dontNotify',this.checked)" name="dontNotify">
-				НЕ оповещать пользователя о совершённом действии
-			</label>
-			<script>
-				domready(function(){
-					Event.one('Controller.onshow', function () {
-						var layer = Controller.ids['{...id}'];
-						var div = $('#'+layer.div);
-						var check=!!Session.get('dontNofify');
-						div.find('[name=dontNotify]').val(check);
-					});
-				});
-			</script>
-		</div>-->
-
-		<div class="myactions" data-place="admin">
-			{rule.manager:myactions}
-		</div>
-		
-		<script>
-			domready(function(){
-				Event.one('Controller.onshow', function () {
-					var layer = Controller.ids['{...id}'];
-					var div = $('#'+layer.div);
-					var counter = {counter};
-					var id = "{crumb.name}";
-					if (id == 'my') id=null;
-					var order = Cart.getGoodOrder(id);
-					var place = div.find('.myactions').data('place');
-					if (!order.rule.edit[place]) Cart.blockform(layer);
-
-					Event.handler('Layer.onsubmit', function (layer) {
-						if (!layer.showed || counter != layer.counter) return;
-						var ans = layer.config.ans;
-						Global.set('cart');
-						Ascroll.go();
-					}, '', layer);
-					
-					if (Session.get('manager{data.order.id}')) {
-						$('.clearMyDelta').css('fontWeight', 'bold');
-					} else {
-						$('.clearMyDelta').css('fontWeight', 'normal');
-					}
-					
-					Event.handler('Session.onsync', function () {
-						if (!layer.showed || counter != layer.counter) return;
-						if (Session.get('manager{data.order.id}')) {
-							$('.clearMyDelta').css('fontWeight', 'bold');
-						} else {
-							$('.clearMyDelta').css('fontWeight', 'normal');
-						}
-					});
-					if ($("#legal").prop('checked')) {
-						$('.legal').slideDown();
-					} else {
-						$('.legal').slideUp();
-					}			
-					if ($("#delivery").prop('checked')) {
-						$('.delivery').slideDown();
-					} else {
-						$('.delivery').slideUp();
-					}
-					
-					$("input[name=entity]:radio").change( function () {
-						if ($("#legal").prop('checked')) {
-							$('.legal').slideDown();
-						} else {
-							$('.legal').slideUp();
-						}
-					});
-					$("input[name=delivery]:radio").change( function () {
-						if ($("#delivery").prop('checked')) {
-							$('.delivery').slideDown();
-						} else {
-							$('.delivery').slideUp();
-						}
-					});
-				});
-			});
-		</script>
 	{totalwarn:} <i title="установлено менеджером">*</i>
 	{noemail:}<b>ещё не отправлялось</b>{wasemail:}было <b>{~date(:j F H:i,order.emailtime)}</b>
 	{mngdelivery:}

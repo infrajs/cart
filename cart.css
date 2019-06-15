@@ -27,15 +27,15 @@
 }
 
 .cart .card {
-	border-color: rgba(128, 128, 128, 0.8);
+	border-color: rgba(128, 128, 128, 0.3);
 }
 .cart .card-header {
 	border-color: rgba(128, 128, 128, 0.8);
 	border-bottom:none;
-	background-color: rgba(128, 128, 128, 0.6);
+	background-color: #e9ecef;
 }
 .cart .card-header span {
-	color:white;
+	/*color:white;*/
 }
 .cart .item.active {
 	background-color: rgba(128, 128, 128, 0.2);
