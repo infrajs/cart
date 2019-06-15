@@ -18,7 +18,12 @@
 	background-color: rgba(247, 102, 44, 1);
 }
 
-
+.cartbasket .bold_basket {
+	width: 140px;
+    overflow: hidden;
+    display: block;
+    text-overflow: ellipsis;
+}
 .cart .req {
 	color:red;
 }
