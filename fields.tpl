@@ -30,9 +30,13 @@
 	<div class="row">
 		<div class="{:col}">
 			<label>Выберите транспортную компанию <span class="req">*</span></label>
-			<select {:isdisabled} value="{transport.cargo}" name="transport.cargo" class="custom-select form-control">
+			<select {:isdisabled} value="{transport.cargo}" onchange="
+				if (~['Деловые Линии','ПЭК','Байкал Сервис'].indexOf(this.value)) $('.pasdata').slideDown();
+				else $('.pasdata').slideUp();
+				"
+				name="transport.cargo" class="custom-select form-control">
 				<option></option>
-				<option {(:Деловые линии):caropt}>Деловые линии</option>
+				<option {(:Деловые Линии):caropt}>Деловые Линии</option>
 				<option {(:ПЭК):caropt}>ПЭК</option>
 				<option {(:СДЭК):caropt}>СДЭК</option>
 				<option {(:DPD):caropt}>DPD</option>
@@ -41,20 +45,20 @@
 				<option {(:Энергия):caropt}>Энергия</option>
 			</select>
 		</div>
-		{~obj(:title,:Регион,:name,:region):inp}
-		{~obj(:title,:Город/Населённый пункт,:name,:city):inp}
+		{~obj(:title,:Регион,:name,:region):inptrans}
+		{~obj(:title,:Город/Населённый пункт,:name,:city):inptrans}
 	</div>
-	<div class="alert border">
+	<div class="alert border pasdata">
 		<div class="row">
-			{~obj(:title,:Серия паспорта,:name,:passeriya):inp}
-			{~obj(:title,:Номер паспорта,:name,:pasnumber):inp}
+			{~obj(:title,:Серия паспорта,:name,:passeriya):inptrans}
+			{~obj(:title,:Номер паспорта,:name,:pasnumber):inptrans}
 		</div>
 		<p>
 			<i>Для отправки выбранной транспортной компанией, потребуется серия и номер паспорта, по этому документу Вам будет выдаваться груз. <b>Требование грузоперевозчика</b>.</i>
 		</p>
 	</div>
 	{caropt:}{data.order.transport.cargo=.?:selected} value="{.}" 
-	{Деловые линии:}Деловые линии
+	{Деловые Линии:}Деловые Линии
 	{ПЭК:}ПЭК
 	{СДЭК:}СДЭК
 	{DPD:}DPD
@@ -116,6 +120,7 @@
 	{selected:}selected
 	{none:}none
 {MEN:}
+	
 	<h1>Курьерская доставка</h1>
 	<div class="more alert border">
 		<div class="d-flex">
@@ -132,11 +137,15 @@
 			</div>
 		</div>
 	</div>
-	<div class="row">
+	<div class="row mentrans">
 		<div class="col-sm-12">
 			<div class="form-group">
 				<label>Служба доставки <span class="req">*</span></label>
 				<select {:isdisabled} onchange="
+					
+					if (this.value=='Курьер') $('.mentrans').find('[name=\'transport.index\'],[name=\'transport.region\'],[name=\'transport.city\']').parents('.form-group').hide();
+					else $('.mentrans').find('[name=\'transport.index\'],[name=\'transport.region\'],[name=\'transport.city\']').parents('.form-group').show();
+
 					var row = $(this).parents('.row:first');
 					row.find('[data-value]').hide();
 					row.find('[data-value=\''+this.value+'\']').fadeIn();
@@ -173,19 +182,21 @@
 				{:whencost}
 			</div>
 		</div>
-		{~obj(:title,:Почтовый индекс,:name,:index):inp}
-		{~obj(:title,:Регион,:name,:region):inp}
-		{~obj(:title,:Город/Населённый пункт,:name,:city):inp}
-		{~obj(:title,:Улица,:name,:street):inp}
-		{~obj(:title,:Дом,:name,:house):inp}
-		{~obj(:title,:Квартира/офис,:name,:kv):inp}
+
+		{~obj(:title,:Почтовый индекс,:name,:index):inptrans}
+		{~obj(:title,:Регион,:name,:region):inptrans}
+		{~obj(:title,:Город/Населённый пункт,:name,:city):inptrans}
+		
+		{~obj(:title,:Улица,:name,:street):inptrans}
+		{~obj(:title,:Дом,:name,:house):inptrans}
+		{~obj(:title,:Квартира/офис,:name,:kv):inptrans}
 	</div>
 	{curopt:}{data.order.transport.courier=.?:selected} value="{.}" 
 	{curinfo:}style="display:{data.order.transport.courier=.??:none}" data-value="{.}" class="alert border"
 	{Курьер:}Курьер
 	{EMS:}EMS
 	{СДЭК:}СДЭК
-{inp:}
+{inptrans:}
 	<div class="{:col}">
 		<div class="form-group">
 			<label>{title} <span class="req">*</span></label>
@@ -196,12 +207,12 @@
 {disabled:}disabled
 	
 {maininputs:}
-	{~obj(:title,:Почтовый индекс,:name,:index):inp}
-	{~obj(:title,:Регион,:name,:region):inp}
-	{~obj(:title,:Город/Населённый пункт,:name,:city):inp}
-	{~obj(:title,:Улица,:name,:street):inp}
-	{~obj(:title,:Дом,:name,:house):inp}
-	{~obj(:title,:Квартира/офис,:name,:kv):inp}
+	{~obj(:title,:Почтовый индекс,:name,:index):inptrans}
+	{~obj(:title,:Регион,:name,:region):inptrans}
+	{~obj(:title,:Город/Населённый пункт,:name,:city):inptrans}
+	{~obj(:title,:Улица,:name,:street):inptrans}
+	{~obj(:title,:Дом,:name,:house):inptrans}
+	{~obj(:title,:Квартира/офис,:name,:kv):inptrans}
 {pochtamore:}
 	<div class="more alert border">
 		<div class="d-flex">
