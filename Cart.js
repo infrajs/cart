@@ -140,7 +140,8 @@ window.Cart = {
 		for (var name in rules.actions) {
 			$(".cart .act-"+name).not('[cartinit]').attr('cartinit', name).click( function () {
 				var name = $(this).attr('cartinit');
-				var place = $(this).parents('.myactions').attr('data-place');
+				var place = $(this).attr('data-place');
+				if (!place) place = $(this).parents('.myactions').attr('data-place');
 				var param = $(this).attr('data-param');
 				var id = $(this).attr('data-id');
 				Cart.action(place, name, id, function(){ }, param);
