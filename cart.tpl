@@ -31,7 +31,7 @@
 						<!--<del style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel">{total!sum?sum:itemcostrub}</del>-->
 					</p>
 					<div class="d-flex text-center text-sm-right flex-column">
-						<div><a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-warning">Перейти к {data.order.id?:заказу {data.order.id}?:оформлению заказа}</a></div>
+						<div><a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-success">Перейти к {data.order.id?:заказу {data.order.id}?:оформлению заказа}</a></div>
 						<div>Займёт не более 3 минут.</div>
 					</div>
 				</div>
