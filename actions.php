@@ -29,18 +29,7 @@ $place = Ans::REQ('place');
 $ans['place'] = $place;
 $conf = Config::get('cart');
 
-if ($action == 'wholesaleDelete') {	
-	if (!Session::get('safe.manager')) return Ans::err($ans, 'У вас нет доступа!');
-	$email = $id;
-	$data = Load::loadJSON('~cart/merchants.json');
-	unset($data['merchants'][$email]);
-	file_put_contents(Path::resolve('~cart/merchants.json'), Load::json_encode($data));
-	return Ans::ret($ans);
-}
 
-
-//Заявка принадлежит тому человеку, который первым изменил её статус с активного на какой-то
-//Передать заявку может и можно, но сумма по заявке будет всегда принадлежать первому человеку
 $ans['order'] = array('id' => $id);
 if (!Cart::canI($id, $action)) return Ans::err($ans, 'У вас нет доступа на совершение действия '.$action.' с заявкой '.$id.'!');
 $order = Cart::loadOrder($id);

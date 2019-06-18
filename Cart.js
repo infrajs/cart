@@ -62,8 +62,11 @@ window.Cart = {
 			cb(ans);
 		});
 	},
+	inaction: false,
 	action: function(place, name, orderid, cb, param) {
 		//place - контекст в котором идёт работа
+		if (Cart.inaction) return;
+		Cart.inaction = true;
 		var rules = Load.loadJSON('-cart/rules.json');
 		var act = rules.actions[name];
 		var order = Cart.getGoodOrder(orderid);
@@ -76,6 +79,7 @@ window.Cart = {
 		var justdo = function () { 
 			//if (!act.link) Cart.blockform(layer);
 			Cart.act(place, name, orderid, function (ans) {
+				Cart.inaction = false;
 				var call = function () {
 					var order = Cart.getGoodOrder(ans.order.id);
 					if (order) {
@@ -127,7 +131,9 @@ window.Cart = {
 			
 			var ask = Template.parse([act.confirm], order);
 			ask = 'Заказ '+link+'<br>'+ask;
-			popup.confirm(ask, justdo);
+			popup.confirm(ask, justdo, function (){
+				Cart.inaction = false;
+			});
 
 		} else {
 			justdo();
