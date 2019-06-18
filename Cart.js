@@ -78,6 +78,7 @@ window.Cart = {
 		
 		var justdo = function () { 
 			//if (!act.link) Cart.blockform(layer);
+			Cart.inaction = true;
 			Cart.act(place, name, orderid, function (ans) {
 				Cart.inaction = false;
 				var call = function () {
@@ -131,9 +132,8 @@ window.Cart = {
 			
 			var ask = Template.parse([act.confirm], order);
 			ask = 'Заказ '+link+'<br>'+ask;
-			popup.confirm(ask, justdo, function (){
-				Cart.inaction = false;
-			});
+			Cart.inaction = false;
+			popup.confirm(ask, justdo);
 
 		} else {
 			justdo();
