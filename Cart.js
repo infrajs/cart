@@ -54,7 +54,7 @@ window.Cart = {
 		if (param) param = '&' + param;
 		else param = '';
 		var path = '-cart/actions.php?id=' + orderid + '&type=' + name + '&place=' + place + param;
-		
+		Session.syncNow();
 		Cart.getJSON(path, function (ans) {
 			Session.syncNow();
 			Global.set('cart');
