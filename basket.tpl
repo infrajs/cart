@@ -21,14 +21,14 @@
 				}
 			}
 		</style>
-		<div id="basket_text">
+		<div id="basket_text" style="margin-top:-5px">
 			<a href="/cart/orders" class="float-right" style="font-size:42px;line-height:42px; display:block">
 				<span class="pe-7s-cart"></span>
 			</a>
 			<span class="bold_basket">{data.user.email?:user?:reg}</span>
 			<div>
 				{data.user.email?:umenu}
-				В <a href="/cart/orders/my/list">корзине</a> <b><span>{data.order.count|:str0}</span>&nbsp;{~words(data.order.count,:позиция,:позиции,:позиций)}</b>
+				<nobr>В <a href="/cart/orders/my/list">корзине</a> <b><span>{data.order.count|:str0}</span>&nbsp;{~words(data.order.count,:позиция,:позиции,:позиций)}</b></nobr>
 			</div>
 			<div style="clear:both"></div>
 		</div>
