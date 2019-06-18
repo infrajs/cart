@@ -424,15 +424,15 @@
 			<div class="col-sm-8 order-sm-1">
 				<div class="form-group">
 					<label>ФИО{:req}</label>
-					<input {:isdisabled} type="text" name="name" value="{name}" class="form-control" placeholder="">
+					<input {:isdisabled} type="text" name="name" value="{data.order.name}" class="form-control" placeholder="">
 				</div>
 				<div class="form-group">
 					<label>Телефон{:req}</label>
-					<input {:isdisabled} type="tel" name="phone"  value="{phone}" class="form-control" placeholder="+79270000000">
+					<input {:isdisabled} type="tel" name="phone"  value="{data.order.phone}" class="form-control" placeholder="+79270000000">
 				</div>
 				<div class="form-group">
 					<label>Email{:req}</label>
-					<input {:isdisabled} type="email" name="email" value="{email}" class="form-control" placeholder="Email">
+					<input {:isdisabled} type="email" name="email" value="{data.order.email|data.user.email}" class="form-control" placeholder="Email">
 				</div>
 			</div>
 			
