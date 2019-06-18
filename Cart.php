@@ -437,8 +437,14 @@ class Cart {
 
 		//Mail::toSupport($subject.' - копия для поддержки', $email, $body);
 
-		if ($to=='user') return Mail::fromAdmin($subject,$email,$body);
-		if ($to=='manager') return Mail::toAdmin($subject,$email,$body);
+		if ($to=='user') {
+			return Mail::html($subject, '<pre>'.$body.'</pre>', true, $email);  //from, to
+			//return Mail::fromAdmin($subject, $email, $body);
+		}
+		if ($to=='manager') {
+			return Mail::html($subject, '<pre>'.$body.'</pre>', $email, true); //from, to
+			//return Mail::toAdmin($subject,$email,$body);
+		}
 	}
 	public static function mergeOrder(&$order, $place, $safe = false) {
 		if (empty($order['id'])) return;

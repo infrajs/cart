@@ -73,7 +73,14 @@ if ($type == 'user') {
 	$ans['email']=Session::getEmail();
 	$ans['manager']=Session::get('safe.manager');
 } else if ($type == 'order') {
+
 	if ($place == 'admin' && !Session::get('safe.manager')) {
+		if (Load::isphp()) {
+			if (Cart::canI($orderid)) {
+				header('Location: /cart/orders/'.$orderid);
+				exit;
+			}
+		}
 		return Ans::err($ans, 'У вас нет доступа к этому разделу. Вы не являетесь Менеджером.');
 	}
 	$ans['fields'] = Load::loadJSON(Cart::$conf['fields']);

@@ -12,7 +12,7 @@
 
 {ready:}
 Завка готова к оплате.
-Перейти к оплате: http://{site}/cart/orders/{id}/paycard
+Перейти к оплате: <a href="http://{site}/cart/orders/{id}/paycard">http://{site}/cart/orders/{id}/paycard</a>
 {:links}
 
 {edit:}
@@ -63,14 +63,14 @@
 
 {AdmLinks:}
 
-Заказ: http://{site}/cart/admin/{id}
+Заказ: <a href="http://{site}/cart/admin/{id}">http://{site}/cart/admin/{id}</a>
 Клиент: {name}
 Email: {email}
 Телефон: {phone}
 
 {links:}
 
-Заказ {id}: http://{site}/cart/orders/{id}
-Личный кабинет: http://{site}/cart
-Каталог товаров: http://{site}/catalog
-Быстрая авторизация: {link}&src=cart/orders/{id}
+Заказ {id}: <a href="http://{site}/cart/orders/{id}">http://{site}/cart/orders/{id}</a>
+Личный кабинет: <a href="http://{site}/cart">http://{site}/cart</a>
+Каталог товаров: <a href="http://{site}/catalog">http://{site}/catalog</a>
+Быстрая авторизация: <a href="{link}&src=cart/orders/{id}">{link}&src=cart/orders/{id}</a>
