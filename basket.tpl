@@ -36,20 +36,9 @@
 	{str0:}0
 	{umenu:}
 		<a onclick="Cart.goTop()" href="/cart/orders/my">{Cart.lang(:Заказ)}</a> |
-		<a class="signout" onclick="Cart.goTop()" href="/user/logout">{Cart.lang(:Выход)}</a><br>
-		<script>
-			domready(function(){
-				$('.signout').click(function(){
-					Session.logout();
-					Global.set(["user"]);
-					Session.syncNow();
-					Cart.goTop();
-					return false;
-				});
-			});
-		</script>
-	{reg:}<a onclick="Cart.goTop()" href="/user/signin">{Cart.lang(:Гость)}</a>
-	{user:} <b><a onclick="Cart.goTop()" href="/user">{data.user.email}</a></b>
+		<a data-crumb="false" onclick="Cart.logout(); return false;" href="/user/logout?back=ref">{Cart.lang(:Выход)}</a><br>
+	{reg:}<a href="/user/signin?back=ref">{Cart.lang(:Гость)}</a>
+	{user:} <b><a href="/user">{data.user.email}</a></b>
 {props:}
 	<table class="props">
 		<tr>

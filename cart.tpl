@@ -441,7 +441,7 @@
 		{payinfo:}
 			<div data-value="{~key}" class="iteminfo"><div class="alert border more">{:basket.fields.{tpl}}</div></div>
 		{fioadmin:}
-		{fiouser:}<b>Вы авторизованы</b><p>Ваш аккаунт <b>{data.user.email}</b></p>
+		{fiouser:}<b>Вы авторизованы</b><p>Ваш аккаунт <b style="display:block; max-width:200px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden">{data.user.email}</b></p>
 		{fioguest:}<b>Уже покупали у нас?</b>
 		<p><a href="/user/signin?back=ref">Авторизуйтесь</a>, чтобы не заполнять форму повторно.</p>
 	{jsitem:}

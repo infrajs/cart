@@ -21,6 +21,7 @@
 .cartbasket .bold_basket {
 	width: 140px;
     overflow: hidden;
+    white-space: nowrap;
     display: block;
     text-overflow: ellipsis;
 }
