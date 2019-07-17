@@ -529,7 +529,7 @@
 			</p>
 	{dateFormat:}d.m.Y h:i:s
 	{couponinp:}
-		<div style="max-width:250px" class="input-group">
+		<div style="max-width: 300px;" class="input-group">
 			<input name="coupon" {:isdisabled} value="{data.order.coupon}" type="text" class="form-control" id="coupon" placeholder="Укажите купон">
 			<div class="input-group-append">
 			    <button onclick="Cart.action('{crumb.parent.name}', 'sync', {data.order.id});" class="btn btn-secondary" type="button">Активировать</button>
