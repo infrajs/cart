@@ -13,12 +13,16 @@ use infrajs\each\Each;
 use infrajs\mail\Mail;
 use infrajs\config\Config;
 use infrajs\path\Path;
+use infrajs\event\Event;
 use infrajs\excel\Xlsx;
 use infrajs\each\Fix;
 use infrajs\user\User;
 use infrajs\view\View;
 use infrajs\lang\Lang;
 
+Event::$classes["Cart"] = function($pos) { 
+	return $pos["producer_nick"].$pos["article_nick"].$pos["item_nick"];
+};
 class Cart {
 	public static $conf = [];
 	public static function getPath($id = '') 
@@ -81,8 +85,7 @@ class Cart {
 			
 			if(empty($order['email']))$order['email'] = '';
 			$order['email'] = trim($order['email']);
-			$order['sumopt'] = 0;
-			$order['sumroz'] = 0;
+			$order['sum'] = 0;
 			$order['count'] = 0;
 			$num = 0;
 			Each::foro($order['basket'], function &(&$pos,$prodart) use (&$order,&$num) {
@@ -120,17 +123,11 @@ class Cart {
 				$pos['count']=$count;
 				$order['count']++;
 				$conf = Config::get('cart');
-				if ($conf['opt']) {
-					if (!empty($pos['Цена оптовая'])) $pos['sumopt']=$pos['Цена оптовая']*$pos['count'];
-					else $pos['sumopt']=0;
-					if (!empty($pos['Цена розничная'])) $pos['sumroz']=$pos['Цена розничная']*$pos['count'];
-					else $pos['sumroz']=0;
-					$order['sumopt']+=$pos['sumopt'];
-				} else {
-					$pos['sumroz']=$pos['Цена']*$pos['count'];
-				}
+			
+				$pos['sum']=$pos['Цена']*$pos['count'];
 				
-				$order['sumroz']+=$pos['sumroz'];
+				
+				$order['sum']+=$pos['sum'];
 
 				return $r;
 			});
@@ -158,88 +155,69 @@ class Cart {
 				//Хотя оплачена alltotal вместе с доставкой
 				//if (!$order['total']) return;//У оплаченой заявки обязательно должно быть total оплаченная, без цены доставки.
 				//$order['manage']['paid'] вся оплаченная сумма с заявкой, по факту.
-				$hadpaid+=$order['manage']['paid'];
+				$hadpaid += $order['manage']['paid'];
 				return $r;
 			});
 			$order['hadpaid']=$hadpaid;
 			//sum цена всех товаров
 			//total цена всех товаров с учётом цены указанной менеджером, тобишь со скидкой
-			//
-
-			$order['merch']=false;
 			
-			$merch = Load::loadJSON('~cart/merchants.json');
-			if (!$merch) $merch = Load::loadJSON('-cart/merchants.json');
-			$order['level']=$merch['level'];
-
-			if (User::is()) {	
-				$email = Session::getEmail();
-				if (!empty($merch['merchants'][$email])) {
-					$order['merch'] = $merch['merchants'][$email];
-				}
-			}
-			if (!$order['merch']) {
-				$order['need']=$order['level']-($order['sumopt']+$order['hadpaid']);
-				if ($order['need']<0)$order['need']=0;
-			} else {
-				$order['need'] = 0;
-			}
 			$conf = Config::get('cart');
-			if ($conf['opt']) {
-				$order['merchdyn']=!$order['need'];
-				if ($order['merchdyn']) {
-					$order['sum']=$order['sumopt'];
-					Each::foro($order['basket'], function &(&$pos) {
-						$r = null;
-						$pos['sum'] = $pos['sumopt'];
-						if(!empty($pos['Цена оптовая'])) $pos['cost'] = $pos['Цена оптовая'];
-						return $r;
-					});
-				} else {
-					$order['sum']=$order['sumroz'];
-					Each::foro($order['basket'], function &(&$pos) {
-						$r = null;
-						$pos['sum']=$pos['sumroz'];
-						if(!empty($pos['Цена розничная'])) $pos['cost'] = $pos['Цена розничная'];
-						return $r;
-					});
-				}
-				if (empty($pos['cost'])) $pos['cost'] = 0;
-			} else {
-				//$pos['cost'] = $pos['Цена'];
-				$order['sum'] = $order['sumroz'];
-				
-				Each::foro($order['basket'], function &(&$pos) {
-					$r = null;
-					if (empty($pos['Цена'])) $pos['Цена'] = 0;
-					$pos['sum'] = $pos['sumroz'];
-					$pos['cost'] = $pos['Цена'];
-					return $r;
-				});
-			}
+			
+			//$pos['cost'] = $pos['Цена'];
+			
+			Each::foro($order['basket'], function &(&$pos) {
+				$r = null;
+				if (empty($pos['Цена'])) $pos['Цена'] = 0;
+				$pos['cost'] = $pos['Цена'];
+				return $r;
+			});
 
-			
 			$order['total'] = $order['sum'];
-			
 
 			if (!empty($order['coupon'])) {
 				$data = Load::loadJSON('-excel/get/group/Купоны/?src=~pages/Параметры.xlsx');
+				
+				$coupon = [
+					'Скидка' => 0,
+					'Купон' => $order['coupon']
+				];
+				$coupons = [];
 				if (sizeof($data['data'])) {
-					$coupons = [];
 					foreach ($data['data']['data'] as $row) {
-						$coupons[$row['Купон']] = $row['Скидка'];
+						$coupons[$row['Купон']] = $row;
 					}
-					if (isset($coupons[$order['coupon']])) {
-						$discount = $coupons[$order['coupon']];
-						$fncost = Template::$scope['~cost'];
-						$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> даёт скидку <b>'.($discount*100).'%</b>.<br>Скидка действует не на все товары.<br>Точную сумму укажет менеджер после проверки.';//' <s>'.$fncost($order['total']).'</s>&nbsp;руб.';
-						$order['total'] = $order['total'] * (1 - $discount);
-						$order['coupon_discount'] = $discount;
-					} else {
-						$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> не найден или устарел';
-						//$order['sum'] = $order['sum'] * 0.95;
-					}
+					if (isset($coupons[$order['coupon']])) $coupon = $coupons[$order['coupon']];
 				}
+
+				$couponsum = 0;
+				Each::foro($order['basket'], function &(&$pos, $prodart) use (&$couponsum, &$coupon, &$order) {
+					
+					$pos['coupon'] = $coupon;
+					$r = Event::fire('Cart.coupon', $pos);
+					if ($r) { //Дейстует
+						$discount = $coupon['Скидка'];
+						$pos['coupcost'] = $pos['Цена'] * (1-$discount);
+						$sum = $pos['Цена'] * $pos['count'] * (1-$discount);
+					} else {//Не дейстует
+						$sum = $pos['Цена'] * $pos['count'];
+					}
+					$couponsum += $sum;
+					$r = null; //$pos['sum'] $pos['order'] $coupon
+					return $r;
+				});
+				$order['total'] = $couponsum;
+				if (isset($coupons[$order['coupon']])) {
+					$discount = $coupons[$order['coupon']]['Скидка'];
+					$fncost = Template::$scope['~cost'];
+					$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> даёт скидку <b>'.($discount*100).'%</b>.<br>Скидка не дейстует на акционные товары.<br>Точную сумму укажет менеджер после проверки.';//' <s>'.$fncost($order['total']).'</s>&nbsp;руб.';
+					//$order['total'] = $order['total'] * (1 - $discount);
+					$order['coupon_discount'] = $discount;
+				} else {
+					$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> не найден или устарел';
+					//$order['sum'] = $order['sum'] * 0.95;
+				}
+
 			}
 			if (!empty($order['manage']['summary'])) {
 				$order['manage']['summary']=preg_replace('/\s/','',$order['manage']['summary']);

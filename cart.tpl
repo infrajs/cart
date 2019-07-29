@@ -27,8 +27,7 @@
 				<div class="mr-sm-3 mx-auto mx-sm-0">{:couponinp}</div>
 				<div class="flex-grow-1">
 					<p class="text-center text-sm-right {data.order.coupon_discount??:d-none}">
-						Итого: <b class="carttotal" style="font-size:140%">{total:itemcostrub}</b> 
-						<!--<del style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel">{total!sum?sum:itemcostrub}</del>-->
+						Итого со скидкой: <b class="carttotal" style="font-size:140%">{total:itemcostrub}</b> 
 					</p>
 					<div class="d-flex text-center text-sm-right flex-column">
 						<div><a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-success">Перейти к {data.order.id?:заказу {data.order.id}?:оформлению заказа}</a></div>
@@ -41,8 +40,7 @@
 				<div class="mr-sm-3 mx-auto mx-sm-0">{data.order:couponinp}</div>
 				<div class="flex-grow-1">
 					<p class="text-center text-sm-right {data.order.coupon_discount??:d-none}">
-						Итого: <b class="carttotal" style="font-size:140%">{data.order.total:itemcostrub}</b> 
-						<!--<del style="margin-left:10px;font-size:18px; color:#999;" class="cartsumdel">{total!sum?sum:itemcostrub}</del>-->
+						Итого со скидкой: <b class="carttotal" style="font-size:140%">{data.order.total:itemcostrub}</b>
 					</p>
 				</div>
 			</div>
@@ -73,7 +71,7 @@
 				{basket::cartpos}
 			</div>
 			<div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-				<div class="mr-2">Сумма: </div><div style="font-size:120%; font-weight:bold" class="cartsum">{sum:itemcostrub}</div>
+				<div class="mr-2">Сумма {coupon_discount?:nodiscount}: </div><div style="font-size:120%; font-weight:bold" class="cartsum">{sum:itemcostrub}</div>
 			</div>
 			<script>
 				domready( function () {
@@ -110,22 +108,26 @@
 					}
 
 					var calc = function () {
+
 						var sum = $('.cart [type=number]').reduce(function(ak, el){
 							ak+=el.value * $(el).attr('data-cost');
 							return ak;
 						}, 0);
 						set('.cartsum', sum);
+
+						var total = $('.cart [type=number]').reduce(function(ak, el){
+							var cost = $(el).attr('data-coupcost');
+							if (!cost) cost = $(el).attr('data-cost');
+							ak+=el.value * cost;
+							return ak;
+						}, 0);
 						
 						if ("{coupon_discount}") {
-							var total = sum * (1-{coupon_discount|:0});
+							//var total = sum * (1-{coupon_discount|:0});
 							set('.carttotal', total);
-							set('.cartsumdel', sum);
-							//$('.carttotal').html(tplcost(total));
-							//$('.cartsumdel').html(tplcost(sum));
 						} else {
 							set('.carttotal', sum);
 							$('.carttotal').html(tplcost(sum));
-							$('.cartsumdel').html('');
 						}
 					}
 					$('.cart [type=number]').change(calc);
@@ -155,14 +157,18 @@
 							{:basket.props}
 						</div>
 						<div class="my-2 d-flex align-items-center ml-sm-3">
-							<div class="mr-2"><input {:isdisabled} data-cost="{Цена}" style="width:60px" value="{basket[{:prodart}]count}" type="number" min="0" max="999" name="basket.{producer_nick} {article_nick}{:cat.idsp}.count" class="form-control" type="number"></div>
-							<div style="min-width:70px;"><b>{Цена:itemcostrub}</b>{*...coupon_discount?:nodiscount}</div>
+							<div class="mr-2"><input {:isdisabled} data-coupcost="{coupcost}" data-cost="{Цена}" style="width:60px" value="{basket[{:prodart}]count}" type="number" min="0" max="999" name="basket.{producer_nick} {article_nick}{:cat.idsp}.count" class="form-control" type="number"></div>
+
+							<div style="min-width:70px;">
+								<div><del>{coupcost?Цена:itemcostrub}</del></div>
+								<b>{(coupcost|Цена):itemcostrub}</b>{*...coupon_discount?:nodiscount}
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 			<hr>
-			{nodiscount:}<br><small><nobr>без скидки</nobr></small>
+			{nodiscount:}<nobr>без скидки</nobr>
 			{cartposimg:}
 				<img class="img-thumbnail" src="/-imager/?w=60&crop=1&h=60&src={images.0}&or=-imager/empty.png">
 			{cartposimgm:}
