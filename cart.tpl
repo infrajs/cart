@@ -150,7 +150,7 @@
 					{images.0?:cartposimg}
 				</div>
 				<div class="flex-grow-1">
-					<div class="">{change:star}<b><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{Наименование}</a></b></div>
+					<div class="">{change:star}<b><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}"><div class="float-right">{:extend.badgenalichie}</div>{Наименование}</a></b></div>
 					<div class="d-flex align-items-center flex-column flex-sm-row">
 						{images.0?:cartposimgm}
 						<div class="my-2 flex-grow-1">

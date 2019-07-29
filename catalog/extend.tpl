@@ -10,6 +10,7 @@
 {itemcost:}<span class="cost">{~cost((Цена|...Цена))}{:orig.unit}</span>
 {itemnocost:}<a href="/contacts">Уточнить</a>
 {nalichie:}{:orig.nalichie}
+{badgenalichie:}{:orig.badgenalichie}
 {orig.priceblockbig:}
 	<span style="font-size: 24px;" class="mt-2 cart-basket form-inline form-group has-success">
 		{(Цена|...Цена)?:itemcost}&nbsp;&nbsp;&nbsp;
