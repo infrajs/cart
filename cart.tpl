@@ -534,6 +534,25 @@
 				<span data-id="{data.order.id}" data-place="{crumb.parent.name}" class="cart-search a">Поиск позиций</span>
 			</p>
 	{dateFormat:}d.m.Y h:i:s
+{COUPONCHECK :}
+	<div style="max-width: 300px;" class="input-group">
+		<input name="coupon" type="text" class="form-control" placeholder="Купон">
+		<div class="input-group-append">
+		    <button class="btn btn-secondary" onclick="
+		    	var name = $('[name=coupon]').val();
+		    	var coupon = Load.loadJSON('-cart/coupon?name='+name);
+		    	$('#coupinfo').html(Template.parse('-cart/cart.tpl',coupon,'coupinfo'));
+		    " type="button">Проверить</button>
+		</div>
+	</div>
+	<div class="py-2" id="coupinfo"></div>
+	{coupinfo:}
+		{result?:coupinfoshow?:coupinfoerr}
+	{coupinfoerr:}{Купон?:coupinfoerr1?:coupinfoerr2}
+		{coupinfoerr1:}<div class="alert alert-danger"><b>{Купон}</b> &mdash; купон не найден или устарел</div>
+		{coupinfoerr2:}<div class="alert alert-danger">Укажите код купона</div>
+	{coupinfoshow:}<div class="alert alert-success"><b>{Купон}</b> &mdash; купон найден. Скидка <b>{~multi(Скидка,:100)}%</b>.</div>
+	{100:}100
 	{couponinp:}
 		<div style="max-width: 300px;" class="input-group">
 			<input name="coupon" {:isdisabled} value="{data.order.coupon}" type="text" class="form-control" id="coupon" placeholder="Укажите купон">

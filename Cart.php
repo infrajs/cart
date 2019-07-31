@@ -176,46 +176,29 @@ class Cart {
 			$order['total'] = $order['sum'];
 
 			if (!empty($order['coupon'])) {
-				$data = Load::loadJSON('-excel/get/group/Купоны/?src=~pages/Параметры.xlsx');
-				
-				$coupon = [
-					'Скидка' => 0,
-					'Купон' => $order['coupon']
-				];
-				$coupons = [];
-				if (sizeof($data['data'])) {
-					foreach ($data['data']['data'] as $row) {
-						$coupons[$row['Купон']] = $row;
-					}
-					if (isset($coupons[$order['coupon']])) $coupon = $coupons[$order['coupon']];
-				}
-
-				$couponsum = 0;
-				Each::foro($order['basket'], function &(&$pos, $prodart) use (&$couponsum, &$coupon, &$order) {
+				$coupon = Load::loadJSON('-cart/coupon?name='.$order['coupon']);
+				$discount = $coupon['Скидка'];
+				$order['total'] = 0;
+				Each::foro($order['basket'], function &(&$pos, $prodart) use (&$coupon, &$order, $discount) {
 					
 					$pos['coupon'] = $coupon;
 					$r = Event::fire('Cart.coupon', $pos);
-					if ($r) { //Дейстует
-						$discount = $coupon['Скидка'];
+					if ($r) { //Действует
 						$pos['coupcost'] = $pos['Цена'] * (1-$discount);
 						$sum = $pos['Цена'] * $pos['count'] * (1-$discount);
 					} else {//Не дейстует
 						$sum = $pos['Цена'] * $pos['count'];
 					}
-					$couponsum += $sum;
-					$r = null; //$pos['sum'] $pos['order'] $coupon
-					return $r;
+					$order['total'] += $sum;
+					$r = null; return $r;
 				});
-				$order['total'] = $couponsum;
-				if (isset($coupons[$order['coupon']])) {
-					$discount = $coupons[$order['coupon']]['Скидка'];
+				
+				if ($coupon['result']) {
 					$fncost = Template::$scope['~cost'];
-					$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> даёт скидку <b>'.($discount*100).'%</b>.<br>Скидка не дейстует на акционные товары.<br>Точную сумму укажет менеджер после проверки.';//' <s>'.$fncost($order['total']).'</s>&nbsp;руб.';
-					//$order['total'] = $order['total'] * (1 - $discount);
+					$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> даёт скидку <b>'.($discount*100).'%</b>.<br>Скидка не дейстует на акционные товары.<br>Точную сумму укажет менеджер после проверки.';
 					$order['coupon_discount'] = $discount;
 				} else {
 					$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> не найден или устарел';
-					//$order['sum'] = $order['sum'] * 0.95;
 				}
 
 			}
