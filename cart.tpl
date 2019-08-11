@@ -170,11 +170,15 @@
 			<hr>
 			{nodiscount:}<nobr>без скидки</nobr>
 			{cartposimg:}
-				<img class="img-thumbnail" src="/-imager/?w=60&crop=1&h=60&src={images.0}&or=-imager/empty.png">
+				<a href="/catalog/{:pospath}">
+					<img class="img-thumbnail" src="/-imager/?w=60&crop=1&h=60&src={images.0}&or=-imager/empty.png">
+				</a>
 			{cartposimgm:}
-				<div class="my-2 mr-3 d-bock d-sm-none">
+				<a href="/catalog/{:pospath}" class="my-2 mr-3 d-bock d-sm-none">
 					<img class="img-thumbnail" src="/-imager/?h=100&src={images.0}&or=-imager/empty.png">
-				</div>
+				</a>
+			{pospath:}{producer_nick}/{article_nick}{item_nick?:itnick}
+			{itnick:}/{item_nick}
 	{ADMORDER:}
 		{:ordercrumb}
 		<div class="cart">
