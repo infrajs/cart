@@ -10,6 +10,7 @@
 	"js":["Cart.js","infra.js"],
 	"css":"cart.css",
 	"fields":"-cart/fields.json",
+	"require":"infra.php",
 	"update":"update.php",
 	"tester":"tester.php",
 	"testerjs":".tester.js",

@@ -186,6 +186,7 @@ class Cart {
 					if ($r) { //Действует
 						$pos['coupcost'] = $pos['Цена'] * (1-$discount);
 						$sum = $pos['Цена'] * $pos['count'] * (1-$discount);
+						if ($pos['coupcost'] == $pos['Цена']) unset($pos['coupcost']);
 					} else {//Не дейстует
 						$sum = $pos['Цена'] * $pos['count'];
 					}
