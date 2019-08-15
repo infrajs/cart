@@ -11,7 +11,7 @@ Event::one('Controller.oninit', function () {
 	};
 });
 Event::handler('Cart.coupon', function (&$pos){
-	if (in_array($pos['Наличие на складе'],['Акция','Распродажа'])) return false;
+	if (isset($pos['Наличие на складе']) && in_array($pos['Наличие на складе'],['Акция','Распродажа'])) return false;
 	//$pos['coupon'], можно изменить цену $pos['Цена']
 	return true;
 });
