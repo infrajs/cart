@@ -26,7 +26,7 @@
 			<div class="d-flex flex-column flex-sm-row justify-content-between mt-3">
 				<div class="mr-sm-3 mx-auto mx-sm-0">{:couponinp}</div>
 				<div class="flex-grow-1">
-					<p class="text-center text-sm-right {data.order.coupon_discount??:d-none}">
+					<p class="text-center text-sm-right {data.order.coupon_data.result??:d-none}">
 						Итого со скидкой: <b class="carttotal" style="font-size:140%">{total:itemcostrub}</b> 
 					</p>
 					<div class="d-flex text-center text-sm-right flex-column">
@@ -39,7 +39,7 @@
 			<div class="d-flex flex-column flex-sm-row justify-content-between mt-3">
 				<div class="mr-sm-3 mx-auto mx-sm-0">{data.order:couponinp}</div>
 				<div class="flex-grow-1">
-					<p class="text-center text-sm-right {data.order.coupon_discount??:d-none}">
+					<p class="text-center text-sm-right {data.order.coupon_data.result??:d-none}">
 						Итого со скидкой: <b class="carttotal" style="font-size:140%">{data.order.total:itemcostrub}</b>
 					</p>
 				</div>
@@ -71,7 +71,7 @@
 				{basket::cartpos}
 			</div>
 			<div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-				<div class="mr-2">Сумма {coupon_discount?:nodiscount}: </div><div style="font-size:120%; font-weight:bold" class="cartsum">{sum:itemcostrub}</div>
+				<div class="mr-2">Сумма {coupon_data.result?:nodiscount}: </div><div style="font-size:120%; font-weight:bold" class="cartsum">{sum:itemcostrub}</div>
 			</div>
 			<script>
 				domready( function () {
@@ -122,7 +122,7 @@
 							return ak;
 						}, 0);
 						
-						if ("{coupon_discount}") {
+						if ({coupon_data.result?:true?:false}) {
 							//var total = sum * (1-{coupon_discount|:0});
 							set('.carttotal', total);
 						} else {
@@ -133,10 +133,13 @@
 					$('.cart [type=number]').change(calc);
 				});
 			</script>
+			{false:}0
+			{true:}1
 		{cartlistborder:}
 			<div class="border rounded p-3">
 				{:cartlist}
 			</div>
+		{badgecoupon:}&nbsp;<span title="Скидка по купону {Купон}" class="badge badge-pill badge-danger">-{~multi(Скидка,:100)}%</span>
 		{cartpos:}
 			<div class="d-flex align-items-sm-center">
 				<div style="{:ishidedisabled}">
@@ -150,7 +153,12 @@
 					{images.0?:cartposimg}
 				</div>
 				<div class="flex-grow-1">
-					<div class="">{change:star}<b><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}"><div class="float-right">{:extend.badgenalichie}</div>{Наименование}</a></b></div>
+					<div>
+						<div class="float-right">{:extend.badgenalichie}{coupon:badgecoupon}</div>
+						<b>{change:star} <a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">
+							{Наименование}</a>
+						</b>
+					</div>
 					<div class="d-flex align-items-center flex-column flex-sm-row">
 						{images.0?:cartposimgm}
 						<div class="my-2 flex-grow-1">
@@ -161,7 +169,7 @@
 
 							<div style="min-width:70px;">
 								<div><del>{coupcost?Цена:itemcostrub}</del></div>
-								<b>{(coupcost|Цена):itemcostrub}</b>{*...coupon_discount?:nodiscount}
+								<b>{(coupcost|Цена):itemcostrub}</b>
 							</div>
 						</div>
 					</div>
@@ -538,7 +546,7 @@
 				<span data-id="{data.order.id}" data-place="{crumb.parent.name}" class="cart-search a">Поиск позиций</span>
 			</p>
 	{dateFormat:}d.m.Y h:i:s
-{COUPONCHECK :}
+{COUPONCHECK:}
 	<div style="max-width: 300px;" class="input-group">
 		<input name="coupon" type="text" class="form-control" placeholder="Купон">
 		<div class="input-group-append">
@@ -553,9 +561,17 @@
 	{coupinfo:}
 		{result?:coupinfoshow?:coupinfoerr}
 	{coupinfoerr:}{Купон?:coupinfoerr1?:coupinfoerr2}
-		{coupinfoerr1:}<div class="alert alert-danger"><b>{Купон}</b> &mdash; купон не найден или устарел</div>
-		{coupinfoerr2:}<div class="alert alert-danger">Укажите код купона</div>
-	{coupinfoshow:}<div class="alert alert-success"><b>{Купон}</b> &mdash; купон найден. Скидка <b>{~multi(Скидка,:100)}%</b>.</div>
+		{coupinfoerr1:}<div class="alert alert-danger"><b>{Купон}</b> &mdash; купон не найден или устарел.</div>
+		{coupinfoerr2:}<div class="alert alert-danger">Укажите код купона.</div>
+	{coupinfoshow:}<div class="alert alert-success">
+			<b>{Купон}</b> &mdash; купон найден. Скидка до <b>{~multi(Скидка,:100)}%</b>. 
+			<br>Скидка не действует на товары участвующие в других акциях и распродажах. 
+			{(Производители|Группы)?:clim}
+			<br>Точную стоимость укажет менеджер после проверки.
+		</div>
+	{clim:}<br>Есть ограничения по группам и производителям.
+	{cprod:}<br>Производители: <b>{Производители}</b>.
+	{cgroup:}<br>Группы: <b>{Группы}</b>.
 	{100:}100
 	{couponinp:}
 		<div style="max-width: 300px;" class="input-group">
@@ -565,7 +581,7 @@
 			</div>
 		</div>
 		<div class="py-2">
-			{data.order.coupon_msg}
+			{coupon_data:coupinfo}
 		</div>
 		{prodart:}{producer_nick} {article_nick}{:cat.idsp}
 		{mybasket:}Ваша корзина

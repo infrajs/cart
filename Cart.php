@@ -177,40 +177,88 @@ class Cart {
 
 			if (!empty($order['coupon'])) {
 				$coupon = Load::loadJSON('-cart/coupon?name='.$order['coupon']);
-				$discount = $coupon['Скидка'];
-				$order['total'] = 0;
-				Each::foro($order['basket'], function &(&$pos, $prodart) use (&$coupon, &$order, $discount) {
-					
-					$pos['coupon'] = $coupon;
-					$r = Event::fire('Cart.coupon', $pos);
-					if ($r) { //Действует
-						$pos['coupcost'] = $pos['Цена'] * (1-$discount);
-						$sum = $pos['Цена'] * $pos['count'] * (1-$discount);
-						if ($pos['coupcost'] == $pos['Цена']) unset($pos['coupcost']);
-					} else {//Не дейстует
-						$sum = $pos['Цена'] * $pos['count'];
-					}
-					$order['total'] += $sum;
-					$r = null; return $r;
-				});
-				
+				$order['coupon_data'] = $coupon;
 				if ($coupon['result']) {
-					$fncost = Template::$scope['~cost'];
-					$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> даёт скидку <b>'.($discount*100).'%</b>.<br>Скидка не дейстует на акционные товары.<br>Точную сумму укажет менеджер после проверки.';
-					$order['coupon_discount'] = $discount;
-				} else {
-					$order['coupon_msg'] = 'Купон <b>'.$order['coupon'].'</b> не найден или устарел';
-				}
 
+				
+					$order['total'] = 0;
+
+					foreach ($coupon['rows'] as $k => $row) {
+						if (isset($coupon['rows'][$k]['Производители'])) {
+							$r = explode(',', $coupon['rows'][$k]['Производители']);
+							$coupon['rows'][$k]['Производители'] = array_map(function ($v){
+								return Path::encode($v);
+							}, $r);
+						}
+						if (isset($coupon['rows'][$k]['Группы'])) {
+							$r = explode(',', $coupon['rows'][$k]['Группы']);
+							$coupon['rows'][$k]['Группы'] = array_map(function ($v){
+								return Path::encode($v);
+							}, $r);
+						}
+					}
+					Each::foro($order['basket'], function &(&$pos, $prodart) use (&$coupon, &$order) {
+						
+						$r = true;
+
+						foreach ($coupon['rows'] as $row) {
+							$rr = true;
+							if (isset($row['Производители'])) {
+								if (!in_array($pos['producer_nick'], $row['Производители'])) {
+									$rr = false;
+									continue;
+								}
+							}
+							if (isset($row['Группы'])) {
+								$rg = false;
+								foreach ($pos['path'] as $g) {
+									if (in_array($g, $row['Группы'])) {
+										$rg = true;	
+										break;
+									}
+								}
+								if (!$rg) {
+									$rr = false;
+									continue;
+								}
+							}
+							if ($rr) break;
+						}
+						if ($rr) {
+							$pos['coupon'] = $row;
+
+						} else {
+							$r = false;
+						}
+						
+						if ($r) $r = Event::fire('Cart.coupon', $pos);
+						
+						if ($r) { //Действует
+							$discount = $pos['coupon']['Скидка'];
+							$pos['coupcost'] = $pos['Цена'] * (1-$discount);
+							$sum = $pos['Цена'] * $pos['count'] * (1-$discount);
+							if ($pos['coupcost'] == $pos['Цена']) unset($pos['coupcost']);
+						} else {//Не дейстует
+							unset($pos['coupon']);
+							$sum = $pos['Цена'] * $pos['count'];
+						}
+						$order['total'] += $sum;
+						$r = null; return $r;
+					});
+					
+				}
+				
+				//if ($coupon['result']) {
+				//$fncost = Template::$scope['~cost'];
 			}
 			if (!empty($order['manage']['summary'])) {
-				$order['manage']['summary']=preg_replace('/\s/','',$order['manage']['summary']);
+				$order['manage']['summary'] = preg_replace('/\s/','',$order['manage']['summary']);
 				$order['total']=$order['manage']['summary'];
 			}
 			//Стоимость с доставкой
 			$order['alltotal']=$order['total'];
 			if (!empty($order['manage']['deliverycost'])) {
-				$order['manage']['deliverycost']=preg_replace('/\s/','',$order['manage']['deliverycost']);
+				$order['manage']['deliverycost'] = preg_replace('/\s/','',$order['manage']['deliverycost']);
 				$order['alltotal']+=$order['manage']['deliverycost'];
 			}
 			return $order;

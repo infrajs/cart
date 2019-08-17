@@ -14,7 +14,17 @@ if ($name) {
 	$coupons = [];
 	if (sizeof($data['data'])) {
 		foreach ($data['data']['data'] as $row) {
-			$coupons[$row['Купон']] = $row;
+			if(empty($coupons[$row['Купон']])) {
+				$coupons[$row['Купон']] = $row;	
+				$coupons[$row['Купон']]['rows'] = [];
+				$coupons[$row['Купон']]['rows'][] = $row;
+			} else {
+				$coupons[$row['Купон']]['rows'][] = $row;
+				if ($coupons[$row['Купон']]["Скидка"] < $row["Скидка"]) {
+					$coupons[$row['Купон']]["Скидка"] = $row["Скидка"];
+				}
+			}
+			
 		}
 		if (isset($coupons[$name])) {
 			$coupon = $coupons[$name];
