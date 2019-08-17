@@ -199,39 +199,9 @@ class Cart {
 					}
 					Each::foro($order['basket'], function &(&$pos, $prodart) use (&$coupon, &$order) {
 						
-						$r = true;
-
-						foreach ($coupon['rows'] as $row) {
-							$rr = true;
-							if (isset($row['Производители'])) {
-								if (!in_array($pos['producer_nick'], $row['Производители'])) {
-									$rr = false;
-									continue;
-								}
-							}
-							if (isset($row['Группы'])) {
-								$rg = false;
-								foreach ($pos['path'] as $g) {
-									if (in_array($g, $row['Группы'])) {
-										$rg = true;	
-										break;
-									}
-								}
-								if (!$rg) {
-									$rr = false;
-									continue;
-								}
-							}
-							if ($rr) break;
-						}
-						if ($rr) {
-							$pos['coupon'] = $row;
-
-						} else {
-							$r = false;
-						}
 						
-						if ($r) $r = Event::fire('Cart.coupon', $pos);
+						$r = Cart::couponCheck($coupon, $pos);
+
 						
 						if ($r) { //Действует
 							$discount = $pos['coupon']['Скидка'];
@@ -263,6 +233,40 @@ class Cart {
 			}
 			return $order;
 		}, array($id));
+	}
+	public static function couponCheck($coupon, &$pos) {
+		$r = true;
+		foreach ($coupon['rows'] as $row) {
+			$rr = true;
+			if (isset($row['Производители'])) {
+				if (!in_array($pos['producer_nick'], $row['Производители'])) {
+					$rr = false;
+					continue;
+				}
+			}
+			if (isset($row['Группы'])) {
+				$rg = false;
+				foreach ($pos['path'] as $g) {
+					if (in_array($g, $row['Группы'])) {
+						$rg = true;	
+						break;
+					}
+				}
+				if (!$rg) {
+					$rr = false;
+					continue;
+				}
+			}
+			if ($rr) break;
+		}
+		if ($rr) {
+			$pos['coupon'] = $row;//Когда пройена предварительная проверка
+		} else {
+			$r = false;
+		}
+		if ($r) $r = Event::fire('Cart.coupon', $pos);
+		if (!$r) unset($pos['coupon']);
+		return $r;
 	}
 	public static function sync($place, $orderid) {
 		$order = Cart::loadOrder($orderid);
