@@ -51,7 +51,7 @@
 			"title":"Заказ выполнен",
 			"user":{
 				"buttons":{"print":"success"},
-				"actions":["print","sync"]
+				"actions":["print"]
 			},
 			"manager":{
 				"buttons":{"email":"danger"},
