@@ -89,7 +89,8 @@ window.Cart = {
 							if (act.result) {
 								var msg = Template.parse([act.result], order);
 								var link = Cart.getLink(order, place);
-								popup.alert(link+'<br>'+msg);
+								//popup.alert(link+'<br>'+msg);
+								popup.alert(msg);
 							}
 							return;
 						}
@@ -100,7 +101,8 @@ window.Cart = {
 							if (!act.silent && act.result) {
 								var msg = Template.parse([act.result], order);
 								var link = Cart.getLink(order, place);
-								popup.alert(link+'<br>'+msg);
+								//popup.alert(link+'<br>'+msg);
+								popup.alert(msg);
 							}
 							if (act.go && act.go[place]) Crumb.go(Template.parse([act.go[place]], order));
 							else Controller.check();
@@ -108,7 +110,8 @@ window.Cart = {
 							if (ans.msg) { 
 								var msg = Template.parse([ans.msg], order);
 								var link = Cart.getLink(order, place);
-								popup.alert(link+'<br>'+msg);
+								//popup.alert(link+'<br>'+msg);
+								popup.alert(msg);
 							} else {
 								popup.alert(link+'<br>Произошла обшибка, попробуйте позже!');
 							}

@@ -63,7 +63,8 @@ if ($type == 'user') {
 		if (empty($list[$status])) $list[$status] = array();
 		$list[$status][]=array(
 			'id'=>$order['id'],
-			'time'=>$order['time']
+			'time'=>$order['time'],
+			'total'=>$order['total']
 		);
 		return $r;
 	});

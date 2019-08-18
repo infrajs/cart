@@ -71,7 +71,7 @@
 				{basket::cartpos}
 			</div>
 			<div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-				<div class="mr-2">Сумма {coupon_data.result?:nodiscount}: </div><div style="font-size:120%; font-weight:bold" class="cartsum">{sum:itemcostrub}</div>
+				<div class="mr-2">Сумма{coupon_data.result?:nodiscount}: </div><div style="font-size:120%; font-weight:bold" class="cartsum">{sum:itemcostrub}</div>
 			</div>
 			<script>
 				domready( function () {
@@ -176,7 +176,7 @@
 				</div>
 			</div>
 			<hr>
-			{nodiscount:}<nobr>без скидки</nobr>
+			{nodiscount:} <nobr>без скидки</nobr>
 			{cartposimg:}
 				<a href="/catalog/{:pospath}">
 					<img class="img-thumbnail" src="/-imager/?w=60&crop=1&h=60&src={images.0}&or=-imager/empty.png">
@@ -613,7 +613,7 @@
 		{:usercrumb}
 		<h1>Личный кабинет</h1>
 		{data.email?:account?:noaccount}
-
+		<!--<p><a href="/cart/orders">Мои заказы</a></p>-->
 		<p>{~length(data.list)?:showinfo}</p>
 		<p>
 			В вашей <a href="/cart/orders/my/list">корзине</a> <b>{data.order.count}</b> {~words(data.order.count,:позиция,:позиции,:позиций)}.
@@ -627,7 +627,8 @@
 			</table>
 		{stinfo:}
 			<tr class="{data.rules.rules[~key].notice}"><td>{data.rules.rules[~key].caption}</td><td>{::prorder}</td></tr>
-			{prorder:}{~key?:comma}<a href="/cart/orders/{id}">{id}</a>
+			{prorder:}{~key?:br}<a href="/cart/orders/{id}">{id}</a> <nobr>от {~date(:d.m.Y,time)}</nobr> <nobr>на <b>{~cost(total)}</b>&nbsp;руб.</nobr>
+		{br:}<br>
 		{noaccount:}
 			<p>
 				<b><a href="/user/signin">Вход</a> не выполнен!</b>
@@ -862,38 +863,62 @@
 		{msgpaidorder:}. Оплата <b>{~cost(manage.paid)} руб.</b> отметка {manage.paidtype=:bank?:банка?:менеджера} {~date(:d.m.Y H:i,manage.paidtime)}
 	{adm_message:}
 		<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>
-	{PRINT:}
+{PRINT:}
 	<ol class="breadcrumb noprint">
 		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
-		<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заказы</a></li>
+		<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заказы</a></li>
 		<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заказ {crumb.parent.name=:my??crumb.parent.name}</a></li>
 		<li class="breadcrumb-item active">Версия для печати</li>
 	</ol>
-<pre style="border:none;"><h1 style="margin-bottom:0px">Заказ {id}</h1>
-ФИО: {name}
-Почта: {email}
-Телефон: {phone}
-Перезвонить: {call=:yes?:да?(call=:no?:нет)}{time?:pr-time}
-{transport::iprint}
-{pay::iprint}
+	<h1>Заказ {id} от {~date(:j.m.Y,time)}</h1>
+	{:printorder}
+{printorder:}
+	
+		<b>ФИО</b>: {name}<br>
+		<b>Почта</b>: {email}<br>
+		<b>Телефон</b>: {phone}<br>
+		{call?:pr-call}
+		{time?:pr-time}
+		{transport:iprinttr}
+		{pay:iprintpay}
+	<hr>
 
-===== {count} {~words(count,:позиция,:позиции,:позиций)} =====
-{basket::basket.pritem}
-
-Сумма: {~cost(sum)}&nbsp;руб.
-{coupon?:prcoupon} 
-
-==== Сообщение =====
-<span style="white-space: pre-wrap;">{comment}</span>
-
-====================
-<span style="white-space: pre-wrap;">{manage.comment}</span>
-</pre>
+	<p>
+		<b>{count} {~words(count,:позиция,:позиции,:позиций)}</b>
+	</p>
+	<p>
+		<pre>{basket::basket.pritem}</pre>
+	</p>
+	<p>
+		<b>Сумма{coupon?:nodiscount}</b>: {~cost(sum)}&nbsp;руб.
+	</p>
+	{coupon?:prcoupon}
+	<p>
+		<b>Комментарий</b>:
+		<pre>{comment}</pre>
+		<pre>{manage.comment}</pre>
+	</p>
+	<hr>
+{pr-call:}<b>Перезвонить</b>: {call=:yes?:yescall?(call=:no?:nocall)}<br>
+{yescall:}да
+{nocall:}звонок не требуется
+{iprinttr:}
+	<b>Доставка</b>: {choice}<br>{index:pr} {region:pr} {city:pr} {street:pr} {house:pr} {kv:pr}
+	{self:pr} {cargo:pr} {passeriya:pr} {pasnumber:pr} {courier:pr}
+{pr:} {.}
+{iprintpay:}
+	<div><b>Оплата</b>: {choice}</div>
+{iprinte:}
+	{.}{~last()??:comma}
+{comma:}, 
 {iprint:}
-{~key}: {.}
-{prcoupon:}Купон: {coupon}
-Итого: {~cost(total)}&nbsp;руб.
+	{~key}: {.}<br>
+{prcoupon:}
+	<p>
+		<b>Купон</b>: {coupon}<br>
+		<b>Итого</b>: {~cost(total)}&nbsp;руб.<br>
+	</p>
 {pr-time:}
-Дата изменений: {~date(:H:i j F Y,time)}
+	<b>Дата изменений</b>: {~date(:H:i j F Y,time)}<br>
 {pr-deliver:}
-Доставка: {~cost(manage.deliverycost)}&nbsp;руб.
+	<b>Доставка</b>: {~cost(manage.deliverycost)}&nbsp;руб.<br>

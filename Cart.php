@@ -208,14 +208,19 @@ class Cart {
 							$pos['coupcost'] = $pos['Цена'] * (1-$discount);
 							$sum = $pos['Цена'] * $pos['count'] * (1-$discount);
 							if ($pos['coupcost'] == $pos['Цена']) unset($pos['coupcost']);
+							$pos['coupcost'] = round($pos['coupcost'],2);
+							$pos['coupsum'] = round($sum,2);
 						} else {//Не дейстует
 							unset($pos['coupon']);
 							$sum = $pos['Цена'] * $pos['count'];
+
 						}
+
+						
 						$order['total'] += $sum;
 						$r = null; return $r;
 					});
-					
+					$order['total'] = round($order['total'],2);
 				}
 				
 				//if ($coupon['result']) {
@@ -452,11 +457,11 @@ class Cart {
 		//Mail::toSupport($subject.' - копия для поддержки', $email, $body);
 
 		if ($to=='user') {
-			return Mail::html($subject, '<pre>'.$body.'</pre>', true, $email);  //from, to
+			return Mail::html($subject, $body, true, $email);  //from, to
 			//return Mail::fromAdmin($subject, $email, $body);
 		}
 		if ($to=='manager') {
-			return Mail::html($subject, '<pre>'.$body.'</pre>', $email, true); //from, to
+			return Mail::html($subject, $body, $email, true); //from, to
 			//return Mail::toAdmin($subject,$email,$body);
 		}
 	}
@@ -518,12 +523,13 @@ class Cart {
 				Session::set('orders.my', $order);//Исключение, данные заявки
 				return;
 			} else {
-				$id = time();
+				$id = (int) ((date('m')+9).(date('j')+9).'00');
 				$src = Cart::getPath($id);
 				while (Path::theme($src)) {
 					$id++;
 					$src = Cart::getPath($id);
 				}
+				Path::clear($src);
 			}
 			$order['id'] = $id;
 			//Добавляем в заявки пользователя
@@ -589,7 +595,9 @@ class Cart {
 			);
 		} else {
 			unset($order['fixid']);
-			$order['time'] = time();
+			if($place == 'orders') {
+				$order['time'] = time();
+			}
 			$order['id'] = $id;
 			$save = $order;
 		}
@@ -621,12 +629,16 @@ class Cart {
 			//Клиент отправляет письма менеджеру и себе
 			//Менеджер только клиенту отправляет письма
 			if (!empty($rule['usermail'])) {
-				Cart::mail('user', $order['email'], $rule['usermail'], $ans['order']);
+				if ($order['id']) $ogood = Cart::getGoodOrder($order['id']);
+				else $ogood = $order;
+				Cart::mail('user', $order['email'], $rule['usermail'], $ogood);
 			}
 
 			if ($ans['place'] == 'orders') {
 				if (!empty($rule['mangmail'])) {
-					Cart::mail('manager', $order['email'], $rule['mangmail'], $order);
+					if ($order['id']) $ogood = Cart::getGoodOrder($order['id']);
+					else $ogood = $order;
+					Cart::mail('manager', $order['email'], $rule['mangmail'], $ogood);
 				}
 			}
 		}

@@ -45,15 +45,16 @@
 			<td class="d-flex"><nobr>Производитель:</nobr><div class="line"></div></td><td>{producer}</td>
 		</tr>
 		<tr>
-			<td class="d-flex"><nobr>Артикул:</nobr><div class="line"></div></td><td>{article} {item}</td>
+			<td class="d-flex"><nobr>Артикул:</nobr><div class="line"></div></td><td>{article}{item:pritem}</td>
 		</tr>
 	</table>
 	{pospath:}{producer_nick}/{article_nick}{item_nick?:itnick}
 	{itnick:}/{item_nick}
 {pritem:}
 {Наименование}
-{producer} {article} {item}
+{producer} {article}{item:pr}
 {count} по {~cost(cost)}&nbsp;руб. = {~cost(sum)}&nbsp;руб.<br>
+{pr:} {.}
 {fields::}-cart/fields.tpl
 {ORDER:}
 	{~obj(:title,:Корзина,:content,:showcartlist,:num,:1):accordCard}
