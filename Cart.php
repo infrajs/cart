@@ -625,19 +625,18 @@ class Cart {
 				Cart::mail('manager', $order['email'], $rule['mangmail'], $order);
 			}
 		}*/
+
 		if (!empty($order['email'])) {
 			//Клиент отправляет письма менеджеру и себе
 			//Менеджер только клиенту отправляет письма
 			if (!empty($rule['usermail'])) {
-				if ($order['id']) $ogood = Cart::getGoodOrder($order['id']);
-				else $ogood = $order;
+				$ogood = Cart::getGoodOrder($order);
 				Cart::mail('user', $order['email'], $rule['usermail'], $ogood);
 			}
 
 			if ($ans['place'] == 'orders') {
 				if (!empty($rule['mangmail'])) {
-					if ($order['id']) $ogood = Cart::getGoodOrder($order['id']);
-					else $ogood = $order;
+					$ogood = Cart::getGoodOrder($order);
 					Cart::mail('manager', $order['email'], $rule['mangmail'], $ogood);
 				}
 			}
