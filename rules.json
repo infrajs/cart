@@ -5,7 +5,7 @@
 		"check":{
 			"freeze":true,
 			"edit":{
-				"orders":true,
+				"orders":false,
 				"admin":true
 			},
 			"notice":"warning",
