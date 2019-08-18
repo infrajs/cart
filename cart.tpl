@@ -870,7 +870,8 @@
 		<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заказ {crumb.parent.name=:my??crumb.parent.name}</a></li>
 		<li class="breadcrumb-item active">Версия для печати</li>
 	</ol>
-	<h1>Заказ {id} от {~date(:j.m.Y,time)}</h1>
+	<h1>Заказ {id}{time:ot}</h1>
+	{ot:} от {~date(:j.m.Y,.)}
 	{:printorder}
 {printorder:}
 	
