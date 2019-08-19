@@ -200,10 +200,9 @@ class Cart {
 					Each::foro($order['basket'], function &(&$pos, $prodart) use (&$coupon, &$order) {
 						
 						
-						$r = Cart::couponCheck($coupon, $pos);
-
-						
-						if ($r) { //Действует
+						$res = Cart::couponCheck($coupon, $pos);
+						if ($res) { //Действует
+							$pos['coupon'] = $res;
 							$discount = $pos['coupon']['Скидка'];
 							$pos['coupcost'] = $pos['Цена'] * (1-$discount);
 							$sum = $pos['Цена'] * $pos['count'] * (1-$discount);
@@ -211,7 +210,6 @@ class Cart {
 							$pos['coupcost'] = round($pos['coupcost'],2);
 							$pos['coupsum'] = round($sum,2);
 						} else {//Не дейстует
-							unset($pos['coupon']);
 							$sum = $pos['Цена'] * $pos['count'];
 
 						}
@@ -265,13 +263,15 @@ class Cart {
 			if ($rr) break;
 		}
 		if ($rr) {
-			$pos['coupon'] = $row;//Когда пройена предварительная проверка
+			$res = $row;//Когда пройена предварительная проверка
 		} else {
-			$r = false;
+			$res = false;
 		}
-		if ($r) $r = Event::fire('Cart.coupon', $pos);
-		if (!$r) unset($pos['coupon']);
-		return $r;
+		if ($res) {
+			$r = Event::fire('Cart.coupon', $pos);
+			if (!$r) $res = false;
+		}
+		return $res;
 	}
 	public static function sync($place, $orderid) {
 		$order = Cart::loadOrder($orderid);

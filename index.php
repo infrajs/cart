@@ -55,6 +55,7 @@ if ($type == 'user') {
 	}
 	$orders = Cart::getMyOrders();
 	$order = Cart::getGoodOrder();
+	
 	$ans['order']=$order;
 	$list=array();
 	Each::forr($orders, function &($order) use (&$list){
