@@ -10,9 +10,8 @@ $coupon = [
 ];
 if ($name) {
 	$data = Load::loadJSON('-excel/get/group/Купоны/?src=~pages/Параметры.xlsx');
-	
 	$coupons = [];
-	if (sizeof($data['data'])) {
+	if (!empty($data['data']) && sizeof($data['data'])) {
 		foreach ($data['data']['data'] as $row) {
 			if(empty($coupons[$row['Купон']])) {
 				$coupons[$row['Купон']] = $row;	
