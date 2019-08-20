@@ -871,8 +871,8 @@
 		<li class="breadcrumb-item active">Версия для печати</li>
 	</ol>
 	<h1>Заказ {id}{time:ot}</h1>
-	{ot:} от {~date(:j.m.Y,.)}
 	{:printorder}
+	{ot:} от {~date(:j.m.Y,.)}
 {printorder:}
 	
 		<b>ФИО</b>: {name}<br>
