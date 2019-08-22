@@ -248,6 +248,7 @@ window.Cart = {
 		var name = [place, orderid, 'basket', prodart, 'count'];	
 		count = Number(count);
 		if (!count) count = null;
+		Goal.reach('basket');
 		Session.set(name, count, true, cb);
 	},
 	add: function (place, orderid, prodart, cb) {
@@ -259,6 +260,7 @@ window.Cart = {
 		
 		var name = [place, orderid, 'basket', prodart];	
 		
+		Goal.reach('basket');
 		Session.set(name, { count: 1 }, true, fn);
 	},
 	lang: function (str) {
