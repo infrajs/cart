@@ -84,3 +84,70 @@
 		{item_nick}	
 	{cost:}<b>{~cost(Цена)}{:extend.unit}</b>
 	{img:}<img style="clear:both; margin-left:5px; float:right; position:relative" src="/-imager/?src={images.0}&h=60">
+{JS:}
+	<div>
+		<style>
+			.autocomplete-suggestions { border: 1px solid #999; background: #FFF; overflow: auto; }
+			.autocomplete-suggestion { 
+				padding: 2px 5px; 
+				/*white-space: nowrap; */
+				/*overflow: hidden; */
+			}
+			.autocomplete-selected { background: #F0F0F0; }
+			.autocomplete-suggestions strong { font-weight: normal; color: #3399FF; cursor:pointer;}
+			.autocomplete-group { padding: 2px 5px; }
+			.autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
+		</style>
+		<script>
+			domready(function () {
+				//https://github.com/devbridge/jQuery-Autocomplete
+				var prodart = false;
+				var div = $('#{div}');
+				var query = '';
+				div.find('input').autocomplete({
+					triggerSelectOnValidInput:false,
+					showNoSuggestionNotice:true,
+					noSuggestionNotice:'<div class="p-2">По запросу ничего не найдено. Попробуйте изменить запрос или поискать по <a onclick="Crumb.go(\'/catalog\'); $(\'#{div}\').find(\'input\').blur(); return false" href="/catalog">группам</a>.</div>',
+					serviceUrl: function (q) {
+						query = q;
+						return '/-cart/rest/search/' + q;
+					},
+					onSelect: function (suggestion) {
+						return;
+					},
+					transformResult: function (ans) {
+						return {
+							suggestions: $.map(ans.list, function (pos) {
+								//var itemrow = Catalog.getItemRowValue(pos);
+								//if (itemrow) itemrow = ' ' + itemrow;
+								//var value = pos['Производитель'] + ' ' + pos['Артикул'] + itemrow;
+								return { 
+									value: query, 
+									data: pos 
+								};
+							})
+						};
+					},
+					dataType:"json",
+					ignoreParams: true,
+					onSearchComplete: function () {
+						Controller.check();
+					},
+					formatResult: function (suggestion, currentValue) {
+						if (!currentValue) return suggestion;
+						//var pattern = '(' + $.Autocomplete.utils.escapeRegExChars(currentValue) + ')';
+						//var res = suggestion.value;
+						var res = Template.parse('-cart/rest/search/layout.tpl',suggestion.data, 'SUGGESTION');
+						return res;
+				    },
+				    groupBy2:'group',
+				    onSearchComplete: function (suggestion) {
+				    	if ($('.autocomplete-suggestion').length < 10) return;
+				    	$('.autocomplete-suggestions').append('<div style="margin-left:4px; margin-top:10px" onclick="$(\'#{div} form\').submit(); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a">Показать всё</span></div>');
+				    }
+				}).autocomplete('disable').click( function (){
+					$(this).autocomplete('enable');
+				});
+			});
+		</script>
+	</div>

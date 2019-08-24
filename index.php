@@ -18,7 +18,7 @@ if (in_array(User::getEmail(),Cart::$conf['manager'])) {
 }
 $ans = array();
 $type = Ans::REQ('type', ['sync', 'orders','order','list','cart','user','admin']);
-if (!$type) return Ans::err($ans, 'Указан неправильный параметр type');
+if (!$type) $type='cart';//return Ans::err($ans, 'Указан неправильный параметр type');
 $place = Ans::REQ('place',['orders', 'admin'], 'orders');
 $ans['place'] = $place;
 $ans['type'] = $type;
