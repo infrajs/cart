@@ -1,3 +1,4 @@
+{extend::}-catalog/extend.tpl
 {root:}
 	<div class="cartbasket">
 		<style scoped>
@@ -42,18 +43,19 @@
 {props:}
 	<table class="props">
 		<tr>
-			<td class="d-flex"><nobr>Производитель:</nobr><div class="line"></div></td><td>{producer}</td>
+			<td class="d-flex"><nobr class="d-none d-sm-block">Производитель:</nobr><div class="line"></div></td><td>{producer}</td>
 		</tr>
 		<tr>
-			<td class="d-flex"><nobr>Артикул:</nobr><div class="line"></div></td><td>{article}{item:pritem}</td>
+			<td class="d-flex"><nobr>Артикул:</nobr><div class="line"></div></td><td>{article}{item:pr}</td>
 		</tr>
 	</table>
 	{pospath:}{producer_nick}/{article_nick}{item_nick?:itnick}
 	{itnick:}/{item_nick}
 {pritem:}
-{Наименование}
-{producer} {article}{item:pr}
-{count} по {~cost(cost)}&nbsp;руб. = {~cost(sum)}&nbsp;руб.<br>
+<p>
+	{Наименование} {producer} {article}{item:pr}
+	<br><b>{count}</b> по <b>{~cost(cost)}&nbsp;руб.</b> = <b>{~cost(sum)}&nbsp;руб.</b>
+</p>
 {pr:} {.}
 {fields::}-cart/fields.tpl
 {ORDER:}

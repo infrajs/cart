@@ -118,7 +118,10 @@
 						var total = $('.cart [type=number]').reduce(function(ak, el){
 							var cost = $(el).attr('data-coupcost');
 							if (!cost) cost = $(el).attr('data-cost');
-							ak+=el.value * cost;
+							var sum = el.value * cost;
+							set($(el).parents('.cartpos').find('.coupsum'), sum);
+							//$(el).parents('.cartpos').find('.coupsum').html(tplcost(sum));
+							ak+=sum;
 							return ak;
 						}, 0);
 						
@@ -141,7 +144,7 @@
 			</div>
 		{badgecoupon:}&nbsp;<span title="Скидка по купону {Купон}" class="badge badge-pill badge-danger">-{~multi(Скидка,:100)}%</span>
 		{cartpos:}
-			<div class="d-flex align-items-sm-center">
+			<div class="d-flex cartpos">
 				<div style="{:ishidedisabled}">
 					<div class="custom-control custom-checkbox">
 						<input onchange="$('.act-clear').attr('data-param','prodart='+$('.showlist :checkbox:checked').reduce(function (ak, el){ ak.push($(el).attr('data-prodart')); return ak },[]).join(','))" 
@@ -149,7 +152,7 @@
 						<label class="custom-control-label" for="check{~key}">&nbsp;</label>
 					</div>
 				</div>
-				<div class="mr-3 d-none d-sm-block" style="min-width:70px">
+				<div class="mr-3 d-none d-lg-block" style="min-width:70px">
 					{images.0?:cartposimg}
 				</div>
 				<div class="flex-grow-1">
@@ -159,17 +162,19 @@
 							{Наименование}</a>
 						</b>
 					</div>
-					<div class="d-flex align-items-center flex-column flex-sm-row">
+					<div class="d-flex flex-column flex-lg-row">
 						{images.0?:cartposimgm}
 						<div class="my-2 flex-grow-1">
 							{:basket.props}
 						</div>
-						<div class="my-2 d-flex align-items-center ml-sm-3">
-							<div class="mr-2"><input {:isdisabled} data-coupcost="{coupcost}" data-cost="{Цена}" style="width:60px" value="{basket[{:prodart}]count}" type="number" min="0" max="999" name="basket.{producer_nick} {article_nick}{:cat.idsp}.count" class="form-control" type="number"></div>
-
-							<div style="min-width:70px;">
+						<div class="my-2 d-flex flex-column ml-lg-3">
+							<div style="min-width:70px;" class="text-lg-right">
 								<div><del>{coupcost?Цена:itemcostrub}</del></div>
-								<b>{(coupcost|Цена):itemcostrub}</b>
+								{(coupcost|Цена):itemcostrub}
+							</div>
+							<div class="my-2"><input {:isdisabled} data-coupcost="{coupcost}" data-cost="{Цена}" style="width:120px" value="{basket[{:prodart}]count}" type="number" min="0" max="999" name="basket.{producer_nick} {article_nick}{:cat.idsp}.count" class="form-control text-right" type="number"></div>
+							<div style="min-width:70px;" class="text-lg-right">
+								<b class="coupsum">{(coupsum|sum):itemcostrub}</b>
 							</div>
 						</div>
 					</div>
@@ -888,38 +893,44 @@
 		<b>{count} {~words(count,:позиция,:позиции,:позиций)}</b>
 	</p>
 	<p>
-		<pre>{basket::basket.pritem}</pre>
+		{basket::basket.pritem}
 	</p>
 	<p>
-		<b>Сумма{coupon?:nodiscount}</b>: {~cost(sum)}&nbsp;руб.
+		Сумма{coupon?:nodiscount}: <b>{~cost(sum)}&nbsp;руб.</b><br>
+		{coupon?:prcoupon}
 	</p>
-	{coupon?:prcoupon}
-	<p>
-		<b>Комментарий</b>:
-		<pre>{comment}</pre>
-		<pre>{manage.comment}</pre>
-	</p>
+	{comment?:prcom}
+	{manage.comment?:prcomm}
 	<hr>
+{prcom:}
+	
+		Комментарий:
+		<pre style="margin-top:0"><b><i>{comment}</i></b></pre>
+	
+{prcomm:}
+	
+		Комментарий менеджера:
+		<pre style="margin-top:0"><b><i>{manage.comment}</i></b></pre>
+	
 {pr-call:}<b>Перезвонить</b>: {call=:yes?:yescall?(call=:no?:nocall)}<br>
 {yescall:}да
 {nocall:}звонок не требуется
 {iprinttr:}
-	<b>Доставка</b>: {choice}<br>{index:pr} {region:pr} {city:pr} {street:pr} {house:pr} {kv:pr}
-	{self:pr} {cargo:pr} {passeriya:pr} {pasnumber:pr} {courier:pr}
+	Доставка: <b>{choice} {index:pr} {region:pr} {city:pr} {street:pr} {house:pr} {kv:pr}
+	{self:pr} {cargo:pr} {passeriya:pr} {pasnumber:pr} {courier:pr}</b>
 {pr:} {.}
 {iprintpay:}
-	<div><b>Оплата</b>: {choice}</div>
+	<div>Оплата: <b>{choice}</b></div>
 {iprinte:}
 	{.}{~last()??:comma}
 {comma:}, 
 {iprint:}
 	{~key}: {.}<br>
 {prcoupon:}
-	<p>
-		<b>Купон</b>: {coupon}<br>
-		<b>Итого</b>: {~cost(total)}&nbsp;руб.<br>
-	</p>
+	
+	Купон: <b>{coupon}</b><br>
+	Итого: <b>{~cost(total)}&nbsp;руб.</b><br>
 {pr-time:}
-	<b>Дата изменений</b>: {~date(:H:i j F Y,time)}<br>
+	Дата изменений: <b>{~date(:H:i j F Y,time)}</b><br>
 {pr-deliver:}
-	<b>Доставка</b>: {~cost(manage.deliverycost)}&nbsp;руб.<br>
+	Доставка: <b>{~cost(manage.deliverycost)}&nbsp;руб.</b><br>

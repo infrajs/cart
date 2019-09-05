@@ -4,7 +4,10 @@
 	{:AdmLinks}
 {cart::}-cart/cart.tpl
 {AdmLinks:}
-	<p><a href="http://{site}/cart/admin/{id}">Заказ {id}</a></p>
+	<p>
+		<a href="http://{site}/cart/admin/{id}">Заказ {id}</a><br>
+		<a href="http://{site}">{site}</a>
+	</p>
 {orderToCheck:}
 	<p>Заказ отправлен на проверку менеджеру.</p>
 	{:cart.printorder}
