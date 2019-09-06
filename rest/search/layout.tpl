@@ -109,8 +109,8 @@
 					showNoSuggestionNotice:true,
 					noSuggestionNotice:'<div class="p-2">По запросу ничего не найдено. Попробуйте изменить запрос или поискать по <a onclick="Crumb.go(\'/catalog\'); $(\'#{div}\').find(\'input\').blur(); return false" href="/catalog">группам</a>.</div>',
 					serviceUrl: function (q) {
-						query = q;
-						return '/-cart/rest/search/' + q;
+						query = Path.encode(q);
+						return '/-cart/rest/search/' + query;
 					},
 					onSelect: function (suggestion) {
 						return;
@@ -142,8 +142,14 @@
 				    },
 				    groupBy2:'group',
 				    onSearchComplete: function (suggestion) {
-				    	if ($('.autocomplete-suggestion').length < 10) return;
-				    	$('.autocomplete-suggestions').append('<div style="margin-left:4px; margin-top:10px" onclick="$(\'#{div} form\').submit(); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a">Показать всё</span></div>');
+				    	var q = Path.encode(suggestion);
+				    	if ($('.autocomplete-suggestion').length < 10) {
+				    		$('.autocomplete-suggestions').append('<div style="margin:10px 4px 5px 4px;" onclick="Crumb.go(\'catalog/'+q+'\'); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a float-right"><b>Открыть каталог</b></span></div>');
+				    	} else {
+				    		$('.autocomplete-suggestions').append('<div style="margin:10px 4px 5px 4px;" onclick="Crumb.go(\'catalog/'+q+'\'); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a float-right"><b>Показать всё</b></span></div>');
+				    	}
+				    	
+				    	
 				    }
 				}).autocomplete('disable').click( function (){
 					$(this).autocomplete('enable');
