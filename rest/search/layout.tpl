@@ -78,12 +78,13 @@
 </div>
 {extend::}-catalog/extend.tpl
 {SUGGESTION:}
-		{images.0?:img}
-		<b><a href="/catalog/{producer_nick}/{article_nick}{:extend.cat.idsl}">{producer} {article}</a></b><wbr> {Цена?:cost}<br>
-		<a href="/catalog/{group_nick}">{group}</a>
-		{item_nick}	
+		
+		<a href="/catalog/{producer_nick}/{article_nick}{:extend.cat.idsl}">{images.0?:img}
+		{producer} {article}</a><br>{Наименование}<br>{Цена?:cost}
+		<a class="float-right" href="/catalog/{group_nick}">{group}</a>
+		<hr class="my-2">
 	{cost:}<b>{~cost(Цена)}{:extend.unit}</b>
-	{img:}<img style="clear:both; margin-left:5px; float:right; position:relative" src="/-imager/?src={images.0}&h=60">
+	{img:}<img style="clear:both; margin-left:5px; float:right; position:relative" src="/-imager/?src={images.0}&h=70&w=70&crop=1">
 {JS:}
 	<div>
 		<style>
@@ -130,9 +131,6 @@
 					},
 					dataType:"json",
 					ignoreParams: true,
-					onSearchComplete: function () {
-						Controller.check();
-					},
 					formatResult: function (suggestion, currentValue) {
 						if (!currentValue) return suggestion;
 						//var pattern = '(' + $.Autocomplete.utils.escapeRegExChars(currentValue) + ')';
@@ -144,11 +142,11 @@
 				    onSearchComplete: function (suggestion) {
 				    	var q = Path.encode(suggestion);
 				    	if ($('.autocomplete-suggestion').length < 10) {
-				    		$('.autocomplete-suggestions').append('<div style="margin:10px 4px 5px 4px;" onclick="Crumb.go(\'catalog/'+q+'\'); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a float-right"><b>Открыть каталог</b></span></div>');
+				    		$('.autocomplete-suggestions').append('<div style="margin:10px 4px 5px 4px;" onclick="Crumb.go(\'/catalog/'+q+'\'); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a float-right"><b>Открыть каталог</b></span></div>');
 				    	} else {
-				    		$('.autocomplete-suggestions').append('<div style="margin:10px 4px 5px 4px;" onclick="Crumb.go(\'catalog/'+q+'\'); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a float-right"><b>Показать всё</b></span></div>');
+				    		$('.autocomplete-suggestions').append('<div style="margin:10px 4px 5px 4px;" onclick="Crumb.go(\'/catalog/'+q+'\'); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a float-right"><b>Показать всё</b></span></div>');
 				    	}
-				    	
+				    	Controller.check();
 				    	
 				    }
 				}).autocomplete('disable').click( function (){
