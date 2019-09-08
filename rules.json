@@ -13,7 +13,7 @@
 			"caption":"Заказы ожидающие проверку менеджера",
 			"title":"Заказ находится на проверке",
 			"user":{
-				"buttons":{"sync":"success"},
+				"buttons":{ },
 				"actions":["active", "sync","print"]
 			},
 			"manager":{

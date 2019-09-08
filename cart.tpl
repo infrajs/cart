@@ -877,7 +877,7 @@
 	</ol>
 	<h1>Заказ {id}{time:ot}</h1>
 	{:printorder}
-	{ot:} от {~date(:j.m.Y,.)}
+	{ot:} от {~date(:d.m.Y,.)}
 {printorder:}
 	
 		<b>ФИО</b>: {name}<br>
