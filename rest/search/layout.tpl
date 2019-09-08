@@ -69,7 +69,6 @@
 					//var pattern = '(' + $.Autocomplete.utils.escapeRegExChars(currentValue) + ')';
 					//var res = suggestion.value;
 					var res = Template.parse('-cart/rest/search/layout.tpl',suggestion.data, 'SUGGESTION');
-
 					return res;
 			    }
 			});
@@ -78,12 +77,12 @@
 </div>
 {extend::}-catalog/extend.tpl
 {SUGGESTION:}
-		
 		<a href="/catalog/{producer_nick}/{article_nick}{:extend.cat.idsl}">{images.0?:img}
-		{producer} {article}</a><br>{Наименование}<br>{Цена?:cost}
+		{producer} {article}</a>{Наименование:br}{Цена?:cost}<br>
 		<a class="float-right" href="/catalog/{group_nick}">{group}</a>
-		<hr class="my-2">
-	{cost:}<b>{~cost(Цена)}{:extend.unit}</b>
+		<hr class="my-2" style="clear:both">
+	{br:} <br>{.}
+	{cost:} <b>{~cost(Цена)}{:extend.unit}</b>
 	{img:}<img style="clear:both; margin-left:5px; float:right; position:relative" src="/-imager/?src={images.0}&h=70&w=70&crop=1">
 {JS:}
 	<div>
