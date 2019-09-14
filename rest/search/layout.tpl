@@ -151,6 +151,12 @@
 				}).autocomplete('disable').click( function (){
 					$(this).autocomplete('enable');
 				});
+				div.find('form').submit( function () {
+					var q = div.find('input').val();
+					var q = Path.encode(q);
+					Crumb.go('/catalog/'+q);
+					return false;
+				});
 			});
 		</script>
 	</div>
