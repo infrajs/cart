@@ -5,13 +5,13 @@ window.Cart = {
 		form.find("input,button,textarea,select").attr("disabled","disabled");
 	},
 	refresh: function (el) {
-		if (el) $(el).removeClass('btn-default').addClass('btn-danger').find('span').addClass('spin');
+		if (el) $(el).removeClass('btn-secondary').addClass('btn-danger').find('span').addClass('spin');
 		setTimeout( function () {
 			Controller.global.set(['user','cart']);
 			Session.syncNow();
 			Controller.check();
 			//Cart.goTop();
-			if (el) $(el).removeClass('btn-danger').addClass('btn-default').find('span').removeClass('spin');
+			if (el) $(el).removeClass('btn-danger').addClass('btn-secondary').find('span').removeClass('spin');
 		},100);
 	},
 	logout: function () {

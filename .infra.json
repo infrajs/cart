@@ -1,5 +1,10 @@
 {
-	"pub":["opt"],
+	"pub":["opt","clsadd","clsready","textadd","textready","textin"],
+	"clsadd":"btn-success",
+	"clsready":"btn-danger",
+	"textadd":"В корзину",
+	"textready":"Оформить",
+	"textin":"Позиция в <a href='/cart/orders/my/list'>корзине</a>",
 	"opt":false,
 	"pay":false,
 	"conf":"infrajs\\cart\\Cart",

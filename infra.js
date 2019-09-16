@@ -17,6 +17,7 @@ Event.handler('Controller.onshow', function () {
 		var a = $(this);
 		Cart.activate(a)
 	});
+	var conf = Config.get('cart');
 	var activate = function(a){
 		var orderid = a.data('order');
 		if (!orderid) orderid = 'my';
@@ -31,31 +32,43 @@ Event.handler('Controller.onshow', function () {
 		if (r) a.parents('.cart-basket').find('input').val(r);
 
 		var c = a.parents('.cart-basket');
+
+		//в tpl дефолтный класс надо чтобы был clsadd
+		
+		
+		/*var clsadd = 'btn-info';
+		var clsready = 'btn-warning';
+		var textadd = 'Добавить в корзину';
+		var textready = 'Оформить заказ';*/
 		if (r || orderid != 'my') {
-			a.text('Оформить');
+			a.text(conf.textready);
 			a.addClass('active');
 			//c.addClass('has-warning');c.removeClass('has-success');
-			a.addClass('btn-danger');a.removeClass('btn-success');
+			a.addClass(conf.clsready);a.removeClass(conf.clsadd);
+			c.find('.bbasket').slideDown();
 		} else {
-			a.text('В корзину');
+			a.text(conf.textadd);
+			c.find('.bbasket').slideUp();
 			a.removeClass('active');
 			//c.addClass('has-success');c.removeClass('has-warning');
-			a.addClass('btn-success');a.removeClass('btn-danger');
+			a.addClass(conf.clsadd);a.removeClass(conf.clsready);
 		}
 	}
 	$('.cart-basket').filter("[data-basket!=true]").attr("data-basket","true").each(function(){
 		var a = $(this).find('.add');
 		var c = $(this);
 		$(this).find('input').click(function(){
-			a.text('В корзину');
+			a.text(conf.textadd);
 			a.removeClass('active');
+			//c.find('.bbasket').slideUp();
 			//c.addClass('has-success');c.removeClass('has-warning');
-			a.addClass('btn-success');a.removeClass('btn-danger');
+			a.addClass(conf.clsadd);a.removeClass(conf.clsready);
 		}).change(function(){
-			a.text('В корзину');
+			a.text(conf.textadd);
 			a.removeClass('active');
+			//c.find('.bbasket').slideUp();
 			//c.addClass('has-success');c.removeClass('has-warning');
-			a.addClass('btn-success');a.removeClass('btn-danger');
+			a.addClass(conf.clsadd);a.removeClass(conf.clsready);
 		});
 		$(this).find('.add').click( function (event) {
 			event.preventDefault();

@@ -103,19 +103,19 @@
 				//https://github.com/devbridge/jQuery-Autocomplete
 				var prodart = false;
 				var div = $('#{div}');
-				var query = '';
 				div.find('input').autocomplete({
-					triggerSelectOnValidInput:false,
+					triggerSelectOnValidInput:true,
 					showNoSuggestionNotice:true,
 					noSuggestionNotice:'<div class="p-2">По запросу ничего не найдено. Попробуйте изменить запрос или поискать по <a onclick="Crumb.go(\'/catalog\'); $(\'#{div}\').find(\'input\').blur(); return false" href="/catalog">группам</a>.</div>',
 					serviceUrl: function (q) {
-						query = Path.encode(q);
+						var query = Path.encode(q);
 						return '/-cart/rest/search/' + query;
 					},
 					onSelect: function (suggestion) {
 						return;
 					},
 					transformResult: function (ans) {
+						var query = div.find('input').val();
 						return {
 							suggestions: $.map(ans.list, function (pos) {
 								//var itemrow = Catalog.getItemRowValue(pos);
@@ -140,20 +140,27 @@
 				    groupBy2:'group',
 				    onSearchComplete: function (suggestion) {
 				    	var q = Path.encode(suggestion);
+				    	
+				    	$('.autocomplete-suggestions').not(':last()').remove();
+				    	
+				    	if ($('.autocomplete-suggestions').find('.msgready').length) return;
 				    	if ($('.autocomplete-suggestion').length < 10) {
-				    		$('.autocomplete-suggestions').append('<div style="margin:10px 4px 5px 4px;" onclick="Crumb.go(\'/catalog/'+q+'\'); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a float-right"><b>Открыть каталог</b></span></div>');
+				    		$('.autocomplete-suggestions').append('<div class="msgready" style="margin:10px 4px 5px 4px;" onclick="Crumb.go(\'/catalog/'+q+'\'); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a float-right"><b>Открыть каталог</b></span></div>');
 				    	} else {
-				    		$('.autocomplete-suggestions').append('<div style="margin:10px 4px 5px 4px;" onclick="Crumb.go(\'/catalog/'+q+'\'); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a float-right"><b>Показать всё</b></span></div>');
+				    		$('.autocomplete-suggestions').append('<div class="msgready" style="margin:10px 4px 5px 4px;" onclick="Crumb.go(\'/catalog/'+q+'\'); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a float-right"><b>Показать всё</b></span></div>');
 				    	}
 				    	Controller.check();
 				    	
 				    }
 				}).autocomplete('disable').click( function (){
+					//if (!disabled) return;
+					//disabled = false;
 					$(this).autocomplete('enable');
 				});
+				//var disabled = true;
 				div.find('form').submit( function () {
 					var q = div.find('input').val();
-					var q = Path.encode(q);
+					var q = Path.encode(q, true);
 					Crumb.go('/catalog/'+q);
 					return false;
 				});

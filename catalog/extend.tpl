@@ -12,22 +12,27 @@
 {nalichie:}{:orig.nalichie}
 {badgenalichie:}{:orig.badgenalichie}
 {orig.priceblockbig:}
-	<span style="font-size: 24px;" class="mt-2 mb-2 cart-basket form-inline form-group has-success">
-		{(Цена|...Цена)?:itemcost}&nbsp;&nbsp;&nbsp;
-		<div class="input-group " title="{producer_nick|...producer_nick} {article_nick|...article_nick}{:cat.idsp}">
-			<input type="number" value="1" min="0" max="999" class="form-control">
-			<div class="input-group-append">
-				<span data-producer="{producer_nick|...producer_nick}" data-article="{article_nick|...article_nick}" data-id="{item_nick}" class="add btn btn-success input-group-addon">В корзину</span>
+	<div class="mt-2 mb-2 cart-basket">
+		<div class="form-inline has-success">
+			Цена:&nbsp;<b>{(Цена|...Цена)?:itemcost}</b>&nbsp;&nbsp;&nbsp;
+			<div class="input-group input-group-sm mt-1" title="Купить {producer|...producer} {article|...article} {item|...item}">
+				<input type="number" value="1" min="0" max="999" class="form-control" style="width:60px">
+				<div class="input-group-append">
+					<span data-producer="{producer_nick|...producer_nick}" data-article="{article_nick|...article_nick}" data-id="{item_nick}" class="add btn input-group-addon">{~conf.cart.textadd}</span>
+				</div>
 			</div>
 		</div>
-	</span>
+		<div class="bbasket" style="display:none;">
+			{~conf.cart.textin}
+		</div>
+	</div>
 {priceblock:}{:orig.priceblock}
 {orig.price:}{:price}
 {price:}
 		<div class="cart text-left basketfont" style="padding:6px">
 			{:basket}&nbsp;{(Цена|...Цена)?:itemcost}
-			<div class="bbasket" style="display:none; font-size:16px">
-				<small>Позиция в <a href="/cart/orders/my/list">корзине</a></small>
+			<div class="bbasket" style="display:none;">
+				{~conf.cart.textin}
 			</div>
 		</div>
 {orig.priceblock:}
