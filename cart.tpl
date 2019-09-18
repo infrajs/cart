@@ -147,7 +147,7 @@
 			<div class="d-flex cartpos">
 				<div style="{:ishidedisabled}">
 					<div class="custom-control custom-checkbox">
-						<input onchange="$('.act-clear').attr('data-param','prodart='+$('.showlist :checkbox:checked').reduce(function (ak, el){ ak.push($(el).attr('data-prodart')); return ak },[]).join(','))" 
+						<input onchange="$('.act-clear').attr('data-param','prodart='+encodeURIComponent(encodeURIComponent($('.showlist :checkbox:checked').reduce(function (ak, el){ ak.push($(el).attr('data-prodart')); return ak },[]).join(','))))" 
 						data-prodart="{~key}" type="checkbox" class="custom-control-input" name="check[{~key}]" id="check{~key}">
 						<label class="custom-control-label" for="check{~key}">&nbsp;</label>
 					</div>

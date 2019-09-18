@@ -18,14 +18,20 @@
 			<div class="input-group input-group-sm mt-1" title="Купить {producer|...producer} {article|...article} {item|...item}">
 				<input type="number" value="1" min="0" max="999" class="form-control" style="width:60px">
 				<div class="input-group-append">
-					<span data-producer="{producer_nick|...producer_nick}" data-article="{article_nick|...article_nick}" data-id="{item_nick}" class="add btn input-group-addon">{~conf.cart.textadd}</span>
+					<span data-producer="{producer_nick|...producer_nick}" data-article="{article_nick|...article_nick}" data-id="{item_nick}{catkit:ampval}" class="add btn input-group-addon">{~conf.cart.textadd}</span>
 				</div>
 			</div>
 		</div>
-		<div class="bbasket" style="display:none;">
+		<div class="bbasket" style="display:none;font-size:13px">
 			{~conf.cart.textin}
 		</div>
+		{~length(kit)?:compolect}
 	</div>
+{compolect:}<div style="font-size:13px">Комплектация{iscatkit?:m}: <ul>{kit::kitli}</ul></div>
+	{kitli:}<li><a href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">{article}</a></li>
+	{m:}<span style="color:red" title="Нестандартная комплектация">*</span>
+{comma:}, 
+{sl:}/{.}
 {priceblock:}{:orig.priceblock}
 {orig.price:}{:price}
 {price:}
@@ -43,5 +49,6 @@
 		</div>
 	</div>
 	{basket:}
-		<a class="abasket" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}" href="/cart/orders/my/list/add/{producer_nick} {article_nick}{:cat.idsp}"><span class="pe-7s-cart flash"></span></a>
+		<a class="abasket" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}{catkit:ampval}" href="/cart/orders/my/list"><span class="pe-7s-cart flash"></span></a>
 {cat::}-catalog/cat.tpl
+{ampval:}&{.}
