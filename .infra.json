@@ -1,5 +1,5 @@
 {
-	"pub":["opt","clsadd","clsready","textadd","textready","textin"],
+	"pub":["opt","clsadd","clsready","textadd","textready","textin","coupon"],
 	"clsadd":"btn-success",
 	"clsready":"btn-danger",
 	"textadd":"В корзину",
@@ -7,6 +7,7 @@
 	"textin":"Позиция в <a href='/cart/orders/my/list'>корзине</a>",
 	"opt":false,
 	"pay":false,
+	"coupon":true,
 	"conf":"infrajs\\cart\\Cart",
 	"delivery":true,
 	"manager":["aky@list.ru","a.kiyatkin@itlf.ru","j.nester@itlf.ru"],

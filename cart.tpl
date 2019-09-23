@@ -578,11 +578,12 @@
 	{cprod:}<br>Производители: <b>{Производители}</b>.
 	{cgroup:}<br>Группы: <b>{Группы}</b>.
 	{100:}100
+	{d-none:}d-none
 	{couponinp:}
 		<div style="max-width: 300px;" class="input-group">
 			<input name="coupon" {:isdisabled} value="{data.order.coupon}" type="text" class="form-control" id="coupon" placeholder="Укажите купон">
 			<div class="input-group-append">
-			    <button onclick="Cart.action('{crumb.parent.name}', 'sync', {data.order.id});" class="btn btn-secondary" type="button">Активировать</button>
+			    <button onclick="Cart.action('{crumb.parent.name}', 'sync', '{data.order.id}');" class="btn btn-secondary" type="button">Активировать</button>
 			</div>
 		</div>
 		<div class="py-2">
