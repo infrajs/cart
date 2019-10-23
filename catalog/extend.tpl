@@ -12,7 +12,9 @@
 {nalichie:}{:orig.nalichie}
 {badgenalichie:}{:orig.badgenalichie}
 {orig.priceblockbig:}
-	<div class="mt-2 mb-2 cart-basket">
+	{min?(show?:showonecost?:showitemscost)?:showonecost}	
+	{showonecost:}
+	<div class="cart-basket">
 		<div class="form-inline has-success">
 			Цена:&nbsp;<b>{(Цена|...Цена)?:itemcost}</b>&nbsp;&nbsp;&nbsp;
 			<div class="input-group input-group-sm mt-1" title="Купить {producer|...producer} {article|...article} {item|...item}">
@@ -22,11 +24,13 @@
 				</div>
 			</div>
 		</div>
-		<div class="bbasket" style="display:none;font-size:13px">
+		<div class="bbasket" style="display:none; font-size:13px">
 			{~conf.cart.textin}
 		</div>
 		{~length(kit)?:compolect}
-	</div>
+	</div>	
+	{showitemscost:}
+		<span>Цена от&nbsp;<b>{~cost(min)}</b> до&nbsp;<b>{~cost(max)}{:unit}</b></span>
 {compolect:}<div style="font-size:13px">Комплектация{iscatkit?:m}: <ul>{kit::kitli}</ul></div>
 	{kitli:}<li><a href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">{article}</a></li>
 	{m:}<span style="color:red" title="Нестандартная комплектация">*</span>
