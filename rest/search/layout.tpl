@@ -161,7 +161,17 @@
 				div.find('form').submit( function () {
 					var q = div.find('input').val();
 					var q = Path.encode(q, true);
-					Crumb.go('/catalog/'+q);
+					if (Crumb.get.m) {
+						var params = '?m=' + Crumb.get.m;
+					} else {
+						var params = '?m=';
+					}
+					params+=':search='+q;
+					
+					var href = 'catalog';
+					if (Crumb.child && Crumb.child.child && !Crumb.child.child.child) href = 'catalog/'+Crumb.child.child.name;
+
+					Crumb.go('/'+href+''+params);
 					return false;
 				});
 			});
