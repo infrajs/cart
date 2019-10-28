@@ -168,10 +168,10 @@
 					}
 					params+=':search='+q;
 					
-					var href = 'catalog';
-					if (Crumb.child && Crumb.child.child && !Crumb.child.child.child) href = 'catalog/'+Crumb.child.child.name;
+					var href = '/catalog';
+					//if (Crumb.child && Crumb.child.child && !Crumb.child.child.child) href = '/catalog/'+Crumb.child.child.name;
 
-					Crumb.go('/'+href+''+params);
+					Crumb.go(href+''+params);
 					return false;
 				});
 			});
