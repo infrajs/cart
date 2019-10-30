@@ -106,7 +106,7 @@
 				div.find('input').autocomplete({
 					triggerSelectOnValidInput:true,
 					showNoSuggestionNotice:true,
-					noSuggestionNotice:'<div class="p-2">По запросу ничего не найдено. Попробуйте изменить запрос или поискать по <a onclick="Crumb.go(\'/catalog\'); $(\'#{div}\').find(\'input\').blur(); return false" href="/catalog">группам</a>.</div>',
+					noSuggestionNotice:'<div class="p-2">По запросу ничего не найдено. Попробуйте изменить запрос или поискать по <a onclick="$(\'#{div}\').find(\'input\').autocomplete(\'hide\'); Crumb.go(\'/catalog\'); $(\'#{div}\').find(\'input\').blur(); return false" href="/catalog">группам</a>.</div>',
 					serviceUrl: function (q) {
 						var query = Path.encode(q);
 						return '/-cart/rest/search/' + query;
