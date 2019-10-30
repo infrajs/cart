@@ -145,9 +145,9 @@
 				    	
 				    	if ($('.autocomplete-suggestions').find('.msgready').length) return;
 				    	if ($('.autocomplete-suggestion').length < 10) {
-				    		$('.autocomplete-suggestions').append('<div class="msgready" style="margin:10px 4px 5px 4px;" onclick="Crumb.go(\'/catalog/'+q+'\'); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a float-right"><b>Открыть каталог</b></span></div>');
+				    		$('.autocomplete-suggestions').append('<div class="msgready" style="margin:10px 4px 5px 4px;" onclick="$(\'#{div}\').find(\'input\').autocomplete(\'hide\'); Crumb.go(\'/catalog/'+q+'\');"><span class="a float-right"><b>Открыть каталог</b></span></div>');
 				    	} else {
-				    		$('.autocomplete-suggestions').append('<div class="msgready" style="margin:10px 4px 5px 4px;" onclick="Crumb.go(\'/catalog/'+q+'\'); $(\'#{div}\').find(\'input\').autocomplete(\'hide\')"><span class="a float-right"><b>Показать всё</b></span></div>');
+				    		$('.autocomplete-suggestions').append('<div class="msgready" style="margin:10px 4px 5px 4px;" onclick="$(\'#{div}\').find(\'input\').autocomplete(\'hide\'); Crumb.go(\'/catalog/'+q+'\'); "><span class="a float-right"><b>Показать всё</b></span></div>');
 				    	}
 				    	Controller.check();
 				    	
