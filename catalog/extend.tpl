@@ -24,14 +24,14 @@
 				</div>
 			</div>
 		</div>
-		<div class="bbasket" style="display:none; font-size:13px">
+		<div class="bbasket" style="display:none; font-size:1rem">
 			{~conf.cart.textin}
 		</div>
 		{~length(kit)?:compolect}
 	</div>	
 	{showitemscost:}
 		<span>Цена от&nbsp;<b>{~cost(min)}</b> до&nbsp;<b>{~cost(max)}{:unit}</b></span>
-{compolect:}<div style="font-size:13px">Комплектация{iscatkit?:m}: <ul>{kit::kitli}</ul></div>
+{compolect:}<div style="font-size:1rem">Комплектация{iscatkit?:m}: <ul>{kit::kitli}</ul></div>
 	{kitli:}<li><a href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">{article}</a></li>
 	{m:}<span style="color:red" title="Нестандартная комплектация">*</span>
 {comma:}, 
@@ -41,14 +41,14 @@
 {price:}
 		<div class="cart text-left basketfont" style="padding:6px">
 			{:basket}&nbsp;{(Цена|...Цена)?:itemcost}
-			<div class="bbasket" style="display:none;">
+			<div class="bbasket" style="display:none; font-size:1rem">
 				{~conf.cart.textin}
 			</div>
 		</div>
 {orig.priceblock:}
 	<div class="cart alert alert-success text-right basketfont" style="padding:6px">
 		{(Цена|...Цена)?:itemcost}{:basket}
-		<div class="bbasket" style="display:none; font-size:16px">
+		<div class="bbasket" style="display:none; font-size:1rem">
 			<small>Позиция в <a href="/cart/orders/my/list">корзине</a></small>
 		</div>
 	</div>
