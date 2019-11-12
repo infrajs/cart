@@ -917,7 +917,7 @@
 {yescall:}да
 {nocall:}звонок не требуется
 {iprinttr:}
-	Доставка: <b>{choice} {index:pr} {region:pr} {city:pr} {street:pr} {house:pr} {kv:pr}
+	Доставка: <b>{address} {choice} {index:pr} {region:pr} {city:pr} {street:pr} {house:pr} {kv:pr}
 	{self:pr} {cargo:pr} {passeriya:pr} {pasnumber:pr} {courier:pr}</b>
 {pr:} {.}
 {iprintpay:}
