@@ -14,23 +14,26 @@
 {orig.priceblockbig:}
 	{min?(show?:showonecost?:showitemscost)?:showonecost}	
 	{showonecost:}
-	<div class="cart-basket">
-		<div class="form-inline has-success">
-			Цена:&nbsp;<b>{(Цена|...Цена)?:itemcost}</b>&nbsp;&nbsp;&nbsp;
-			<div class="input-group input-group-sm mt-1" title="Купить {producer|...producer} {article|...article} {item|...item}">
-				<input type="number" value="1" min="0" max="999" class="form-control" style="width:60px">
-				<div class="input-group-append">
-					<span data-producer="{producer_nick|...producer_nick}" data-article="{article_nick|...article_nick}" data-id="{item_nick}{catkit:ampval}" class="add btn input-group-addon">{~conf.cart.textadd}</span>
+		<div class="cart-basket">
+			<div class="form-inline has-success">
+				Цена:&nbsp;<b>{(Цена|...Цена)?:itemcost}</b>&nbsp;&nbsp;&nbsp;
+				<div class="input-group input-group-sm mt-1" title="Купить {producer|...producer} {article|...article} {item|...item}">
+					<input type="number" value="1" min="0" max="999" class="form-control" style="width:60px">
+					<div class="input-group-append">
+						<span data-producer="{producer_nick|...producer_nick}" data-article="{article_nick|...article_nick}" data-id="{item_nick}{catkit:ampval}" class="add btn input-group-addon">{~conf.cart.textadd}</span>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="bbasket" style="display:none; font-size:1rem">
-			{~conf.cart.textin}
-		</div>
-		{~length(kit)?:compolect}
-	</div>	
+			<div class="bbasket" style="display:none; font-size:1rem">
+				{~conf.cart.textin}
+			</div>
+			{~length(kit)?:compolect}
+		</div>	
 	{showitemscost:}
-		<span>Цена от&nbsp;<b>{~cost(min)}</b> до&nbsp;<b>{~cost(max)}{:unit}</b></span>
+		<div class="form-inline has-success">
+			<span>Цена от&nbsp;<b class="cost">{~cost(min)}</b> до&nbsp;<b class="cost">{~cost(max)}{:unit}</b></span> 
+			&nbsp;<a class="btn btn-sm {~conf.cart.clsadd}" href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">Выбрать</a>
+		</div>
 {compolect:}<div style="font-size:1rem">Комплектация{iscatkit?:m}: <ul>{kit::kitli}</ul></div>
 	{kitli:}<li><a href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">{article}</a></li>
 	{m:}<span style="color:red" title="Нестандартная комплектация">*</span>
