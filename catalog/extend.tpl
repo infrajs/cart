@@ -12,7 +12,12 @@
 {nalichie:}{:orig.nalichie}
 {badgenalichie:}{:orig.badgenalichie}
 {orig.priceblockbig:}
-	{min?(show?:showonecost?:showitemscost)?:showonecost}	
+	{min?(show?:showonecost?:showitemscost)?(~length(items)?:showitemonecost?:showonecost)}
+	{showitemonecost:}
+		<div class="form-inline has-success">
+			Цена:&nbsp;<b>{(Цена|...Цена)?:itemcost}</b>
+			&nbsp;<a class="btn btn-sm {~conf.cart.clsadd}" href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">Выбрать</a>
+		</div>
 	{showonecost:}
 		<div class="cart-basket">
 			<div class="form-inline has-success">
