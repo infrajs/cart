@@ -20,8 +20,14 @@
 		</div>
 	{showonecost:}
 		<div class="cart-basket">
+			<style>
+				.between .cart-basket .form-inline {
+					display: flex;
+					justify-content: space-between;
+				}
+			</style>
 			<div class="form-inline has-success">
-				Цена:&nbsp;<b>{(Цена|...Цена)?:itemcost}</b>&nbsp;&nbsp;&nbsp;
+				<div class="mr-2">Цена:&nbsp;<b>{(Цена|...Цена)?:itemcost}</b></div>
 				<div class="input-group input-group-sm" title="Купить {producer|...producer} {article|...article} {item|...item}">
 					<input type="number" value="1" min="0" max="999" class="form-control" style="width:60px">
 					<div class="input-group-append">
