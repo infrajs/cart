@@ -13,6 +13,7 @@
 {badgenalichie:}{:orig.badgenalichie}
 {orig.priceblockbig:}
 	{min?(show?:showonecost?:showitemscost)?(~length(items)?:showitemonecost?:showonecost)}
+	{~length(kit)?:compolect}
 	{showitemonecost:}
 		<div class="form-inline has-success">
 			Цена:&nbsp;<b>{(Цена|...Цена)?:itemcost}</b>
@@ -38,7 +39,6 @@
 			<div class="bbasket" style="display:none; font-size:1rem">
 				{~conf.cart.textin}
 			</div>
-			{~length(kit)?:compolect}
 		</div>	
 	{showitemscost:}
 		<div class="form-inline has-success">
