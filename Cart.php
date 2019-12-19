@@ -206,8 +206,11 @@ class Cart {
 							$discount = $pos['coupon']['Скидка'];
 							$pos['coupcost'] = $pos['Цена'] * (1-$discount);
 							$sum = $pos['Цена'] * $pos['count'] * (1-$discount);
-							if ($pos['coupcost'] == $pos['Цена']) unset($pos['coupcost']);
-							$pos['coupcost'] = round($pos['coupcost'],2);
+							if ($pos['coupcost'] == $pos['Цена']) {
+								unset($pos['coupcost']);
+							} else {
+								$pos['coupcost'] = round($pos['coupcost'],2);
+							}
 							$pos['coupsum'] = round($sum,2);
 						} else {//Не дейстует
 							$sum = $pos['Цена'] * $pos['count'];
