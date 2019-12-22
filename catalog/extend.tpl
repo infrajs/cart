@@ -15,9 +15,12 @@
 	{min?(show?:showonecost?:showitemscost)?(~length(items)?:showitemonecost?:showonecost)}
 	{~length(kit)?:compolect}
 	{showitemonecost:}
-		<div class="form-inline has-success">
-			Цена:&nbsp;<b>{(Цена|...Цена)?:itemcost}</b>
-			&nbsp;<a class="btn btn-sm {~conf.cart.clsadd}" href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">Выбрать</a>
+		<div class="cart-basket">
+			<div class="form-inline has-success">
+				<span>Цена:&nbsp;<b>{(Цена|...Цена)?:itemcost}</b>
+				&nbsp;</span>
+				<a class="btn btn-sm {~conf.cart.clsadd}" href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">Выбрать</a>
+			</div>
 		</div>
 	{showonecost:}
 		<div class="cart-basket">
@@ -41,12 +44,14 @@
 			</div>
 		</div>	
 	{showitemscost:}
-		<div class="form-inline has-success">
-			<span>Цена от&nbsp;<b class="cost">{~cost(min)}</b> до&nbsp;<b class="cost">{~cost(max)}{:unit}</b></span> 
-			&nbsp;<a class="btn btn-sm {~conf.cart.clsadd}" href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">Выбрать</a>
+		<div class="cart-basket">
+			<div class="form-inline has-success">
+				<span>Цена от&nbsp;<b class="cost">{~cost(min)}</b> до&nbsp;<b class="cost">{~cost(max)}{:unit}</b>&nbsp;</span> 
+				<a class="btn btn-sm {~conf.cart.clsadd}" href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">Выбрать</a>
+			</div>
 		</div>
 {compolect:}<div style="font-size:1rem">Комплектация{iscatkit?:m}: <ul>{kit::kitli}</ul></div>
-	{kitli:}<li><a href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">{article}</a></li>
+	{kitli:}<li><a href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit?:sl}{catkit:ampval}">{article}</a></li>
 	{m:}<span style="color:red" title="Нестандартная комплектация">*</span>
 {comma:}, 
 {sl:}/{.}
