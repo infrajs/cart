@@ -50,7 +50,8 @@
 				<a class="btn btn-sm {~conf.cart.clsadd}" href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">Выбрать</a>
 			</div>
 		</div>
-{compolect:}<div style="font-size:1rem">Комплектация{iscatkit?:m}: <ul>{kit::kitli}</ul></div>
+{compolect:}<div style="font-size:1rem">Комплектация{iscatkit?:m}: <ul>{kit::kitlig}</ul></div>
+	{kitlig:}{::kitli}
 	{kitli:}<li><a href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit?:sl}{catkit:ampval}">{article}</a></li>
 	{m:}<span style="color:red" title="Нестандартная комплектация">*</span>
 {comma:}, 
