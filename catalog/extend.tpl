@@ -7,10 +7,10 @@
 {pos-img:}{:orig.pos-img}
 {unit:}{:orig.unit}
 {priceblockbig:}{:orig.priceblockbig}
-{itemcost:}<span class="cost">{~cost((Цена|...Цена))}{:orig.unit}</span>
-{itemnocost:}<a href="/contacts">Уточнить</a>
-{nalichie:}{:orig.nalichie}
-{badgenalichie:}{:orig.badgenalichie}
+	{itemcost:}<span class="cost">{~cost((Цена|...Цена))}{:orig.unit}</span>
+	{itemnocost:}<a href="/contacts">Уточнить</a>
+	{nalichie:}{:orig.nalichie}
+	{badgenalichie:}{:orig.badgenalichie}
 {orig.priceblockbig:}
 	{min?(show?:showonecost?:showitemscost)?(~length(items)?:showitemonecost?:showonecost)}
 	{~length(kit)?:compolect}
@@ -58,6 +58,9 @@
 {sl:}/{.}
 {priceblock:}{:orig.priceblock}
 {orig.price:}{:price}
+{pricerow:}
+	<div class="d-flex justify-content-between"><div>Цена:&nbsp;</div><div>{:itemcost}</div></div>
+{priceold:}<div class="d-flex justify-content-between"><div>Цена:&nbsp;</div><div>{:itemcost}</div></div>
 {price:}
 		<div class="cart text-left basketfont" style="padding:6px">
 			{:basket}&nbsp;{(Цена|...Цена)?:itemcost}
@@ -69,7 +72,7 @@
 	<div class="cart alert alert-success text-right basketfont" style="padding:6px">
 		{(Цена|...Цена)?:itemcost}{:basket}
 		<div class="bbasket" style="display:none; font-size:1rem">
-			<small>Позиция в <a href="/cart/orders/my/list">корзине</a></small>
+			<small>{~conf.cart.textin}</small>
 		</div>
 	</div>
 	{basket:}
