@@ -942,7 +942,7 @@
 
 {pr:} {.}
 {iprintpay:}
-	<div>Оплата: <b>{choice}</b></div>
+	<div><b>Оплата</b>: {choice}</div>
 {iprinte:}
 	{.}{~last()??:comma}
 {comma:}, 
@@ -953,6 +953,6 @@
 	Купон: <b>{coupon}</b><br>
 	Итого: <b>{~cost(total)}&nbsp;руб.</b><br>
 {pr-time:}
-	Дата изменений: <b>{~date(:H:i j F Y,time)}</b><br>
+	<b>Дата изменений</b>: {~date(:H:i j F Y,time)}<br>
 {pr-deliver:}
 	Доставка: <b>{~cost(manage.deliverycost)}&nbsp;руб.</b><br>
