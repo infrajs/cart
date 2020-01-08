@@ -917,8 +917,29 @@
 {yescall:}да
 {nocall:}звонок не требуется
 {iprinttr:}
-	Доставка: <b>{address} {choice} {index:pr} {region:pr} {city:pr} {street:pr} {house:pr} {kv:pr}
-	{self:pr} {cargo:pr} {passeriya:pr} {pasnumber:pr} {courier:pr}</b>
+	<b>Доставка</b>: {choice} 
+		{choice=:strПочта1?:rowПочта1}
+		{choice=:strПочта?:rowПочта}
+		{choice=:strТраспорт?:rowТраспорт}
+		{choice=:strКурьер?:rowКурьер}
+		{choice=:strВывоз?:rowВывоз}
+	
+	
+	{strПочта:}Почта России
+	{rowПочта:}{index:pr} {region:pr} {city:pr} {street:pr} {house:pr} {kv:pr}
+	
+	{strПочта1:}Почта России <nobr>1 класс</nobr>
+	{rowПочта1:}{:rowПочта}
+
+	{strТраспорт:}Транспортные компании
+	{rowТраспорт:}{region:pr} {city:pr} {cargo:pr} {passeriya:pr} {pasnumber:pr}
+
+	{strКурьер:}Доставка курьером
+	{rowКурьер:}{courier:pr} {:rowПочта}
+
+	{strВывоз:}Пункты самовывоза <nobr>в Тольятти</nobr>
+	{rowВывоз:}{self:pr}
+
 {pr:} {.}
 {iprintpay:}
 	<div>Оплата: <b>{choice}</b></div>

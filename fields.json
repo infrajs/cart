@@ -6,7 +6,7 @@
 			"tpl":"POCHTA",
 			"term":"Срок 2-17 дней"
 		},
-		"Почта России 1&nbsp;класс":{
+		"Почта России <nobr>1 класс</nobr>":{
 			"cost":"от 260 руб.",
 			"ico":"-cart/images/pochta.png",
 			"tpl":"POCHTA1",
@@ -25,7 +25,7 @@
 			"tpl":"MEN",
 			"term":"Срок 2-5 дней"
 		},
-		"Пункты самовывоза в г.&nbsp;Тольятти":{
+		"Пункты самовывоза <nobr>в Тольятти</nobr>":{
 			"cost":"бесплатно",
 			"ico":"-cart/images/self.png",
 			"tpl":"SELF",
