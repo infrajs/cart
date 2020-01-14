@@ -60,6 +60,25 @@
 {orig.price:}{:price}
 {pricerow:}
 	<div class="d-flex justify-content-between"><div>Цена:&nbsp;</div><div>{:itemcost}</div></div>
+{basketrow:}
+	<div class="cart-basket">
+			<style>
+				.between .cart-basket .input-group {
+					width:100%;
+				}
+			</style>
+			<div class="form-inline has-success">
+				<div class="input-group input-group-sm" title="Купить {producer} {article} {item}">
+					<input type="number" value="1" min="0" max="999" class="form-control" style="width:60px;">
+					<div class="input-group-append">
+						<span data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}{catkit:ampval}" class="add btn input-group-addon">{~conf.cart.textadd}</span>
+					</div>
+				</div>
+			</div>
+			<div class="bbasket" style="display:none; font-size:1rem">
+				{~conf.cart.textin}
+			</div>
+		</div>
 {priceold:}<div class="d-flex justify-content-between"><div>Цена:&nbsp;</div><div>{:itemcost}</div></div>
 {price:}
 		<div class="cart text-left basketfont" style="padding:6px">

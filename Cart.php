@@ -88,7 +88,8 @@ class Cart {
 			$order['sum'] = 0;
 			$order['count'] = 0;
 			$num = 0;
-			Each::foro($order['basket'], function &(&$pos,$prodart) use (&$order,&$num) {
+			$zerro = false;
+			Each::foro($order['basket'], function &(&$pos,$prodart) use (&$order,&$num, &$zerro) {
 				$r = null;
 				if(!isset($pos['count'])) $pos['count'] = 0;
 				$count = $pos['count'];//Сохранили значение из корзины
@@ -117,7 +118,10 @@ class Cart {
 						if ($pos['hash'] != $hash) $pos['change'] = true;//Метка что что-то поменялось в описании позиции.
 					}
 				}
-				if (empty($pos['Цена'])) $pos['Цена'] = 0;
+				if (empty($pos['Цена'])) {
+					$zerro = true;
+					$pos['Цена'] = 0;
+				}
 				
 				$pos['num']=++$num;
 				$pos['count']=$count;
@@ -126,12 +130,12 @@ class Cart {
 			
 				$pos['sum']=$pos['Цена']*$pos['count'];
 				
-				
 				$order['sum']+=$pos['sum'];
 
 				return $r;
 			});
 
+			if ($zerro)  $order['sum'] = 0;
 			$hadpaid=0;//Сумма уже оплаченных заявок
 			
 			//В заявке сохранён email по нему можно получить пользователя и все его заявки
