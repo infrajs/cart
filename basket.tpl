@@ -49,8 +49,6 @@
 			<td class="d-flex"><nobr>Артикул:</nobr><div class="line"></div></td><td>{article}{item:pr}</td>
 		</tr>
 	</table>
-	{pospath:}{producer_nick}/{article_nick}{item_nick?:itnick}
-	{itnick:}/{item_nick}
 {pritem:}
 <p>
 	{Наименование} {producer} {article}{item:pr}
