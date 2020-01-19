@@ -902,9 +902,9 @@
 	<p>
 		<b>{count} {~words(count,:позиция,:позиции,:позиций)}</b>
 	</p>
-	<p>
-		{basket::basket.pritem}
-	</p>
+	
+	{basket::basket.pritem}
+	
 	<p>
 		Сумма{coupon?:nodiscount}: <b>{~cost(sum)}&nbsp;руб.</b><br>
 		{coupon?:prcoupon}
@@ -960,7 +960,7 @@
 {prcoupon:}
 	
 	Купон: <b>{coupon}</b><br>
-	Итого: <b>{~cost(total)}&nbsp;руб.</b><br>
+	Итого со скидкой: <b>{~cost(total)}&nbsp;руб.</b><br>
 {pr-time:}
 	<b>Дата изменений</b>: {~date(:H:i j F Y,time)}<br>
 {pr-deliver:}
