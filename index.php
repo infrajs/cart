@@ -13,6 +13,7 @@ use infrajs\sequence\Sequence;
 
 
 Nostore::on();
+header('X-Robots-Tag: noindex');
 if (in_array(User::getEmail(),Cart::$conf['manager'])) {
 	Session::set('safe.manager',true);
 }
