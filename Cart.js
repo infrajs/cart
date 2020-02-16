@@ -58,7 +58,7 @@ window.Cart = {
 		Cart.getJSON(path, function (ans) {
 			Session.syncNow();
 			Global.set('cart');
-			Global.set('user');
+			//Global.set('user');
 			cb(ans);
 		});
 	},
@@ -73,7 +73,6 @@ window.Cart = {
 		order.place = place;
 		var layer = Controller.ids['order'];
 		//if (!act.link && (!act.go || !act.go[place])) alert('Ошибка. Действие невозможно выполнить с этой странице!');
-	
 		var link = Cart.getLink(order, place);
 		
 		var justdo = function () { 
