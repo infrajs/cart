@@ -280,7 +280,7 @@
 					});
 				})
 			</script>
-			<div class="my-2 row">
+			<div class="my-3 mb-4 row">
 				<div class="col-sm-6">
 					<div>Комментарий к заказу</div>
 					<textarea {:isdisabled} name="comment" class="form-control" rows="3">{order.comment}</textarea>

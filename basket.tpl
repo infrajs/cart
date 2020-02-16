@@ -61,7 +61,7 @@
 	{~conf.cart.coupon?~obj(:title,:Купон,:content,:couponinfoorder,:num,:2):accordCard}
 	{~obj(:title,:Получатель,:content,:fiocard,:num,:3):accordCard}
 	{~obj(:title,:Доставка,:content,:transcardsimple,:num,:4):accordCard}
-	{~obj(:title,:Оплата,:content,:paycard,:num,:5):accordCard}
+	{~conf.cart.pay?~obj(:title,:Оплата,:content,:paycard,:num,:5):accordCard}
 	{accordCard:}
 		<div class="card" data-num="{num}">
 			<div onclick="Ascroll.go('#heading{num}')" 
