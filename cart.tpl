@@ -322,16 +322,10 @@
 					<input {:isdisabled} type="text" name="transport.address" value="{data.order.transport.address}" class="form-control" placeholder="">
 				</div>
 			</div>
-			<div class="col-6">
+			<div class="col-12">
 				<div class="form-group">
-					<label>Серия паспорта</label>
+					<label>Серия и номер паспорта для транспортной компании</label>
 					<input {:isdisabled} type="text" name="transport.passeriya"  value="{data.order.transport.passeriya}" class="form-control">
-				</div>
-			</div>
-			<div class="col-6">
-				<div class="form-group">
-					<label>Номер паспорта</label>
-					<input {:isdisabled} type="text" name="transport.pasnumber" value="{data.order.transport.pasnumber}" class="form-control">
 				</div>
 			</div>
 		</div>
