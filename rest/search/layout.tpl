@@ -15,7 +15,7 @@
 	</p>
 	<!--<span class="btn btn-secondary button">Добавить</span>-->
 	<script>
-		domready(function () {
+		domready(async () => {
 			//https://github.com/devbridge/jQuery-Autocomplete
 			var prodart = false;
 			var div = $('.cart-search-complete');
@@ -25,6 +25,9 @@
 				div.find('.input').val('');
 			});
 			var query = '';
+			let CDN = await Load.on('import-default', '/vendor/akiyatkin/load/CDN.js')
+			await CDN.js('jquery');
+			await CDN.js("jquery.autocomplete","//cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.10/jquery.autocomplete.min.js")
 			div.find('.input').autocomplete({
 				serviceUrl: function (q) {
 					query = q;
@@ -99,10 +102,14 @@
 			.autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
 		</style>
 		<script>
-			domready(function () {
+			domready(async () => {
 				//https://github.com/devbridge/jQuery-Autocomplete
 				var prodart = false;
 				var div = $('#{div}');
+				let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
+				let CDN = await Load.on('import-default', '/vendor/akiyatkin/load/CDN.js')
+				await CDN.js('jquery');
+				await CDN.js("jquery.autocomplete","//cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.10/jquery.autocomplete.min.js")
 				div.find('input').autocomplete({
 					triggerSelectOnValidInput:true,
 					showNoSuggestionNotice:true,
