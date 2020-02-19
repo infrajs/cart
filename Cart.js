@@ -1,4 +1,3 @@
-if (!$.fn.reduce) $.fn.reduce = [].reduce;
 window.Cart = {
 	blockform: function (layer) {
 		var form=$("#"+layer.div).find('form');

@@ -113,6 +113,7 @@
 						proc = 1;
 						setTimeout(()=>{
 							var zero = false;
+							if (!$.fn.reduce) $.fn.reduce = [].reduce;
 							var sum = $('.cart [type=number]').reduce(function(ak, el){
 								var cost = Number($(el).attr('data-cost'));
 								if (!cost) zero = true;
@@ -158,7 +159,7 @@
 			<div class="d-flex cartpos">
 				<div style="{:ishidedisabled}">
 					<div class="custom-control custom-checkbox">
-						<input onchange="$('.act-clear').attr('data-param','prodart='+encodeURIComponent(encodeURIComponent($('.showlist :checkbox:checked').reduce(function (ak, el){ ak.push($(el).attr('data-prodart')); return ak },[]).join(','))))" 
+						<input onchange="if (!$.fn.reduce) $.fn.reduce = [].reduce; $('.act-clear').attr('data-param','prodart='+encodeURIComponent(encodeURIComponent($('.showlist :checkbox:checked').reduce(function (ak, el){ ak.push($(el).attr('data-prodart')); return ak },[]).join(','))))" 
 						data-prodart="{~key}" type="checkbox" class="custom-control-input" name="check[{~key}]" id="check{~key}">
 						<label class="custom-control-label" for="check{~key}">&nbsp;</label>
 					</div>
