@@ -26,8 +26,7 @@
 			});
 			var query = '';
 			let CDN = await Load.on('import-default', '/vendor/akiyatkin/load/CDN.js')
-			await CDN.js('jquery');
-			await CDN.js("jquery.autocomplete","//cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.10/jquery.autocomplete.min.js")
+			await CDN.load("jquery.autocomplete")
 			div.find('.input').autocomplete({
 				serviceUrl: function (q) {
 					query = q;
@@ -108,8 +107,8 @@
 				var div = $('#{div}');
 				let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
 				let CDN = await Load.on('import-default', '/vendor/akiyatkin/load/CDN.js')
-				await CDN.js('jquery');
-				await CDN.js("jquery.autocomplete","//cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.10/jquery.autocomplete.min.js")
+				
+				await CDN.load("jquery.autocomplete")
 				div.find('input').autocomplete({
 					triggerSelectOnValidInput:true,
 					showNoSuggestionNotice:true,
