@@ -98,3 +98,23 @@
 		<a class="abasket" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}{catkit:ampval}" href="/cart/orders/my/list"><span class="pe-7s-cart flash"></span></a>
 {cat::}-catalog/cat.tpl
 {ampval:}&{.}
+{print_more_descr:}
+	<div>{~cut(:200,Описание)}</div>
+{print_more:}
+	<table class="props" style="width:auto; font-size:14px">
+		{:print_more_rows}
+	</table>
+	{print_more_rows:}
+		{:print_more_list_rows}	
+	{print_more_list_rows:}
+		{:print_main_props_rows}
+		<tr><td class="d-flex"><div style="white-space: nowrap">Группа:</div><div class="line"></div></td><td><a href="/catalog/{group_nick}{:orig.cat.mark.set}">{group}</a></td></tr>
+	{rownonal:}<tr><td class="d-flex"><div style="white-space: nowrap">Наличие:</div><div class="line"></div></td><td style="">Нет в наличии</td></tr>
+	{rownalichie:}<tr><td class="d-flex"><div style="white-space: nowrap">Наличие:</div><div class="line"></div></td><td style="color:rgb(0, 204, 0); font-weight:bold">Есть в наличии</td></tr>
+	{alertnalichie:}{Наличие на складе=:strВ наличии?:nalichieda?Наличие на складе}
+	{nalichieda:}<span style="color:rgb(0, 204, 0); font-weight:bold">Есть в наличии</span>
+	{strНет:}Нет в наличии
+	{strВ наличии:}В наличии
+	{print_main_props_rows:}
+		<tr><td class="d-flex"><div style="white-space: nowrap">Артикул:</div><div class="line"></div></td><td>{article}</td></tr>
+		<tr><td class="d-flex"><div style="white-space: nowrap">Производитель:</div><div class="line"></div></td><td><a href="/catalog/{producer_nick}{:orig.cat.mark.set}">{producer}</a></td></tr>
