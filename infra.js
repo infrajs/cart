@@ -1,5 +1,5 @@
 Event.handler('Controller.onshow', function () {
-	$('.cart .abasket').filter("[data-crumb!=false]").attr("data-crumb","false").click( function (event) {
+	$('.abasket').filter("[data-crumb!=false]").attr("data-crumb","false").click( function (event) {
 		event.preventDefault();
 		var a = $(this);
 		
@@ -83,7 +83,7 @@ Event.handler('Controller.onshow', function () {
 			var place = a.data('place');
 			if (!place) place = 'orders';
 			if (!orderid) orderid = 'my';
-			if ($(this).hasClass('active')) {
+			if (a.hasClass('active')) {
 				Crumb.go('/cart/orders/my');
 				return;
 			}
