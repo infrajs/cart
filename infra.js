@@ -41,38 +41,48 @@ Event.handler('Controller.onshow', function () {
 		var textadd = 'Добавить в корзину';
 		var textready = 'Оформить заказ';*/
 		if (r || orderid != 'my') {
-			a.text(conf.textready);
+			let text = a.find('.text');
+			if(!text.length) text = a;
+			text.text(conf.textready);
 			a.addClass('active');
 			//c.addClass('has-warning');c.removeClass('has-success');
-			a.addClass(conf.clsready);a.removeClass(conf.clsadd);
+			a.addClass(conf.clsready);
+			a.removeClass(conf.clsadd);
 			c.find('.bbasket').slideDown();
 		} else {
-			a.text(conf.textadd);
+			let text = a.find('.text');
+			if (!text.length) text = a;
+			text.text(conf.textadd);
 			c.find('.bbasket').slideUp();
 			a.removeClass('active');
 			//c.addClass('has-success');c.removeClass('has-warning');
-			a.addClass(conf.clsadd);a.removeClass(conf.clsready);
+			a.addClass(conf.clsadd);
+			a.removeClass(conf.clsready);
 		}
 	}
 	$('.cart-basket').filter("[data-basket!=true]").attr("data-basket","true").each(function(){
 		var a = $(this).find('.add');
+
 		var c = $(this);
 		$(this).find('input').click(function(){
-			a.text(conf.textadd);
+			let text = a.find('.text');
+			if (!text.length) text = a;
+			text.text(conf.textadd);
 			a.removeClass('active');
 			//c.find('.bbasket').slideUp();
 			//c.addClass('has-success');c.removeClass('has-warning');
 			a.addClass(conf.clsadd);a.removeClass(conf.clsready);
 		}).change(function(){
-			a.text(conf.textadd);
+			let text = a.find('.text');
+			if (!text.length) text = a;
+			text.text(conf.textadd);
 			a.removeClass('active');
 			//c.find('.bbasket').slideUp();
 			//c.addClass('has-success');c.removeClass('has-warning');
 			a.addClass(conf.clsadd);a.removeClass(conf.clsready);
 		});
-		$(this).find('.add').click( function (event) {
+		a.click( function (event) {
 			event.preventDefault();
-			var a = $(this);
 			var count = a.parents('.cart-basket').find('input').val();
 			
 			var prodart = a.data('producer') + ' ' + a.data('article');

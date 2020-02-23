@@ -1,6 +1,6 @@
 {::}vendor/infrajs/catalog/model.tpl
 {orig::}vendor/infrajs/catalog/model.tpl
-{CARDS-cost:}
+{CARDS-basket:}
 	{:basket-between}
 {basket-between:}
 	<div class="between">
