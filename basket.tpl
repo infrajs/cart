@@ -1,4 +1,4 @@
-{extend::}-catalog/extend.tpl
+{model::}-catalog/model.tpl
 {root:}
 	<div class="cartbasket">
 		<style scoped>
@@ -40,20 +40,7 @@
 		<a data-crumb="false" onclick="Cart.logout(); return false;" href="/user/logout?back=ref">{Cart.lang(:Выход)}</a><br>
 	{reg:}<a href="/user/signin?back=ref">{Cart.lang(:Гость)}</a>
 	{user:} <b><a href="/user">{data.user.email}</a></b>
-{props:}
-	<table class="props">
-		<tr>
-			<td class="d-flex"><nobr class="d-none d-sm-block">Производитель:</nobr><div class="line"></div></td><td>{producer}</td>
-		</tr>
-		<tr>
-			<td class="d-flex"><nobr>Артикул:</nobr><div class="line"></div></td><td>{article}{item:pr}</td>
-		</tr>
-	</table>
-{pritem:}
-<p>
-	{Наименование} {producer} {article}{item:pr}
-	<br><b>{count}</b> по <b>{~cost(cost)}&nbsp;руб.</b> = <b>{~cost(sum)}&nbsp;руб.</b>
-</p>
+
 {pr:} {.}
 {fields::}-cart/fields.tpl
 {ORDER:}

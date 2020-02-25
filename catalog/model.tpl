@@ -2,6 +2,20 @@
 {orig::}vendor/infrajs/catalog/model.tpl
 {CARDS-basket:}
 	{:basket-between}
+{PRINT-item:}
+	<p>
+		{Наименование} {producer} {article}{item:pr}
+		<br><b>{count}</b> по <b>{~cost(cost)}&nbsp;руб.</b> = <b>{~cost(sum)}&nbsp;руб.</b>
+	</p>
+{CART-props:}
+	<table class="props">
+		<tr>
+			<td class="d-flex"><nobr class="d-none d-sm-block">Производитель:</nobr><div class="line"></div></td><td>{producer}</td>
+		</tr>
+		<tr>
+			<td class="d-flex"><nobr>Артикул:</nobr><div class="line"></div></td><td>{article}{item:pr}</td>
+		</tr>
+	</table>
 {basket-between:}
 	<div class="between">
 		<style>
@@ -47,4 +61,3 @@
 			{:cost-two}
 			<a class="ml-2 my-1 btn btn-sm {~conf.cart.clsadd}" href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">Выбрать</a>
 		</div>
-	

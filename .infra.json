@@ -7,6 +7,7 @@
 	"textin":"Позиция в <a href='/cart/orders/my/list'>корзине</a>",
 	"opt":false,
 	"pay":false,
+	"paramsrc":"~auto/pages/Параметры.xlsx",
 	"coupon":true,
 	"conf":"infrajs\\cart\\Cart",
 	"delivery":true,

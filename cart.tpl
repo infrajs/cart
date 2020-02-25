@@ -47,6 +47,7 @@
 		{showcartlist:}
 			{order:cartlist}
 		{cartlist:}
+			{:model.css}
 			<div style="{:ishidedisabled}">
 				<div class="d-flex justify-content-between">
 					<div>
@@ -142,6 +143,7 @@
 								$('.carttotal').html(tplcost(sum));
 							}
 							proc = 0;
+							Global.set('cart');
 						},1);
 					}
 					
@@ -177,7 +179,7 @@
 					<div class="d-flex flex-column flex-lg-row">
 						{images.0?:cartposimgm}
 						<div class="my-2 flex-grow-1">
-							{:basket.props}
+							{:model.CART-props}
 						</div>
 						<div class="my-2 d-flex flex-column ml-lg-3">
 							<div style="min-width:70px;" class="text-lg-right">
@@ -813,7 +815,7 @@
 				{adm_paidorder:}<b>{~cost(manage.paid)} руб.</b> {manage.paidtype=:bank?:банк?:менеджер} {~date(:d.m.Y H:i,manage.paidtime)}
 	{cat::}-catalog/cat.tpl
 	{extend::}-catalog/extend.tpl
-
+	{model::}-catalog/model.tpl
 	{basket::}-cart/basket.tpl
 
 
@@ -865,8 +867,8 @@
 		<li class="breadcrumb-item active">Оформление заказа {data.order.id}</li></li>
 	</ol>
 	{liallorder:}<li class="breadcrumb-item"><a class="{data.place=:admin?:text-danger}" href="/cart/{data.place}">{data.place=:admin?:Все?:Мои} заказы</a></li>
-	{itemcost:}{~cost(.)}<span class="d-none d-sm-inline">&nbsp;<small>{:extend.unit}</small></span>
-	{itemcostrub:}{~cost(.)}&nbsp;<small>{:extend.unit}</small>
+	{itemcost:}{~cost(.)}<span class="d-none d-sm-inline">&nbsp;<small>{:model.unit}</small></span>
+	{itemcostrub:}{~cost(.)}&nbsp;<small>{:model.unit}</small>
 	{star:}<span class="req" title="Позиция в каталоге изменилась">*</span> 
 	{req:} <span class="req">*</span>
 	{ordernum:}Номер заказа: <b>{id}</b>{manage.paid?:msgpaidorder}
@@ -884,21 +886,20 @@
 	{:printorder}
 	{ot:} от {~date(:d.m.Y,.)}
 {printorder:}
-	
-		<b>ФИО</b>: {name}<br>
-		<b>Почта</b>: {email}<br>
-		<b>Телефон</b>: {phone}<br>
-		{call?:pr-call}
-		{time?:pr-time}
-		{transport:iprinttr}
-		{pay:iprintpay}
+	<b>ФИО</b>: {name}<br>
+	<b>Почта</b>: {email}<br>
+	<b>Телефон</b>: {phone}<br>
+	{call?:pr-call}
+	{time?:pr-time}
+	{transport:iprinttr}
+	{pay:iprintpay}
 	<hr>
 
 	<p>
 		<b>{count} {~words(count,:позиция,:позиции,:позиций)}</b>
 	</p>
 	
-	{basket::basket.pritem}
+	{basket::model.PRINT-item}
 	
 	<p>
 		Сумма{coupon?:nodiscount}: <b>{~cost(sum)}&nbsp;руб.</b><br>

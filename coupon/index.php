@@ -1,7 +1,7 @@
 <?php
 use infrajs\ans\Ans;
 use infrajs\load\Load;
-
+use infrajs\cart\Cart;
 
 $name = Ans::REQ('name');
 $coupon = [
@@ -9,7 +9,8 @@ $coupon = [
 	'Купон'=>$name
 ];
 if ($name) {
-	$data = Load::loadJSON('-excel/get/group/Купоны/?src=~pages/Параметры.xlsx');
+	
+	$data = Load::loadJSON('-excel/get/group/Купоны/?src='.Cart::$conf['paramsrc']);
 	$coupons = [];
 	if (!empty($data['data']) && sizeof($data['data'])) {
 		foreach ($data['data']['data'] as $row) {
