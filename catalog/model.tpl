@@ -36,12 +36,12 @@
 	</div>
 	{compolect:}<div style="font-size:1rem">Комплектация{iscatkit?:m}: <ul>{kit::kitlig}</ul></div>
 		{kitlig:}{::kitli}
-		{kitli:}<li><a href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit?:sl}{catkit:ampval}">{article}</a></li>
+		{kitli:}<li><a href="{:link-pos}">{article}</a></li>
 		{m:}<span style="color:red" title="Нестандартная комплектация">*</span>
 	{showitemonecost:}
 		<div class="form-inline has-success">
 			{:cost-one}
-			<a class="ml-2 my-1 btn btn-sm {~conf.cart.clsadd}" href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">Выбрать</a>
+			<a class="ml-2 my-1 btn btn-sm {~conf.cart.clsadd}" href="{:link-pos}">Выбрать</a>
 		</div>
 	{showonecost:}
 		<div class="form-inline has-success">
@@ -59,5 +59,5 @@
 	{showitemscost:}
 		<div class="form-inline has-success">
 			{:cost-two}
-			<a class="ml-2 my-1 btn btn-sm {~conf.cart.clsadd}" href="/{Controller.names.catalog.crumb}/{producer_nick}/{article_nick}{item_nick:sl}{catkit:ampval}">Выбрать</a>
+			<a class="ml-2 my-1 btn btn-sm {~conf.cart.clsadd}" href="{:link-pos}">Выбрать</a>
 		</div>
