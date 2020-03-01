@@ -1,5 +1,4 @@
 {::}vendor/infrajs/catalog/model.tpl
-{orig::}vendor/infrajs/catalog/model.tpl
 {CART-props:}
 	<table class="props">
 		<tr>
