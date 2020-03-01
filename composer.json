@@ -25,7 +25,6 @@
         "infrajs/layer-config":"~1",
         "infrajs/layer-autosave":"~1",
         "infrajs/layer-onsubmit":"~1",
-        "infrajs/autoedit":"~1",
         "infrajs/rubrics":"~1",
         "grimmlink/pixeden-stroke-7-icon":"~1"
     },
