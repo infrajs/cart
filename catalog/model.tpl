@@ -33,7 +33,7 @@
 		{m:}<span style="color:red" title="Нестандартная комплектация">*</span>
 	{showitemonecost:}
 		<div class="form-inline has-success">
-			{:cost-one}
+			<div>{:cost-one}</div>
 			<a class="ml-2 my-1 btn btn-sm {~conf.cart.clsadd}" href="{:link-pos}">Выбрать</a>
 		</div>
 	{showonecost:}
@@ -51,6 +51,6 @@
 		</div>
 	{showitemscost:}
 		<div class="form-inline has-success">
-			{:cost-two}
+			<div>{:cost-two}</div>
 			<a class="ml-2 my-1 btn btn-sm {~conf.cart.clsadd}" href="{:link-pos}">Выбрать</a>
 		</div>
