@@ -38,7 +38,7 @@
 		</div>
 	{showonecost:}
 		<div class="form-inline has-success">
-			<div>{:cost-one}</div>
+			<div class="mr-1">{:cost-one}</div>
 			<div class="my-1 input-group input-group-sm" title="Купить {producer|...producer} {article|...article} {item|...item}">
 				<input type="number" value="1" min="0" max="999" class="form-control" style="width:50px">
 				<div class="input-group-append">
