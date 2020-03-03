@@ -182,25 +182,8 @@ class Cart {
 			if (!empty($order['coupon'])) {
 				$coupon = Load::loadJSON('-cart/coupon?name='.$order['coupon']);
 				$order['coupon_data'] = $coupon;
-				if ($coupon['result']) {
-
-				
+				if ($coupon['result']) {				
 					$order['total'] = 0;
-
-					foreach ($coupon['rows'] as $k => $row) {
-						if (isset($coupon['rows'][$k]['Производители'])) {
-							$r = explode(',', $coupon['rows'][$k]['Производители']);
-							$coupon['rows'][$k]['Производители'] = array_map(function ($v){
-								return Path::encode($v);
-							}, $r);
-						}
-						if (isset($coupon['rows'][$k]['Группы'])) {
-							$r = explode(',', $coupon['rows'][$k]['Группы']);
-							$coupon['rows'][$k]['Группы'] = array_map(function ($v){
-								return Path::encode($v);
-							}, $r);
-						}
-					}
 					Each::foro($order['basket'], function &(&$pos, $prodart) use (&$coupon, &$order) {
 						
 						

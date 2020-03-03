@@ -46,7 +46,10 @@
 				</div>
 			</div>
 		</div>
-		<div class="bbasket bg-light" style="display:none; position: absolute;">
+		<div class="bbasket" style="display:none; position: absolute; border-bottom: 1px solid var(--gray);
+			    margin-left: -4px;
+			    padding: 0px 4px 4px;
+			    background-color: white;">
 			{~conf.cart.textin}
 		</div>
 	{showitemscost:}
