@@ -38,7 +38,11 @@ window.Cart = {
 		link = Template.parse([link],order);
 		return link;
 	},
-
+	reach: async (name) => {
+		let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
+		let Goal = await Load.on('import-default', '-goal/Goal.js')
+		Goal.reach(name);
+	},
 	act: function (place, name, orderid, cb, param) {
 		if (!cb) cb = function () {};
 		
@@ -95,7 +99,7 @@ window.Cart = {
 						//Cart.unblockform(layer);
 						
 						if (ans.result) {
-							if (act.goal) Goal.reach(act.goal)
+							if (act.goal) Cart.reach(act.goal)
 							if (!act.silent && act.result) {
 								var msg = Template.parse([act.result], order);
 								var link = Cart.getLink(order, place);
@@ -246,7 +250,7 @@ window.Cart = {
 		var name = [place, orderid, 'basket', prodart, 'count'];	
 		count = Number(count);
 		if (!count) count = null;
-		Goal.reach('basket');
+		Cart.reach('basket');
 		Session.set(name, count, true, cb);
 	},
 	add: function (place, orderid, prodart, cb) {
@@ -258,7 +262,7 @@ window.Cart = {
 		
 		var name = [place, orderid, 'basket', prodart];	
 		
-		Goal.reach('basket');
+		Cart.reach('basket');
 		Session.set(name, { count: 1 }, true, fn);
 	},
 	lang: function (str) {
