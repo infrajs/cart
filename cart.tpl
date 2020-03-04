@@ -171,7 +171,7 @@
 				</div>
 				<div class="flex-grow-1">
 					<div>
-						<div class="float-right">{:extend.badgenalichie}{coupon:badgecoupon}</div>
+						<div class="float-right">{:model.badgenalichie}{coupon:badgecoupon}</div>
 						<b>{change:star} <a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">
 							{Наименование}</a>
 						</b>
