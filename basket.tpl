@@ -51,7 +51,7 @@
 	{~conf.cart.pay?~obj(:title,:Оплата,:content,:paycard,:num,:5):accordCard}
 	{accordCard:}
 		<div class="card" data-num="{num}">
-			<div onclick="Ascroll.go('#heading{num}')" 
+			<div onclick2="Ascroll.go('#heading{num}')" 
 			class="card-header {show?:font-weight-bold}" id="heading{num}" data-toggle="collapse" data-target="#collapse{num}">
 				<span class="badge badge-light text-dark badge-pill">{num}</span> <span class="a" aria-expanded="true" aria-controls="collapse{num}">
 				{title}

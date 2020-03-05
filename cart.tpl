@@ -274,7 +274,7 @@
 						}
 						var first = true;
 						for (num in list) {
-							if (!first) Ascroll.once=false;
+							//if (!first) Ascroll.once=false;
 							first = false;
 
 
