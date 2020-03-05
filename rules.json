@@ -17,8 +17,8 @@
 				"actions":["active", "sync","print"]
 			},
 			"manager":{
-				"buttons":{"sync":"secondary","complete":"success"},
-				"actions":["complete","delete","email","sync","print"]
+				"buttons":{"sync":"secondary","email":"secondary", "complete":"success"},
+				"actions":["complete","delete","sync","print"]
 			}
 		},
 		"wait":{
