@@ -25,9 +25,12 @@
 				div.find('.input').val('');
 			});
 			var query = '';
+			let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
 			let CDN = await Load.on('import-default', '/vendor/akiyatkin/load/CDN.js')
 			await CDN.load("jquery.autocomplete")
 			div.find('.input').autocomplete({
+				triggerSelectOnValidInput:false,
+				showNoSuggestionNotice:true,
 				serviceUrl: function (q) {
 					query = q;
 					return '/-cart/rest/search/' + q;
@@ -86,7 +89,7 @@
 	{br:} <br>{.}
 	{cost:} <b>{~cost(Цена)}{:extend.unit}</b>
 	{img:}<img style="clear:both; margin-left:5px; float:right; position:relative" src="/-imager/?src={images.0}&h=70&w=70&crop=1">
-{JS:}
+{*JS:}
 	<div>
 		<style>
 			.autocomplete-suggestions { border: 1px solid #999; background: #FFF; overflow: auto; }
