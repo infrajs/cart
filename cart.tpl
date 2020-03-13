@@ -186,7 +186,7 @@
 								<div><del>{coupcost?Цена:itemcostrub}</del></div>
 								{(coupcost|Цена):itemcostrub}
 							</div>
-							<div class="my-2"><input {:isdisabled} data-coupcost="{coupcost}" data-cost="{Цена}" style="width:120px" value="{basket[{:prodart}]count}" type="number" min="0" max="999" name="basket.{producer_nick} {article_nick}{:cat.idsp}.count" class="form-control text-right" type="number"></div>
+							<div class="my-2"><input {:isdisabled} data-coupcost="{coupcost}" data-cost="{Цена}" style="width:5em" value="{basket[{:prodart}]count}" type="number" min="0" max="999" name="basket.{producer_nick} {article_nick}{:cat.idsp}.count" class="form-control" type="number"></div>
 							<div style="min-width:70px;" class="text-lg-right">
 								<b class="coupsum">{(coupsum|sum):itemcostrub}</b>
 							</div>
