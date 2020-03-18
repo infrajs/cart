@@ -25,8 +25,7 @@
 				div.find('.input').val('');
 			});
 			var query = '';
-			let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
-			let CDN = await Load.on('import-default', '/vendor/akiyatkin/load/CDN.js')
+			let CDN = (await import('/vendor/akiyatkin/load/CDN.js')).default
 			await CDN.load("jquery.autocomplete")
 			div.find('.input').autocomplete({
 				triggerSelectOnValidInput:false,
@@ -108,8 +107,7 @@
 				//https://github.com/devbridge/jQuery-Autocomplete
 				var prodart = false;
 				var div = $('#{div}');
-				let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
-				let CDN = await Load.on('import-default', '/vendor/akiyatkin/load/CDN.js')
+				let CDN = (await import('/vendor/akiyatkin/load/CDN.js')).default
 				
 				await CDN.load("jquery.autocomplete")
 				div.find('input').autocomplete({

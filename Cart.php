@@ -23,6 +23,9 @@ use infrajs\lang\Lang;
 Event::$classes["Cart"] = function($pos) { 
 	return $pos["producer_nick"].$pos["article_nick"].$pos["item_nick"];
 };
+Event::$classes["Order"] = function($order) { 
+	return $order['id'];
+};
 class Cart {
 	public static $conf = [];
 	public static function getPath($id = '') 
@@ -224,6 +227,7 @@ class Cart {
 				$order['manage']['deliverycost'] = preg_replace('/\s/','',$order['manage']['deliverycost']);
 				$order['alltotal']+=$order['manage']['deliverycost'];
 			}
+			Event::fire('Order.calc', $order);
 			return $order;
 		}, array($id));
 	}

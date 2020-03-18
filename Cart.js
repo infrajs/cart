@@ -39,8 +39,7 @@ window.Cart = {
 		return link;
 	},
 	reach: async (name) => {
-		let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
-		let Goal = await Load.on('import-default', '/-goal/Goal.js')
+		let Goal = (await import('/vendor/akiyatkin/goal/Goal.js')).default
 		Goal.reach(name);
 	},
 	act: function (place, name, orderid, cb, param) {

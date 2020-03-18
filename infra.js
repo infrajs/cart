@@ -1,6 +1,5 @@
 Event.handler('Controller.onshow', async () => {
-	let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
-	let CDN = await Load.on('import-default', '/vendor/akiyatkin/load/CDN.js')
+	let CDN = (await import('/vendor/akiyatkin/load/CDN.js')).default
 	await CDN.load('jquery')
 
 	$('.abasket').filter("[data-crumb!=false]").attr("data-crumb","false").click( function (event) {
@@ -115,8 +114,7 @@ Event.one('Controller.onshow', async () => {
 	var layer = {
 		external: "-cart/rest/search/layer.json"
 	};
-	let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
-	let CDN = await Load.on('import-default', '/vendor/akiyatkin/load/CDN.js')
+	let CDN = (await import('/vendor/akiyatkin/load/CDN.js')).default
 	await CDN.load('jquery')
 	Event.handler('Controller.onshow', function () {
 		$('.cart-search').filter("[data-search!=false]").attr("data-search","false").each( function () {
