@@ -214,6 +214,7 @@ class Cart {
 					$order['total'] = round($order['total'],2);
 				}
 				
+				
 				//if ($coupon['result']) {
 				//$fncost = Template::$scope['~cost'];
 			}
@@ -222,7 +223,7 @@ class Cart {
 				$order['total']=$order['manage']['summary'];
 			}
 			//Стоимость с доставкой
-			$order['alltotal']=$order['total'];
+			$order['alltotal'] = $order['total'];
 			if (!empty($order['manage']['deliverycost'])) {
 				$order['manage']['deliverycost'] = preg_replace('/\s/','',$order['manage']['deliverycost']);
 				$order['alltotal']+=$order['manage']['deliverycost'];

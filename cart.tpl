@@ -304,9 +304,11 @@
 					</div>
 				</div>
 			</div>
-			<div class="alert alert-secondary">Вся информация по заказу сроки и стоимость доставки, а также данные для оплаты, будет отправлена на указанную электронную почту.</div>
+			{order:info}
 			{crumb.parent.name=:admin?:adminactions?:useractions}
 			<div style="clear:both"></div>
+		{info:}
+			<div class="alert alert-secondary">Вся информация по заказу сроки и стоимость доставки, а также данные для оплаты, будет отправлена на указанную электронную почту.</div>
 		{useractions:}
 			<div class="myactions" data-place="orders">
 				{order.rule.user:myactions}
@@ -900,14 +902,15 @@
 	</p>
 	
 	{basket::model.PRINT-item}
-	
-	<p>
-		Сумма{coupon?:nodiscount}: <b>{~cost(sum)}&nbsp;руб.</b><br>
-		{coupon?:prcoupon}
-	</p>
+	<p>{:amount}</p>
 	{comment?:prcom}
 	{manage.comment?:prcomm}
 	<hr>
+{amount:}
+	<p>
+		Стоимость{coupon?:nodiscount}: <b>{~cost(sum)}&nbsp;руб.</b><br>
+		{coupon?:prcoupon}
+	</p>
 {prcom:}
 	
 		Комментарий:
@@ -954,7 +957,6 @@
 {iprint:}
 	{~key}: {.}<br>
 {prcoupon:}
-	
 	Купон: <b>{coupon}</b><br>
 	Итого со скидкой: <b>{~cost(total)}&nbsp;руб.</b><br>
 {pr-time:}
