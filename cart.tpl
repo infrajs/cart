@@ -243,7 +243,6 @@
 		{orderPageContent:}
 			<div class="float-right" title="Последние измения">{~date(:j F H:i,order.time)}</div>
 			<h1>{order.rule.title} {order.id}</h1>
-			
 			{order.manage.comment?order:showManageComment}
 			<form>
 				<div class="accordion" id="accordionorder">
@@ -266,12 +265,14 @@
 							var num = tab.attr('data-num');
 							if (Session.is()) Autosave.set(layer,'accordion.'+num);
 						});
+
 						var layer = Controller.ids["{id}"];
-						var list = Autosave.get(layer,'accordion',{~json(order.accordion)});
+						var list = Autosave.get(layer, 'accordion', {~json(order.accordion)});
 						if (!list) {
 							list = { };
-							list[3] = true;
+							list[3] = true; //Пользователь
 						}
+						list[4] = true; //Доставка
 						var first = true;
 						for (num in list) {
 							//if (!first) Ascroll.once=false;
