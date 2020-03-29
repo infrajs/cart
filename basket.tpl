@@ -43,9 +43,12 @@
 
 {pr:} {.}
 {fields::}-cart/fields.tpl
-{ORDER:}
+
+{*:}
 	{~obj(:title,:Корзина,:content,:showcartlist,:num,:1):accordCard}
 	{~conf.cart.coupon?~obj(:title,:Купон,:content,:couponinfoorder,:num,:2):accordCard}
+{ORDER:}
+	
 	{~obj(:title,:Получатель,:content,:fiocard,:num,:3):accordCard}
 	{~obj(:title,:Доставка,:content,:transcardsimple,:num,:4):accordCard}
 	{~conf.cart.pay?~obj(:title,:Оплата,:content,:paycard,:num,:5):accordCard}
@@ -53,7 +56,8 @@
 		<div class="card" data-num="{num}">
 			<div onclick2="Ascroll.go('#heading{num}')" 
 			class="card-header {show?:font-weight-bold}" id="heading{num}" data-toggle="collapse" data-target="#collapse{num}">
-				<span class="badge badge-light text-dark badge-pill">{num}</span> <span class="a" aria-expanded="true" aria-controls="collapse{num}">
+				<!--<span class="badge badge-light text-dark badge-pill">{num}</span>-->
+				<span class="a" aria-expanded="true" aria-controls="collapse{num}">
 				{title}
 				</span>
 

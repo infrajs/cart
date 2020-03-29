@@ -897,16 +897,16 @@
 	{transport:iprinttr}
 	{pay:iprintpay}
 	<hr>
-
 	<p>
 		<b>{count} {~words(count,:позиция,:позиции,:позиций)}</b>
 	</p>
-	
-	{basket::model.PRINT-item}
+	{:basketresume}
 	<p>{:amount}</p>
 	{comment?:prcom}
 	{manage.comment?:prcomm}
 	<hr>
+{basketresume:}
+	{basket::model.PRINT-item}
 {amount:}
 	<p>
 		Стоимость{coupon?:nodiscount}: <b>{~cost(sum)}&nbsp;руб.</b><br>

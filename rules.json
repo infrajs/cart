@@ -13,11 +13,11 @@
 			"caption":"Заказы ожидающие проверку менеджера",
 			"title":"Заказ находится на проверке",
 			"user":{
-				"buttons":{ },
+				"buttons":{"basket":"secondary"},
 				"actions":["active", "sync","print"]
 			},
 			"manager":{
-				"buttons":{"email":"secondary", "complete":"success"},
+				"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
 				"actions":["complete","delete","sync","print"]
 			}
 		},
@@ -54,7 +54,7 @@
 				"actions":["print"]
 			},
 			"manager":{
-				"buttons":{"email":"danger"},
+				"buttons":{"basket":"secondary", "email":"danger"},
 				"actions":["delete","email","sync","print"]
 			}
 		},
@@ -71,6 +71,7 @@
 			"title":"Оформление заказа",
 			"user":{
 				"buttons":{
+					"basket":"secondary", 
 					"check":"success"
 				},
 				"actions":["check","print"]
@@ -83,6 +84,13 @@
 			"go":{
 				"orders":"/cart/orders/{id|:my}/print",
 				"admin":"/cart/admin/{id|:my}/print"
+			}
+		},
+		"basket":{
+			"title":"Корзина",
+			"go":{
+				"orders":"/cart/orders/{id|:my}/list",
+				"admin":"/cart/admin/{id|:my}/list"
 			}
 		},
 		"delete":{
