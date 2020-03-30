@@ -309,7 +309,10 @@
 			{crumb.parent.name=:admin?:adminactions?:useractions}
 			<div style="clear:both"></div>
 		{info:}
-			<div class="alert alert-secondary">Вся информация по заказу сроки и стоимость доставки, а также данные для оплаты, будет отправлена на указанную электронную почту.</div>
+			<div class="alert alert-secondary">
+				{:basketresume}
+				<p>{:amount}</p>
+			</div>
 		{useractions:}
 			<div class="myactions" data-place="orders">
 				{order.rule.user:myactions}
