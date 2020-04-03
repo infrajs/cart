@@ -11,7 +11,7 @@
 {CARDS-basket:}
 	{Цена?:basket-between}
 {ROWS-basket:}
-	<div class="my-3 float-left">{Цена?:basket-between}</div>
+	<div style="clear:both" class="my-3 float-left">{Цена?:basket-between}</div>
 {basket-between:}
 	<div class="between">
 		<style>
