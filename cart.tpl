@@ -267,7 +267,7 @@
 						});
 
 						var layer = Controller.ids["{id}"];
-						var list = Autosave.get(layer, 'accordion', {~json(order.accordion)});
+						/*var list = Autosave.get(layer, 'accordion', {~json(order.accordion)});
 						if (!list) {
 							list = { };
 							list[3] = true; //Пользователь
@@ -280,7 +280,7 @@
 
 
 							$('.accordion').find('[data-num='+num+'] .card-header').click();
-						}
+						}*/
 					});
 				})
 			</script>
