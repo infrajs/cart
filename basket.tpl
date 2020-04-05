@@ -55,14 +55,14 @@
 	{accordCard:}
 		<div class="card" data-num="{num}">
 			<div onclick2="Ascroll.go('#heading{num}')" 
-			class="card-header {show?:font-weight-bold}" id="heading{num}" data-toggle="collapse" data-target="#collapse{num}">
+			class="card-header font-weight-bold" id="heading{num}" data-toggle="collapse" data-target="#collapse{num}">
 				<!--<span class="badge badge-light text-dark badge-pill">{num}</span>-->
 				<span class="a" aria-expanded="true" aria-controls="collapse{num}">
 				{title}
 				</span>
 
 			</div>
-			<div id="collapse{num}" class="collapse {show?:show}" aria-labelledby="heading{num}" data-*parent="#accordionorder">
+			<div id="collapse{num}" class="collapse show" aria-labelledby="heading{num}" data-*parent="#accordionorder">
 				<div class="card-body">
 					{content}
 				</div>
