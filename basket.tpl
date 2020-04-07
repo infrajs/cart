@@ -58,7 +58,6 @@
 				<span class="a" aria-expanded="true" aria-controls="collapse{num}">
 				{title}
 				</span>
-
 			</div>
 			<div id="collapse{num}" class="collapse show" aria-labelledby="heading{num}" data-*parent="#accordionorder">
 				<div class="card-body">
