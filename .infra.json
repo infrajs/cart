@@ -1,5 +1,5 @@
 {
-	"pub":["opt","clsadd","clsready","textadd","textready","textin","coupon"],
+	"pub":["opt","clsadd","clsready","textadd","textready","textin","coupon","pay"],
 	"clsadd":"btn-success",
 	"clsready":"btn-danger",
 	"textadd":"В корзину",

@@ -72,6 +72,7 @@
 			"user":{
 				"buttons":{
 					"basket":"secondary", 
+					"sbrfpay":"success",
 					"check":"success"
 				},
 				"actions":["check","print"]
@@ -79,6 +80,13 @@
 		}
 	},
 	"actions":{
+		"sbrfpay":{
+			"title":"Оплатить",
+			"go":{
+				"orders":"/cart/orders/{id|:my}/print",
+				"admin":"/cart/admin/{id|:my}/print"
+			}
+		},
 		"print":{
 			"title":"Версия для печати",
 			"go":{

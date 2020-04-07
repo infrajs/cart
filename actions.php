@@ -125,7 +125,11 @@ if ($action == 'saved') {
 } else if ($action == 'savechanges') {
 	Cart::saveOrder($order, $place);//К order применились изменения и после сохранения эти изменения будут доступны другим
 } else if ($action == 'check') {
-	$order['status'] = 'check';
+	if ($order['pay']['choice'] == 'Оплатить онлайн') {
+		$order['status'] = 'visapay';
+	} else {
+		$order['status'] = 'check';
+	}
 	Cart::saveOrder($order, $place);
 	if ($status == 'active') {
 		Session::set('orders.my.basket');//Очистили заявку

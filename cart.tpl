@@ -317,6 +317,20 @@
 			<div class="myactions" data-place="orders">
 				{order.rule.user:myactions}
 			</div>
+			<script async type="module">
+				let div = document.getElementById('{div}')
+				let cls = cls => div.getElementsByClassName(cls)
+				for (let act of cls('act-sbrfpay')) act.style.display = 'none'
+				import('/vendor/akiyatkin/load/Fire.js').then(async obj => {
+					let Fire = obj.default
+					Fire.hand(Cart, 'choicepay', (value) => {
+						let r = value == 'Оплатить онлайн'
+						
+						for (let act of cls(r ? 'act-check':'act-sbrfpay')) act.style.display = 'none'
+						for (let act of cls(r ? 'act-sbrfpay':'act-check')) act.style.display = ''
+					})
+				})
+			</script>
 		{adminactions:}
 
 			<div class="myactions" data-place="admin">
@@ -416,17 +430,6 @@
 					<span class="morelink ml-1 a float-right">Подробней</span>
 				</div>
 			</div>
-			{transinfo:}
-				<div data-value="{~key}" class="iteminfo">{:basket.fields.{tpl}}</div>
-	{paycard:}
-		<div class="paycard">
-			<div class="d-flex flex-wrap" style="font-size:11px">
-				{fields.pay::pay}
-			</div>
-			{fields.pay::payinfo}
-		</div>
-		{transinfo:}
-			<div data-value="{~key}" class="iteminfo">{:basket.fields.{tpl}}</div>
 {paycard:}
 	<div class="paycard">
 		<div class="d-flex flex-wrap" style="font-size:11px">
@@ -441,16 +444,13 @@
 		})
 	</script>
 	{pay:}
-	<div data-value="{~key}" style="display:flex" class="item flex-column border rounded m-1 p-1">
-		<div style="height:60px" class="d-flex align-items-center justify-content-center"><div><img class="img-fluid" src="/-imager/?h=60&src={ico}"></div></div>
-		<div class="mb-auto title"><big>{~key}</big></div>
-		<div class="text-right">
-			<span class="morelink ml-1 a">Подробней</span>
+		<div data-value="{~key}" style="display:flex" class="item flex-column border rounded m-1 p-1">
+			<div style="height:60px" class="d-flex align-items-center justify-content-center"><div><img class="img-fluid" src="/-imager/?h=60&src={ico}"></div></div>
+			<div class="mb-auto title"><big>{~key}</big></div>
+			<div class="text-right">
+				<span class="morelink ml-1 a">Подробней</span>
+			</div>
 		</div>
-	</div>
-	
-	{payinfo:}
-		<div data-value="{~key}" class="iteminfo"><div class="alert border more">{:basket.fields.{tpl}}</div></div>
 {fiocard:}
 	<div class="cartcontacts row">
 			<div class="col-sm-4 order-sm-2">
@@ -473,41 +473,53 @@
 			
 		</div>
 		{ans:config.ans}
-		{payinfo:}
-			<div data-value="{~key}" class="iteminfo"><div class="alert border more">{:basket.fields.{tpl}}</div></div>
 		{fioadmin:}
 		{fiouser:}<b>Вы авторизованы</b><p>Ваш аккаунт <b style="display:block; max-width:200px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden">{data.user.email}</b></p>
 		{fioguest:}<b>Уже покупали у нас?</b>
 		<p><a href="/user/signin?back=ref">Авторизуйтесь</a>, чтобы не заполнять форму повторно.</p>
+	{transinfo:}
+			<div data-value="{~key}" class="iteminfo">{:basket.fields.{tpl}}</div>
+	{payinfo:}
+			<div data-value="{~key}" class="iteminfo"><div class="m-1 alert border more">{:basket.fields.{tpl}}</div></div>
 	{jsitem:}
 		//< script>
 		Event.one('Controller.onshow', function (){
 			var div = $('.'+name+'card');
 			var layer = Controller.ids["{id}"];
-			var value1 = Autosave.get(layer,name+'.choice','{data.order.pay.choice}');
-			var value2 = Autosave.get(layer,name+'.choice','{data.order.transport.choice}');
-			if(name == 'pay') var value = value1;
-			else var value = value2;
+			var value = Autosave.get(layer, name+'.choice', '{data.order.'+name+'.choice}');
 			var first = false;
 			div.find('.item').click( function (){
 				if (first && !{data.order.rule.edit[data.place]?:true?:false}) return;
 				first = true;
-				div.find('.item').not(this).removeClass('active');
-				if ($(this).is('.active')) {
-					$(this).removeClass('active');
-					Autosave.set(layer,name+'.choice');	
-				} else {
-					var value = $(this).data('value');
-					$(this).addClass('active');
-					Autosave.set(layer,name+'.choice',value);	
-				}
-				div.find('.iteminfo').hide();
-				if (value) div.find('.iteminfo').each( function () {
-					if ($(this).data('value') == value) {
-						$(this).fadeIn();
+				
+				
+				import('/vendor/akiyatkin/load/Fire.js').then(async obj => {
+					let Fire = obj.default
+					div.find('.item.active').not(this).removeClass('active');
+					
+					let value = $(this).data('value');
+					Fire.fire(Cart, 'choice' + name, value)
+					
+					
+
+					if ($(this).is('.active')) {
+						value = false;
+						$(this).removeClass('active');
+						Autosave.set(layer, name+'.choice');
+					} else {
+						$(this).addClass('active');
+						Autosave.set(layer, name+'.choice', value);
 					}
-				});
-				Autosave.loadAll(layer);
+					
+
+					div.find('.iteminfo').hide();
+					if (value) div.find('.iteminfo').each( function () {
+						if ($(this).data('value') == value) {
+							$(this).fadeIn();
+						}
+					});
+					Autosave.loadAll(layer);
+				})
 			}).each(function(){
 				if ($(this).data('value') == value) {
 					$(this).click();
@@ -529,6 +541,7 @@
 				
 			});
 		});
+		//< /script>
 		{myactions:}
 			<div style="margin:20px 0;" class="cart">
 				<div class="btn-toolbar" role="toolbar">

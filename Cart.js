@@ -5,9 +5,10 @@ window.Cart = {
 	},
 	refresh: function (el) {
 		if (el) $(el).removeClass('btn-secondary').addClass('btn-danger').find('span').addClass('spin');
-		setTimeout( function () {
+		setTimeout( async () => {
 			Controller.global.set(['user','cart']);
-			Session.syncNow();
+			console.log('asdf')
+			await Session.async();
 			Controller.check();
 			//Cart.goTop();
 			if (el) $(el).removeClass('btn-danger').addClass('btn-secondary').find('span').removeClass('spin');
@@ -177,8 +178,9 @@ window.Cart = {
 			Global.set('cart');
 		});
 	},
-	usersync: function () {
+	usersync: async () => {
 		//Синхронизируем user с активной заявкой
+		await Session.async()
 		var props = ['email','name','phone'];
 		Each.exec(props, function (prop) {
 			var userval = Session.get(['user', prop]);
