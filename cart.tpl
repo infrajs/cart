@@ -973,6 +973,8 @@
 		<pre style="margin-top:0"><b><i>{manage.comment}</i></b></pre>
 	
 {pr-call:}<b>Перезвонить</b>: {call=:yes?:yescall?(call=:no?:nocall)}<br>
+{yes:}yes
+{no:}no
 {yescall:}да
 {my:}my
 {nocall:}звонок не требуется
