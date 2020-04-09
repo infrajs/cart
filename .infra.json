@@ -22,6 +22,10 @@
 	"tester":"tester.php",
 	"testerjs":".tester.js",
 	"dependencies":["path","event","catalog","session","showcase"],
+	"sbrfpay":{
+		"userName":"",
+		"password":""
+	},
 	"clutch":{
 		"catalog":"vendor/infrajs/cart/",
 		"session":"vendor/infrajs/cart/",

@@ -1,0 +1,16 @@
+{
+	"tpl":"-cart/sbrfpay/layout.tpl",
+	"jsontpl":"-cart/sbrfpay/?id={crumb.parent.name}&place={crumb.parent.parent.name}",
+	"childs":{
+		"success":{
+			"tpl":"-cart/sbrfpay/layout.tpl",
+			"tplroot":"SUCCESS",
+			"jsontpl":"-cart/sbrfpay/?id={crumb.parent.parent.name}&place={crumb.parent.parent.parent.name}&orderId={Crumb.get.orderId}&status=success"
+		},
+		"error":{
+			"tpl":"-cart/sbrfpay/layout.tpl",
+			"tplroot":"ERROR",
+			"jsontpl":"-cart/sbrfpay/?id={crumb.parent.parent.name}&place={crumb.parent.parent.parent.name}}&orderId={Crumb.get.orderId}&status=error"
+		}
+	}
+}

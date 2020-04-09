@@ -21,6 +21,9 @@
 				"global":["user", "cart"],
 				"tplroot":"ORDER",
 				"childs":{
+					"sbrfpay":{
+						"external":"-cart/sbrfpay/layer.json"
+					},
 					"list":{					
 						"tpl":"-cart/cart.tpl",
 						"tplroot":"LIST",
@@ -52,6 +55,9 @@
 				"global":["user", "cart"],
 				"tplroot":"ADMORDER",
 				"childs":{
+					"sbrfpay":{
+						"external":"-cart/sbrfpay/layer.json"
+					},
 					"print":{
 						"jsontpl":"-cart/?type=order&id={crumb.parent.name}",
 						"tpl":"-cart/cart.tpl",

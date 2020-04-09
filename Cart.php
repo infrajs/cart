@@ -228,9 +228,24 @@ class Cart {
 				$order['manage']['deliverycost'] = preg_replace('/\s/','',$order['manage']['deliverycost']);
 				$order['alltotal']+=$order['manage']['deliverycost'];
 			}
+			if ($order['status'] == 'sbrfpay' 
+				&& isset($order['sbrfpay']['orderId']) 
+				&& empty(isset($order['sbrfpay']['info'])) ) {
+				//Есть информация что выдана ссылка, и нет информации об оплате
+				//Такое может быть если человек не переходил по ссылке success
+			}
+
 			Event::fire('Order.calc', $order);
 			return $order;
 		}, array($id));
+	}
+	public static function clearActiveSession() {
+		Session::set('orders.my.basket');//Очистили заявку
+		Session::set('orders.my.id');
+		Session::set('orders.my.fixid');
+		Session::set('orders.my.copyid');
+		Session::set('orders.my.time');
+		Session::set('orders.my.manage');
 	}
 	public static function couponCheck($coupon, &$pos) {
 		$r = true;

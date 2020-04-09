@@ -239,11 +239,17 @@
 			<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-info" role="alert"><b>Сообщение менеджера</b>
 					<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
 			</div>
-		
+		{sbrfpay:}
+			<p><b>{orderDescription}</b></p>
+			<table style="width:auto" class="table table-sm table-striped">
+				<tr><td>Оплачено</td><td>{~date(:d.m.Y H:i,date)}</td></tr>
+				<tr><td>Сумма</td><td>{~cost(total)}{:model.unit}</td></tr>
+			</table>
 		{orderPageContent:}
 			<div class="float-right" title="Последние измения">{~date(:j F H:i,order.time)}</div>
 			<h1>{order.rule.title} {order.id}</h1>
 			{order.manage.comment?order:showManageComment}
+			{order.sbrfpay.info:sbrfpay}
 			<form>
 				<div class="accordion" id="accordionorder">
 					{:basket.ORDER}
@@ -290,7 +296,7 @@
 					<textarea {:isdisabled} name="comment" class="form-control" rows="3">{order.comment}</textarea>
 				</div>
 				<div class="col-sm-6">
-					<div>Звонок менеджера <span class="req">*</span></div>
+					<div>Звонок менеджера</div>
 					<div class="form-check mt-1">
 						<input {:isdisabled} class="form-check-input" type="radio" name="call" {order.call=:yes?:checked} id="exampleRadios1" value="yes">
 						<label class="form-check-label" for="exampleRadios1">
@@ -314,20 +320,34 @@
 				<p>{:amount}</p>
 			</div>
 		{useractions:}
+			<style>
+				.act-sbrfpay {
+					display: none
+				}
+			</style>
+
 			<div class="myactions" data-place="orders">
 				{order.rule.user:myactions}
 			</div>
+		
 			<script async type="module">
 				let div = document.getElementById('{div}')
 				let cls = cls => div.getElementsByClassName(cls)
-				for (let act of cls('act-sbrfpay')) act.style.display = 'none'
 				import('/vendor/akiyatkin/load/Fire.js').then(async obj => {
 					let Fire = obj.default
-					Fire.hand(Cart, 'choicepay', (value) => {
-						let r = value == 'Оплатить онлайн'
+					Fire.hand(Cart, 'choicepay', async (value) => {
+						let is = (value == 'Оплатить онлайн')
+						for (let act of cls('act-sbrfpay')) act.style.display = 'none'
+						for (let act of cls('act-check')) act.style.display = 'block'
+						if (!is) return	
 						
-						for (let act of cls(r ? 'act-check':'act-sbrfpay')) act.style.display = 'none'
-						for (let act of cls(r ? 'act-sbrfpay':'act-check')) act.style.display = ''
+						/*let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
+
+						let arg = { 
+						}
+						let ans = Load.on('json', '-sbrf/?'+Load.param(arg))*/
+						for (let act of cls('act-check')) act.style.display = 'none'
+						for (let act of cls('act-sbrfpay')) act.style.display = 'block'
 					})
 				})
 			</script>
@@ -381,6 +401,7 @@
 				</div>
 				{fields.transport::transinfo}
 			</div>
+
 			<script>
 				domready(function (){
 					var name = 'transport';
@@ -486,8 +507,12 @@
 		Event.one('Controller.onshow', function (){
 			var div = $('.'+name+'card');
 			var layer = Controller.ids["{id}"];
-			var value = Autosave.get(layer, name+'.choice', '{data.order.'+name+'.choice}');
+			
+			if (name == 'pay') var value = Autosave.get(layer,name+'.choice','{data.order.pay.choice}');
+			else var value = Autosave.get(layer,name+'.choice','{data.order.transport.choice}');
+
 			var first = false;
+
 			div.find('.item').click( function (){
 				if (first && !{data.order.rule.edit[data.place]?:true?:false}) return;
 				first = true;
@@ -875,6 +900,15 @@
 		<li class="breadcrumb-item active">Содержимое корзины</li>
 		<li class="breadcrumb-item"><a href="/cart/{data.place}/{data.order.id|:my}">Оформление заказа {data.order.id}</a></li>
 	</ol>
+{utilcrumb:}
+	{:usersync}
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
+		{data.place=:admin?:liallorder}
+		<li class="breadcrumb-item"><a class="{data.place=:admin?:text-danger}" href="/cart/{data.place}/{data.order.id|:my}/list">Содержимое корзины</a>
+		<li class="breadcrumb-item"><a href="/cart/{data.place}/{data.order.id|:my}">Оформление заказа {data.order.id}</a></li>
+		<li class="breadcrumb-item active">{.}</li>
+	</ol>
 {ordercrumb:}
 	{:usersync}
 	<ol class="breadcrumb">
@@ -883,7 +917,7 @@
 		<!--<li class="breadcrumb-item active">Заявка {crumb.name=:my?:Активная?crumb.name}</li>-->
 		{data.place=:admin?:liallorder}
 		<li class="breadcrumb-item"><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb}/list">Содержимое корзины</a>
-		<li class="breadcrumb-item active">Оформление заказа {data.order.id}</li></li>
+		<li class="breadcrumb-item active">Оформление заказа {data.order.id}</li>
 	</ol>
 	{liallorder:}<li class="breadcrumb-item"><a class="{data.place=:admin?:text-danger}" href="/cart/{data.place}">{data.place=:admin?:Все?:Мои} заказы</a></li>
 	{itemcost:}{~cost(.)}<span class="d-none d-sm-inline">&nbsp;<small>{:model.unit}</small></span>
@@ -940,6 +974,7 @@
 	
 {pr-call:}<b>Перезвонить</b>: {call=:yes?:yescall?(call=:no?:nocall)}<br>
 {yescall:}да
+{my:}my
 {nocall:}звонок не требуется
 {iprinttr:}
 	<b>Доставка</b>: {choice} 

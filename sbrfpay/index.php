@@ -1,0 +1,86 @@
+<?php
+use infrajs\config\Config;
+use infrajs\cart\Cart;
+use infrajs\ans\Ans;
+use infrajs\view\View;
+use infrajs\cart\sbrfpay\Sbrfpay;
+
+$ans = [];
+$id = Ans::get('id');
+if (!$id) return Ans::err($ans, 'Заказ не найден');
+
+$place = Ans::get('place','string',['admin','orders']);
+if (!$place) return Ans::err($ans, 'Не указано место работы с заказом');
+$ans['place'] = $place;
+
+$order = Cart::loadOrder($id);
+if (!$order) return Ans::err($ans, 'Заказ не найден. Код 100');
+
+if (empty($order['pay']['choice']) || $order['pay']['choice'] != 'Оплатить онлайн') return Ans::err($ans, 'Ошибка. Выбран несовместимый способ оплаты. Код 105');
+
+if (!isset($_GET['orderId'])) {
+	$status = Ans::get('status');
+	if ($status) return Ans::err($ans, 'Ссылка устарела. Код 003');
+
+	$ogood = Cart::getGoodOrder($id);
+	
+	if (!$ogood['total']) return Ans::err($ans, 'Ошибка стоимости. Код 102');
+	$ans['order'] = $ogood;
+
+	if (isset($ogood['sbrfpay']['orderId'])) { //Если ссылка создана, то она не меняется
+		//Нужно проверить статус, может уже всё оплачено
+		$orderId = $ogood['sbrfpay']['orderId'];
+
+		$info = Sbrfpay::getInfo($orderId);
+		if ($info['orderStatus'] == 2) { //Вся сумма авторизирована
+			$order = Cart::loadOrder($id);
+			$status = 'success';
+			//Во всех остальных случаях пробуем ещё раз оплатить
+			$order['status'] = 'check';
+			Cart::saveOrder($order, $place);
+			return Ans::ret($ans, 'Заказ оплачен');
+		} 
+
+		$ans['orderId'] = $ogood['sbrfpay']['orderId'];
+		$ans['formUrl'] = $ogood['sbrfpay']['formUrl'];
+	} else {
+		$res = Sbrfpay::getId($id, $ogood['total']);
+		if (empty($res['orderId'])) return Ans::err($ans, $res['errorMessage']);
+	
+		$ans['orderId'] = $res['orderId'];
+		$ans['formUrl'] = $res['formUrl'];
+
+		$order = Cart::loadOrder($id);
+		$order['sbrfpay'] = [];
+		$order['sbrfpay']['orderId'] = $res['orderId'];
+		$order['sbrfpay']['formUrl'] = $res['formUrl'];
+		Cart::saveOrder($order, $place);
+	}
+	return Ans::ret($ans);
+} else {
+	$orderId = $_GET['orderId'];
+	if (empty($orderId)) return Ans::err($ans, 'Ссылка устарела. Код 001');
+	
+	$status = Ans::get('status');
+	if (empty($status) || !in_array($status, ['error','success'])) return Ans::err($ans, 'Ссылка устарела. Код 010');
+	
+	
+	if (empty($order['sbrfpay']) || $order['sbrfpay']['orderId'] != $orderId) return Ans::err($ans, 'Ссылка устарела. Код 002');
+	
+	
+	$info = Sbrfpay::getInfo($orderId);
+	
+	if ($info['orderStatus'] == 2) { //Вся сумма авторизирована
+		//Оплачено и статус меняется
+		$order['sbrfpay']['info'] = $info;
+		$order['status'] = 'check';
+		Cart::saveOrder($order, $place);
+		return Ans::ret($ans, 'Заказ оплачен.');
+	} else {
+		Cart::saveOrder($order, $place);
+		return Ans::ret($ans, 'Ошибка, заказ не оплачен.');
+	}
+	
+
+}
+

@@ -13,7 +13,7 @@
 			"caption":"Заказы ожидающие проверку менеджера",
 			"title":"Заказ находится на проверке",
 			"user":{
-				"buttons":{"basket":"secondary"},
+				"buttons":{"basket":"secondary","sbrfpay":"success"},
 				"actions":["active", "sync","print"]
 			},
 			"manager":{
@@ -67,7 +67,6 @@
 			"notice":"default",
 			"short":"",
 			"caption":"Заказ",
-			"editable":true,
 			"title":"Оформление заказа",
 			"user":{
 				"buttons":{
@@ -77,14 +76,34 @@
 				},
 				"actions":["check","print"]
 			}
+		},
+		"sbrfpay":{
+			"freeze":true,
+			"notice":"info",
+			"edit":{
+				"orders":false,
+				"admin":false
+			},
+			"caption":"Заявки ожидающие оплату",
+			"short":"Ожидает оплату",
+			"title":"Заявка ожидает оплату",
+			"user":{
+				"buttons":{"basket":"secondary","sbrfpay":"success"},
+				"actions":["active", "sync","print"]
+			},
+			"manager":{
+				"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
+				"actions":["complete","delete","sync","print"]
+			}
 		}
 	},
 	"actions":{
 		"sbrfpay":{
+			"checkdata":true,
 			"title":"Оплатить",
 			"go":{
-				"orders":"/cart/orders/{id|:my}/print",
-				"admin":"/cart/admin/{id|:my}/print"
+				"orders":"/cart/orders/{id}/sbrfpay",
+				"admin":"/cart/admin/{id}/sbrfpay"
 			}
 		},
 		"print":{
@@ -144,7 +163,7 @@
 		"active":{
 			"checkdata":false,
 			"go":{
-				"orders":"/cart/orders/my"
+				"orders":"/cart/orders/my/list"
 			},
 			"title":"Отозвать заказ",
 			"confirm":"В заказ снова можно будет добавлять новые позиции из каталога.",

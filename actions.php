@@ -63,7 +63,7 @@ if (!empty($act['checkdata']) && !empty($rule['edit'][$place])) {
 	//if ($ans['fields']['passport'] && (empty($order['passport'])||!User::checkData($order['passport'],'value')))  return Ans::err($ans, 'Укажите серию и номер паспорта'.$page);
 	//if ($ans['fields']['address'] && (empty($order['address'])||!User::checkData($order['address'],'value')))  return Ans::err($ans, 'Укажите адрес доставки'.$page);
 
-	if (!empty($conf['pay'])) {
+	/*if (!empty($conf['pay'])) {
 		if (!User::checkData($order['entity'],'radio')) return Ans::err($ans, 'Укажите кто будет оплачивать'.$page);
 		if (!User::checkData($order['paymenttype'],'radio')) return Ans::err($ans, 'Укажите способ оплаты'.$page);
 		if ($order['entity'] == 'legal') {
@@ -77,7 +77,7 @@ if (!empty($act['checkdata']) && !empty($rule['edit'][$place])) {
 				if (!User::checkData($order['addrespochta'],'value')) return Ans::err($ans, 'Укажите почтовый адрес юр.лица'.$page);
 			}
 		}
-	}
+	}*/
 	if ($conf['deliverychoice']) {
 		if (!User::checkData($order['delivery'],'radio')) return Ans::err($ans, 'Укажите способ доставки'.$page);
 		if ($order['delivery'] == 'delivery') {
@@ -92,12 +92,7 @@ if ($action == 'saved') {
 	$order['status'] = 'saved';
 	Cart::saveOrder($order, $place);
 	if ($status == 'active') {
-		Session::set('orders.my.basket');//Очистили Текущую активную заявку
-		Session::set('orders.my.id');
-		Session::set('orders.my.fixid');
-		Session::set('orders.my.copyid');
-		Session::set('orders.my.time');
-		Session::set('orders.my.manage');
+		Cart::clearActiveSession();
 	}
 } else if ($action == 'removechanges') {
 	if ($order['status'] == 'active') return Ans::err($ans, 'У активной заявки нельзя отменить изменения');
@@ -124,20 +119,20 @@ if ($action == 'saved') {
 	Cart::saveOrder($order, $place);
 } else if ($action == 'savechanges') {
 	Cart::saveOrder($order, $place);//К order применились изменения и после сохранения эти изменения будут доступны другим
-} else if ($action == 'check') {
-	if ($order['pay']['choice'] == 'Оплатить онлайн') {
-		$order['status'] = 'visapay';
-	} else {
-		$order['status'] = 'check';
-	}
+
+} else if ($action == 'sbrfpay') {
+	$ogood = Cart::getGoodOrder($orderid);
+	if (empty($ogood['total'])) return Ans::err($ans, 'Ошибка стоимости. Код 300');
+	$order['status'] = 'sbrfpay';
 	Cart::saveOrder($order, $place);
 	if ($status == 'active') {
-		Session::set('orders.my.basket');//Очистили заявку
-		Session::set('orders.my.id');
-		Session::set('orders.my.fixid');
-		Session::set('orders.my.copyid');
-		Session::set('orders.my.time');
-		Session::set('orders.my.manage');
+		Cart::clearActiveSession();
+	}
+} else if ($action == 'check') {
+	$order['status'] = 'check';
+	Cart::saveOrder($order, $place);
+	if ($status == 'active') {
+		Cart::clearActiveSession();
 	}
 } else if ($action == 'remove') {
 	$prodart = Ans::REQ('prodart');
