@@ -72,7 +72,7 @@
 		<tr><td class="d-flex"><div style="white-space: nowrap">Группа:</div><div class="line"></div></td><td><a href="/catalog/{group_nick}{:orig.cat.mark.set}">{group}</a></td></tr>
 	{rownonal:}<tr><td class="d-flex"><div style="white-space: nowrap">Наличие:</div><div class="line"></div></td><td style="">Нет в наличии</td></tr>
 	{rownalichie:}<tr><td class="d-flex"><div style="white-space: nowrap">Наличие:</div><div class="line"></div></td><td style="color:rgb(0, 204, 0); font-weight:bold">Есть в наличии</td></tr>
-	{alertnalichie:}{Наличие на складе=:strВ наличии?:nalichieda?Наличие на складе}
+	{alertnalichie:}{Наличие=:strВ наличии?:nalichieda?Наличие}
 	{nalichieda:}<span style="color:rgb(0, 204, 0); font-weight:bold">Есть в наличии</span>
 	{strНет:}Нет в наличии
 	{strВ наличии:}В наличии
