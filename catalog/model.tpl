@@ -41,7 +41,7 @@
 			<div class="mr-2">{:cost-one}</div>
 			<div class="input-group" title="Купить {producer|...producer} {article|...article} {item|...item}">
 				<input type="number" value="1" min="0" max="999" class="form-control" 
-				style="width: 3.8em; padding-left: 10px; padding-right: 10px;">
+				style="width: 3.6em; padding-left: 6px; padding-right: 6сpx;">
 				<div class="input-group-append">
 					<span data-producer="{producer_nick|...producer_nick}" data-article="{article_nick|...article_nick}" data-id="{item_nick}{catkit:ampval}" class="add btn input-group-addon">{~conf.cart.textadd}</span>
 				</div>
