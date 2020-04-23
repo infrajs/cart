@@ -8,12 +8,13 @@ use infrajs\cart\sbrfpay\Sbrfpay;
 $ans = [];
 $id = Ans::get('id');
 if (!$id) return Ans::err($ans, 'Заказ не найден');
-
+$ans['id'] = $id;
 $place = Ans::get('place','string',['admin','orders']);
 if (!$place) return Ans::err($ans, 'Не указано место работы с заказом');
 $ans['place'] = $place;
 
 $order = Cart::loadOrder($id);
+
 if (!$order) return Ans::err($ans, 'Заказ не найден. Код 100');
 
 if (empty($order['pay']['choice']) || $order['pay']['choice'] != 'Оплатить онлайн') return Ans::err($ans, 'Ошибка. Выбран несовместимый способ оплаты. Код 105');
@@ -38,6 +39,7 @@ if (!isset($_GET['orderId'])) {
 			//Во всех остальных случаях пробуем ещё раз оплатить
 			$order['status'] = 'check';
 			Cart::saveOrder($order, $place);
+			$ans['order'] = $order;
 			return Ans::ret($ans, 'Заказ оплачен');
 		} 
 
@@ -56,6 +58,7 @@ if (!isset($_GET['orderId'])) {
 		$order['sbrfpay']['formUrl'] = $res['formUrl'];
 		Cart::saveOrder($order, $place);
 	}
+	$ans['order'] = $order;
 	return Ans::ret($ans);
 } else {
 	$orderId = $_GET['orderId'];
@@ -75,9 +78,11 @@ if (!isset($_GET['orderId'])) {
 		$order['sbrfpay']['info'] = $info;
 		$order['status'] = 'check';
 		Cart::saveOrder($order, $place);
+		$ans['order'] = $order;
 		return Ans::ret($ans, 'Заказ оплачен.');
 	} else {
 		Cart::saveOrder($order, $place);
+		$ans['order'] = $order;
 		return Ans::ret($ans, 'Ошибка, заказ не оплачен.');
 	}
 	

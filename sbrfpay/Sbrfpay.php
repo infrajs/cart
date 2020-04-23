@@ -26,7 +26,7 @@ class Sbrfpay {
 
 		$vars['userName'] = $conf['userName'];
 		$vars['password'] = $conf['password'];
-		 
+		
 		/* ID заказа в магазине */
 
 		$vars['orderNumber'] = $id;
@@ -97,7 +97,9 @@ class Sbrfpay {
 		curl_close($ch);
 
 		$res = json_decode($res, JSON_OBJECT_AS_ARRAY);
-		if (isset($res['amount'])) $res['total'] = round($res['amount']/2,2);
+		if (isset($res['amount'])) $res['total'] = round($res['amount']/100,2);
+		
+		if (isset($res['date'])) $res['date'] = round($res['date']/1000);
 		return $res;
 	}
 }

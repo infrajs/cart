@@ -240,10 +240,10 @@
 					<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
 			</div>
 		{sbrfpay:}
-			<p><b>{orderDescription}</b></p>
+			<p>{orderDescription}</p>
 			<table style="width:auto" class="table table-sm table-striped">
-				<tr><td>Оплачено</td><td>{~date(:d.m.Y H:i,date)}</td></tr>
-				<tr><td>Сумма</td><td>{~cost(total)}{:model.unit}</td></tr>
+				<tr><th>Оплачено</th><td>{~date(:d.m.Y H:i,date)}</td></tr>
+				<tr><th>Сумма</th><td>{~cost(total)}{:model.unit}</td></tr>
 			</table>
 		{orderPageContent:}
 			<div class="float-right" title="Последние измения">{~date(:j F H:i,order.time)}</div>

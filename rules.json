@@ -14,7 +14,7 @@
 			"title":"Заказ находится на проверке",
 			"user":{
 				"buttons":{"basket":"secondary","sbrfpay":"success"},
-				"actions":["active", "sync","print"]
+				"actions":["print"]
 			},
 			"manager":{
 				"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
