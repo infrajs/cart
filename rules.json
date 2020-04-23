@@ -1,5 +1,5 @@
 {
-	"list":["check","wait"],
+	"list":["check","wait","sbrfpay"],
 	"def":"wait",
 	"rules":{
 		"check":{
