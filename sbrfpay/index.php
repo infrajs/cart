@@ -40,7 +40,8 @@ if (!isset($_GET['orderId'])) {
 			$order['status'] = 'check';
 			Cart::saveOrder($order, $place);
 			$ans['order'] = $order;
-			return Ans::ret($ans, 'Заказ оплачен');
+			$ans['msg'] = 'Заказ оплачен';
+			return Cart::ret($ans, 'check');
 		} 
 
 		$ans['orderId'] = $ogood['sbrfpay']['orderId'];
@@ -79,7 +80,7 @@ if (!isset($_GET['orderId'])) {
 		$order['status'] = 'check';
 		Cart::saveOrder($order, $place);
 		$ans['order'] = $order;
-		$ans['msg'] = 'Заказ оплачен.';
+		$ans['msg'] = 'Заказ оплачен';
 		return Cart::ret($ans, 'check');
 	} else {
 		Cart::saveOrder($order, $place);

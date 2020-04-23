@@ -19,8 +19,8 @@
 	{:links}
 	
 {redirect:}
-	<p>После нажатия на кноку откроется страница банка для вводы платёжных данных.</p>
-	<a class="btn btn-lg btn-success" href="{data.formUrl}">Оплатить</a>
+	<p>После нажатия на кноку откроется страница банка для ввода платёжных данных.</p>
+	<a target="about:blank" class="btn btn-lg btn-success" href="{data.formUrl}">Оплатить</a>
 {cart::}-cart/cart.tpl
 {ans::}-ans/ans.tpl
 {links:}
