@@ -2,7 +2,7 @@
 	{(:Онлайн оплата):cart.utilcrumb}
 	<h1>Заказ {data.id}</h1>
 	{data.formUrl?:redirect}
-	{data.ans?data:ans.msg}
+	{data.msg?data:ans.msg}
 	{data.order.sbrfpay.info:cart.sbrfpay}
 	{:links}
 {SUCCESS:}
