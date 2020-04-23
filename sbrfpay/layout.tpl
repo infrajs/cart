@@ -20,7 +20,7 @@
 	
 {redirect:}
 	<p>После нажатия на кноку откроется страница банка для ввода платёжных данных.</p>
-	<a target="about:blank" class="btn btn-lg btn-success" href="{data.formUrl}">Оплатить</a>
+	<a target2="about:blank" class="btn btn-lg btn-success" href="{data.formUrl}">Оплатить</a>
 {cart::}-cart/cart.tpl
 {ans::}-ans/ans.tpl
 {links:}

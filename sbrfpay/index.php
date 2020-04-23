@@ -83,6 +83,7 @@ if (!isset($_GET['orderId'])) {
 		$ans['msg'] = 'Заказ оплачен';
 		return Cart::ret($ans, 'check');
 	} else {
+		$order['sbrfpay']['info'] = $info;
 		Cart::saveOrder($order, $place);
 		$ans['order'] = $order;
 		return Ans::ret($ans, 'Ошибка, заказ не оплачен.');
