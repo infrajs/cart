@@ -240,6 +240,9 @@
 					<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
 			</div>
 		{sbrfpay:}
+			{orderStatus=:2?:sbrfpaygood}
+		{2:}2
+		{sbrfpaygood:}
 			<p>{orderDescription}</p>
 			<table style="width:auto" class="table table-sm table-striped">
 				<tr><th>Оплачено</th><td>{~date(:d.m.Y H:i,date)}</td></tr>
