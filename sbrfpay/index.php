@@ -25,8 +25,8 @@ if (!isset($_GET['orderId'])) {
 
 	$ogood = Cart::getGoodOrder($id);
 	
-	if (!$ogood['total']) return Ans::err($ans, 'Ошибка стоимости. Код 102');
-	$ans['order'] = $ogood;
+	if (!$ogood['total']) return Ans::err($ans, 'Отсутствует стоиость заказа. Код 102');
+	$ans['order'] = $order;
 
 	if (isset($ogood['sbrfpay']['orderId'])) { //Если ссылка создана, то она не меняется
 		//Нужно проверить статус, может уже всё оплачено
@@ -79,7 +79,8 @@ if (!isset($_GET['orderId'])) {
 		$order['status'] = 'check';
 		Cart::saveOrder($order, $place);
 		$ans['order'] = $order;
-		return Ans::ret($ans, 'Заказ оплачен.');
+		$ans['msg'] = 'Заказ оплачен.';
+		return Cart::ret($ans, 'check');
 	} else {
 		Cart::saveOrder($order, $place);
 		$ans['order'] = $order;

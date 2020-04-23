@@ -245,6 +245,7 @@ class Cart {
 		Session::set('orders.my.fixid');
 		Session::set('orders.my.copyid');
 		Session::set('orders.my.time');
+		Session::set('orders.my.comment');
 		Session::set('orders.my.manage');
 	}
 	public static function couponCheck($coupon, &$pos) {
