@@ -86,7 +86,8 @@ if (!isset($_GET['orderId'])) {
 		$order['sbrfpay']['info'] = $info;
 		Cart::saveOrder($order, $place);
 		$ans['order'] = $order;
-		return Ans::ret($ans, 'Ошибка, заказ не оплачен.');
+		$add = isset($info['actionCodeDescription'])? $info['actionCodeDescription'] : '';
+		return Ans::ret($ans, 'Ошибка, заказ не оплачен. '.$add);
 	}
 	
 
