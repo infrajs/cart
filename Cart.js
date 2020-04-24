@@ -60,8 +60,7 @@ window.Cart = {
 		Session.syncNow();
 		Cart.getJSON(path, function (ans) {
 			Session.syncNow();
-			Global.set('cart');
-			//Global.set('user');
+			Global.set(['cart','user']); //при заказе может произойти авторизация
 			cb(ans);
 		});
 	},
