@@ -41,7 +41,7 @@
 			"ico":"-cart/images/bank.png",
 			"tpl":"PAYBANK"
 		},
-		"Оплата банковской картой":{
+		"Оплатить онлайн":{
 			"ico":"-cart/images/visa-master.jpg",
 			"tpl":"PAYCARD"	
 		}

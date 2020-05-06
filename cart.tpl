@@ -524,7 +524,6 @@
 				import('/vendor/akiyatkin/load/Fire.js').then(async obj => {
 					let Fire = obj.default
 					div.find('.item.active').not(this).removeClass('active');
-					
 					let value = $(this).data('value');
 					Fire.fire(Cart, 'choice' + name, value)
 					
