@@ -1,11 +1,16 @@
+import { Crumb } from '/vendor/infrajs/controller/src/Crumb.js'
+import { Event } from '/vendor/infrajs/event/Event.js'
+import { CDN } from '/vendor/akiyatkin/load/CDN.js'
+import { Cart } from '/vendor/infrajs/cart/Cart.js'
+import { Global } from '/vendor/infrajs/layer-global/Global.js'
+
 Event.handler('Controller.onshow', async () => {
-	let CDN = (await import('/vendor/akiyatkin/load/CDN.js')).default
 	await CDN.load('jquery')
 
-	$('.abasket').filter("[data-crumb!=false]").attr("data-crumb","false").click( function (event) {
+	$('.abasket').filter("[data-crumb!=false]").attr("data-crumb", "false").click(function (event) {
 		event.preventDefault();
 		var a = $(this);
-		
+
 		var prodart = a.data('producer') + ' ' + a.data('article');
 		var id = a.data('id');
 		if (id) prodart += ' ' + a.data('id');
@@ -14,38 +19,38 @@ Event.handler('Controller.onshow', async () => {
 		if (!place) place = 'orders';
 		if (!orderid) orderid = 'my';
 		Cart.toggle(place, orderid, prodart, function () {
-			Cart.activate(a);	
-		});	
-	}).each(function(){
+			Cart.activate(a);
+		});
+	}).each(function () {
 		var a = $(this);
 		Cart.activate(a)
 	});
 	var conf = Config.get('cart');
-	var activate = function(a){
+	var activate = function (a) {
 		var orderid = a.data('order');
 		if (!orderid) orderid = 'my';
-		
+
 		var prodart = a.data('producer') + ' ' + a.data('article');
 		var id = a.data('id');
 		if (id) prodart += ' ' + a.data('id');
 
 		var name = ['orders', orderid, 'basket', prodart, 'count'];
 		var r = Session.get(name, 0);
-		
+
 		if (r) a.parents('.cart-basket').find('input').val(r);
 
 		var c = a.parents('.cart-basket');
 
 		//в tpl дефолтный класс надо чтобы был clsadd
-		
-		
+
+
 		/*var clsadd = 'btn-info';
 		var clsready = 'btn-warning';
 		var textadd = 'Добавить в корзину';
 		var textready = 'Оформить заказ';*/
 		if (r || orderid != 'my') {
 			let text = a.find('.text');
-			if(!text.length) text = a;
+			if (!text.length) text = a;
 			text.text(conf.textready);
 			a.addClass('active');
 			//c.addClass('has-warning');c.removeClass('has-success');
@@ -63,35 +68,34 @@ Event.handler('Controller.onshow', async () => {
 			a.removeClass(conf.clsready);
 		}
 	}
-	$('.cart-basket').filter("[data-basket!=true]").attr("data-basket","true").each(function(){
+	$('.cart-basket').filter("[data-basket!=true]").attr("data-basket", "true").each(function () {
 		var a = $(this).find('.add');
 
 		var c = $(this);
-		$(this).find('input').click(function(){
+		$(this).find('input').click(function () {
 			let text = a.find('.text');
 			if (!text.length) text = a;
 			text.text(conf.textadd);
 			a.removeClass('active');
 			//c.find('.bbasket').slideUp();
 			//c.addClass('has-success');c.removeClass('has-warning');
-			a.addClass(conf.clsadd);a.removeClass(conf.clsready);
-		}).change(function(){
+			a.addClass(conf.clsadd); a.removeClass(conf.clsready);
+		}).change(function () {
 			let text = a.find('.text');
 			if (!text.length) text = a;
 			text.text(conf.textadd);
 			a.removeClass('active');
 			//c.find('.bbasket').slideUp();
 			//c.addClass('has-success');c.removeClass('has-warning');
-			a.addClass(conf.clsadd);a.removeClass(conf.clsready);
+			a.addClass(conf.clsadd); a.removeClass(conf.clsready);
 		});
-		a.click( function (event) {
+		a.click( (event) => {
 			event.preventDefault();
 			var count = a.parents('.cart-basket').find('input').val();
-			
 			var prodart = a.data('producer') + ' ' + a.data('article');
 			var id = a.data('id');
 			if (id) prodart += ' ' + a.data('id');
-			
+
 			var orderid = a.data('order');
 			var place = a.data('place');
 			if (!place) place = 'orders';
@@ -104,7 +108,7 @@ Event.handler('Controller.onshow', async () => {
 				Global.check('cart');
 				activate(a);
 			});
-		}).each(function(){
+		}).each(function () {
 			var a = $(this);
 			activate(a);
 		});
@@ -117,9 +121,9 @@ Event.one('Controller.onshow', async () => {
 	let CDN = (await import('/vendor/akiyatkin/load/CDN.js')).default
 	await CDN.load('jquery')
 	Event.handler('Controller.onshow', function () {
-		$('.cart-search').filter("[data-search!=false]").attr("data-search","false").each( function () {
+		$('.cart-search').filter("[data-search!=false]").attr("data-search", "false").each(function () {
 			var el = this;
-			$(el).click( function () {
+			$(el).click(function () {
 				layer.config = $(el).data();
 				console.log(layer.config);
 				Popup.open(layer);

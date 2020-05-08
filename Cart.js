@@ -1,42 +1,47 @@
-window.Cart = {
+import { Crumb } from '/vendor/infrajs/controller/src/Crumb.js'
+import { Global } from '/vendor/infrajs/layer-global/Global.js'
+import { Ascroll } from '/vendor/infrajs/ascroll/Ascroll.js'
+import { Popup } from '/vendor/infrajs/popup/Popup.js'
+
+let Cart = {
 	blockform: function (layer) {
-		var form=$("#"+layer.div).find('form');
-		form.find("input,button,textarea,select").attr("disabled","disabled");
+		var form = $("#" + layer.div).find('form');
+		form.find("input,button,textarea,select").attr("disabled", "disabled");
 	},
 	refresh: function (el) {
 		if (el) $(el).removeClass('btn-secondary').addClass('btn-danger').find('span').addClass('spin');
-		setTimeout( async () => {
-			Controller.global.set(['user','cart']);
+		setTimeout(async () => {
+			Controller.global.set(['user', 'cart']);
 			console.log('asdf')
 			await Session.async();
 			Controller.check();
 			//Cart.goTop();
 			if (el) $(el).removeClass('btn-danger').addClass('btn-secondary').find('span').removeClass('spin');
-		},100);
+		}, 100);
 	},
 	logout: function () {
 		Session.logout();
 		Session.syncNow();
-		Global.check(['cart','user']);
+		Global.check(['cart', 'user']);
 	},
 	unblockform: function (layer) {
-		var div=$("#"+layer.div).find('form');
+		var div = $("#" + layer.div).find('form');
 		div.find("input").removeAttr("disabled");
 		div.find("button").removeAttr("disabled");
 		div.find("textarea").removeAttr("disabled");
 		div.find("select").removeAttr("disabled");
 	},
 	getLink: function (order, place) {
-		if (place =='admin') {
-			var link = '<a onclick = "Popup.closeAll();" href="/cart/'+place+'/{id}">{id}</a>';
+		if (place == 'admin') {
+			var link = '<a onclick = "Popup.closeAll();" href="/cart/' + place + '/{id}">{id}</a>';
 		} else {//place =='orders'
 			if (!order.id) {
-				var link = '<a onclick = "Popup.closeAll();" href="/cart/'+place+'/my/list">Оформление заказа</a>';
+				var link = '<a onclick = "Popup.closeAll();" href="/cart/' + place + '/my/list">Оформление заказа</a>';
 			} else {
-				var link = '<a onclick = "Popup.closeAll();" href="/cart/'+place+'/{id}">{id}</a>';
-			}			
+				var link = '<a onclick = "Popup.closeAll();" href="/cart/' + place + '/{id}">{id}</a>';
+			}
 		}
-		link = Template.parse([link],order);
+		link = Template.parse([link], order);
 		return link;
 	},
 	reach: async (name) => {
@@ -44,15 +49,15 @@ window.Cart = {
 		Goal.reach(name);
 	},
 	act: function (place, name, orderid, cb, param) {
-		if (!cb) cb = function () {};
-		
+		if (!cb) cb = function () { };
+
 		var rules = Load.loadJSON('-cart/rules.json');
 		var act = rules.actions[name];
 		var order = Cart.getGoodOrder(orderid);
 		order.place = place;
 		if (act.link) {
-			Crumb.go(Template.parse([act.link],order));
-			return cb({result:1});	
+			Crumb.go(Template.parse([act.link], order));
+			return cb({ result: 1 });
 		}
 		if (param) param = '&' + param;
 		else param = '';
@@ -60,12 +65,12 @@ window.Cart = {
 		Session.syncNow();
 		Cart.getJSON(path, function (ans) {
 			Session.syncNow();
-			Global.set(['cart','user']); //при заказе может произойти авторизация
+			Global.set(['cart', 'user']); //при заказе может произойти авторизация
 			cb(ans);
 		});
 	},
 	inaction: false,
-	action: function(place, name, orderid, cb, param) {
+	action: function (place, name, orderid, cb, param) {
 		//place - контекст в котором идёт работа
 		if (Cart.inaction) return;
 		Cart.inaction = true;
@@ -76,8 +81,8 @@ window.Cart = {
 		var layer = Controller.ids['order'];
 		//if (!act.link && (!act.go || !act.go[place])) alert('Ошибка. Действие невозможно выполнить с этой странице!');
 		var link = Cart.getLink(order, place);
-		
-		var justdo = function () { 
+
+		var justdo = function () {
 			//if (!act.link) Cart.blockform(layer);
 			Cart.inaction = true;
 			Cart.act(place, name, orderid, function (ans) {
@@ -91,37 +96,37 @@ window.Cart = {
 								var msg = Template.parse([act.result], order);
 								var link = Cart.getLink(order, place);
 								//popup.alert(link+'<br>'+msg);
-								popup.alert(msg);
+								Popup.alert(msg);
 							}
 							return;
 						}
 						//Cart.unblockform(layer);
-						
+
 						if (ans.result) {
 							if (act.goal) Cart.reach(act.goal)
 							if (!act.silent && act.result) {
 								var msg = Template.parse([act.result], order);
 								var link = Cart.getLink(order, place);
-								//popup.alert(link+'<br>'+msg);
-								popup.alert(msg);
+								//Popup.alert(link+'<br>'+msg);
+								Popup.alert(msg);
 							}
 							if (act.go && act.go[place]) Crumb.go(Template.parse([act.go[place]], order));
 							else Controller.check();
 						} else {
-							if (ans.msg) { 
+							if (ans.msg) {
 								var msg = Template.parse([ans.msg], order);
 								var link = Cart.getLink(order, place);
-								//popup.alert(link+'<br>'+msg);
-								popup.alert(msg);
+								//Popup.alert(link+'<br>'+msg);
+								Popup.alert(msg);
 							} else {
-								popup.alert(link+'<br>Произошла обшибка, попробуйте позже!');
+								Popup.alert(link + '<br>Произошла обшибка, попробуйте позже!');
 							}
 						}
 					} else {//Заявка удалена
-						
+
 						if (ans.result) Crumb.go(act.go[place]);
 						if (ans.msg) {
-							popup.alert(ans.msg);
+							Popup.alert(ans.msg);
 						}
 					}
 					if (cb && ans.result) cb(ans);
@@ -133,11 +138,11 @@ window.Cart = {
 			}, param);
 		};
 		if (act.confirm) {
-			
+
 			var ask = Template.parse([act.confirm], order);
-			ask = 'Заказ '+link+'<br>'+ask;
+			ask = 'Заказ ' + link + '<br>' + ask;
 			Cart.inaction = false;
-			popup.confirm(ask, justdo);
+			Popup.confirm(ask, justdo);
 
 		} else {
 			justdo();
@@ -148,45 +153,45 @@ window.Cart = {
 		var layer = Controller.ids['order'];
 
 		for (var name in rules.actions) {
-			$(".cart .act-"+name).not('[cartinit]').attr('cartinit', name).click( function () {
+			$(".cart .act-" + name).not('[cartinit]').attr('cartinit', name).click(function () {
 				var name = $(this).attr('cartinit');
 				var place = $(this).attr('data-place');
 				if (!place) place = $(this).parents('.myactions').attr('data-place');
 				var param = $(this).attr('data-param');
 				var id = $(this).attr('data-id');
-				Cart.action(place, name, id, function(){ }, param);
+				Cart.action(place, name, id, function () { }, param);
 				return false;
 			});
 		}
 	},
 	getJSON: function (src, call) {
 		$.ajax({
-		  dataType: "json",
-		  url: '/'+src,
-		  cache:false,
-		  async:true,
-		  success: call,
-		  error: function () {
-		  	popup.alert('Ошибка на сервере. Попробуйте позже.');
-		  }
+			dataType: "json",
+			url: '/' + src,
+			cache: false,
+			async: true,
+			success: call,
+			error: function () {
+				Popup.alert('Ошибка на сервере. Попробуйте позже.');
+			}
 		});
 	},
 	sync: function (place, orderid) {
 		//Синхронизируем сессию клиента с реальной заявкой на сервере
-		Cart.getJSON('-cart/actions.php?type=sync&id='+orderid+'&place='+place, function () {
+		Cart.getJSON('-cart/actions.php?type=sync&id=' + orderid + '&place=' + place, function () {
 			Global.set('cart');
 		});
 	},
 	usersync: async () => {
 		//Синхронизируем user с активной заявкой
 		await Session.async()
-		var props = ['email','name','phone'];
+		var props = ['email', 'name', 'phone'];
 		Each.exec(props, function (prop) {
 			var userval = Session.get(['user', prop]);
-			var cartval = Session.get(['orders','my',prop]);
+			var cartval = Session.get(['orders', 'my', prop]);
 			if (userval && cartval) return;
 			if (!userval && !cartval) return;
-			if (!cartval) Session.set(['orders','my',prop], userval);
+			if (!cartval) Session.set(['orders', 'my', prop], userval);
 			if (!userval) Session.set(['user', prop], cartval);
 		});
 	},
@@ -197,16 +202,16 @@ window.Cart = {
 		var order = Cart.getGoodOrder(id);
 		if (!order) return false;
 		//if (Sequence.get(order,['rule','user','buttons',action]))return true;
-		return Each.exec(Sequence.get(order,['rule','user','actions']), function (r) {
+		return Each.exec(Sequence.get(order, ['rule', 'user', 'actions']), function (r) {
 			if (r['act'] == action) return true;
 		});
 	},
 	getGoodOrder: function (orderid) {
 		if (!orderid) orderid = '';
 		//генерирует объект описывающий все цены... передаётся basket на случай если count актуальный именно в basket
-		var path='-cart/?type=order&id='+orderid;
+		var path = '-cart/?type=order&id=' + orderid;
 		Global.unload('cart', path);
-		var path='-cart?type=order&id='+orderid;
+		var path = '-cart?type=order&id=' + orderid;
 		Global.unload('cart', path);
 		//Load.unload(path);
 		//Session.syncNow();
@@ -247,7 +252,7 @@ window.Cart = {
 	},
 	set: function (place, orderid, prodart, count, cb) {
 		if (!orderid) orderid = 'my';
-		var name = [place, orderid, 'basket', prodart, 'count'];	
+		var name = [place, orderid, 'basket', prodart, 'count'];
 		count = Number(count);
 		if (!count) count = null;
 		Cart.reach('basket');
@@ -259,14 +264,14 @@ window.Cart = {
 			Global.check('cart');
 		}
 		if (!orderid) orderid = 'my';
-		
-		var name = [place, orderid, 'basket', prodart];	
-		
+
+		var name = [place, orderid, 'basket', prodart];
+
 		Cart.reach('basket');
 		Session.set(name, { count: 1 }, true, fn);
 	},
 	lang: function (str) {
-		if (typeof(str) == 'undefined') return Lang.name('cart');
+		if (typeof (str) == 'undefined') return Lang.name('cart');
 		return Lang.str('cart', str);
 	}
 	/*,
@@ -312,7 +317,7 @@ window.Cart = {
 			$(this).removeClass('basket_img_over');
 		});
 	}*/
-	, 
+	,
 	activate: function (a) {
 		var orderid = a.data('order');
 		if (!orderid) orderid = 'my';
@@ -326,14 +331,14 @@ window.Cart = {
 		if (r || orderid != 'my') {
 			a.parent().find('.bbasket').stop().slideDown();
 			a.parent().find('.basketdescr').stop().slideUp();
-			
+
 			a.addClass('selected');
-			a.attr('title','Удалить из корзины');
+			a.attr('title', 'Удалить из корзины');
 		} else {
 			a.parent().find('.bbasket').stop().slideUp();
 			a.parent().find('.basketdescr').stop().slideDown();
 			a.removeClass('selected');
-			a.attr('title','Добавить в корзину');
+			a.attr('title', 'Добавить в корзину');
 		}
 	},
 	/*activate: function (a) {
@@ -353,6 +358,8 @@ window.Cart = {
 		}
 	}*/
 }
+window.Cart = Cart
+export { Cart }
 /*
 Event.handler('Session.onsync', function () {
 	$(document).find('.cat_item').each( function () {

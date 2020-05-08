@@ -102,7 +102,8 @@
 			.autocomplete-group { padding: 2px 5px; }
 			.autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
 		</style>
-		<script>
+		<script type="module">
+			import { Crumb } from '/vendor/infrajs/controller/src/Crumb.js'
 			domready(async () => {
 				//https://github.com/devbridge/jQuery-Autocomplete
 				var prodart = false;
