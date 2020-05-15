@@ -5,12 +5,9 @@
 	{cartanswer:}
 		<pre>{mail}</pre>
 	{js:}
-		<script>
-			domready(function(){
-				Event.one('Controller.onshow', function () {
-					Cart.init();
-				});
-			});
+		<script type="module">
+			import { Cart } from '/vendor/infrajs/cart/Cart.js'
+			Cart.init()
 		</script>
 	{LIST:}
 		{:listcrumb}
@@ -74,14 +71,18 @@
 			<div class="d-flex align-items-center justify-content-center justify-content-sm-end">
 				<div class="mr-2">Сумма{coupon_data.result?:nodiscount}: </div><div style="font-size:120%; font-weight:bold" class="cartsum">{sum:itemcostrub}</div>
 			</div>
-			<script>
-				domready( function () {
+			<script type="module">
+				import { DOM } from '/vendor/akiyatkin/load/DOM.js'
+				import { Global } from '/vendor/infrajs/layer-global/Global.js'
+				DOM.wait('load').then(async () => {
 					//При изменении инпутов. надо рассчитать Сумму и Итого с учётом coupon_discount
 					/*
 					cartsum
 					cartsumdel
 					carttotal
 					*/
+					await CDN.load('jquery')
+
 					var tplcost = function (val) {
 						return Template.parse('-cart/cart.tpl', val, 'itemcost')
 					}
@@ -258,41 +259,6 @@
 					{:basket.ORDER}
 				</div>
 			</form>
-			<script>
-				domready( function (){
-					Event.one('Controller.onshow', function (){
-						var layer = Controller.ids["{id}"];
-						$('.accordion .collapse').on('show.bs.collapse', function(){
-							var tab = $(this).parent();
-							tab.find('.card-header').addClass('font-weight-bold');
-							var num = tab.attr('data-num');	
-							if (Session.is()) Autosave.set(layer,'accordion.'+num, true);
-						});
-						$('.accordion .collapse').on('hide.bs.collapse', function(){
-							var tab = $(this).parent();
-							tab.find('.card-header').removeClass('font-weight-bold');
-							var num = tab.attr('data-num');
-							if (Session.is()) Autosave.set(layer,'accordion.'+num);
-						});
-
-						var layer = Controller.ids["{id}"];
-						/*var list = Autosave.get(layer, 'accordion', {~json(order.accordion)});
-						if (!list) {
-							list = { };
-							list[3] = true; //Пользователь
-						}
-						list[4] = true; //Доставка
-						var first = true;
-						for (num in list) {
-							//if (!first) Ascroll.once=false;
-							first = false;
-
-
-							$('.accordion').find('[data-num='+num+'] .card-header').click();
-						}*/
-					});
-				})
-			</script>
 			<div class="my-3 mb-4 row">
 				<div class="col-sm-6">
 					<div>Комментарий к заказу</div>
@@ -333,25 +299,25 @@
 				{order.rule.user:myactions}
 			</div>
 		
-			<script async type="module">
+			<script type="module">
+				import { Cart } from '/vendor/infrajs/cart/Cart.js'
+				
 				let div = document.getElementById('{div}')
 				let cls = cls => div.getElementsByClassName(cls)
-				import('/vendor/akiyatkin/load/Fire.js').then(async obj => {
-					let Fire = obj.default
-					Fire.hand(Cart, 'choicepay', async (value) => {
-						let is = (value == 'Оплатить онлайн')
-						for (let act of cls('act-sbrfpay')) act.style.display = 'none'
-						for (let act of cls('act-check')) act.style.display = 'block'
-						if (!is) return	
-						
-						/*let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
+				
+				Cart.hand('choicepay', async (value) => {
+					let is = (value == 'Оплатить онлайн')
+					for (let act of cls('act-sbrfpay')) act.style.display = 'none'
+					for (let act of cls('act-check')) act.style.display = 'block'
+					if (!is) return	
+					
+					/*let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
 
-						let arg = { 
-						}
-						let ans = Load.on('json', '-sbrf/?'+Load.param(arg))*/
-						for (let act of cls('act-check')) act.style.display = 'none'
-						for (let act of cls('act-sbrfpay')) act.style.display = 'block'
-					})
+					let arg = { 
+					}
+					let ans = Load.on('json', '-sbrf/?'+Load.param(arg))*/
+					for (let act of cls('act-check')) act.style.display = 'none'
+					for (let act of cls('act-sbrfpay')) act.style.display = 'block'
 				})
 			</script>
 		{adminactions:}
@@ -405,42 +371,47 @@
 				{fields.transport::transinfo}
 			</div>
 
-			<script>
-				domready(function (){
+			<script type="module">
+				import { DOM } from '/vendor/akiyatkin/load/DOM.js'
+				import { Load } from '/vendor/infrajs/load/Load.js'
+				import { Autosave } from '/vendor/infrajs/layer-autosave/Autosave.js'
+				import { Cart } from '/vendor/infrajs/cart/Cart.js'
+				import { CDN } from '/vendor/akiyatkin/load/CDN.js'
+
+				DOM.wait('load').then(async () => {
 					var name = 'transport';
 					{:jsitem}
-					Event.one('Controller.onshow', function (){
-						var tcard = $('.transportcard');
-						var pcard = $('.paycard');
-						tcard.find('.item').click( function (){
-							var layer = Controller.ids["{id}"];
-							var value = Autosave.get(layer, 'transport.choice');
-							pcard.find('.item').css('display','flex');
-							if (!value) return;
-							var data = Load.loadJSON(layer.json);
-							if (!data) return;
-							
-							if (!data.fields.transport[value] || !data.fields.transport[value].hide) return;
-							var hide = data.fields.transport[value].hide;
-							var payvalue = Autosave.get(layer, 'pay.choice');
+					
+					var tcard = $('.transportcard');
+					var pcard = $('.paycard');
+					tcard.find('.item').click( async () => {
+						let value = await Autosave.get("{autosavename}", 'transport.choice');
+						pcard.find('.item').css('display','flex');
+						if (!value) return;
+						let data = await Load.on('json','{json}');
+						if (!data) return;
+						
+						if (!data.fields.transport[value] || !data.fields.transport[value].hide) return;
+						var hide = data.fields.transport[value].hide;
+						var payvalue = await Autosave.get("{autosavename}", 'pay.choice');
 
-							
-							if (~hide.indexOf(payvalue)) {
-								pcard.find('.item').each(function(){
-									var val = $(this).data('value');
-									if (val == payvalue) $(this).click(); //отменили выбор
-								});
-							}
-							
+						
+						if (~hide.indexOf(payvalue)) {
 							pcard.find('.item').each(function(){
 								var val = $(this).data('value');
-								if (~hide.indexOf(val)) {
-									$(this).hide();//Скрыли кнопку
-								}
+								if (val == payvalue) $(this).click(); //отменили выбор
 							});
-							
+						}
+						
+						pcard.find('.item').each(function(){
+							var val = $(this).data('value');
+							if (~hide.indexOf(val)) {
+								$(this).hide();//Скрыли кнопку
+							}
 						});
+						
 					});
+					
 				})
 			</script>
 			{trans:}
@@ -461,9 +432,15 @@
 		</div>
 		{fields.pay::payinfo}
 	</div>
-	<script>
-		domready(function (){
-			var name = 'pay';
+	<script type="module">
+		import { DOM } from '/vendor/akiyatkin/load/DOM.js'
+		import { Load } from '/vendor/infrajs/load/Load.js'
+		import { Autosave } from '/vendor/infrajs/layer-autosave/Autosave.js'
+		import { Cart } from '/vendor/infrajs/cart/Cart.js'
+		import { CDN } from '/vendor/akiyatkin/load/CDN.js'
+
+		DOM.wait('load').then(async () => {
+			let name = 'pay'
 			{:jsitem}
 		})
 	</script>
@@ -506,67 +483,60 @@
 	{payinfo:}
 			<div data-value="{~key}" class="iteminfo"><div class="m-1 alert border more">{:basket.fields.{tpl}}</div></div>
 	{jsitem:}
-		//< script>
-		Event.one('Controller.onshow', function (){
-			var div = $('.'+name+'card');
-			var layer = Controller.ids["{id}"];
+		//<script>
+		await CDN.load('jquery')
+		var div = $('.'+name+'card');
+		
+		if (name == 'pay') var value = await Autosave.get("{autosavename}", name+'.choice','{data.order.pay.choice}');
+		else var value = await Autosave.get("{autosavename}", name+'.choice','{data.order.transport.choice}');
+
+		var first = false;
+
+		div.find('.item').click( function (){
+			if (first && !{data.order.rule.edit[data.place]?:true?:false}) return;
+			first = true;
 			
-			if (name == 'pay') var value = Autosave.get(layer,name+'.choice','{data.order.pay.choice}');
-			else var value = Autosave.get(layer,name+'.choice','{data.order.transport.choice}');
+			div.find('.item.active').not(this).removeClass('active');
+			let value = $(this).data('value');
+			Cart.on('choice' + name, value)
+			
+			if ($(this).is('.active')) {
+				value = false;
+				$(this).removeClass('active');
+				Autosave.set("{autosavename}", name+'.choice');
+			} else {
+				$(this).addClass('active');
+				Autosave.set("{autosavename}", name+'.choice', value);
+			}
+			
 
-			var first = false;
-
-			div.find('.item').click( function (){
-				if (first && !{data.order.rule.edit[data.place]?:true?:false}) return;
-				first = true;
-				
-				
-				import('/vendor/akiyatkin/load/Fire.js').then(async obj => {
-					let Fire = obj.default
-					div.find('.item.active').not(this).removeClass('active');
-					let value = $(this).data('value');
-					Fire.fire(Cart, 'choice' + name, value)
-					
-					
-
-					if ($(this).is('.active')) {
-						value = false;
-						$(this).removeClass('active');
-						Autosave.set(layer, name+'.choice');
-					} else {
-						$(this).addClass('active');
-						Autosave.set(layer, name+'.choice', value);
-					}
-					
-
-					div.find('.iteminfo').hide();
-					if (value) div.find('.iteminfo').each( function () {
-						if ($(this).data('value') == value) {
-							$(this).fadeIn();
-						}
-					});
-					Autosave.loadAll(layer);
-				})
-			}).each(function(){
+			div.find('.iteminfo').hide();
+			if (value) div.find('.iteminfo').each( function () {
 				if ($(this).data('value') == value) {
-					$(this).click();
+					$(this).fadeIn();
 				}
 			});
-			first = true;
-			div.find('.morelink').click( function (event){
-				var item = $(this).parents('.item');
-				var value = item.data('value');
-				if (item.is('.active')) {
-					event.stopPropagation();
-				} 
-				div.find('.iteminfo').each( function () {
-					if ($(this).data('value') == value) {
-						if (item.is('.active')) $(this).find('.more').slideToggle();
-						else $(this).find('.more').show();
-					}
-				});
-				
+			Autosave.loadAll("{autosavename}","{div}");
+	
+		}).each(function(){
+			if ($(this).data('value') == value) {
+				$(this).click();
+			}
+		});
+		first = true;
+		div.find('.morelink').click( function (event){
+			var item = $(this).parents('.item');
+			var value = item.data('value');
+			if (item.is('.active')) {
+				event.stopPropagation();
+			} 
+			div.find('.iteminfo').each( function () {
+				if ($(this).data('value') == value) {
+					if (item.is('.active')) $(this).find('.more').slideToggle();
+					else $(this).find('.more').show();
+				}
 			});
+			
 		});
 		//< /script>
 		{myactions:}

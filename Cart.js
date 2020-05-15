@@ -2,8 +2,15 @@ import { Crumb } from '/vendor/infrajs/controller/src/Crumb.js'
 import { Global } from '/vendor/infrajs/layer-global/Global.js'
 import { Ascroll } from '/vendor/infrajs/ascroll/Ascroll.js'
 import { Popup } from '/vendor/infrajs/popup/Popup.js'
+import { DOM } from '/vendor/akiyatkin/load/DOM.js'
+import { CDN } from '/vendor/akiyatkin/load/CDN.js'
+import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 
 let Cart = {
+	ok: (...params) => Fire.ok(Cart, ...params),
+	race: (...params) => Fire.race(Cart, ...params),
+	tikok: (...params) => Fire.tikok(Cart, ...params),
+	wait: (...params) => Fire.wait(Cart, ...params),
 	blockform: function (layer) {
 		var form = $("#" + layer.div).find('form');
 		form.find("input,button,textarea,select").attr("disabled", "disabled");
@@ -148,11 +155,12 @@ let Cart = {
 			justdo();
 		}
 	},
-	init: function () {
-		var rules = Load.loadJSON('-cart/rules.json');
-		var layer = Controller.ids['order'];
+	init: async () => {
+		await DOM.wait('load')
+		await CDN.on('load','jquery')
+		let rules = await Load.on('json', '-cart/rules.json')
 
-		for (var name in rules.actions) {
+		for (let name in rules.actions) {
 			$(".cart .act-" + name).not('[cartinit]').attr('cartinit', name).click(function () {
 				var name = $(this).attr('cartinit');
 				var place = $(this).attr('data-place');
