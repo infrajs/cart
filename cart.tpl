@@ -81,7 +81,7 @@
 					cartsumdel
 					carttotal
 					*/
-					await CDN.load('jquery')
+					await CDN.on('load','jquery')
 
 					var tplcost = function (val) {
 						return Template.parse('-cart/cart.tpl', val, 'itemcost')
@@ -311,11 +311,7 @@
 					for (let act of cls('act-check')) act.style.display = 'block'
 					if (!is) return	
 					
-					/*let Load = (await import('/vendor/akiyatkin/load/Load.js')).default
 
-					let arg = { 
-					}
-					let ans = Load.on('json', '-sbrf/?'+Load.param(arg))*/
 					for (let act of cls('act-check')) act.style.display = 'none'
 					for (let act of cls('act-sbrfpay')) act.style.display = 'block'
 				})
@@ -484,7 +480,7 @@
 			<div data-value="{~key}" class="iteminfo"><div class="m-1 alert border more">{:basket.fields.{tpl}}</div></div>
 	{jsitem:}
 		//<script>
-		await CDN.load('jquery')
+		await CDN.on('load','jquery')
 		var div = $('.'+name+'card');
 		
 		if (name == 'pay') var value = await Autosave.get("{autosavename}", name+'.choice','{data.order.pay.choice}');

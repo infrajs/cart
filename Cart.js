@@ -5,6 +5,7 @@ import { Popup } from '/vendor/infrajs/popup/Popup.js'
 import { DOM } from '/vendor/akiyatkin/load/DOM.js'
 import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Fire } from '/vendor/akiyatkin/load/Fire.js'
+import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
 
 let Cart = {
 	ok: (...params) => Fire.ok(Cart, ...params),
@@ -52,7 +53,6 @@ let Cart = {
 		return link;
 	},
 	reach: async (name) => {
-		let Goal = (await import('/vendor/akiyatkin/goal/Goal.js')).default
 		Goal.reach(name);
 	},
 	act: function (place, name, orderid, cb, param) {

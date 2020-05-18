@@ -5,7 +5,7 @@ import { Cart } from '/vendor/infrajs/cart/Cart.js'
 import { Global } from '/vendor/infrajs/layer-global/Global.js'
 
 Event.handler('Controller.onshow', async () => {
-	await CDN.load('jquery')
+	await CDN.on('load','jquery')
 
 	$('.abasket').filter("[data-crumb!=false]").attr("data-crumb", "false").click(function (event) {
 		event.preventDefault();
@@ -118,8 +118,7 @@ Event.one('Controller.onshow', async () => {
 	var layer = {
 		external: "-cart/rest/search/layer.json"
 	};
-	let CDN = (await import('/vendor/akiyatkin/load/CDN.js')).default
-	await CDN.load('jquery')
+	await CDN.on('load','jquery')
 	Event.handler('Controller.onshow', function () {
 		$('.cart-search').filter("[data-search!=false]").attr("data-search", "false").each(function () {
 			var el = this;
