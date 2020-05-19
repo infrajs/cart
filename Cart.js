@@ -2,7 +2,6 @@ import { Crumb } from '/vendor/infrajs/controller/src/Crumb.js'
 import { Global } from '/vendor/infrajs/layer-global/Global.js'
 import { Ascroll } from '/vendor/infrajs/ascroll/Ascroll.js'
 import { Popup } from '/vendor/infrajs/popup/Popup.js'
-import { DOM } from '/vendor/akiyatkin/load/DOM.js'
 import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
@@ -156,7 +155,6 @@ let Cart = {
 		}
 	},
 	init: async () => {
-		await DOM.wait('load')
 		await CDN.on('load','jquery')
 		let rules = await Load.on('json', '-cart/rules.json')
 

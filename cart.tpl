@@ -72,18 +72,17 @@
 				<div class="mr-2">Сумма{coupon_data.result?:nodiscount}: </div><div style="font-size:120%; font-weight:bold" class="cartsum">{sum:itemcostrub}</div>
 			</div>
 			<script type="module">
-				import { DOM } from '/vendor/akiyatkin/load/DOM.js'
-				import { Global } from '/vendor/infrajs/layer-global/Global.js'
-				DOM.wait('load').then(async () => {
+				import { CDN } from '/vendor/akiyatkin/load/CDN.js'
+				import { Template } from '/vendor/infrajs/template/Template.js'
+				CDN.on('load','jquery').then(async () => {
 					//При изменении инпутов. надо рассчитать Сумму и Итого с учётом coupon_discount
 					/*
 					cartsum
 					cartsumdel
 					carttotal
 					*/
-					await CDN.on('load','jquery')
 
-					var tplcost = function (val) {
+					var tplcost = val => {
 						return Template.parse('-cart/cart.tpl', val, 'itemcost')
 					}
 					
@@ -113,7 +112,7 @@
 					var calc = function () {
 						if (proc) return;
 						proc = 1;
-						setTimeout(()=>{
+						setTimeout(async () => {
 							var zero = false;
 							if (!$.fn.reduce) $.fn.reduce = [].reduce;
 							var sum = $('.cart [type=number]').reduce(function(ak, el){
@@ -144,8 +143,9 @@
 								$('.carttotal').html(tplcost(sum));
 							}
 							proc = 0;
+							{ Global } = await import('/vendor/infrajs/layer-global/Global.js')
 							Global.set('cart');
-						},1);
+						}, 1);
 					}
 					
 					$('.cart [type=number]').change(calc);
@@ -368,13 +368,11 @@
 			</div>
 
 			<script type="module">
-				import { DOM } from '/vendor/akiyatkin/load/DOM.js'
-				import { Load } from '/vendor/infrajs/load/Load.js'
+				import { Load } from '/vendor/akiyatkin/load/Load.js'
 				import { Autosave } from '/vendor/infrajs/layer-autosave/Autosave.js'
 				import { Cart } from '/vendor/infrajs/cart/Cart.js'
 				import { CDN } from '/vendor/akiyatkin/load/CDN.js'
-
-				DOM.wait('load').then(async () => {
+				CDN.on('load','jquery').then(async () => {
 					var name = 'transport';
 					{:jsitem}
 					
@@ -404,10 +402,8 @@
 							if (~hide.indexOf(val)) {
 								$(this).hide();//Скрыли кнопку
 							}
-						});
-						
-					});
-					
+						})
+					})
 				})
 			</script>
 			{trans:}
@@ -429,13 +425,12 @@
 		{fields.pay::payinfo}
 	</div>
 	<script type="module">
-		import { DOM } from '/vendor/akiyatkin/load/DOM.js'
 		import { Load } from '/vendor/infrajs/load/Load.js'
 		import { Autosave } from '/vendor/infrajs/layer-autosave/Autosave.js'
 		import { Cart } from '/vendor/infrajs/cart/Cart.js'
 		import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 
-		DOM.wait('load').then(async () => {
+		CDN.on('load','jquery').then(async () => {
 			let name = 'pay'
 			{:jsitem}
 		})
@@ -479,8 +474,7 @@
 	{payinfo:}
 			<div data-value="{~key}" class="iteminfo"><div class="m-1 alert border more">{:basket.fields.{tpl}}</div></div>
 	{jsitem:}
-		//<script>
-		await CDN.on('load','jquery')
+		//script>
 		var div = $('.'+name+'card');
 		
 		if (name == 'pay') var value = await Autosave.get("{autosavename}", name+'.choice','{data.order.pay.choice}');
