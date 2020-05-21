@@ -3,10 +3,15 @@ import { Event } from '/vendor/infrajs/event/Event.js'
 import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Cart } from '/vendor/infrajs/cart/Cart.js'
 import { Global } from '/vendor/infrajs/layer-global/Global.js'
+import { Popup } from '/vendor/infrajs/popup/Popup.js'
+import { DOM } from '/vendor/akiyatkin/load/DOM.js'
+import { Template } from '/vendor/infrajs/template/Template.js'
 
-Event.handler('Controller.onshow', async () => {
+DOM.once('load', async () => {
 	await CDN.on('load','jquery')
-
+})
+//Event.handler('Controller.onshow', async () => {
+DOM.done('load', () => {
 	$('.abasket').filter("[data-crumb!=false]").attr("data-crumb", "false").click(function (event) {
 		event.preventDefault();
 		var a = $(this);
@@ -114,32 +119,25 @@ Event.handler('Controller.onshow', async () => {
 		});
 	});
 });
-Event.one('Controller.onshow', async () => {
-	var layer = {
-		external: "-cart/rest/search/layer.json"
-	};
-	await CDN.on('load','jquery')
-	Event.handler('Controller.onshow', function () {
-		$('.cart-search').filter("[data-search!=false]").attr("data-search", "false").each(function () {
-			var el = this;
-			$(el).click(function () {
-				layer.config = $(el).data();
-				console.log(layer.config);
-				Popup.open(layer);
-			});
+
+
+//Event.one('Controller.onshow', async () => {
+let layer = {
+	external: "-cart/rest/search/layer.json"
+};
+DOM.done('load', () => {
+	$('.cart-search').filter("[data-search!=false]").attr("data-search", "false").each(function () {
+		var el = this;
+		$(el).click(function () {
+			layer.config = $(el).data();
+			console.log(layer.config);
+			Popup.open(layer);
 		});
-		/*$('.cart-clear').filter("[data-clear!=false]").attr("data-clear","false").click( function () {
-			var el = this;
-			var orderid = $(el).data('orderid');
-			var place = $(el).data('place');
-			Cart.clear(place, orderid);
-		});*/
 	});
 });
 
-Event.one('Controller.oninit', function () {
-	Template.scope['Cart'] = {};
-	Template.scope['Cart']['lang'] = function (str) {
-		return Cart.lang(str);
-	};
-});
+
+Template.scope['Cart'] = {};
+Template.scope['Cart']['lang'] = function (str) {
+	return Cart.lang(str);
+}

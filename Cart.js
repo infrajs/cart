@@ -5,12 +5,10 @@ import { Popup } from '/vendor/infrajs/popup/Popup.js'
 import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
+import { Load } from '/vendor/akiyatkin/load/Load.js'
 
 let Cart = {
-	ok: (...params) => Fire.ok(Cart, ...params),
-	race: (...params) => Fire.race(Cart, ...params),
-	tikok: (...params) => Fire.tikok(Cart, ...params),
-	wait: (...params) => Fire.wait(Cart, ...params),
+	...Fire, 
 	blockform: function (layer) {
 		var form = $("#" + layer.div).find('form');
 		form.find("input,button,textarea,select").attr("disabled", "disabled");
@@ -54,12 +52,11 @@ let Cart = {
 	reach: async (name) => {
 		Goal.reach(name);
 	},
-	act: function (place, name, orderid, cb, param) {
+	act: async (place, name, orderid, cb, param) => {
 		if (!cb) cb = function () { };
-
-		var rules = Load.loadJSON('-cart/rules.json');
+		let rules = await Load.on('json', '-cart/rules.json')
 		var act = rules.actions[name];
-		var order = Cart.getGoodOrder(orderid);
+		var order = await Cart.getGoodOrder(orderid);
 		order.place = place;
 		if (act.link) {
 			Crumb.go(Template.parse([act.link], order));
@@ -67,34 +64,33 @@ let Cart = {
 		}
 		if (param) param = '&' + param;
 		else param = '';
-		var path = '-cart/actions.php?id=' + orderid + '&type=' + name + '&place=' + place + param;
-		Session.syncNow();
-		Cart.getJSON(path, function (ans) {
-			Session.syncNow();
-			Global.set(['cart', 'user']); //при заказе может произойти авторизация
-			cb(ans);
-		});
+		var path = '/-cart/actions.php?id=' + orderid + '&type=' + name + '&place=' + place + param;
+		await Session.async();
+		let ans = await fetch(path).then(res => res.json())
+		await Session.async();
+		Global.set(['cart', 'user']); //при заказе может произойти авторизация
+		await cb(ans);
 	},
 	inaction: false,
-	action: function (place, name, orderid, cb, param) {
+	action: async (place, name, orderid, cb, param) => {
 		//place - контекст в котором идёт работа
 		if (Cart.inaction) return;
 		Cart.inaction = true;
-		var rules = Load.loadJSON('-cart/rules.json');
+		let rules = await Load.on('json', '-cart/rules.json')
 		var act = rules.actions[name];
-		var order = Cart.getGoodOrder(orderid);
+		var order = await Cart.getGoodOrder(orderid);
 		order.place = place;
 		var layer = Controller.ids['order'];
 		//if (!act.link && (!act.go || !act.go[place])) alert('Ошибка. Действие невозможно выполнить с этой странице!');
 		var link = Cart.getLink(order, place);
 
-		var justdo = function () {
+		var justdo = async () => {
 			//if (!act.link) Cart.blockform(layer);
 			Cart.inaction = true;
-			Cart.act(place, name, orderid, function (ans) {
+			await Cart.act(place, name, orderid, async (ans) => {
 				Cart.inaction = false;
-				var call = function () {
-					var order = Cart.getGoodOrder(ans.order.id);
+				var call = async () => {
+					var order = await Cart.getGoodOrder(ans.order.id);
 					if (order) {
 						order.place = place;
 						if (act.link) {
@@ -139,7 +135,7 @@ let Cart = {
 				}
 				//if (act.noscroll) call();
 				//else Cart.goTop(call);	
-				call();
+				await call();
 				if (!act.noscroll) Cart.goTop();
 			}, param);
 		};
@@ -151,7 +147,7 @@ let Cart = {
 			Popup.confirm(ask, justdo);
 
 		} else {
-			justdo();
+			await justdo();
 		}
 	},
 	init: async () => {
@@ -159,35 +155,22 @@ let Cart = {
 		let rules = await Load.on('json', '-cart/rules.json')
 
 		for (let name in rules.actions) {
-			$(".cart .act-" + name).not('[cartinit]').attr('cartinit', name).click(function () {
-				var name = $(this).attr('cartinit');
+			
+			$(".cart .act-" + name).not('[cartinit]').attr('cartinit', name).click(async function () {
 				var place = $(this).attr('data-place');
 				if (!place) place = $(this).parents('.myactions').attr('data-place');
 				var param = $(this).attr('data-param');
 				var id = $(this).attr('data-id');
-				Cart.action(place, name, id, function () { }, param);
+				await Cart.action(place, name, id, function () { }, param);
 				return false;
 			});
 		}
 	},
-	getJSON: function (src, call) {
-		$.ajax({
-			dataType: "json",
-			url: '/' + src,
-			cache: false,
-			async: true,
-			success: call,
-			error: function () {
-				Popup.alert('Ошибка на сервере. Попробуйте позже.');
-			}
-		});
-	},
-	sync: function (place, orderid) {
-		//Синхронизируем сессию клиента с реальной заявкой на сервере
-		Cart.getJSON('-cart/actions.php?type=sync&id=' + orderid + '&place=' + place, function () {
-			Global.set('cart');
-		});
-	},
+	// sync: async (place, orderid) => {
+	// 	//Синхронизируем сессию клиента с реальной заявкой на сервере
+	// 	await fetch('/-cart/actions.php?type=sync&id=' + orderid + '&place=' + place)
+	// 	Global.set('cart');
+	// },
 	usersync: async () => {
 		//Синхронизируем user с активной заявкой
 		await Session.async()
@@ -204,15 +187,15 @@ let Cart = {
 	goTop: function (cb) {
 		Ascroll.go(null, null, cb);
 	},
-	canI: function (id, action) {//action true совпадёт с любой строчкой
-		var order = Cart.getGoodOrder(id);
-		if (!order) return false;
-		//if (Sequence.get(order,['rule','user','buttons',action]))return true;
-		return Each.exec(Sequence.get(order, ['rule', 'user', 'actions']), function (r) {
-			if (r['act'] == action) return true;
-		});
-	},
-	getGoodOrder: function (orderid) {
+	// canI: async (id, action) => {//action true совпадёт с любой строчкой
+	// 	var order = await Cart.getGoodOrder(id);
+	// 	if (!order) return false;
+	// 	//if (Sequence.get(order,['rule','user','buttons',action]))return true;
+	// 	return Each.exec(Sequence.get(order, ['rule', 'user', 'actions']), function (r) {
+	// 		if (r['act'] == action) return true;
+	// 	});
+	// },
+	getGoodOrder: async (orderid) => {
 		if (!orderid) orderid = '';
 		//генерирует объект описывающий все цены... передаётся basket на случай если count актуальный именно в basket
 		var path = '-cart/?type=order&id=' + orderid;
@@ -221,13 +204,15 @@ let Cart = {
 		Global.unload('cart', path);
 		//Load.unload(path);
 		//Session.syncNow();
-		var order = Load.loadJSON(path);//GoodOrder серверная версия
+
+		let order = await Load.on('json', path)
+		//var order = Load.loadJSON(path);//GoodOrder серверная версия
 		if (!order.result) return false;
 		return order.order;
 	},
-	toggle: function (place, orderid, prodart, cb) {
+	toggle: async (place, orderid, prodart, cb) => {
 		var name = [place, orderid, 'basket', prodart];
-		var order = Cart.getGoodOrder(orderid);
+		var order = await Cart.getGoodOrder(orderid);
 		var r = Sequence.get(order, ['basket', prodart, 'count']);
 		if (r) {
 			Cart.remove(place, orderid, prodart, cb);
@@ -236,22 +221,12 @@ let Cart = {
 		}
 		return !r;
 	},
-	/*clear: function (place, orderid, cb, param) {
+	remove: async (place, orderid, prodart, cb) => {
 		var fn = function () {
 			if (cb) cb();
 			Global.check('cart');
 		}
-		Cart.action(place, 'clear', orderid, function () {
-			var name = [place, orderid, 'basket'];
-			Session.set(name, null, true, fn);
-		});
-	},*/
-	remove: function (place, orderid, prodart, cb) {
-		var fn = function () {
-			if (cb) cb();
-			Global.check('cart');
-		}
-		Cart.action(place, 'remove', orderid, function () {
+		await Cart.action(place, 'remove', orderid, function () {
 			var name = [place, orderid, 'basket', prodart];
 			Session.set(name, null, true, fn);
 		}, 'prodart=' + prodart);

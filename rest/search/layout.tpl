@@ -11,12 +11,11 @@
 	<h1>Добавить в корзину</h1>
 	<!--<p><a href="/cart/{config.place}/{config.id|:my}/list">Оформление заказа {config.id}</a></p>-->
 	<p>
-		<input value='' min="0" max="999" autosave="0" type="text" class="formControll input" style="width:100%">
+		<input value='' min="0" max="999" autosave="0" type="text" class="form-control input" style="width:100%">
 	</p>
 	<!--<span class="btn btn-secondary button">Добавить</span>-->
 	<script type="module">
 		import { CDN } from '/vendor/akiyatkin/load/CDN.js'
-		import { Popup } from '/vendor/infrajs/popup/Popup.js'
 		import { Cart } from '/vendor/infrajs/cart/Cart.js'
 		import { Global } from '/vendor/infrajs/layer-global/Global.js'
 		import { Popup } from '/vendor/infrajs/popup/Popup.js'
@@ -45,11 +44,12 @@
 					var pos = suggestion.data;
 					prodart = pos['producer_nick'] + ' ' + pos['article_nick'];
 					if (pos['id']) prodart += ' ' + pos['id'];
-					Popup.confirm('Количество: <input name="count" type="number">', function(div){
+					Popup.confirm('Количество: <input name="count" type="number">', function (div) {
+						div = $(div)
 						var count = div.find('[name=count]').val();
-						Cart.set('{config.place}', '{config.id}', prodart, count, function(){
-							Cart.act('{config.place}', 'sync', '{config.id}', function(ans){
-								console.log(ans);
+						Cart.set('{config.place}', '{config.id}', prodart, count, async () => {
+							await Cart.act('{config.place}', 'sync', '{config.id}', function(ans){
+								//console.log(ans);
 							});
 							Global.check('cart');	
 						});

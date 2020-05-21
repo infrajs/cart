@@ -1,5 +1,4 @@
 {
-	"domready":true,
 	"activelink":true,
 	"tpl":"-cart/cart.tpl",
 	"tplroot":"CART",

@@ -143,7 +143,7 @@
 								$('.carttotal').html(tplcost(sum));
 							}
 							proc = 0;
-							{ Global } = await import('/vendor/infrajs/layer-global/Global.js')
+							let { Global } = await import('/vendor/infrajs/layer-global/Global.js')
 							Global.set('cart');
 						}, 1);
 					}
@@ -369,7 +369,7 @@
 
 			<script type="module">
 				import { Load } from '/vendor/akiyatkin/load/Load.js'
-				import { Autosave } from '/vendor/infrajs/layer-autosave/Autosave.js'
+				import { Autosave } from '/vendor/akiyatkin/form/Autosave.js'
 				import { Cart } from '/vendor/infrajs/cart/Cart.js'
 				import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 				CDN.on('load','jquery').then(async () => {
@@ -426,7 +426,7 @@
 	</div>
 	<script type="module">
 		import { Load } from '/vendor/infrajs/load/Load.js'
-		import { Autosave } from '/vendor/infrajs/layer-autosave/Autosave.js'
+		import { Autosave } from '/vendor/akiyatkin/form/Autosave.js'
 		import { Cart } from '/vendor/infrajs/cart/Cart.js'
 		import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 
@@ -595,9 +595,18 @@
 		<div style="max-width: 300px;" class="input-group">
 			<input name="coupon" {:isdisabled} value="{data.order.coupon}" type="text" class="form-control" id="coupon" placeholder="Укажите купон">
 			<div class="input-group-append">
-			    <button onclick="Cart.action('{crumb.parent.name}', 'sync', '{data.order.id}');" class="btn btn-secondary" type="button">Активировать</button>
+			    <button class="couponbtn btn btn-secondary" type="button">Активировать</button>
 			</div>
 		</div>
+		<script type="module">
+			import { Cart } from '/vendor/infrajs/cart/Cart.js'
+			let div = document.getElementById('{div}')
+			let cls = cls => div.getElementsByClassName(cls)
+			let btn = cls('couponbtn')[0]
+			btn.addEventListener('click', async () => {
+				Cart.action('{crumb.parent.name}', 'sync', '{data.order.id}');
+			})
+		</script>
 		<div class="py-2">
 			{coupon_data:coupinfo}
 		</div>
@@ -637,7 +646,6 @@
 			В вашей <a href="/cart/orders/my/list">корзине</a> <b>{data.order.count}</b> {~words(data.order.count,:позиция,:позиции,:позиций)}.
 		</p>
 		
-		{data.admin?:adminControl}
 		{data.manager?:mngControl}
 		{showinfo:}
 			<table class="table table-striped">
@@ -663,39 +671,6 @@
 			<div class="alert alert-success" role="alert">
 				<b>Вы менеджер - <a href="/cart/admin">все заказы</a></b>
 			</div>
-		{adminControl:}
-			<div class="alert alert-{data.manager?:success?:danger}" role="alert">
-				{data.email?:adminForm?:allertForAdmin}
-			</div>
-			
-			{adminForm:}
-				<p>Введён логин и пароль администратора сайта</p>
-				<p>Вы можете изменить свой статус</p>
-				<form style="margin-top:10px" class="managerForm" action="/-cart/?type=cart&amp;submit=1" method="post">
-					 <div style="display:none" class="checkbox">
-						<label>
-							<input name="IAmManager" type="checkbox" {data.manager??:checked}>
-						</label>
-					</div>
-					<div class="input-group">
-						<input type="submit" class="btn btn-{data.manager?:success?:danger}" value="{data.manager?:Сделать меня обычным пользователем?:Сделать меня менеджером}">
-					</div>
-				</form>
-				
-				<script>
-					domready( function () {
-						Once.exec('layer{id}', function () {
-							var layer = Controller.ids['{id}'];
-							Event.handler('Controller.onsubmit', function (layer) {
-								if (!layer.showed) return;
-								var ans = layer.config.ans;
-								Global.set(["user","cart"]);
-							});
-						});
-					})
-				</script>
-			{allertForAdmin:}
-				<div class="mesage">Необходимо <a href="/user/signup">зарегистрироваться</a>, чтобы получить права менеджера</div>
 	{ORDERS:}
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
@@ -842,10 +817,9 @@
 {comma:}, 
 {text-danger:}text-danger
 {usersync:}
-	<script>
-		domready( function () {
-			Cart.usersync();
-		});
+	<script type="module">
+		import { Cart } from '/vendor/infrajs/cart/Cart.js'
+		Cart.usersync()
 	</script>
 {usercrumb:}
 	<ol class="breadcrumb">
