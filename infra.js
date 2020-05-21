@@ -5,7 +5,6 @@ import { Cart } from '/vendor/infrajs/cart/Cart.js'
 import { Global } from '/vendor/infrajs/layer-global/Global.js'
 import { Popup } from '/vendor/infrajs/popup/Popup.js'
 import { DOM } from '/vendor/akiyatkin/load/DOM.js'
-import { Template } from '/vendor/infrajs/template/Template.js'
 
 DOM.once('load', async () => {
 	await CDN.on('load','jquery')
@@ -136,8 +135,11 @@ DOM.done('load', () => {
 	});
 });
 
+DOM.once('check', async () => {
+	let Template = (await import('/vendor/infrajs/template/Template.js')).Template
+	Template.scope['Cart'] = {};
+	Template.scope['Cart']['lang'] = function (str) {
+		return Cart.lang(str);
+	}
+})
 
-Template.scope['Cart'] = {};
-Template.scope['Cart']['lang'] = function (str) {
-	return Cart.lang(str);
-}

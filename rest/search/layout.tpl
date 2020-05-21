@@ -15,12 +15,13 @@
 	</p>
 	<!--<span class="btn btn-secondary button">Добавить</span>-->
 	<script type="module">
+		import { DOM } from '/vendor/akiyatkin/load/DOM.js'
 		import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 		import { Cart } from '/vendor/infrajs/cart/Cart.js'
 		import { Global } from '/vendor/infrajs/layer-global/Global.js'
 		import { Popup } from '/vendor/infrajs/popup/Popup.js'
-		import { Controller } from '/vendor/infrajs/controller/src/Controller.js'
-		import { Template } from '/vendor/infrajs/template/Template.js'
+		let Template
+		
 		
 		CDN.on('load',"jquery.autocomplete").then(() => {
 			//https://github.com/devbridge/jQuery-Autocomplete
@@ -36,6 +37,9 @@
 			div.find('.input').autocomplete({
 				triggerSelectOnValidInput:false,
 				showNoSuggestionNotice:true,
+				onSearchStart: async () => {
+					Template = (await import('/vendor/infrajs/template/Template.js')).Template
+				},
 				serviceUrl: function (q) {
 					query = q;
 					return '/-cart/rest/search/' + q;
@@ -73,7 +77,7 @@
 				dataType:"json",
 				ignoreParams: true,
 				onSearchComplete: function () {
-					Controller.check();
+					DOM.emit('check')
 				},
 				formatResult: function (suggestion, currentValue) {
 					if (!currentValue) return suggestion;

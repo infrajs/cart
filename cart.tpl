@@ -73,7 +73,7 @@
 			</div>
 			<script type="module">
 				import { CDN } from '/vendor/akiyatkin/load/CDN.js'
-				import { Template } from '/vendor/infrajs/template/Template.js'
+				let Template
 				CDN.on('load','jquery').then(async () => {
 					//При изменении инпутов. надо рассчитать Сумму и Итого с учётом coupon_discount
 					/*
@@ -109,7 +109,8 @@
 					}
 
 					var proc = 0;
-					var calc = function () {
+					var calc = async () => {
+						Template = (await import('/vendor/infrajs/template/Template.js')).Template
 						if (proc) return;
 						proc = 1;
 						setTimeout(async () => {
