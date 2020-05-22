@@ -16,10 +16,10 @@ let Cart = {
 	refresh: function (el) {
 		if (el) $(el).removeClass('btn-secondary').addClass('btn-danger').find('span').addClass('spin');
 		setTimeout(async () => {
-			Controller.global.set(['user', 'cart']);
+			Global.set(['user', 'cart']);
 			console.log('asdf')
 			await Session.async();
-			Controller.check();
+			DOM.emit('check')
 			//Cart.goTop();
 			if (el) $(el).removeClass('btn-danger').addClass('btn-secondary').find('span').removeClass('spin');
 		}, 100);
@@ -80,7 +80,7 @@ let Cart = {
 		var act = rules.actions[name];
 		var order = await Cart.getGoodOrder(orderid);
 		order.place = place;
-		var layer = Controller.ids['order'];
+		//var layer = Controller.names['order'];
 		//if (!act.link && (!act.go || !act.go[place])) alert('Ошибка. Действие невозможно выполнить с этой странице!');
 		var link = Cart.getLink(order, place);
 
@@ -113,7 +113,7 @@ let Cart = {
 								Popup.alert(msg);
 							}
 							if (act.go && act.go[place]) Crumb.go(Template.parse([act.go[place]], order));
-							else Controller.check();
+							else DOM.emit('check');
 						} else {
 							if (ans.msg) {
 								var msg = Template.parse([ans.msg], order);
@@ -151,8 +151,9 @@ let Cart = {
 		}
 	},
 	init: async () => {
-		await CDN.on('load','jquery')
-		let rules = await Load.on('json', '-cart/rules.json')
+		await CDN.fire('load','jquery')
+		await CDN.fire('load','bootstrap')
+		let rules = await Load.fire('json', '-cart/rules.json')
 
 		for (let name in rules.actions) {
 			

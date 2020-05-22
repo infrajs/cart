@@ -2,7 +2,6 @@
 	"activelink":true,
 	"tpl":"-cart/cart.tpl",
 	"tplroot":"CART",
-	"onsubmit":true,
 	"json":"-cart/?type=cart",
 	"global":["user", "cart"],
 	"conf":"cart",
@@ -13,7 +12,7 @@
 			"json":"-cart/?type=orders",
 			"global":["user", "cart"],
 			"child":{
-				"id":"order",
+				"name":"order",
 				"jsontpl":"-cart/?type=order&id={crumb.name=:my|crumb.name}&place=orders",
 				"autosavenametpl":"orders.{crumb.name}",
 				"tpl":"-cart/cart.tpl",

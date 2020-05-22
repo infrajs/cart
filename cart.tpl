@@ -11,10 +11,12 @@
 		</script>
 	{LIST:}
 		{:listcrumb}
-		<div class="cart">
+		<form 
+		data-autosave="{autosavename}"
+		class="form cart">
 			<h1>{data.order.id?:numbasket?(data.result?:mybasket?:numbasket)}</h1>
 			{data.result?data.order:showlist?:adm_message}
-		</div>
+		</form>
 		{:js}
 		{showlist:}
 			{:cartlistborder}
@@ -255,7 +257,9 @@
 			<h1>{order.rule.title} {order.id}</h1>
 			{order.manage.comment?order:showManageComment}
 			{order.sbrfpay.info:sbrfpay}
-			<form>
+			
+			<form class="form"
+				data-autosave="{autosavename}">
 				<div class="accordion" id="accordionorder">
 					{:basket.ORDER}
 				</div>
@@ -431,7 +435,7 @@
 		import { Cart } from '/vendor/infrajs/cart/Cart.js'
 		import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 
-		CDN.on('load','jquery').then(async () => {
+		CDN.fire('load','jquery').then(async () => {
 			let name = 'pay'
 			{:jsitem}
 		})
@@ -476,8 +480,7 @@
 			<div data-value="{~key}" class="iteminfo"><div class="m-1 alert border more">{:basket.fields.{tpl}}</div></div>
 	{jsitem:}
 		//script>
-		var div = $('.'+name+'card');
-		
+		var div = $('.'+name+'card')
 		if (name == 'pay') var value = await Autosave.get("{autosavename}", name+'.choice','{data.order.pay.choice}');
 		else var value = await Autosave.get("{autosavename}", name+'.choice','{data.order.transport.choice}');
 
@@ -489,7 +492,7 @@
 			
 			div.find('.item.active').not(this).removeClass('active');
 			let value = $(this).data('value');
-			Cart.on('choice' + name, value)
+			Cart.fire('choice' + name, value)
 			
 			if ($(this).is('.active')) {
 				value = false;
@@ -569,9 +572,11 @@
 		<input name="coupon" type="text" class="form-control" placeholder="Купон">
 		<div class="input-group-append">
 		    <button class="btn btn-secondary" onclick="
-		    	var name = $('[name=coupon]').val();
-		    	var coupon = Load.loadJSON('-cart/coupon?name='+name);
-		    	$('#coupinfo').html(Template.parse('-cart/cart.tpl',coupon,'coupinfo'));
+		    	let name = $('[name=coupon]').val()
+		    	fetch('/-cart/coupon?name=' + name).then(req => req.json()).then(async coupon => {
+		    		let Template = (await import('/vendor/infrajs/template/Template.js')).Template
+		    		$('#coupinfo').html(Template.parse('-cart/cart.tpl', coupon, 'coupinfo'));
+		    	})
 		    " type="button">Проверить</button>
 		</div>
 	</div>
