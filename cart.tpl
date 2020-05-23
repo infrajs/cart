@@ -308,15 +308,25 @@
 				import { Cart } from '/vendor/infrajs/cart/Cart.js'
 				
 				let div = document.getElementById('{div}')
-				let cls = cls => div.getElementsByClassName(cls)
+				let cls = (cls, el = div) => el.getElementsByClassName(cls)
 				
-				Cart.hand('choicepay', async (value) => {
+				let actionsbtn = cls('actionsbtn')[0]
+				let paybtn = cls('act-sbrfpay', actionsbtn)[0]
+				let checkbtn = cls('act-check', actionsbtn)[0]
+
+				//actionsbtn.replaceChild(cls('act-sbrfpay', actionsbtn)[0], cls('act-check', actionsbtn)[0])
+
+				Cart.hand('choicepay', (value) => {
+					if (!div.parentElement) return
 					let is = (value == 'Оплатить онлайн')
+
 					for (let act of cls('act-sbrfpay')) act.style.display = 'none'
 					for (let act of cls('act-check')) act.style.display = 'block'
+
+					if (is) actionsbtn.insertBefore(checkbtn, paybtn)
+					else actionsbtn.insertBefore(paybtn, checkbtn)
 					if (!is) return	
 					
-
 					for (let act of cls('act-check')) act.style.display = 'none'
 					for (let act of cls('act-sbrfpay')) act.style.display = 'block'
 				})
@@ -492,7 +502,7 @@
 			
 			div.find('.item.active').not(this).removeClass('active');
 			let value = $(this).data('value');
-			Cart.fire('choice' + name, value)
+			Cart.emit('choice' + name, value)
 			
 			if ($(this).is('.active')) {
 				value = false;
@@ -544,7 +554,7 @@
 							{actions::actprint}
 						</div>	
 					</div>
-					<div class="btn-group ml-2">
+					<div class="btn-group ml-2 actionsbtn">
 						{buttons::mybtns}
 					</div>
 				</div>
