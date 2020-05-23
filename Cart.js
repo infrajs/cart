@@ -26,9 +26,9 @@ let Cart = {
 			if (el) $(el).removeClass('btn-danger').addClass('btn-secondary').find('span').removeClass('spin');
 		}, 100);
 	},
-	logout: function () {
+	logout: async () => {
 		Session.logout();
-		Session.syncNow();
+		await Session.async();
 		Global.check(['cart', 'user']);
 	},
 	unblockform: function (layer) {
@@ -205,8 +205,6 @@ let Cart = {
 		Global.unload('cart', path);
 		var path = '-cart?type=order&id=' + orderid;
 		Global.unload('cart', path);
-		//Load.unload(path);
-		//Session.syncNow();
 
 		let order = await Load.on('json', path)
 		//var order = Load.loadJSON(path);//GoodOrder серверная версия
