@@ -70,12 +70,12 @@
 .cart .item:hover {
 	
 }
-.cart .iteminfo {
+/*.cart .iteminfo {
 	display: none;
 }
 .cart .more {
 	display: none;
-}
+}*/
 
 .cart .spin {
 	animation-name: cart-spin;

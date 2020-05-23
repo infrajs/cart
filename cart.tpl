@@ -314,21 +314,26 @@
 				let paybtn = cls('act-sbrfpay', actionsbtn)[0]
 				let checkbtn = cls('act-check', actionsbtn)[0]
 
-				//actionsbtn.replaceChild(cls('act-sbrfpay', actionsbtn)[0], cls('act-check', actionsbtn)[0])
-
 				Cart.hand('choicepay', (value) => {
-					if (!div.parentElement) return
+
+					if (!actionsbtn.closest('html')) return
 					let is = (value == 'Оплатить онлайн')
 
-					for (let act of cls('act-sbrfpay')) act.style.display = 'none'
-					for (let act of cls('act-check')) act.style.display = 'block'
 
-					if (is) actionsbtn.insertBefore(checkbtn, paybtn)
-					else actionsbtn.insertBefore(paybtn, checkbtn)
-					if (!is) return	
+					if (is) {
+						for (let act of cls('act-check')) act.style.display = 'none'
+						for (let act of cls('act-sbrfpay')) act.style.display = 'block'
+					} else {
+						for (let act of cls('act-sbrfpay')) act.style.display = 'none'
+						for (let act of cls('act-check')) act.style.display = 'block'
+					}
+
+					if (checkbtn && paybtn) {
+						if (is) actionsbtn.insertBefore(checkbtn, paybtn)
+						else actionsbtn.insertBefore(paybtn, checkbtn)
+					}
 					
-					for (let act of cls('act-check')) act.style.display = 'none'
-					for (let act of cls('act-sbrfpay')) act.style.display = 'block'
+					
 				})
 			</script>
 		{adminactions:}
@@ -375,7 +380,11 @@
 			</div>
 			{caropt:}{data.order.transport.cargo=.?:selected} value="{.}" 
 		{transcard:}
-			<div class="transportcard">
+			<div class="transportcard" 
+				data-name="transport" 
+				data-value="{data.order.transport.choice}"
+				data-editable="{data.order.rule.edit[data.place]?:yes}"
+				data-autosave="{autosavename}">
 				<div class="d-flex flex-wrap" style="font-size:11px">
 					{fields.transport::trans}
 				</div>
@@ -387,10 +396,13 @@
 				import { Autosave } from '/vendor/akiyatkin/form/Autosave.js'
 				import { Cart } from '/vendor/infrajs/cart/Cart.js'
 				import { CDN } from '/vendor/akiyatkin/load/CDN.js'
-				CDN.on('load','jquery').then(async () => {
-					var name = 'transport';
-					{:jsitem}
-					
+
+				let div = document.getElementById('{div}')
+				let cls = cls => div.getElementsByClassName(cls)
+				let cards = cls('transportcard')[0]
+				Cart.fire('init-choice-btn', cards)
+
+				CDN.fire('load','jquery').then(async () => {
 					var tcard = $('.transportcard');
 					var pcard = $('.paycard');
 					tcard.find('.item').click( async () => {
@@ -433,30 +445,28 @@
 				</div>
 			</div>
 {paycard:}
-	<div class="paycard">
+	<div class="paycard" 
+		data-name="pay" 
+		data-autosave="{autosavename}"
+		data-value="{data.order.pay.choice|data.fields.paydefault}"
+		data-editable="{data.order.rule.edit[data.place]?:yes}">
 		<div class="d-flex flex-wrap" style="font-size:11px">
 			{fields.pay::pay}
 		</div>
-		{fields.pay::payinfo}
 	</div>
 	<script type="module">
-		import { Load } from '/vendor/infrajs/load/Load.js'
-		import { Autosave } from '/vendor/akiyatkin/form/Autosave.js'
 		import { Cart } from '/vendor/infrajs/cart/Cart.js'
-		import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 
-		CDN.fire('load','jquery').then(async () => {
-			let name = 'pay'
-			{:jsitem}
-		})
+		let div = document.getElementById('{div}')
+		let cls = cls => div.getElementsByClassName(cls)
+		let cards = cls('paycard')[0]
+		
+		Cart.fire('init-choice-btn', cards)
 	</script>
 	{pay:}
 		<div data-value="{~key}" style="display:flex" class="item flex-column border rounded m-1 p-1">
 			<div style="height:60px" class="d-flex align-items-center justify-content-center"><div><img class="img-fluid" src="/-imager/?h=60&src={ico}"></div></div>
 			<div class="mb-auto title"><big>{~key}</big></div>
-			<div class="text-right">
-				<span class="morelink ml-1 a">Подробней</span>
-			</div>
 		</div>
 {fiocard:}
 	<div class="cartcontacts row">

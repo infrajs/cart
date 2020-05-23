@@ -6,6 +6,8 @@ import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
 import { Load } from '/vendor/akiyatkin/load/Load.js'
+import { Autosave } from '/vendor/akiyatkin/form/Autosave.js'
+
 
 let Cart = {
 	...Fire, 
@@ -323,37 +325,80 @@ let Cart = {
 			a.attr('title', 'Добавить в корзину');
 		}
 	},
-	/*activate: function (a) {
-		var orderid = a.data('order');
-		if (!orderid) orderid = 'my';
-
-		var prodart = a.data('producer')+' '+a.data('article');
-		var name = ['orders', orderid, 'basket', prodart];
-		var r = Session.get(name);
-		if (r || orderid != 'my') {
-			a.addClass('selected');
-			a.attr("data-crumb","true");
-			a.attr('title','Перейти в корзину');
-		} else {
-			a.removeClass('selected');
-			a.attr('title','Добавить в корзину');
-		}
-	}*/
 }
+
+
+
+
+
+Cart.hand('init-choice-btn', async div => {
+	await Session.async()
+	let name = div.dataset.name
+	let autosavename = div.dataset.autosave
+	let editable = div.dataset.editable
+	let value = await Autosave.get(autosavename, name+'.choice', div.dataset.value)
+
+	let checkinfo = () => {
+		for (let info of cls('iteminfo')) {
+			if (info.dataset.value == value) {
+				info.style.display = ''
+			} else {
+				info.style.display = 'none'
+			}
+		}
+	}
+	var first = false;
+	let cls = cls => div.getElementsByClassName(cls)
+	for (let item of cls('item')) {
+		
+		item.addEventListener('click', async () => {
+			if (first && !editable) return;
+			first = true;
+			for (let active of cls('active')) {
+				if (active == item) continue
+				active.classList.remove('active')
+			}
+
+			let value = item.dataset.value
+			Cart.elan('choice' + name, value)
+			
+			if (item.classList.contains('active')) {
+				value = false;
+				item.classList.remove('active');
+				Autosave.set(autosavename, name + '.choice');
+			} else {
+				item.classList.add('active');
+				Autosave.set(autosavename, name + '.choice', value);
+			}
+			checkinfo()
+			
+			
+			Autosave.loadAll(div, autosavename);
+		})
+		if (item.dataset.value == value) item.dispatchEvent(new Event('click'))
+	}
+	
+	for (let more of cls('morelink')) {
+		more.addEventListener('click', async event => {
+			var item = more.closest('.item')
+			var value = item.dataset.value
+			if (item.classList.contains('active')) event.stopPropagation();
+			
+			for (let info of cls('iteminfo')) {
+				if (info.dataset.value == value) {
+					info.style.display = ''
+				} else {
+					info.style.display = 'none'
+				}
+			}
+			checkinfo()
+		})
+	}
+})
+
+
+
+
+
 window.Cart = Cart
 export { Cart }
-/*
-Event.handler('Session.onsync', function () {
-	$(document).find('.cat_item').each( function () {
-		var cart = $(this).find('.basket_img');
-		var id = cart.data('producer') + ' ' + cart.data('article');
-		if (Session.get('order.my.basket.' + id)) {
-			$(this).find('.posbasket').show();
-			cart.addClass('basket_img_sel');
-			cart.attr('title','Удалить из корзины');
-		} else {
-			cart.attr('title','Добавить в корзину');
-		}
-	});
-});
-*/
