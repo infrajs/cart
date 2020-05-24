@@ -25,15 +25,19 @@ if (!isset($_GET['orderId'])) {
 
 	$ogood = Cart::getGoodOrder($id);
 	
-	if (!$ogood['total']) return Ans::err($ans, 'Отсутствует стоиость заказа. Код 102');
+	if (!$ogood['alltotal']) return Ans::err($ans, 'Отсутствует стоиость заказа. Код 102');
 	$ans['order'] = $order;
 
-	/*if (isset($ogood['sbrfpay']['orderId'])) { //Если ссылка создана, то она не меняется
+	if (isset($ogood['sbrfpay']['orderId'])) { //Если ссылка создана, то она не меняется
 		//Нужно проверить статус, может уже всё оплачено
 		$orderId = $ogood['sbrfpay']['orderId'];
-
+		
 		$info = Sbrfpay::getInfo($orderId);
-		if ($info['orderStatus'] == 2) { //Вся сумма авторизирована
+		
+		if ($info['orderStatus'] == 6) {
+			//[actionCodeDescription] => Истек срок ожидания ввода данных.
+			return Ans::err($ans, $info['actionCodeDescription']);
+		} else if ($info['orderStatus'] == 2) { //Вся сумма авторизирована
 			$order = Cart::loadOrder($id);
 			$status = 'success';
 			//Во всех остальных случаях пробуем ещё раз оплатить
@@ -46,19 +50,21 @@ if (!isset($_GET['orderId'])) {
 
 		$ans['orderId'] = $ogood['sbrfpay']['orderId'];
 		$ans['formUrl'] = $ogood['sbrfpay']['formUrl'];
-	} else {*/
-		$res = Sbrfpay::getId($id, $ogood['total']);
-		if (empty($res['orderId'])) return Ans::err($ans, $res['errorMessage']);
+	} else {
+		$res = Sbrfpay::getId($id, $ogood['alltotal']);
 
+		if (!empty($res['errorCode'])) return Ans::err($ans, $res['errorMessage']);
+		
 		$ans['orderId'] = $res['orderId'];
-		$ans['formUrl'] = $res['formUrl'];
-
+		$ans['formUrl'] = $res['formUrl'];	
 		$order = Cart::loadOrder($id);
 		$order['sbrfpay'] = [];
-		$order['sbrfpay']['orderId'] = $res['orderId'];
-		$order['sbrfpay']['formUrl'] = $res['formUrl'];
+		$order['sbrfpay']['orderId'] = $ans['orderId'];
+		$order['sbrfpay']['formUrl'] = $ans['formUrl'];
 		Cart::saveOrder($order, $place);
-	//}
+		
+		
+	}
 	$ans['order'] = $order;
 	return Ans::ret($ans);
 } else {

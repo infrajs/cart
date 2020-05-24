@@ -52,7 +52,7 @@ $ans['order'] = $order;
 $ans['fields'] = Load::loadJSON('-cart/fields.json');
 if (!empty($act['checkdata']) && !empty($rule['edit'][$place])) {
 	$email = empty($order['email']) ? null : $order['email'];
-	$msg = User::checkReg($email);
+	$msg = User::checkReg($email, 'cart/orders/my');
 	if (is_string($msg)) return Ans::err($ans,$msg);
 	//Действие требует проверку данных и текущий стату заявки разрешает редактирование, соответственно можно применит ьданные
 	//if (empty($order['basket'])) return Ans::err($ans, 'Заявка пустая! Добавьте товар!');
@@ -122,7 +122,7 @@ if ($action == 'saved') {
 
 } else if ($action == 'sbrfpay') {
 	$ogood = Cart::getGoodOrder($orderid);
-	if (empty($ogood['total'])) return Ans::err($ans, 'Ошибка. Нет стоимости заявки.');
+	if (empty($ogood['alltotal'])) return Ans::err($ans, 'Ошибка. Нет стоимости заявки.');
 	$order['status'] = 'sbrfpay';
 	Cart::saveOrder($order, $place);
 	if ($status == 'active') {

@@ -70,7 +70,16 @@ class Sbrfpay {
 		 
 		/* Описание заказа, не более 24 символов, запрещены % + \r \n */
 		$vars['description'] = 'Заказ №' . $id . ' на '.View::getHost();
-		 
+
+		/*
+		expirationDate Дата и время окончания жизни заказа. Формат: yyyy-MM-ddTHH:mm:ss .
+		Если этот параметр не передаётся в запросе, то для определения времени окончания жизни заказа используется sessionTimeoutSecs.
+		*/
+		$vars['expirationDate'] = (date('Y')+1).'-'.date('m').'-01T00:00:00';
+
+		//echo $vars['expirationDate'];
+		//exit;
+
 		$ch = curl_init('https://3dsec.sberbank.ru/payment/rest/register.do?' . http_build_query($vars));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);

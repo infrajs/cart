@@ -13,7 +13,7 @@
 			"caption":"Заказы ожидающие проверку менеджера",
 			"title":"Заказ находится на проверке",
 			"user":{
-				"buttons":{"basket":"secondary","sbrfpay":"success"},
+				"buttons":{"basket":"secondary"},
 				"actions":["print"]
 			},
 			"manager":{
@@ -101,6 +101,10 @@
 		"sbrfpay":{
 			"checkdata":true,
 			"title":"Оплатить",
+			"gohistory":{
+				"orders":"/cart/orders/{id}",
+				"admin":"/cart/admin/{id}"
+			},
 			"go":{
 				"orders":"/cart/orders/{id}/sbrfpay",
 				"admin":"/cart/admin/{id}/sbrfpay"

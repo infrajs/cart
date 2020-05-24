@@ -46,7 +46,7 @@
 .cart .item.active {
 	background-color: rgba(128, 128, 128, 0.2);
 }
-.cart .item:hover {
+.cart .item:not(.disabled):hover {
 	background-color: rgba(128, 128, 128, 0.4);
 }
 
@@ -59,6 +59,8 @@
 }
 .cart .item {
 	width:149px;
+}
+.cart .item:not(.disabled) {
 	cursor: pointer;
 }
 .cart .item.active {

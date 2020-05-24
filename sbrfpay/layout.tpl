@@ -21,6 +21,9 @@
 {redirect:}
 	<p>После нажатия на кнопку откроется страница банка для ввода платёжных данных.</p>
 	<a target2="about:blank" class="btn btn-lg btn-success" href="{data.formUrl}">Оплатить</a>
+	<script>
+		location.replace("{data.formUrl}")
+	</script>
 {cart::}-cart/cart.tpl
 {ans::}-ans/ans.tpl
 {links:}

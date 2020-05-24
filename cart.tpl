@@ -287,11 +287,39 @@
 			</div>
 			{order:info}
 			{crumb.parent.name=:admin?:adminactions?:useractions}
-			<div style="clear:both"></div>
+			<div class="d-md-none" style="clear:both"></div>	
+			{data.fields.pay.Оплатить онлайн?:sbrfpayinfo}
+			
+
+			{sbrfpayinfo:}
+				<div id="sbrfpayinfo">
+					<p>
+						<i>После нажатия на кнопку <b>Оплатить</b> откроется платёжный шлюз <b>ПАО&nbsp;СБЕРБАНК</b>, где будет предложено ввести платёжные данных карты для оплаты заказа.
+						Введённая информация не будет предоставлена третьим лицам за исключением случаев, предусмотренных законодательством РФ. 
+						Оплата происходит с использованием карт следующих платёжных систем:</i>
+					</p>
+					<center>
+						<img class="img-fluid mb-2" src="/vendor/infrajs/cart/sbrfpay/cards.png">
+					</center>
+					<p>
+						Ознакомьтесь с информацией <a href="/company">о компании</a>, <a href="/contacts">контакты и реквизиты</a>, <a href="/guaranty">гарантийные условия</a>, <a href="/terms">политика конфиденциальности</a>, <a href="/return">возврат и обмен</a>.
+					</p>
+				</div>
+				<script type="module">
+					import { Cart } from '/vendor/infrajs/cart/Cart.js'
+					let info = document.getElementById('sbrfpayinfo')
+					Cart.done('choicepay', value => {
+						if (value == 'Оплатить онлайн') {
+							info.style.display = 'block'
+						} else {
+							info.style.display = 'none'
+						}
+					})
+				</script>
 		{info:}
 			<div class="alert alert-secondary">
 				{:basketresume}
-				<p>{:amount}</p>
+				{:amount}
 			</div>
 		{useractions:}
 			<style>
@@ -400,7 +428,7 @@
 				let div = document.getElementById('{div}')
 				let cls = cls => div.getElementsByClassName(cls)
 				let cards = cls('transportcard')[0]
-				Cart.fire('init-choice-btn', cards)
+				Cart.initChoiceBtn(cards)
 
 				CDN.fire('load','jquery').then(async () => {
 					var tcard = $('.transportcard');
@@ -460,14 +488,15 @@
 		let div = document.getElementById('{div}')
 		let cls = cls => div.getElementsByClassName(cls)
 		let cards = cls('paycard')[0]
+		Cart.initChoiceBtn(cards)
 		
-		Cart.fire('init-choice-btn', cards)
 	</script>
 	{pay:}
-		<div data-value="{~key}" style="display:flex" class="item flex-column border rounded m-1 p-1">
+		<div data-value="{~key}" style="display:flex" class="{data.order.rule.edit[data.place]??:disabled} item flex-column border rounded m-1 p-1">
 			<div style="height:60px" class="d-flex align-items-center justify-content-center"><div><img class="img-fluid" src="/-imager/?h=60&src={ico}"></div></div>
 			<div class="mb-auto title"><big>{~key}</big></div>
 		</div>
+	{disabled:}disabled
 {fiocard:}
 	<div class="cartcontacts row">
 			<div class="col-sm-4 order-sm-2">
@@ -913,7 +942,7 @@
 		<b>{count} {~words(count,:позиция,:позиции,:позиций)}</b>
 	</p>
 	{:basketresume}
-	<p>{:amount}</p>
+	{:amount}
 	{comment?:prcom}
 	{manage.comment?:prcomm}
 	<hr>

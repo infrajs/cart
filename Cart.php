@@ -353,19 +353,7 @@ class Cart {
 					if (is_string($val)) $val = trim($val);
 					return $r;
 				});
-				/*//По идеи в сессии хранится email и он уже там есть, как и любые другие поля.
-				$email = Session::getEmail();//Это единственное место где в заявку добавляется email
-				if (isset($order['email']) && $email && $email != $order['email']) {
-					$user = Session::getUser($order['email']);
-					if ($user) { //Пользователь с указанным уже есть и это не текущий пользователь
-						if (Session::get('safe.manager')) {
-
-						} else {
-							$r = Cart::lang('To your email on the website there is a registration, you need to <a href=\'/user/signin\'>login</a>');
-							return $r;
-						}
-					}
-				}*/
+				
 				$order['status'] = 'active';
 			}
 			if (empty($order['manage'])) $order['manage'] = array();

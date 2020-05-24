@@ -114,8 +114,15 @@ let Cart = {
 								//Popup.alert(link+'<br>'+msg);
 								Popup.alert(msg);
 							}
-							if (act.go && act.go[place]) Crumb.go(Template.parse([act.go[place]], order));
-							else DOM.emit('check');
+							if (act.gohistory && act.gohistory[place]) {
+								Crumb.go(Template.parse([act.gohistory[place]], order));								
+							}
+
+							if (act.go && act.go[place]) {
+								Crumb.go(Template.parse([act.go[place]], order));
+							} else {
+								DOM.emit('check');
+							}
 						} else {
 							if (ans.msg) {
 								var msg = Template.parse([ans.msg], order);
@@ -329,7 +336,7 @@ let Cart = {
 
 
 
-Cart.hand('init-choice-btn', async div => {
+Cart.initChoiceBtn = async div => {
 	await Session.async()
 	let name = div.dataset.name
 	let autosavename = div.dataset.autosave
@@ -392,7 +399,7 @@ Cart.hand('init-choice-btn', async div => {
 			checkinfo()
 		})
 	}
-})
+}
 
 
 
