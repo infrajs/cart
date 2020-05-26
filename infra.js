@@ -7,7 +7,7 @@ import { Popup } from '/vendor/infrajs/popup/Popup.js'
 import { DOM } from '/vendor/akiyatkin/load/DOM.js'
 
 DOM.once('load', async () => {
-	await CDN.on('load','jquery')
+	await CDN.fire('load','jquery')
 })
 //Event.handler('Controller.onshow', async () => {
 DOM.done('load', () => {

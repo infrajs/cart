@@ -293,6 +293,11 @@
 
 			{sbrfpayinfo:}
 				<div id="sbrfpayinfo">
+					<style>
+						#sbrfpayinfo {
+							display: none
+						}
+					</style>
 					<p>
 						<i>После нажатия на кнопку <b>Оплатить</b> откроется платёжный шлюз <b>ПАО&nbsp;СБЕРБАНК</b>, где будет предложено ввести платёжные данные карты для оплаты заказа.
 						Введённая информация не будет предоставлена третьим лицам за исключением случаев, предусмотренных законодательством РФ. 
@@ -971,13 +976,14 @@
 {nocall:}звонок не требуется
 {iprinttr:}
 	<b>Доставка</b>: {choice} 
+		{choice??:nochoice}
 		{choice=:strПочта1?:rowПочта1}
 		{choice=:strПочта?:rowПочта}
 		{choice=:strТраспорт?:rowТраспорт}
 		{choice=:strКурьер?:rowКурьер}
 		{choice=:strВывоз?:rowВывоз}
 	
-	
+	{nochoice:} {address} {passeriya:pr}
 	{strПочта:}Почта России
 	{rowПочта:}{index:pr} {region:pr} {city:pr} {street:pr} {house:pr} {kv:pr}
 	
