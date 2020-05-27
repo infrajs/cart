@@ -14,7 +14,7 @@
 			"title":"Заказ находится на проверке",
 			"user":{
 				"buttons":{"basket":"secondary"},
-				"actions":["print"]
+				"actions":["print","active"]
 			},
 			"manager":{
 				"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
@@ -167,7 +167,7 @@
 		"active":{
 			"checkdata":false,
 			"go":{
-				"orders":"/cart/orders/my/list"
+				"orders":"/cart/orders/my"
 			},
 			"title":"Отозвать заказ",
 			"confirm":"В заказ снова можно будет добавлять новые позиции из каталога.",

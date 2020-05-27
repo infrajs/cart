@@ -252,6 +252,7 @@
 				<tr><th>Оплачено</th><td>{~date(:d.m.Y H:i,date)}</td></tr>
 				<tr><th>Сумма</th><td>{~cost(total)}{:model.unit}</td></tr>
 			</table>
+		{checked:}checked
 		{orderPageContent:}
 			<div class="float-right" title="Последние измения">{~date(:j F H:i,order.time)}</div>
 			<h1>{order.rule.title} {order.id}</h1>
