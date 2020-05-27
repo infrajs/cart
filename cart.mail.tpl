@@ -1,5 +1,5 @@
 {AdmOrderToCheck:}
-	<p>На проверку поступил новый заказ.</p>
+	<p>Заказ <b>{id}</b> от {~date(:j.m.Y,time)} {sbrfpay.info.orderStatus=:2?:payd?:rec} и ожидает проверки.</p>
 	{:cart.printorder}
 	{:AdmLinks}
 {AdmLinks:}
@@ -14,9 +14,6 @@
 {orderToCheck:}
 	<p>{name}, Ваш заказ <b>{id}</b> от {~date(:j.m.Y,time)} {sbrfpay.info.orderStatus=:2?:payd?:rec} и ожидает проверки. После проверки позиций в заказе, с вами свяжется наш менеджер для подтверждения и уточнения деталей заказа.</p>
 	<p>Отслеживать состояние заказа можно в <a href="{link}&src=cart">личном кабинете</a>.</p>
-	<p>
-		<b>Заказ <b>{id}</b> от {~date(:j.m.Y,time)}</b>
-	</p>
 	{:cart.printorder}
 	<p>
 		По всем вопросам обращайтесь по нашим <a href="https://{site}/contacts">контактам</a>. При возникновении вопросов наш сотрудник свяжется с вами! Спасибо, что выбрали наш магазин.
