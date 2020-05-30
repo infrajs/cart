@@ -5,6 +5,7 @@ import { Cart } from '/vendor/infrajs/cart/Cart.js'
 import { Global } from '/vendor/infrajs/layer-global/Global.js'
 import { Popup } from '/vendor/infrajs/popup/Popup.js'
 import { DOM } from '/vendor/akiyatkin/load/DOM.js'
+let Session
 
 DOM.once('load', async () => {
 	await CDN.fire('load','jquery')
@@ -30,7 +31,8 @@ DOM.done('load', () => {
 		Cart.activate(a)
 	});
 	var conf = Config.get('cart');
-	var activate = function (a) {
+	var activate = async function (a) {
+		Session = (await import('/vendor/infrajs/session/Session.js')).Session
 		var orderid = a.data('order');
 		if (!orderid) orderid = 'my';
 

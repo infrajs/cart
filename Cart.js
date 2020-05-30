@@ -6,7 +6,6 @@ import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
 import { Load } from '/vendor/akiyatkin/load/Load.js'
-import { Autosave } from '/vendor/akiyatkin/form/Autosave.js'
 
 
 let Cart = {
@@ -338,6 +337,7 @@ let Cart = {
 
 Cart.initChoiceBtn = async div => {
 	await Session.async()
+	Autosave = (await import('/vendor/akiyatkin/form/Autosave.js')).Autosave
 	let name = div.dataset.name
 	let autosavename = div.dataset.autosave
 	let editable = div.dataset.editable
