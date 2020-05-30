@@ -434,6 +434,7 @@
 				let div = document.getElementById('{div}')
 				let cls = cls => div.getElementsByClassName(cls)
 				let cards = cls('transportcard')[0]
+
 				Cart.initChoiceBtn(cards)
 
 				CDN.fire('load','jquery').then(async () => {
@@ -530,9 +531,9 @@
 		{fioguest:}<b>Уже покупали у нас?</b>
 		<p><a href="/user/signin?back=ref">Авторизуйтесь</a>, чтобы не заполнять форму повторно.</p>
 	{transinfo:}
-			<div data-value="{~key}" class="iteminfo">{:basket.fields.{tpl}}</div>
+			<div data-value="{~key}" class="pt-2 iteminfo">{:basket.fields.{tpl}}</div>
 	{payinfo:}
-			<div data-value="{~key}" class="iteminfo"><div class="m-1 alert border more">{:basket.fields.{tpl}}</div></div>
+			<div data-value="{~key}" class="pt-2 iteminfo"><div class="m-1 alert border more">{:basket.fields.{tpl}}</div></div>
 	{jsitem:}
 		//script>
 		var div = $('.'+name+'card')

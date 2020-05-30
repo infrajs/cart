@@ -342,23 +342,26 @@ Cart.initChoiceBtn = async div => {
 	let autosavename = div.dataset.autosave
 	let editable = div.dataset.editable
 	let value = await Autosave.get(autosavename, name+'.choice', div.dataset.value)
-
-	let checkinfo = () => {
+	let cls = cls => div.getElementsByClassName(cls)
+	let checkinfo = (value) => {
 		for (let info of cls('iteminfo')) {
+
 			if (info.dataset.value == value) {
 				info.style.display = ''
+				info.style.opacity = 1
 			} else {
 				info.style.display = 'none'
+				info.style.opacity = 0
 			}
 		}
 	}
 	var first = false;
-	let cls = cls => div.getElementsByClassName(cls)
+	
 	for (let item of cls('item')) {
 		
 		item.addEventListener('click', async () => {
-			if (first && !editable) return;
-			first = true;
+			if (first && !editable) return
+			first = true
 			for (let active of cls('active')) {
 				if (active == item) continue
 				active.classList.remove('active')
@@ -375,7 +378,7 @@ Cart.initChoiceBtn = async div => {
 				item.classList.add('active');
 				Autosave.set(autosavename, name + '.choice', value);
 			}
-			checkinfo()
+			checkinfo(value)
 			
 			
 			Autosave.loadAll(div, autosavename);
@@ -396,7 +399,7 @@ Cart.initChoiceBtn = async div => {
 					info.style.display = 'none'
 				}
 			}
-			checkinfo()
+			checkinfo(value)
 		})
 	}
 }
