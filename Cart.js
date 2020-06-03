@@ -6,8 +6,8 @@ import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
 import { Load } from '/vendor/akiyatkin/load/Load.js'
-
-let Template, Session
+import { Session } from '/vendor/infrajs/session/Session.js'
+let Template
 
 let Cart = {
 	...Fire, 
@@ -78,7 +78,6 @@ let Cart = {
 	action: async (place, name, orderid, cb, param) => {
 		//place - контекст в котором идёт работа
 		Template = (await import('/vendor/infrajs/template/Template.js')).Template
-		Session = (await import('/vendor/infrajs/session/Session.js')).Session
 		if (Cart.inaction) return;
 		Cart.inaction = true;
 		let rules = await Load.on('json', '-cart/rules.json')
