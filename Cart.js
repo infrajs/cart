@@ -7,6 +7,7 @@ import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
 import { Load } from '/vendor/akiyatkin/load/Load.js'
 
+let Template, Session
 
 let Cart = {
 	...Fire, 
@@ -54,6 +55,7 @@ let Cart = {
 		Goal.reach(name);
 	},
 	act: async (place, name, orderid, cb, param) => {
+		Template = (await import('/vendor/infrajs/template/Template.js')).Template
 		if (!cb) cb = function () { };
 		let rules = await Load.on('json', '-cart/rules.json')
 		var act = rules.actions[name];
@@ -75,6 +77,8 @@ let Cart = {
 	inaction: false,
 	action: async (place, name, orderid, cb, param) => {
 		//place - контекст в котором идёт работа
+		Template = (await import('/vendor/infrajs/template/Template.js')).Template
+		Session = (await import('/vendor/infrajs/session/Session.js')).Session
 		if (Cart.inaction) return;
 		Cart.inaction = true;
 		let rules = await Load.on('json', '-cart/rules.json')
