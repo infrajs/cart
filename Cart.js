@@ -347,10 +347,11 @@ Cart.initChoiceBtn = async div => {
 	let value = await Autosave.get(autosavename, name+'.choice', div.dataset.value)
 	let cls = cls => div.getElementsByClassName(cls)
 	let checkinfo = (value) => {
+
 		for (let info of cls('iteminfo')) {
 
 			if (info.dataset.value == value) {
-				info.style.display = ''
+				info.style.display = 'block'
 				info.style.opacity = 1
 			} else {
 				info.style.display = 'none'
@@ -359,7 +360,6 @@ Cart.initChoiceBtn = async div => {
 		}
 	}
 	var first = false;
-	
 	for (let item of cls('item')) {
 		
 		item.addEventListener('click', async () => {
@@ -386,7 +386,10 @@ Cart.initChoiceBtn = async div => {
 			
 			Autosave.loadAll(div, autosavename);
 		})
-		if (item.dataset.value == value) item.dispatchEvent(new Event('click'))
+		if (item.dataset.value == value) {
+
+			item.dispatchEvent(new Event('click'))
+		}
 	}
 	
 	for (let more of cls('morelink')) {
@@ -394,14 +397,6 @@ Cart.initChoiceBtn = async div => {
 			var item = more.closest('.item')
 			var value = item.dataset.value
 			if (item.classList.contains('active')) event.stopPropagation();
-			
-			for (let info of cls('iteminfo')) {
-				if (info.dataset.value == value) {
-					info.style.display = ''
-				} else {
-					info.style.display = 'none'
-				}
-			}
 			checkinfo(value)
 		})
 	}
