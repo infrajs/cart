@@ -1,5 +1,4 @@
 import { Crumb } from '/vendor/infrajs/controller/src/Crumb.js'
-import { Global } from '/vendor/infrajs/layer-global/Global.js'
 import { Ascroll } from '/vendor/infrajs/ascroll/Ascroll.js'
 import { Popup } from '/vendor/infrajs/popup/Popup.js'
 import { CDN } from '/vendor/akiyatkin/load/CDN.js'
@@ -7,7 +6,7 @@ import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
 import { Load } from '/vendor/akiyatkin/load/Load.js'
 import { Session } from '/vendor/infrajs/session/Session.js'
-let Template
+let Template, Global
 
 let Cart = {
 	...Fire, 
@@ -18,6 +17,7 @@ let Cart = {
 	refresh: function (el) {
 		if (el) $(el).removeClass('btn-secondary').addClass('btn-danger').find('span').addClass('spin');
 		setTimeout(async () => {
+			let Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
 			Global.set(['user', 'cart']);
 			console.log('asdf')
 			await Session.async();
@@ -29,6 +29,7 @@ let Cart = {
 	logout: async () => {
 		Session.logout();
 		await Session.async();
+		let Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
 		Global.check(['cart', 'user']);
 	},
 	unblockform: function (layer) {
@@ -71,6 +72,7 @@ let Cart = {
 		await Session.async();
 		let ans = await fetch(path).then(res => res.json())
 		await Session.async();
+		let Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
 		Global.set(['cart', 'user']); //при заказе может произойти авторизация
 		await cb(ans);
 	},
@@ -211,6 +213,7 @@ let Cart = {
 		if (!orderid) orderid = '';
 		//генерирует объект описывающий все цены... передаётся basket на случай если count актуальный именно в basket
 		var path = '-cart/?type=order&id=' + orderid;
+		Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
 		Global.unload('cart', path);
 		var path = '-cart?type=order&id=' + orderid;
 		Global.unload('cart', path);
@@ -232,6 +235,7 @@ let Cart = {
 		return !r;
 	},
 	remove: async (place, orderid, prodart, cb) => {
+		let Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
 		var fn = function () {
 			if (cb) cb();
 			Global.check('cart');
@@ -250,8 +254,9 @@ let Cart = {
 		Session.set(name, count, true, cb);
 	},
 	add: function (place, orderid, prodart, cb) {
-		var fn = function () {
+		var fn = async () => {
 			if (cb) cb();
+			let Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
 			Global.check('cart');
 		}
 		if (!orderid) orderid = 'my';
