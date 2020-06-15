@@ -2,10 +2,9 @@ import { Crumb } from '/vendor/infrajs/controller/src/Crumb.js'
 import { Event } from '/vendor/infrajs/event/Event.js'
 import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Cart } from '/vendor/infrajs/cart/Cart.js'
-import { Global } from '/vendor/infrajs/layer-global/Global.js'
 import { Popup } from '/vendor/infrajs/popup/Popup.js'
 import { DOM } from '/vendor/akiyatkin/load/DOM.js'
-let Session
+let Session, Global
 
 DOM.once('load', async () => {
 	await CDN.fire('load','jquery')
@@ -110,10 +109,11 @@ DOM.done('load', () => {
 				Crumb.go('/cart/orders/my');
 				return;
 			}
-			Cart.set(place, orderid, prodart, count, function () {
-				Global.check('cart');
-				activate(a);
-			});
+			Cart.set(place, orderid, prodart, count, async () => {
+				let Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
+				Global.check('cart')
+				activate(a)
+			})
 		}).each(function () {
 			var a = $(this);
 			activate(a);
