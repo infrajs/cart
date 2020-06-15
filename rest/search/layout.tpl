@@ -23,7 +23,7 @@
 		let Template
 		
 		
-		CDN.on('load',"jquery.autocomplete").then(() => {
+		CDN.fire('load',"jquery.autocomplete").then(() => {
 			//https://github.com/devbridge/jQuery-Autocomplete
 			var prodart = false;
 			var div = $('.cart-search-complete');
