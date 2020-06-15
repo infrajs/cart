@@ -2,6 +2,7 @@
 	"activelink":true,
 	"tpl":"-cart/cart.tpl",
 	"tplroot":"CART",
+	"showanimatefastrepase":true,
 	"json":"-cart/?type=cart",
 	"global":["user", "cart"],
 	"conf":"cart",
