@@ -1,6 +1,7 @@
 {
 	"pub":["opt","clsadd","clsready","textadd","textready","textin","coupon","pay"],
 	"clsadd":"btn-success",
+	"hostnum":"",
 	"clsready":"btn-danger",
 	"textadd":"В корзину",
 	"textready":"Оформить",

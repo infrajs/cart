@@ -247,6 +247,7 @@ class Cart {
 		Session::set('orders.my.time');
 		Session::set('orders.my.comment');
 		Session::set('orders.my.manage');
+		Session::set('orders.my.sbrfpay');
 	}
 	public static function couponCheck($coupon, &$pos) {
 		$r = true;
@@ -522,13 +523,15 @@ class Cart {
 				Session::set('orders.my', $order);//Исключение, данные заявки
 				return;
 			} else {
+				$sym = Cart::$conf['hostnum'];
 				$id = (int) ((date('m')+9).(date('j')+9).'00');
-				$src = Cart::getPath($id);
+				$src = Cart::getPath($sym.$id);
 				while (Path::theme($src)) {
 					$id++;
-					$src = Cart::getPath($id);
+					$src = Cart::getPath($sym.$id);
 				}
 				Path::clear($src);
+				$id = $sym.$id;
 			}
 			$order['id'] = $id;
 			//Добавляем в заявки пользователя

@@ -122,7 +122,7 @@ if ($action == 'saved') {
 
 } else if ($action == 'sbrfpay') {
 	$ogood = Cart::getGoodOrder($orderid);
-	if (empty($ogood['alltotal'])) return Ans::err($ans, 'Ошибка. Нет стоимости заявки.');
+	if (empty($ogood['alltotal'])) return Ans::err($ans, 'Ошибка. У заказа нет стоимости.');
 	$order['status'] = 'sbrfpay';
 	Cart::saveOrder($order, $place);
 	if ($status == 'active') {
