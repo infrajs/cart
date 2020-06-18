@@ -14,7 +14,7 @@
 			"title":"Заказ находится на проверке",
 			"user":{
 				"buttons":{"basket":"secondary"},
-				"actions":["print","active"]
+				"actions":["print"]
 			},
 			"manager":{
 				"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
@@ -84,12 +84,12 @@
 				"orders":false,
 				"admin":false
 			},
-			"caption":"Заявки ожидающие оплату",
+			"caption":"Заказы ожидающие оплату",
 			"short":"Ожидает оплату",
-			"title":"Заявка ожидает оплату",
+			"title":"Заказ ожидает оплату",
 			"user":{
 				"buttons":{"basket":"secondary","sbrfpay":"success"},
-				"actions":["active", "sync","print"]
+				"actions":["sync","print"]
 			},
 			"manager":{
 				"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
