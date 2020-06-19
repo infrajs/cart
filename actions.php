@@ -12,6 +12,8 @@ use infrajs\access\Access;
 use infrajs\user\User;
 use infrajs\each\Fix;
 
+Nostore::on();
+
 $ans = array();
 $id = Ans::REQ('id','int');
 $orderid = $id;

@@ -6,7 +6,7 @@ import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
 import { Load } from '/vendor/akiyatkin/load/Load.js'
 import { Session } from '/vendor/infrajs/session/Session.js'
-let Template, Global
+let Template, Global, Autosave
 
 let Cart = {
 	...Fire, 
@@ -19,7 +19,6 @@ let Cart = {
 		setTimeout(async () => {
 			let Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
 			Global.set(['user', 'cart']);
-			console.log('asdf')
 			await Session.async();
 			DOM.emit('check')
 			//Cart.goTop();
@@ -82,6 +81,18 @@ let Cart = {
 		Template = (await import('/vendor/infrajs/template/Template.js')).Template
 		if (Cart.inaction) return;
 		Cart.inaction = true;
+
+		let div = document.getElementsByClassName('cart')[0]
+		if (div) {
+			await CDN.fire('load','jquery')
+			Autosave = (await import('/vendor/akiyatkin/form/Autosave.js')).Autosave
+			var inps = Autosave.getInps(div);
+			for (let inp of inps) {
+				Autosave.fireEvent(inp, 'change');
+			}
+		}
+
+		
 		let rules = await Load.on('json', '-cart/rules.json')
 		var act = rules.actions[name];
 		var order = await Cart.getGoodOrder(orderid);
@@ -104,7 +115,7 @@ let Cart = {
 								var msg = Template.parse([act.result], order);
 								var link = Cart.getLink(order, place);
 								//popup.alert(link+'<br>'+msg);
-								Popup.alert(msg);
+								await Popup.alert(msg);
 							}
 							return;
 						}
@@ -116,7 +127,7 @@ let Cart = {
 								var msg = Template.parse([act.result], order);
 								var link = Cart.getLink(order, place);
 								//Popup.alert(link+'<br>'+msg);
-								Popup.alert(msg);
+								await Popup.alert(msg);
 							}
 							if (act.gohistory && act.gohistory[place]) {
 								Crumb.go(Template.parse([act.gohistory[place]], order));								
@@ -128,23 +139,24 @@ let Cart = {
 								DOM.emit('check');
 							}
 						} else {
+							
 							if (ans.msg) {
 								var msg = Template.parse([ans.msg], order);
 								var link = Cart.getLink(order, place);
 								//Popup.alert(link+'<br>'+msg);
-								Popup.alert(msg);
+								await Popup.alert(msg);
 							} else {
-								Popup.alert(link + '<br>Произошла обшибка, попробуйте позже!');
+								await Popup.alert(link + '<br>Произошла обшибка, попробуйте позже!');
 							}
 						}
 					} else {//Заявка удалена
 
 						if (ans.result) Crumb.go(act.go[place]);
 						if (ans.msg) {
-							Popup.alert(ans.msg);
+							await Popup.alert(ans.msg);
 						}
 					}
-					if (cb && ans.result) cb(ans);
+					if (cb && ans.result) await cb(ans);
 				}
 				//if (act.noscroll) call();
 				//else Cart.goTop(call);	
@@ -215,10 +227,10 @@ let Cart = {
 		var path = '-cart/?type=order&id=' + orderid;
 		Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
 		Global.unload('cart', path);
-		var path = '-cart?type=order&id=' + orderid;
-		Global.unload('cart', path);
+		//var path = '-cart?type=order&id=' + orderid;
+		//Global.unload('cart', path);
 
-		let order = await Load.on('json', path)
+		let order = await Load.fire('json', path)
 		//var order = Load.loadJSON(path);//GoodOrder серверная версия
 		if (!order.result) return false;
 		return order.order;
