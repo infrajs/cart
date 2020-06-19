@@ -7,6 +7,7 @@ use infrajs\ans\Ans;
 use infrajs\access\Access;
 use infrajs\session\Session;
 use infrajs\once\Once;
+use infrajs\mem\Mem;
 use infrajs\load\Load;
 use infrajs\template\Template;
 use infrajs\each\Each;
@@ -523,15 +524,21 @@ class Cart {
 				Session::set('orders.my', $order);//Исключение, данные заявки
 				return;
 			} else {
+				$today = (int) ((date('m')+10).(date('j')+10).'00');
+				$last_day = Mem::get('cart_last_day');
 				$sym = Cart::$conf['hostnum'];
-				$id = (int) ((date('m')+9).(date('j')+9).'00');
-				$src = Cart::getPath($sym.$id);
-				while (Path::theme($src)) {
-					$id++;
-					$src = Cart::getPath($sym.$id);
+				if ($last_day == $today) {
+					$num = Mem::get('cart_last_num');
+					if (!$num) $num = 0;
+					$num = $num + 1;
+				} else {
+					$num = 0;
 				}
-				Path::clear($src);
-				$id = $sym.$id;
+				$id = $sym . ($today + $num);
+				Mem::set('cart_last_day', $today);
+				Mem::set('cart_last_num', $num);
+				
+				$src = Cart::getPath($id);
 			}
 			$order['id'] = $id;
 			//Добавляем в заявки пользователя
