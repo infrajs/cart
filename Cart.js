@@ -88,7 +88,10 @@ let Cart = {
 			Autosave = (await import('/vendor/akiyatkin/form/Autosave.js')).Autosave
 			var inps = Autosave.getInps(div);
 			for (let inp of inps) {
-				Autosave.fireEvent(inp, 'change');
+				if (inp.name == 'email') {
+					 Autosave.fireEvent(inp, 'change');
+					 break;
+				}
 			}
 		}
 
