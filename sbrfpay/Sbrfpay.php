@@ -109,6 +109,8 @@ class Sbrfpay {
 		if (isset($res['amount'])) $res['total'] = round($res['amount']/100,2);
 		
 		if (isset($res['date'])) $res['date'] = round($res['date']/1000);
+		if (isset($res['authDateTime'])) $res['authDateTime'] = round($res['authDateTime']/1000);
+		
 		return $res;
 	}
 }

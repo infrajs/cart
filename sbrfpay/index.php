@@ -21,36 +21,45 @@ $ans['order'] = $order;
 
 if (!$order) return Ans::err($ans, 'Заказ не найден. Код 100');
 
-if (!empty($order['pay']['choice']) && $order['pay']['choice'] != 'Оплатить онлайн') {
+if (empty($order['pay'])) $order['pay'] = [];
+if (empty($order['pay']['choice'])) $order['pay']['choice'] = 'Оплатить онлайн';
+if ($order['pay']['choice'] != 'Оплатить онлайн') {
 	return Ans::err($ans, 'Ошибка. Выбран несовместимый способ оплаты. Код 105');
 }
 
-if (!isset($_GET['orderId'])) {
+$status = Ans::get('status');
+if (empty($_GET['orderId'])) {
+	//Перешли в корень страницы /id/sbrfpay/
 	
-	$status = Ans::get('status');
 	if ($status) return Ans::err($ans, 'Ссылка устарела. Код 003');
 	if ($order['status'] == 'check') return Ans::ret($ans, 'Заказ находится на проверке.');
 	if ($order['status'] != 'sbrfpay') return Ans::err($ans, 'Некорректный статус заказа. Код 203');
 
 	
-	if (isset($order['sbrfpay']['orderId'])) { //Если ссылка создана, то она не меняется?
+	if (isset($order['sbrfpay']['orderId'])) {
 		//Нужно проверить статус, может уже всё оплачено
 		$orderId = $order['sbrfpay']['orderId'];	
 		$info = Sbrfpay::getInfo($orderId);
+		if (!$info) return Ans::err($ans, 'Не удалось получить статус заказа. Код 404');
 		if ($info['orderNumber'] != $id) return Ans::err($ans, 'Ошибка уникальности номера заказа. Код 204');
+
 		
-		if ($info['orderStatus'] == 6) {
-			//[actionCodeDescription] => Истек срок ожидания ввода данных.
-			return Ans::err($ans, $info['actionCodeDescription']);
-		} else if ($info['orderStatus'] == 2) { //Вся сумма авторизирована
-			$order['sbrfpay']['info'] = $info;
-			$status = 'success';
+		if ($info['orderStatus'] == 2) { //Вся сумма авторизирована\
 			//Во всех остальных случаях пробуем ещё раз оплатить
+			$order['sbrfpay']['info'] = $info; //Сохраняем только если успхе
+			$status = 'success';
+			
 			$order['status'] = 'check';
 			Cart::saveOrder($order, $place);
 			$ans['order'] = $order;
 			$ans['msg'] = 'Заказ оплачен. Уникальный номер заказа в системе '.$orderId;
 			return Cart::ret($ans, 'check');
+		} else if ($info['orderStatus'] == 0) {
+			//Заказ в ожидании
+			//Номер заказа и ссылка при этом не меняются и $info сохранять не надо
+		} else {
+			//6 [actionCodeDescription] => Истек срок ожидания ввода данных.
+			return Ans::err($ans, $info['actionCodeDescription'].' Код банка '.$info['errorCode'].'.');
 		} 
 
 		$ans['orderId'] = $order['sbrfpay']['orderId'];
@@ -79,7 +88,6 @@ if (!isset($_GET['orderId'])) {
 	$orderId = $_GET['orderId'];
 	if (empty($orderId)) return Ans::err($ans, 'Ссылка устарела. Код 001');
 	
-	$status = Ans::get('status');
 	if (empty($status) || !in_array($status, ['error','success'])) return Ans::err($ans, 'Ссылка устарела. Код 010');
 	
 	
@@ -97,11 +105,9 @@ if (!isset($_GET['orderId'])) {
 		$ans['msg'] = 'Заказ оплачен';
 		return Cart::ret($ans, 'check');
 	} else {
-		$order['sbrfpay']['info'] = $info;
-		Cart::saveOrder($order, $place);
+		//Cart::saveOrder($order, $place);
 		$ans['order'] = $order;
-		$add = isset($info['actionCodeDescription'])? $info['actionCodeDescription'] : '';
-		return Ans::ret($ans, 'Ошибка, заказ не оплачен. '.$add);
+		return Ans::err($ans, $info['actionCodeDescription'].' Код банка '.$info['errorCode'].'.');
 	}
 	
 

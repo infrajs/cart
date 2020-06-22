@@ -249,7 +249,7 @@
 		{sbrfpaygood:}
 			<p>{orderDescription}</p>
 			<table style="width:auto" class="table table-sm table-striped">
-				<tr><th>Оплачено</th><td>{~date(:d.m.Y H:i,date)}</td></tr>
+				<tr><th>Оплачено</th><td>{~date(:d.m.Y H:i,authDateTime)}</td></tr>
 				<tr><th>Сумма</th><td>{~cost(total)}{:model.unit}</td></tr>
 			</table>
 		{checked:}checked
