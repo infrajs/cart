@@ -43,11 +43,27 @@
 .cart .card-header span {
 	/*color:white;*/
 }
-.cart .item.active {
-	background-color: rgba(128, 128, 128, 0.2);
+
+.cart .item {
+	width:149px;
+	text-align: center;
 }
-.cart .item:not(.disabled):hover {
-	background-color: rgba(128, 128, 128, 0.4);
+.cart .item .body {
+	border:solid 2px gainsboro;
+	display:flex; 
+	height:100px;
+}
+
+.cart .item.active .title {
+	/*font-weight: bold;*/
+}
+
+.cart .item:not(.disabled):hover .body {
+	border-color:var(--main);
+	border-color:gray;
+}
+.cart .item.active .body {
+	border-color:var(--main)!important;
 }
 
 .cart .card {
@@ -57,18 +73,11 @@
 	cursor:pointer; 
 	
 }
-.cart .item {
-	width:149px;
-}
+
 .cart .item:not(.disabled) {
 	cursor: pointer;
 }
-.cart .item.active {
-	
-}
-.cart .item.active .title {
-	font-weight: bold;
-}
+
 .cart .item:hover {
 	
 }

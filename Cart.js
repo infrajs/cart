@@ -17,7 +17,7 @@ let Cart = {
 	refresh: function (el) {
 		if (el) $(el).removeClass('btn-secondary').addClass('btn-danger').find('span').addClass('spin');
 		setTimeout(async () => {
-			let Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
+			Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
 			Global.set(['user', 'cart']);
 			await Session.async();
 			DOM.emit('check')
@@ -404,7 +404,9 @@ Cart.initChoiceBtn = async div => {
 			checkinfo(value)
 			
 			
-			Autosave.loadAll(div, autosavename);
+			Autosave.loadAll(div, autosavename)
+			Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
+			Global.set('cart')
 		})
 		if (item.dataset.value == value) {
 

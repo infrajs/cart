@@ -485,7 +485,7 @@
 		data-autosave="{autosavename}"
 		data-value="{data.order.pay.choice|data.fields.paydefault}"
 		data-editable="{data.order.rule.edit[data.place]?:yes}">
-		<div class="d-flex flex-wrap" style="font-size:11px">
+		<div class="d-flex flex-wrap m-n2" style="font-size:11px">
 			{fields.pay::pay}
 		</div>
 	</div>
@@ -499,10 +499,14 @@
 		
 	</script>
 	{pay:}
-		<div data-value="{~key}" style="display:flex" class="{data.order.rule.edit[data.place]??:disabled} item flex-column border rounded m-1 p-1">
-			<div style="height:60px" class="d-flex align-items-center justify-content-center"><div><img class="img-fluid" src="/-imager/?h=60&src={ico}"></div></div>
-			<div class="mb-auto title"><big>{~key}</big></div>
+		<div data-value="{~key}" class="item m-2">
+			<div class="body {data.order.rule.edit[data.place]??:disabled} rounded d-flex align-items-center justify-content-center">		
+				<img class="img-fluid" src="/-imager/?h=80&src={ico}">
+				
+			</div>
+			<div class="title"><big>{~key}</big></div>
 		</div>
+		
 	{disabled:}disabled
 {fiocard:}
 	<div class="cartcontacts row">

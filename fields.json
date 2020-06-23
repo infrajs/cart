@@ -33,16 +33,16 @@
 		}
 	},
 	"pay":{
-		"Оплата при получении заказа":{
+		"Оплатить при получении заказа":{
 			"ico":"-cart/images/recive.jpg",
 			"tpl":"PAYRECIVE"
 		},
-		"Оплата по счёту для юридических лиц":{
+		"Оплатить по счёту для юридических лиц":{
 			"ico":"-cart/images/bank.png",
 			"tpl":"PAYBANK"
 		},
 		"Оплатить онлайн":{
-			"ico":"-cart/images/visa-master.jpg",
+			"ico":"-cart/images/mastercard.png",
 			"tpl":"PAYCARD"	
 		}
 	}
