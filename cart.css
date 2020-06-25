@@ -53,7 +53,9 @@
 	display:flex; 
 	height:100px;
 }
-
+.cart .item .title {
+	margin-top:5px;
+}
 .cart .item.active .title {
 	/*font-weight: bold;*/
 }

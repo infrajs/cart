@@ -299,13 +299,13 @@
 							display: none
 						}
 					</style>
-					<p>
+					
 						<i>После нажатия на кнопку <b>Оплатить</b> откроется платёжный шлюз <b>ПАО&nbsp;СБЕРБАНК</b>, где будет предложено ввести платёжные данные карты для оплаты заказа.
 						Введённая информация не будет предоставлена третьим лицам за исключением случаев, предусмотренных законодательством РФ. 
 						Оплата происходит с использованием карт следующих платёжных систем:</i>
-					</p>
+					
 					<center>
-						<img class="img-fluid mb-2" src="/vendor/infrajs/cart/sbrfpay/cards.png">
+						<img class="img-fluid my-3" src="/vendor/infrajs/cart/sbrfpay/cards.png">
 					</center>
 					<p>
 						Ознакомьтесь с информацией <a href="/company">о компании</a>, <a href="/contacts">контакты и реквизиты</a>, <a href="/guaranty">гарантийные условия</a>, <a href="/terms">политика конфиденциальности</a>, <a href="/return">возврат и обмен</a>.
@@ -502,7 +502,6 @@
 		<div data-value="{~key}" class="item m-2">
 			<div class="body {data.order.rule.edit[data.place]??:disabled} rounded d-flex align-items-center justify-content-center">		
 				<img class="img-fluid" src="/-imager/?h=80&src={ico}">
-				
 			</div>
 			<div class="title"><big>{~key}</big></div>
 		</div>
