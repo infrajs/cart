@@ -442,7 +442,7 @@
 					var pcard = $('.paycard');
 					tcard.find('.item').click( async () => {
 						let value = await Autosave.get("{autosavename}", 'transport.choice');
-						pcard.find('.item').css('display','flex');
+						pcard.find('.item').css('display','');
 						if (!value) return;
 						let data = await Load.on('json','{json}');
 						if (!data) return;
