@@ -42,7 +42,7 @@
 	{user:} <b><a href="/user">{data.user.email}</a></b>
 
 {pr:} {.}
-{fields::}-cart/fields.tpl?v=1
+{fields::}-cart/fields.tpl?v=2
 
 {*:}
 	{~obj(:title,:Корзина,:content,:showcartlist,:num,:1):accordCard}
