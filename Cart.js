@@ -364,7 +364,8 @@ Cart.initChoiceBtn = async div => {
 	let name = div.dataset.name
 	let autosavename = div.dataset.autosave
 	let editable = div.dataset.editable
-	let value = await Autosave.get(autosavename, name+'.choice', div.dataset.value)
+	let value = await Autosave.get(autosavename, name+'.choice', div.dataset.value) //defvalue
+	if (value) Autosave.set(autosavename, name + '.choice', value)
 	let cls = cls => div.getElementsByClassName(cls)
 	let checkinfo = (value) => {
 

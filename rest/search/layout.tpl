@@ -77,7 +77,7 @@
 				dataType:"json",
 				ignoreParams: true,
 				onSearchComplete: function () {
-					DOM.emit('check')
+					DOM.emit('load')
 				},
 				formatResult: function (suggestion, currentValue) {
 					if (!currentValue) return suggestion;
