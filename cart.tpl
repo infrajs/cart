@@ -501,7 +501,7 @@
 	{pay:}
 		<div data-value="{~key}" class="item m-2">
 			<div class="body {data.order.rule.edit[data.place]??:disabled} rounded d-flex align-items-center justify-content-center">		
-				<img class="img-fluid" src="/-imager/?h=80&src={ico}">
+				<img class="img-fluid" src="/-imager/?h=80&w=135&src={ico}">
 			</div>
 			<div class="title"><big>{~key}</big></div>
 		</div>
