@@ -20,7 +20,8 @@
 		import { Cart } from '/vendor/infrajs/cart/Cart.js'
 		import { Global } from '/vendor/infrajs/layer-global/Global.js'
 		import { Popup } from '/vendor/infrajs/popup/Popup.js'
-		let Template
+		import { Template } from '/vendor/infrajs/template/Template.js'
+		//let Template
 		
 		
 		CDN.fire('load',"jquery.autocomplete").then(() => {
@@ -38,7 +39,7 @@
 				triggerSelectOnValidInput:false,
 				showNoSuggestionNotice:true,
 				onSearchStart: async () => {
-					Template = (await import('/vendor/infrajs/template/Template.js')).Template
+					//Template = (await import('/vendor/infrajs/template/Template.js')).Template
 				},
 				serviceUrl: function (q) {
 					query = q;
