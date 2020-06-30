@@ -29,7 +29,7 @@
 						Итого со скидкой: <b class="carttotal" style="font-size:140%">{total:itemcostrub}</b> 
 					</p>
 					<div class="d-flex text-center text-sm-right flex-column">
-						<div><a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-success">Перейти к {data.order.id?:заказу {data.order.id}?:оформлению заказа}</a></div>
+						<div class="mb-2"><a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-success">Перейти к {data.order.id?:заказу {data.order.id}?:оформлению заказа}</a></div>
 						<div>Займёт не более 3 минут.</div>
 					</div>
 				</div>
@@ -266,21 +266,21 @@
 				</div>
 			</form>
 			<div class="my-3 mb-4 row">
-				<div class="col-sm-6">
-					<div>Комментарий к заказу</div>
+				<div class="col-sm-6 mb-2">
+					<div class="mb-2">Комментарий к заказу</div>
 					<textarea {:isdisabled} name="comment" class="form-control" rows="3">{order.comment}</textarea>
 				</div>
 				<div class="col-sm-6">
-					<div>Звонок менеджера</div>
+					<div class="mb-1">Звонок менеджера</div>
 					<div class="form-check mt-1">
 						<input {:isdisabled} class="form-check-input" type="radio" name="call" {order.call=:yes?:checked} id="exampleRadios1" value="yes">
-						<label class="form-check-label" for="exampleRadios1">
+						<label class="ml-1 form-check-label" for="exampleRadios1">
 							Мне нужен звонок менеджера для уточнения деталей заказа.
 						</label>
 					</div>
-					<div class="form-check">
+					<div class="form-check mt-1">
 						<input {:isdisabled} class="form-check-input" type="radio" name="call" {order.call=:no?:checked} id="exampleRadios2" value="no">
-						<label class="form-check-label" for="exampleRadios2">
+						<label class="ml-1 form-check-label" for="exampleRadios2">
 							Звонок не нужен, информация по заказу понятна.
 						</label>
 					</div>
@@ -501,7 +501,7 @@
 	{pay:}
 		<div data-value="{~key}" class="item m-2">
 			<div class="body {data.order.rule.edit[data.place]??:disabled} rounded d-flex align-items-center justify-content-center">		
-				<img class="img-fluid" src="/-imager/?h=80&w=135&src={ico}">
+			<img style="{icostyle}" class="img-fluid" src="/-imager/?h=80&w=135&src={ico}">
 			</div>
 			<div class="title"><big>{~key}</big></div>
 		</div>
