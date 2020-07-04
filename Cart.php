@@ -524,7 +524,7 @@ class Cart {
 				Session::set('orders.my', $order);//Исключение, данные заявки
 				return;
 			} else {
-				$today = (int) ((date('m')+10).(date('j')+10).'00');
+				$today = (int) ((date('m')+10).(date('j')+10));
 				$last_day = Mem::get('cart_last_day');
 				$sym = Cart::$conf['hostnum'];
 				if ($last_day == $today) {
@@ -534,9 +534,17 @@ class Cart {
 				} else {
 					$num = 0;
 				}
-				$id = $sym . ($today + $num);
 				Mem::set('cart_last_day', $today);
 				Mem::set('cart_last_num', $num);
+
+				if ($num < 100) {
+					$today = (int) ($today.'00');
+					$id = $sym . ($today + $num);
+				} else {
+					$id = $sym . $today . $num;
+				}
+				
+				
 				
 				$src = Cart::getPath($id);
 			}

@@ -264,28 +264,29 @@
 				<div class="accordion" id="accordionorder">
 					{:basket.ORDER}
 				</div>
+				
+				<div class="my-3 mb-4 row">
+					<div class="col-sm-6 mb-2">
+						<div class="mb-2">Комментарий к заказу</div>
+						<textarea {:isdisabled} name="comment" class="form-control" rows="3">{order.comment}</textarea>
+					</div>
+					<div class="col-sm-6">
+						<div class="mb-1">Звонок менеджера</div>
+						<div class="form-check mt-1">
+							<input {:isdisabled} class="form-check-input" type="radio" name="call" {order.call=:yes?:checked} id="exampleRadios1" value="yes">
+							<label class="ml-1 form-check-label" for="exampleRadios1">
+								Мне нужен звонок менеджера для уточнения деталей заказа.
+							</label>
+						</div>
+						<div class="form-check mt-1">
+							<input {:isdisabled} class="form-check-input" type="radio" name="call" {order.call=:no?:checked} id="exampleRadios2" value="no">
+							<label class="ml-1 form-check-label" for="exampleRadios2">
+								Звонок не нужен, информация по заказу понятна.
+							</label>
+						</div>
+					</div>
+				</div>
 			</form>
-			<div class="my-3 mb-4 row">
-				<div class="col-sm-6 mb-2">
-					<div class="mb-2">Комментарий к заказу</div>
-					<textarea {:isdisabled} name="comment" class="form-control" rows="3">{order.comment}</textarea>
-				</div>
-				<div class="col-sm-6">
-					<div class="mb-1">Звонок менеджера</div>
-					<div class="form-check mt-1">
-						<input {:isdisabled} class="form-check-input" type="radio" name="call" {order.call=:yes?:checked} id="exampleRadios1" value="yes">
-						<label class="ml-1 form-check-label" for="exampleRadios1">
-							Мне нужен звонок менеджера для уточнения деталей заказа.
-						</label>
-					</div>
-					<div class="form-check mt-1">
-						<input {:isdisabled} class="form-check-input" type="radio" name="call" {order.call=:no?:checked} id="exampleRadios2" value="no">
-						<label class="ml-1 form-check-label" for="exampleRadios2">
-							Звонок не нужен, информация по заказу понятна.
-						</label>
-					</div>
-				</div>
-			</div>
 			{order:info}
 			{crumb.parent.name=:admin?:adminactions?:useractions}
 			<div class="d-md-none" style="clear:both"></div>	
@@ -469,14 +470,16 @@
 				})
 			</script>
 			{trans:}
-			<div data-value="{~key}" class="item d-flex flex-column border rounded m-1 p-1">
-				<div class="d-flex mb-auto title">
-					<div><img class="mr-1" src="/-imager/?w=40&src={ico}"></div><div style="text-transform: uppercase;">{~key}</div>
-				</div>
-				<div>
-					<b>{cost}</b><br>
-					{term} 
-					<span class="morelink ml-1 a float-right">Подробней</span>
+			<div data-value="{~key}" class="item text-left">
+				<div class="body d-flex flex-column rounded m-1 px-2 p-1">
+					<div class="d-flex mb-auto title">
+						<div><img class="mr-1" src="/-imager/?w=40&src={ico}"></div><div style="text-transform: uppercase;">{~key}</div>
+					</div>
+					<div>
+						<b>{cost}</b><br>
+						{term} 
+						<!-- <span class="morelink ml-1 a float-right">Подробней</span> -->
+					</div>
 				</div>
 			</div>
 {paycard:}
