@@ -38,7 +38,9 @@ class Paykeeper
 
 		if ($key != $mykey) return Paykeeper::err($ans, 'Данные повреждены. Код PK001');
 		if (!$orderid) return Paykeeper::err($ans, 'Нет информации о заказе. Код PK005');
-		if (!Cart::canI($orderid)) return Paykeeper::err($ans, 'У вас нет доступа к заказу. Код PK003');
+		
+		//Системный вызов, доступ не проверяем
+		//if (!Cart::canI($orderid)) return Paykeeper::err($ans, 'У вас нет доступа к заказу. Код PK003');
 
 		$order = Cart::loadOrder($orderid);
 		if (!$order) return Paykeeper::err($ans, 'Заказ не найден. Код PK002');
