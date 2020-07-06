@@ -31,7 +31,7 @@ class Paykeeper
 		$payment_data = array(
 			"pay_amount" => number_format($amount, 2,'.',''),
 			"clientid" => $fio,
-			"orderid" => '№' . $orderid . ' на ' . View::getHost(),
+			"orderid" => $orderid . ' на ' . View::getHost(),
 			"client_email" => $email,
 			"service_name" => "Заказ",
 			"client_phone" => $phone
