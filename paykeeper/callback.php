@@ -3,24 +3,34 @@
 use infrajs\ans\Ans;
 use infrajs\config\Config;
 use infrajs\cart\Cart;
+use infrajs\load\Load;
 
 $ans = array();
 $info = $_POST;
-$ans['info'] = $info;
+
 $conf = Config::get('cart');
 $conf = $conf['paykeeper'];
 
-$json = json_encode($info, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-file_put_contents('data/auto/.paykeepercallback.json', $json);
 
+$save = 'data/auto/.paykeepercallback.json';
+
+//$info = Load::loadJSON($save);
+//$_REQUEST = $info;
+
+$json = json_encode($info, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+file_put_contents($save, $json);
+
+
+$ans['info'] = $info;
 $secret = $conf['secret'];
-$paymentid = Ans::req('id');
-$sum = Ans::req('sum');
-$clientid = Ans::req('clientid'); //fio + (email)
-$orderid = Ans::req('orderid');
-$key = Ans::req('key');
+$paymentid = Ans::REQ('id');
+$sum = Ans::REQ('sum');
+$clientid = Ans::REQ('clientid'); //fio + (email)
+$orderid = Ans::REQ('orderid');
+$key = Ans::REQ('key');
 
 $mykey = md5($paymentid . number_format($sum, 2, ".", "") . $clientid . $orderid . $secret);
+
 if ($key != $mykey) return Ans::err($ans, 'Данные повреждены. Код PK001');
 if (!$orderid) return Ans::err($ans, 'Нет информации о заказе. Код PK005');
 if (!Cart::canI($orderid)) return Ans::err($ans, 'У вас нет доступа к заказу. Код PK003');
