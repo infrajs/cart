@@ -24,10 +24,13 @@ class Paykeeper
 		$conf = Config::get('cart');
 		$conf = $conf['paykeeper'];
 		$secret = $conf['secret'];
-
-		$info = Load::loadJSON('data/auto/.paykeepercallback.json');
-		$ans['info'] = $info;
 		
+		//$info = Load::loadJSON('data/auto/.paykeepercallback.json');
+		//$ans['info'] = $info;
+		
+		foreach(['id','sum','clientid','orderid','key'] as $k) {
+			if(empty($info[$k])) return Paykeeper::err($ans, 'Недостаточно данных. Код PK008');
+		}
 		$paymentid = $info['id'];
 		$sum = $info['sum'];
 		$clientid = $info['clientid']; //fio + (email)
