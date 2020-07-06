@@ -26,6 +26,7 @@ class Sbrfpay {
 
 		$vars['userName'] = $conf['userName'];
 		$vars['password'] = $conf['password'];
+		$vars['server'] = $conf['server'];
 		
 		/* ID заказа в магазине */
 
@@ -80,7 +81,7 @@ class Sbrfpay {
 		//echo $vars['expirationDate'];
 		//exit;
 
-		$ch = curl_init('https://3dsec.sberbank.ru/payment/rest/register.do?' . http_build_query($vars));
+		$ch = curl_init($vars['server'].'/payment/rest/register.do?' . http_build_query($vars));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_HEADER, false);
@@ -97,8 +98,9 @@ class Sbrfpay {
 		$vars['userName'] = $conf['userName'];
 		$vars['password'] = $conf['password'];
 		$vars['orderId'] = $orderId;
+		$vars['server'] = $conf['server'];
 		 
-		$ch = curl_init('https://3dsec.sberbank.ru/payment/rest/getOrderStatusExtended.do?' . http_build_query($vars));
+		$ch = curl_init($vars['server'].'/payment/rest/getOrderStatusExtended.do?' . http_build_query($vars));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_HEADER, false);

@@ -24,6 +24,7 @@
 	"testerjs":".tester.js",
 	"dependencies":["path","event","catalog","session","showcase"],
 	"sbrfpay":{
+		"server":"https://3dsec.sberbank.ru",
 		"userName":"",
 		"password":""
 	},
