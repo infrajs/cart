@@ -243,21 +243,14 @@
 			<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-info" role="alert"><b>Сообщение менеджера</b>
 					<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
 			</div>
-		{sbrfpay:}
-			{orderStatus=:2?:sbrfpaygood}
-		{2:}2
-		{sbrfpaygood:}
-			<p>{orderDescription}</p>
-			<table style="width:auto" class="table table-sm table-striped">
-				<tr><th>Оплачено</th><td>{~date(:d.m.Y H:i,authDateTime)}</td></tr>
-				<tr><th>Сумма</th><td>{~cost(total)}{:model.unit}</td></tr>
-			</table>
+		{paylayout::}-cart/sbrfpay/layout.tpl
 		{checked:}checked
 		{orderPageContent:}
 			<div class="float-right" title="Последние измения">{~date(:j F H:i,order.time)}</div>
 			<h1>{order.rule.title} {order.id}</h1>
 			{order.manage.comment?order:showManageComment}
-			{order.sbrfpay.info:sbrfpay}
+
+			{order:paylayout.INFO}
 			
 			<form class="form"
 				data-autosave="{autosavename}">
@@ -290,31 +283,19 @@
 			{order:info}
 			{crumb.parent.name=:admin?:adminactions?:useractions}
 			<div class="d-md-none" style="clear:both"></div>	
-			{data.fields.pay.Оплатить онлайн?:sbrfpayinfo}
-			
-
-			{sbrfpayinfo:}
-				<div id="sbrfpayinfo">
+			{data.fields.pay.Оплатить онлайн?:paydescr}
+			{paydescr:}
+				<div id="paydescr">
 					<style>
-						#sbrfpayinfo {
+						#paydescr {
 							display: none
 						}
 					</style>
-					
-						<i>После нажатия на кнопку <b>Оплатить</b> откроется платёжный шлюз <b>ПАО&nbsp;СБЕРБАНК</b>, где будет предложено ввести платёжные данные карты для оплаты заказа.
-						Введённая информация не будет предоставлена третьим лицам за исключением случаев, предусмотренных законодательством РФ. 
-						Оплата происходит с использованием карт следующих платёжных систем:</i>
-					
-					<center>
-						<img class="img-fluid my-3" src="/vendor/infrajs/cart/sbrfpay/cards.png">
-					</center>
-					<p>
-						Ознакомьтесь с информацией <a href="/company">о компании</a>, <a href="/contacts">контакты и реквизиты</a>, <a href="/guaranty">гарантийные условия</a>, <a href="/terms">политика конфиденциальности</a>, <a href="/return">возврат и обмен</a>.
-					</p>
+					{order:paylayout.DESCR}
 				</div>
 				<script type="module">
 					import { Cart } from '/vendor/infrajs/cart/Cart.js'
-					let info = document.getElementById('sbrfpayinfo')
+					let info = document.getElementById('paydescr')
 					Cart.done('choicepay', value => {
 						if (value == 'Оплатить онлайн') {
 							info.style.display = 'block'
@@ -478,7 +459,6 @@
 					<div>
 						<b>{cost}</b><br>
 						{term} 
-						<!-- <span class="morelink ml-1 a float-right">Подробней</span> -->
 					</div>
 				</div>
 			</div>
@@ -501,14 +481,20 @@
 		Cart.initChoiceBtn(cards)
 		
 	</script>
+	{paybig:}
+		<div data-value="{~key}" class="item m-2">
+			<div style="height:145px" class="body {data.order.rule.edit[data.place]??:disabled} rounded d-flex align-items-center justify-content-center">
+				<img style="{icostyle}" class="img-fluid" src="/-imager/?h=124&src={ico}">
+			</div>
+			<div class="title"><big>{title|~key}</big></div>
+		</div>
 	{pay:}
 		<div data-value="{~key}" class="item m-2">
-			<div class="body {data.order.rule.edit[data.place]??:disabled} rounded d-flex align-items-center justify-content-center">		
+			<div style="height:100px;" class="body {data.order.rule.edit[data.place]??:disabled} rounded d-flex align-items-center justify-content-center">		
 			<img style="{icostyle}" class="img-fluid" src="/-imager/?h=80&w=135&src={ico}">
 			</div>
-			<div class="title"><big>{~key}</big></div>
-		</div>
-		
+			<div class="title"><big>{title|~key}</big></div>
+		</div>	
 	{disabled:}disabled
 {fiocard:}
 	<div class="cartcontacts row">
@@ -540,61 +526,6 @@
 			<div data-value="{~key}" class="pt-2 iteminfo">{:basket.fields.{tpl}}</div>
 	{payinfo:}
 			<div data-value="{~key}" class="pt-2 iteminfo"><div class="m-1 alert border more">{:basket.fields.{tpl}}</div></div>
-	{jsitem:}
-		//script>
-		var div = $('.'+name+'card')
-		if (name == 'pay') var value = await Autosave.get("{autosavename}", name+'.choice','{data.order.pay.choice}');
-		else var value = await Autosave.get("{autosavename}", name+'.choice','{data.order.transport.choice}');
-
-		var first = false;
-
-		div.find('.item').click( function (){
-			if (first && !{data.order.rule.edit[data.place]?:true?:false}) return;
-			first = true;
-			
-			div.find('.item.active').not(this).removeClass('active');
-			let value = $(this).data('value');
-			Cart.emit('choice' + name, value)
-			
-			if ($(this).is('.active')) {
-				value = false;
-				$(this).removeClass('active');
-				Autosave.set("{autosavename}", name+'.choice');
-			} else {
-				$(this).addClass('active');
-				Autosave.set("{autosavename}", name+'.choice', value);
-			}
-			
-
-			div.find('.iteminfo').hide();
-			if (value) div.find('.iteminfo').each( function () {
-				if ($(this).data('value') == value) {
-					$(this).fadeIn();
-				}
-			});
-			Autosave.loadAll("{autosavename}","{div}");
-	
-		}).each(function(){
-			if ($(this).data('value') == value) {
-				$(this).click();
-			}
-		});
-		first = true;
-		div.find('.morelink').click( function (event){
-			var item = $(this).parents('.item');
-			var value = item.data('value');
-			if (item.is('.active')) {
-				event.stopPropagation();
-			} 
-			div.find('.iteminfo').each( function () {
-				if ($(this).data('value') == value) {
-					if (item.is('.active')) $(this).find('.more').slideToggle();
-					else $(this).find('.more').show();
-				}
-			});
-			
-		});
-		//< /script>
 		{myactions:}
 			<div style="margin:20px 0;" class="cart">
 				<div class="btn-toolbar" role="toolbar">
@@ -866,8 +797,6 @@
 	{extend::}-catalog/extend.tpl
 	{model::}-catalog/model.tpl
 	{basket::}-cart/basket.tpl
-
-
 	{totalwarn:} <i title="установлено менеджером">*</i>
 	{noemail:}<b>ещё не отправлялось</b>{wasemail:}было <b>{~date(:j F H:i,order.emailtime)}</b>
 	{mngdelivery:}
@@ -903,15 +832,6 @@
 		<!--<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заявка {crumb.parent.name=:my?:Активная?crumb.parent.name}</a></li>-->
 		<li class="breadcrumb-item active">Содержимое корзины</li>
 		<li class="breadcrumb-item"><a href="/cart/{data.place}/{data.order.id|:my}">Оформление заказа {data.order.id}</a></li>
-	</ol>
-{utilcrumb:}
-	{:usersync}
-	<ol class="breadcrumb">
-		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
-		{data.place=:admin?:liallorder}
-		<li class="breadcrumb-item"><a class="{data.place=:admin?:text-danger}" href="/cart/{data.place}/{data.order.id|:my}/list">Содержимое корзины</a>
-		<li class="breadcrumb-item"><a href="/cart/{data.place}/{data.order.id|:my}">Оформление заказа {data.order.id}</a></li>
-		<li class="breadcrumb-item active">{.}</li>
 	</ol>
 {ordercrumb:}
 	{:usersync}

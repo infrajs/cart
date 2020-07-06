@@ -85,7 +85,7 @@ let Cart = {
 		let div = document.getElementsByClassName('cart')[0]
 		if (div) {
 			await CDN.fire('load','jquery')
-			Autosave = (await import('/vendor/akiyatkin/form/Autosave.js')).Autosave
+			let { Autosave } = await import('/vendor/akiyatkin/form/Autosave.js')
 			var inps = Autosave.getInps(div);
 			for (let inp of inps) {
 				if (inp.name == 'email') {
@@ -360,15 +360,13 @@ let Cart = {
 
 Cart.initChoiceBtn = async div => {
 	await Session.async()
-	Autosave = (await import('/vendor/akiyatkin/form/Autosave.js')).Autosave
+	let { Autosave } = await import('/vendor/akiyatkin/form/Autosave.js')
 	let name = div.dataset.name
 	let autosavename = div.dataset.autosave
 	let editable = div.dataset.editable
-	let value = await Autosave.get(autosavename, name+'.choice', div.dataset.value) //defvalue
-	if (value) Autosave.set(autosavename, name + '.choice', value)
+	
 	let cls = cls => div.getElementsByClassName(cls)
 	let checkinfo = (value) => {
-
 		for (let info of cls('iteminfo')) {
 
 			if (info.dataset.value == value) {
@@ -380,48 +378,37 @@ Cart.initChoiceBtn = async div => {
 			}
 		}
 	}
-	var first = false;
-	for (let item of cls('item')) {
-		
-		item.addEventListener('click', async () => {
-			if (first && !editable) return
-			first = true
-			for (let active of cls('active')) {
-				if (active == item) continue
-				active.classList.remove('active')
-			}
-
-			let value = item.dataset.value
-			Cart.elan('choice' + name, value)
-			
-			if (item.classList.contains('active')) {
-				value = false;
-				item.classList.remove('active');
-				Autosave.set(autosavename, name + '.choice');
-			} else {
-				item.classList.add('active');
-				Autosave.set(autosavename, name + '.choice', value);
-			}
-			checkinfo(value)
-			
-			
-			Autosave.loadAll(div, autosavename)
-			Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
-			Global.set('cart')
-		})
-		if (item.dataset.value == value) {
-
-			item.dispatchEvent(new Event('click'))
+	let activateItem = async function () {
+		let item = this
+		for (let active of cls('active')) {
+			if (active == item) continue
+			active.classList.remove('active')
 		}
+
+		let value = item.dataset.value
+		Cart.elan('choice' + name, value)
+		
+		if (item.classList.contains('active')) {
+			value = false;
+			item.classList.remove('active');
+			Autosave.set(autosavename, name + '.choice');
+		} else {
+			item.classList.add('active');
+			Autosave.set(autosavename, name + '.choice', value);
+		}
+		checkinfo(value)
+		Autosave.loadAll(div, autosavename)
+		Global = (await import('/vendor/infrajs/layer-global/Global.js')).Global
+		Global.set('cart')
 	}
-	
-	for (let more of cls('morelink')) {
-		more.addEventListener('click', async event => {
-			var item = more.closest('.item')
-			var value = item.dataset.value
-			if (item.classList.contains('active')) event.stopPropagation();
-			checkinfo(value)
-		})
+	let value = div.dataset.value
+	if (editable) {
+		value = await Autosave.get(autosavename, name+'.choice', value) //data.value or defvalue
+		if (value) Autosave.set(autosavename, name + '.choice', value)
+	}
+	for (let item of cls('item')) {
+		if (editable) item.addEventListener('click', activateItem)
+		if (item.dataset.value == value) activateItem.bind(item)()
 	}
 }
 

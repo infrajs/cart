@@ -130,6 +130,14 @@ if ($action == 'saved') {
 	if ($status == 'active') {
 		Cart::clearActiveSession();
 	}
+} else if ($action == 'paykeeper') {
+	$ogood = Cart::getGoodOrder($orderid);
+	if (empty($ogood['alltotal'])) return Ans::err($ans, 'Ошибка. У заказа нет стоимости.');
+	$order['status'] = 'paykeeper';
+	Cart::saveOrder($order, $place);
+	if ($status == 'active') {
+		Cart::clearActiveSession();
+	}
 } else if ($action == 'check') {
 	$order['status'] = 'check';
 	Cart::saveOrder($order, $place);

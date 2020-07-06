@@ -93,23 +93,24 @@ if (empty($_GET['orderId'])) {
 	
 	if (empty($order['sbrfpay']) || $order['sbrfpay']['orderId'] != $orderId) return Ans::err($ans, 'Ссылка устарела. Код 002');
 	
-	
-	$info = Sbrfpay::getInfo($orderId);
-
-	if ($info['orderStatus'] == 2) { //Вся сумма авторизирована
-		//Оплачено и статус меняется
-		$order['sbrfpay']['info'] = $info;
-		$order['status'] = 'check';
-		Cart::saveOrder($order, $place);
-		$ans['order'] = $order;
-		$ans['msg'] = 'Заказ оплачен';
-		return Cart::ret($ans, 'check');
-	} else {
-		//Cart::saveOrder($order, $place);
-		$ans['order'] = $order;
-		return Ans::err($ans, $info['actionCodeDescription'].' Код банка '.$info['errorCode'].'.');
+	if ($order['status'] == 'sbrfpay') {
+		$info = Sbrfpay::getInfo($orderId);
+		if ($info['orderStatus'] == 2) { //Вся сумма авторизирована
+			//Оплачено и статус меняется
+			$order['sbrfpay']['info'] = $info;
+			$order['status'] = 'check';
+			Cart::saveOrder($order, $place);
+			$ans['order'] = $order;
+			$ans['msg'] = 'Заказ оплачен';
+			return Cart::ret($ans, 'check');
+		} else {
+			//Cart::saveOrder($order, $place);
+			$ans['order'] = $order;
+			return Ans::err($ans, $info['actionCodeDescription'].' Код банка '.$info['errorCode'].'.');
+		}
 	}
+	$ans['order'] = $order;
+	return Ans::ret($ans);
 	
-
 }
 

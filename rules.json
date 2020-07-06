@@ -77,6 +77,25 @@
 				"actions":["check","print"]
 			}
 		},
+		"paykeeper":{
+			"freeze":true,
+			"notice":"info",
+			"edit":{
+				"orders":false,
+				"admin":false
+			},
+			"caption":"Заказы ожидающие оплату",
+			"short":"Ожидает оплату",
+			"title":"Заказ ожидает оплату",
+			"user":{
+				"buttons":{"basket":"secondary","paykeeper":"success"},
+				"actions":["sync","print"]
+			},
+			"manager":{
+				"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
+				"actions":["complete","delete","sync","print"]
+			}
+		},
 		"sbrfpay":{
 			"freeze":true,
 			"notice":"info",
@@ -108,6 +127,18 @@
 			"go":{
 				"orders":"/cart/orders/{id}/sbrfpay",
 				"admin":"/cart/admin/{id}/sbrfpay"
+			}
+		},
+		"paykeeper":{
+			"checkdata":true,
+			"title":"Оплатить",
+			"gohistory":{
+				"orders":"/cart/orders/{id}",
+				"admin":"/cart/admin/{id}"
+			},
+			"go":{
+				"orders":"/cart/orders/{id}/paykeeper",
+				"admin":"/cart/admin/{id}/paykeeper"
 			}
 		},
 		"print":{

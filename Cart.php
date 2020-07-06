@@ -229,12 +229,13 @@ class Cart {
 				$order['manage']['deliverycost'] = preg_replace('/\s/','',$order['manage']['deliverycost']);
 				$order['alltotal']+=$order['manage']['deliverycost'];
 			}
-			if ($order['status'] == 'sbrfpay' 
+			
+			/*if ($order['status'] == 'sbrfpay' 
 				&& isset($order['sbrfpay']['orderId']) 
 				&& empty(isset($order['sbrfpay']['info'])) ) {
 				//Есть информация что выдана ссылка, и нет информации об оплате
 				//Такое может быть если человек не переходил по ссылке success
-			}
+			}*/
 
 			Event::fire('Order.calc', $order);
 			return $order;
@@ -249,6 +250,7 @@ class Cart {
 		Session::set('orders.my.comment');
 		Session::set('orders.my.manage');
 		Session::set('orders.my.sbrfpay');
+		Session::set('orders.my.paykeeper');
 	}
 	public static function couponCheck($coupon, &$pos) {
 		$r = true;
@@ -612,7 +614,7 @@ class Cart {
 			);
 		} else {
 			unset($order['fixid']);
-			if($place == 'orders') {
+			if ($place == 'orders' || empty($order['time'])) {
 				$order['time'] = time();
 			}
 			$order['id'] = $id;

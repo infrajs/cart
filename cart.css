@@ -46,13 +46,12 @@
 }
 
 .cart .item {
-	width:149px;
+	width: 149px;
 	text-align: center;
 }
 .cart .item .body {
 	border:solid 2px gainsboro;
-	display:flex; 
-	height:100px;
+	display:flex;
 }
 .cart .item .title {
 	margin-top:5px;

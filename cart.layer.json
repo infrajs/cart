@@ -23,6 +23,9 @@
 					"sbrfpay":{
 						"external":"-cart/sbrfpay/layer.json"
 					},
+					"paykeeper":{
+						"external":"-cart/paykeeper/layer.json"
+					},
 					"list":{					
 						"tpl":"-cart/cart.tpl",
 						"tplroot":"LIST",

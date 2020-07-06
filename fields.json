@@ -35,16 +35,14 @@
 	"paydefault":"Оплатить при получении заказа",
 	"pay":{
 		"Оплатить при получении заказа":{
-			"ico":"-cart/images/recive.jpg",
-			"tpl":"PAYRECIVE"
+			"ico":"-cart/images/recive.jpg"
 		},
 		"Оплатить по счёту для юридических лиц":{
-			"ico":"-cart/images/bank.png",
-			"tpl":"PAYBANK"
+			"ico":"-cart/images/bank.png"
 		},
 		"Оплатить онлайн":{
-			"ico":"-cart/images/mastercard.png",
-			"tpl":"PAYCARD"	
+			"layout":"-cart/sbrfpay/layout.tpl",
+			"ico":"-cart/images/mastercard.png"
 		}
 	}
 }

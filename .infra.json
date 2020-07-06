@@ -27,6 +27,12 @@
 		"userName":"",
 		"password":""
 	},
+	"paykeeper":{
+		"secret":"",
+		"userName":"",
+		"password":"",
+		"server":"demo.server.paykeeper.ru"
+	},
 	"clutch":{
 		"catalog":"vendor/infrajs/cart/",
 		"session":"vendor/infrajs/cart/",
