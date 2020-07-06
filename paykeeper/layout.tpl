@@ -14,15 +14,12 @@
 		</script>
 {INFO:}
 	{paykeeper.info:showinfo}
-	{showinfo:}
-	{~print(.)}
-	<p>Заказ: {orderid}</p>
+	{showinfo:}	
+	<p>Заказ <b>№{orderid}</b> оплачен.</p>
 	<table style="width:auto" class="table table-sm table-striped">
-		<tr><th>Оплачено</th><td>{~date(:d.m.Y H:i,batch_date)}</td></tr>
 		<tr><th>Сумма</th><td>{~cost(sum)}{:model.unit}</td></tr>
-		<tr><th>Телефон покупателя</th><td>{client_phone}</td></tr>
-		<tr><th>Email покупателя</th><td>{client_email}</td></tr>
-		<tr><th>УИН в банке</th><td>{id}</td></tr>
+		<!-- <tr><th>Телефон покупателя</th><td>{client_phone}</td></tr>
+		<tr><th>Email покупателя</th><td>{client_email}</td></tr> -->
 	</table>
 {DESCR:}
 	<i>После нажатия на кнопку <b>Оплатить</b> откроется платёжный шлюз, где будет предложено ввести платёжные данные карты для оплаты заказа.</i>

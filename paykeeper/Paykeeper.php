@@ -4,10 +4,60 @@ namespace infrajs\cart\paykeeper;
 
 use infrajs\config\Config;
 use infrajs\cart\Cart;
-use infrajs\view\View;
+use infrajs\load\Load;
+
 
 class Paykeeper
 {
+	public static function err($ans, $msg) {
+		$ans['msg'] = $msg;
+		$ans['result'] = 0;
+		
+		$json = json_encode($ans, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+		$save = 'data/auto/.paykeeper-callback-error.json';
+		file_put_contents($save, $json);
+
+		return $ans;
+	}
+	public static function callback($info) {
+		$ans = array();
+		$conf = Config::get('cart');
+		$conf = $conf['paykeeper'];
+		$secret = $conf['secret'];
+
+		$info = Load::loadJSON('data/auto/.paykeepercallback.json');
+		$ans['info'] = $info;
+		
+		$paymentid = $info['id'];
+		$sum = $info['sum'];
+		$clientid = $info['clientid']; //fio + (email)
+		$orderid = $info['orderid'];
+		$key = $info['key'];
+
+		$mykey = md5($paymentid . number_format($sum, 2, ".", "") . $clientid . $orderid . $secret);
+
+		if ($key != $mykey) return Paykeeper::err($ans, 'Данные повреждены. Код PK001');
+		if (!$orderid) return Paykeeper::err($ans, 'Нет информации о заказе. Код PK005');
+		if (!Cart::canI($orderid)) return Paykeeper::err($ans, 'У вас нет доступа к заказу. Код PK003');
+
+		$order = Cart::loadOrder($orderid);
+		if (!$order) return Paykeeper::err($ans, 'Заказ не найден. Код PK002');
+
+		$ogood = Cart::getGoodOrder($orderid);
+		if(empty($ogood['alltotal'])) return Paykeeper::err($ans, 'Ошибка в стоимости заказа. Код PK007');
+		$amount = $ogood['alltotal'];
+		if (number_format($sum, 2,'.','') != number_format($amount, 2,'.','')) return Paykeeper::err($ans, 'Ошибка с суммой заказа. Код PK004');
+
+		if(!isset($order['paykeeper'])) return Paykeeper::err($ans, 'Ошибка инициации оплаты. Код PK006');
+		$order['paykeeper']['info'] = $info;
+		$order['status'] = 'check';
+		$place = 'orders';
+		Cart::saveOrder($order, $place);
+
+		$ans['result'] = 1;
+		$ans['msg'] = "OK " . md5($paymentid . $secret);
+		return $ans;
+	}
 	public static function getLink($orderid, $amount, $email, $phone, $fio)
 	{
 		$conf = Config::get('cart');
@@ -82,37 +132,37 @@ class Paykeeper
 		# Теперь её можно использовать как угодно, например, выводим ссылку на оплату
 		return $link;
 	}
-	public static function getInfo($orderId)
-	{
-		$conf = Config::get('cart');
-		$conf = $conf['paykeeper'];
+	// public static function getInfo($orderId)
+	// {
+	// 	$conf = Config::get('cart');
+	// 	$conf = $conf['paykeeper'];
 
-		# Логин и пароль любого пользователя личного кабинета
-		$user = $conf['userName'];
-		$password = $conf['password'];
-		$server = $conf['server'];
+	// 	# Логин и пароль любого пользователя личного кабинета
+	// 	$user = $conf['userName'];
+	// 	$password = $conf['password'];
+	// 	$server = $conf['server'];
 
-		# параметры запроса
-		$auth_header =  array(
-			'Authorization: Basic ' . base64_encode("$user:$password")
-		);
-		$request_headers = array_merge(
-			$auth_header,
-			array("Content-type: application/x-www-form-urlencoded")
-		);
+	// 	# параметры запроса
+	// 	$auth_header =  array(
+	// 		'Authorization: Basic ' . base64_encode("$user:$password")
+	// 	);
+	// 	$request_headers = array_merge(
+	// 		$auth_header,
+	// 		array("Content-type: application/x-www-form-urlencoded")
+	// 	);
 
-		$context = stream_context_create(array(
-			'http' => array(
-				'method' => 'GET',
-				'header' => $request_headers
-			)
-		));
+	// 	$context = stream_context_create(array(
+	// 		'http' => array(
+	// 			'method' => 'GET',
+	// 			'header' => $request_headers
+	// 		)
+	// 	));
 
-		$src = "/info/payments/byid/";
-		$res = json_decode(file_get_contents("http://$server" . $src . "?id=$orderId", FALSE, $context), TRUE);
+	// 	$src = "/info/payments/byid/";
+	// 	$res = json_decode(file_get_contents("http://$server" . $src . "?id=$orderId", FALSE, $context), TRUE);
 
 
 
-		return $res;
-	}
+	// 	return $res;
+	// }
 }
