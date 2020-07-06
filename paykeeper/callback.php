@@ -10,11 +10,13 @@ $ans['info'] = $info;
 $conf = Config::get('cart');
 $conf = $conf['paykeeper'];
 
+$json = json_encode($info, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+file_put_contents('data/auto/.paykeepercallback.json', $json);
 
 $secret = $conf['secret'];
 $paymentid = Ans::req('id');
 $sum = Ans::req('sum');
-$clientid = Ans::req('clientid'); //email
+$clientid = Ans::req('clientid'); //fio + (email)
 $orderid = Ans::req('orderid');
 $key = Ans::req('key');
 

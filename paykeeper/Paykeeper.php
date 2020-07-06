@@ -29,8 +29,8 @@ class Paykeeper
 		# Параметры платежа, сумма - обязательный параметр
 		# Остальные параметры можно не задавать
 		$payment_data = array(
-			"pay_amount" => number_format($amount, 2,'.',''),
-			"clientid" => $fio,
+			"pay_amount" => number_format($amount, 2, '.', ''),
+			"clientid" => $fio . ' (' . $email . ')',
 			"orderid" => $orderid . ' на ' . View::getHost(),
 			"client_email" => $email,
 			"service_name" => "Заказ",
