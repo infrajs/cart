@@ -21,11 +21,11 @@ $ans['order'] = $order;
 
 if (!$order) return Ans::err($ans, 'Заказ не найден. Код 100');
 
+$fields = Load::loadJSON('-cart/fields.json');
 if (empty($order['pay'])) $order['pay'] = [];
-if (empty($order['pay']['choice'])) $order['pay']['choice'] = 'Оплатить онлайн';
-if ($order['pay']['choice'] != 'Оплатить онлайн') {
-	return Ans::err($ans, 'Ошибка. Выбран несовместимый способ оплаты. Код 105');
-}
+if (empty($order['pay']['choice'])) $order['pay']['choice'] = $fields['paydefault'];
+if ($order['pay']['choice'] != 'Оплатить онлайн') return Ans::err($ans, 'Ошибка. Выбран несовместимый способ оплаты. Код 105');
+
 
 $status = Ans::get('status');
 if (empty($_GET['orderId'])) {

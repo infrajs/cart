@@ -123,6 +123,11 @@ if ($action == 'saved') {
 	Cart::saveOrder($order, $place);//К order применились изменения и после сохранения эти изменения будут доступны другим
 
 } else if ($action == 'sbrfpay') {
+	
+	if (empty($order['pay'])) $order['pay'] = [];
+	if (empty($order['pay']['choice'])) $order['pay']['choice'] = $ans['fields']['paydefault'];
+	if ($order['pay']['choice'] != 'Оплатить онлайн') return Ans::err($ans, 'Ошибка. Выбран несовместимый способ оплаты. Код AC102');
+
 	$ogood = Cart::getGoodOrder($orderid);
 	if (empty($ogood['alltotal'])) return Ans::err($ans, 'Ошибка. У заказа нет стоимости.');
 	$order['status'] = 'sbrfpay';
@@ -131,6 +136,11 @@ if ($action == 'saved') {
 		Cart::clearActiveSession();
 	}
 } else if ($action == 'paykeeper') {
+	
+	if (empty($order['pay'])) $order['pay'] = [];
+	if (empty($order['pay']['choice'])) $order['pay']['choice'] = $ans['fields']['paydefault'];
+	if ($order['pay']['choice'] != 'Оплатить онлайн') return Ans::err($ans, 'Ошибка. Выбран несовместимый способ оплаты. Код AC101');
+
 	$ogood = Cart::getGoodOrder($orderid);
 	if (empty($ogood['alltotal'])) return Ans::err($ans, 'Ошибка. У заказа нет стоимости.');
 	$order['status'] = 'paykeeper';

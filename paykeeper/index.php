@@ -2,6 +2,7 @@
 use infrajs\config\Config;
 use infrajs\cart\Cart;
 use infrajs\ans\Ans;
+use infrajs\load\Load;
 use infrajs\nostore\Nostore;
 use infrajs\cart\paykeeper\Paykeeper;
 
@@ -18,12 +19,11 @@ $order = Cart::loadOrder($orderid);
 $ans['order'] = $order;
 if (!$order) return Ans::err($ans, 'Заказ не найден. Код PK102');
 //if (isset($order['paykeeper']['formUrl'])) return Ans::ret($ans);
-
+$fields = Load::loadJSON('-cart/fields.json');
 if (empty($order['pay'])) $order['pay'] = [];
-if (empty($order['pay']['choice'])) $order['pay']['choice'] = 'Оплатить онлайн';
-if ($order['pay']['choice'] != 'Оплатить онлайн') {
-	return Ans::err($ans, 'Ошибка. Выбран несовместимый способ оплаты. Код PK104');
-}
+if (empty($order['pay']['choice'])) $order['pay']['choice'] = $fields['paydefault'];
+if ($order['pay']['choice'] != 'Оплатить онлайн') return Ans::err($ans, 'Ошибка. Выбран несовместимый способ оплаты. Код PK104');
+
 
 
 
