@@ -314,6 +314,9 @@
 				.act-sbrfpay {
 					display: none
 				}
+				.act-paykeeper {
+					display: none
+				}
 			</style>
 
 			<div class="myactions" data-place="orders">
@@ -328,6 +331,7 @@
 				
 				let actionsbtn = cls('actionsbtn')[0]
 				let paybtn = cls('act-sbrfpay', actionsbtn)[0]
+				if (!paybtn) cls('act-paykeeper', actionsbtn)[0]
 				let checkbtn = cls('act-check', actionsbtn)[0]
 
 				Cart.hand('choicepay', (value) => {
@@ -339,8 +343,10 @@
 					if (is) {
 						for (let act of cls('act-check')) act.style.display = 'none'
 						for (let act of cls('act-sbrfpay')) act.style.display = 'block'
+						for (let act of cls('act-paykeeper')) act.style.display = 'block'
 					} else {
 						for (let act of cls('act-sbrfpay')) act.style.display = 'none'
+						for (let act of cls('act-paykeeper')) act.style.display = 'none'
 						for (let act of cls('act-check')) act.style.display = 'block'
 					}
 
