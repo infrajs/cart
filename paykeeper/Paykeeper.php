@@ -27,7 +27,7 @@ class Paykeeper
 		
 		//$info = Load::loadJSON('data/auto/.paykeepercallback.json');
 		//$ans['info'] = $info;
-		
+		$ans['info'] = $info;
 		foreach(['id','sum','clientid','orderid','key'] as $k) {
 			if(empty($info[$k])) return Paykeeper::err($ans, 'Недостаточно данных. Код PK008');
 		}
