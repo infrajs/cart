@@ -61,7 +61,23 @@ class Paykeeper
 
 		$ans['result'] = 1;
 		$ans['msg'] = "OK " . md5($paymentid . $secret);
+		
+		Paykeeper::mail($order);
 		return $ans;
+	}
+	public static function mail($order, $action = 'check') {
+		if (empty($order['email'])) return;
+		$rules = Load::loadJSON('-cart/rules.json');
+		$rule = $rules['actions'][$action];
+		
+		if (!empty($rule['usermail'])) {
+			$ogood = Cart::getGoodOrder($order);
+			Cart::mail('user', $order['email'], $rule['usermail'], $ogood);
+		}
+		if (!empty($rule['mangmail'])) {
+			$ogood = Cart::getGoodOrder($order);
+			Cart::mail('manager', $order['email'], $rule['mangmail'], $ogood);
+		}
 	}
 	public static function getLink($orderid, $amount, $email, $phone, $fio)
 	{

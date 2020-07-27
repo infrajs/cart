@@ -2,6 +2,7 @@
 use infrajs\config\Config;
 use infrajs\cart\Cart;
 use infrajs\ans\Ans;
+use infrajs\load\Load;
 use infrajs\nostore\Nostore;
 use infrajs\view\View;
 use infrajs\cart\sbrfpay\Sbrfpay;
@@ -64,6 +65,9 @@ if (empty($_GET['orderId'])) {
 
 		$ans['orderId'] = $order['sbrfpay']['orderId'];
 		$ans['formUrl'] = $order['sbrfpay']['formUrl'];
+		$action = 'check';
+		$ans['order'] = $order;
+		return Ans::ret($ans, $action);
 	} else {
 		$ogood = Cart::getGoodOrder($id);
 		if (!$ogood['alltotal']) return Ans::err($ans, 'Отсутствует стоимость заказа. Код 102');
@@ -79,11 +83,9 @@ if (empty($_GET['orderId'])) {
 		$order['sbrfpay']['orderId'] = $ans['orderId'];
 		$order['sbrfpay']['formUrl'] = $ans['formUrl'];
 		Cart::saveOrder($order, $place);
-		
-		
+		$ans['order'] = $order;	
+		return $ans;
 	}
-	$ans['order'] = $order;
-	return Ans::ret($ans);
 } else {
 	$orderId = $_GET['orderId'];
 	if (empty($orderId)) return Ans::err($ans, 'Ссылка устарела. Код 001');

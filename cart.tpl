@@ -318,7 +318,7 @@
 					display: none
 				}
 			</style>
-
+cd
 			<div class="myactions" data-place="orders">
 				{order.rule.user:myactions}
 			</div>

@@ -1,5 +1,5 @@
 {AdmOrderToCheck:}
-	<p>Заказ <b>{id}</b> от {~date(:j.m.Y,time)} {sbrfpay.info.orderStatus=:2?:payd?:rec} и ожидает проверки.</p>
+	<p>Заказ <b>{id}</b> от {~date(:j.m.Y,time)} {:payorrec} и ожидает проверки.</p>
 	{:cart.printorder}
 	{:AdmLinks}
 {AdmLinks:}
@@ -7,12 +7,13 @@
 		<a href="http://{site}/cart/admin/{id}">Заказ {id}</a><br>
 		<a href="http://{site}">{site}</a>
 	</p>
+{payorrec:}{(sbrfpay.info.orderStatus=:2|paykeeper.info)?:payd?:rec}
 {cart::}-cart/cart.tpl
 {payd:}<b>оплачен</b>
 {rec:}принят
 {2:}2
 {orderToCheck:}
-	<p>{name}, Ваш заказ <b>{id}</b> от {~date(:j.m.Y,time)} {sbrfpay.info.orderStatus=:2?:payd?:rec} и ожидает проверки. После проверки позиций в заказе, с вами свяжется наш менеджер для подтверждения и уточнения деталей заказа.</p>
+	<p>{name}, Ваш заказ <b>{id}</b> от {~date(:j.m.Y,time)} {:payorrec} и ожидает проверки. После проверки позиций в заказе, с вами свяжется наш менеджер для подтверждения и уточнения деталей заказа.</p>
 	<p>Отслеживать состояние заказа можно в <a href="{link}&src=cart">личном кабинете</a>.</p>
 	{:cart.printorder}
 	<p>
