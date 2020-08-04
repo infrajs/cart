@@ -12,6 +12,7 @@
         "infrajs/event":"~1",
         "akiyatkin/goal":"~1",
         "infrajs/controller":"~1",
+        "akiyatkin/city":"~1",
     	"infrajs/doc":"~1",
     	"infrajs/excel":"~1",
         "infrajs/imager":"~1",

@@ -23,6 +23,10 @@
 	"tester":"tester.php",
 	"testerjs":".tester.js",
 	"dependencies":["path","event","catalog","session","showcase"],
+	"lang":{
+		"def":"ru",
+		"list":["ru","en"]
+	},
 	"sbrfpay":{
 		"server":"https://3dsec.sberbank.ru",
 		"userName":"",

@@ -6,8 +6,21 @@ use infrajs\rest\Rest;
 use infrajs\ans\Ans;
 use infrajs\path\Path;
 
-return Rest::get( function () {
-	echo 'order';
+header('Cache-Control: no-store');
+
+$ans = [];
+
+$lang = Ans::REQ('lang', Cart::$conf['lang']['list'], Cart::$conf['lang']['def']);
+$token = Ans::REQ('token', 'string', '');
+$user = User::fromToken($token);
+$submit = ($_SERVER['REQUEST_METHOD'] === 'POST' || Ans::GET('submit', 'bool'));
+$admin = $user ? in_array($user['email'], User::$conf['admin']) : false;
+
+return Rest::get( function () use ($ans, $user, $submit, $admin, $lang) {
+	$ans['user'] = !empty($user['user_id']);
+	$ans['auth'] = !empty($user['email']);
+	$ans['admin'] = $admin;
+	return Cart::ret($ans, $lang, 'CR001');
 }, 'order', function ($type, $id = ''){
 	$ans = [];
 	$orderid = $id;

@@ -1,10 +1,10 @@
 <?php
-use infrajs\once\Once;
+
+use infrajs\db\Db;
 use infrajs\path\Path;
-use infrajs\cart\Cart;
 
+$db = &Db::pdo();
 
-Path::mkdir('~auto/');
-$src = Cart::getPath();
-Path::mkdir($src);
-Path::mkdir($src.'deleted/');
+$filesql = Path::theme('-cart/update.sql');
+$sql = file_get_contents($filesql);
+$db->exec($sql);
