@@ -802,7 +802,6 @@ cd
 	{cat::}-catalog/cat.tpl
 	{extend::}-catalog/extend.tpl
 	{model::}-catalog/model.tpl
-	{basket::}-cart/basket.tpl
 	{totalwarn:} <i title="установлено менеджером">*</i>
 	{noemail:}<b>ещё не отправлялось</b>{wasemail:}было <b>{~date(:j F H:i,order.emailtime)}</b>
 	{mngdelivery:}
@@ -817,6 +816,13 @@ cd
 			Email: <b>{email}</b><br>
 			Телефон: <b>{phone}</b>
 		</div>
+{EMAIL:}
+	<p>Отправить клиенту на <b>{email}</b> письмо об изменении заказа?</p>
+	<textarea class='w-100' onchange='Session.set(\"{place}.{order_nick}.manage.comment\",$(this).val())'>{Session.get(:name)|manage.comment}</textarea>
+	<p>Письмо {emailtime?:was?:no}</p>
+	{no:}<b>ещё не отправлялось</b>
+	{was:}было <b>{~date(:j F H:i,emailtime)}</b>
+	{name:}{place}.{order_nick}.manage.comment
 {comma:}, 
 {text-danger:}text-danger
 {usersync:}

@@ -10,6 +10,7 @@ use infrajs\access\Access;
 use infrajs\session\Session;
 use infrajs\once\Once;
 use infrajs\mem\Mem;
+use akiyatkin\showcase\Showcase;
 use infrajs\load\Load;
 use infrajs\template\Template;
 use infrajs\each\Each;
@@ -22,43 +23,652 @@ use infrajs\each\Fix;
 use infrajs\user\User;
 use infrajs\view\View;
 use infrajs\lang\Lang;
-
+use infrajs\db\Db;
+use infrajs\lang\LangAns;
+use infrajs\cache\CacheOnce;
+use infrajs\user\UserMail;
 
 class Cart
 {
 	public static $conf = [];
-	public static function lang($lang, $str)
+	public static $name = 'cart';
+	use CacheOnce;
+	use LangAns;
+	use UserMail;
+	public static function mailbefore(&$data)
 	{
-		return Lang::lang($lang, 'cart', $str);
 	}
-	//Без кода ошибки в сообщении
-	public static function err($ans, $lang = null, $code = null)
+	public static function mailafter($data, $r)
 	{
-		if (is_null($code)) return Ans::err($ans);
-		$r = explode('.', $code);
-		$msg = Cart::lang($lang, $r[0]);
-		$ans['code'] = $code;
-		return Ans::err($ans, $msg);
 	}
-	//С кодом ошибки в сообщении
-	public static function fail($ans, $lang = null, $code = null)
+	/*
+	public static function mail($to, $email, $mailroot, $data = array())
 	{
-		if (is_null($code)) return Ans::err($ans);
-		$r = explode('.', $code);
-		$msg = Cart::lang($lang, $r[0]);
-		$msg .= '. ' . Cart::lang($lang, 'Code') . ' ' . $code . '';
-		$ans['code'] = $code;
+		if (!$email) $email = 'noreplay@' . $_SERVER['HTTP_HOST'];
+		if (!$mailroot) return; //Когда не указаний в конфиге... ничего такого...
+		$rules = Load::loadJSON('-cart/rules.json');
 
-		return Ans::err($ans, $msg);
-	}
-	//Без кода ошибки в сообщении
-	public static function ret($ans, $lang = null, $code = null)
+		$data['host'] = View::getHost();
+		$data['link'] = Session::getLink($email);
+		$data['email'] = $email;
+		$data['user'] = Session::getUser($email);
+		$data['time'] = time();
+		$data["site"] = $data['host'];
+
+		$subject = Template::parse(array($rules['mails'][$mailroot]), $data);
+		$body = Template::parse('-cart/cart.mail.tpl', $data, $mailroot);
+
+		//Mail::toSupport($subject.' - копия для поддержки', $email, $body);
+
+		if ($to == 'user') {
+			return Mail::html($subject, $body, true, $email);  //from, to
+			//return Mail::fromAdmin($subject, $email, $body);
+		}
+		if ($to == 'manager') {
+			return Mail::html($subject, $body, $email, true); //from, to
+			//return Mail::toAdmin($subject,$email,$body);
+		}
+	}*/
+	public static function createNick()
 	{
-		if (is_null($code)) return Ans::ret($ans);
-		$r = explode('.', $code);
-		$msg = Cart::lang($lang, $r[0]);
-		if ($code) $ans['code'] = $code;
-		return Ans::ret($ans, $msg);
+		$today = (int) ((date('m') + 10) . (date('j') + 10));
+		$last_day = Mem::get('cart_last_day');
+		$sym = Cart::$conf['hostnum'];
+		if ($last_day == $today) {
+			$num = Mem::get('cart_last_num');
+			if (!$num) $num = 0;
+			$num = $num + 1;
+		} else {
+			$num = 0;
+		}
+		Mem::set('cart_last_day', $today);
+		Mem::set('cart_last_num', $num);
+
+		if ($num < 100) {
+			$today = (int) ($today . '00');
+			$nick = $sym . ($today + $num);
+		} else {
+			$nick = $sym . $today . $num;
+		}
+		return $nick;
+	}
+
+	// public static function getAllByEmail($email)
+	// {
+	// 	return static::once('getAllByEmail', $email, function ($email) {
+	// 		$sql = 'SELECT uo.order_id
+	// 			FROM cart_userorders uo
+	// 			LEFT JOIN users u ON u.email = ? and uo.user_id = u.user_id
+	// 		';
+	// 		$list = Db::colAll($sql, [$email]);
+	// 		return $list;
+	// 	});
+	// }
+	public static function getOrders($fuser, $status, $wait, $start, $end)
+	{
+		return static::once('getOrders', [$fuser, $status, $wait, $start, $end], function ($fuser, $status, $wait, $start, $end) {
+			$fields = 'o.order_nick, o.order_id, o.status, o.sum, o.name, o.email, o.coupon, o.paid';
+			$fields = 'o.order_id';
+			$param = [];
+			if ($fuser) {
+				$param[':user_id'] = $fuser['user_id'];
+				$sql = "SELECT DISTINCT $fields
+					FROM cart_orders o
+					RIGHT JOIN cart_userorders ou on (ou.user_id = :user_id and ou.order_id = o.order_id)
+					WHERE datecreate >= FROM_UNIXTIME(:start) and datecreate < FROM_UNIXTIME(:end)
+					ORDER BY o.datecreate
+				";
+			} else {
+				$param[":start"] = $start;
+				$param[":end"] = $end;
+				if ($status) {
+					$param[':status'] = $status;
+					if ($fuser) {
+						$param[':user_id'] = $fuser['user_id'];
+						$sql = "SELECT DISTINCT $fields
+							FROM cart_orders o
+							RIGHT JOIN cart_userorders ou on (ou.user_id = :user_id and ou.order_id = o.order_id)
+							WHERE datecreate >= FROM_UNIXTIME(:start) and datecreate < FROM_UNIXTIME(:end)
+							and o.status = :status
+							ORDER BY o.datecreate
+						";
+					} else {
+						$sql = "SELECT DISTINCT $fields
+							FROM cart_orders o
+							WHERE datecreate >= FROM_UNIXTIME(:start) and datecreate < FROM_UNIXTIME(:end)
+							and o.status = :status
+							ORDER BY o.datecreate
+						";
+					}
+				} else {
+					if ($wait) {
+						$sql = "SELECT DISTINCT $fields
+							FROM cart_orders o
+							WHERE datecreate >= FROM_UNIXTIME(:start) and datecreate < FROM_UNIXTIME(:end)
+							ORDER BY o.datecreate
+						";
+					} else {
+						$sql = "SELECT DISTINCT $fields
+							FROM cart_orders o
+							WHERE datecreate >= FROM_UNIXTIME(:start) and datecreate < FROM_UNIXTIME(:end)
+							AND o.status != 'wait' AND o.status != ''
+							ORDER BY o.datecreate
+						";
+					}
+				}
+			}
+			$list = Db::colAll($sql, $param);
+			foreach ($list as $k => $order_id) {
+				$list[$k] = Cart::getById($order_id);
+			}
+			return $list;
+		});
+	}
+	public static function getYears($lang = 'ru')
+	{
+		$sql = 'SELECT UNIX_TIMESTAMP(min(dateedit)) as start FROM cart_orders';
+		$end = time();
+		$start = Db::col($sql) ?? $end + 1;
+		$start -= 60 * 60 * 24 * 30 * 20;
+		$list = [];
+
+
+		$runyear = (int) date('Y', $start);
+		$runmonth = (int) date('m', $start);
+		$next = strtotime('1.' . $runmonth . '.' . $runyear);
+		if (empty($list[$runyear])) $list[$runyear] = [];
+
+		$list[$runyear][] = Cart::getYearsOpt($lang, $next);
+
+		do {
+			$runmonth++;
+			if ($runmonth == 13) {
+				$runyear++;
+				$runmonth = 1;
+			}
+			$next = strtotime('1.' . $runmonth . '.' . $runyear);
+			if ($next > $end) break;
+			if (empty($list[$runyear])) $list[$runyear] = [];
+			$list[$runyear][] = Cart::getYearsOpt($lang, $next);
+		} while (true);
+		return $list;
+	}
+	private static function getYearsOpt($lang, $next)
+	{
+		return [
+			"start" => $next,
+			"end" => strtotime('+1 month', $next),
+			"Y" => (int) date("Y", $next),
+			"m" => (int) date('m', $next),
+			"F" => Cart::lang($lang, date('F', $next))
+		];
+	}
+	public static function create($user)
+	{
+		$order_nick = Cart::createNick();
+		$sql = 'INSERT INTO cart_orders (datecreate, datewait, dateedit, order_nick, sum) VALUES(now(),now(),now(),?, 0)';
+		$order_id = Db::lastId($sql, [$order_nick]);
+		if (!$order_id) return false;
+		$sql = 'INSERT INTO cart_userorders (user_id, order_id, active) VALUES(?,?,1)';
+		Db::lastId($sql, [$user['user_id'], $order_id]);
+		return Cart::getById($order_id);
+	}
+	public static function getActiveOrder($user)
+	{
+		return static::once('getActiveOrder', $user['user_id'], function ($user_id) {
+			$sql = 'SELECT o.order_id
+				FROM cart_userorders uo
+				LEFT JOIN cart_orders o on (uo.order_id = o.order_id)
+				WHERE uo.user_id = ? and uo.active = 1
+			';
+			$order_id = Db::col($sql, [$user_id]);
+			if (!$order_id) return false;
+			return Cart::getById($order_id);
+		});
+	}
+	public static function uniqkey($pos)
+	{
+		return $pos['model_id'] . $pos['item_num'] . $pos['catkit'];
+	}
+	public static function add($order, $model, $count)
+	{
+		$prodart = Cart::uniqkey($model);
+		foreach ($order['basket'] as $i => $p) {
+			//$p = Cart::getPosById($p);
+			$pa = Cart::uniqkey($p);
+			if ($prodart == $pa) {
+				unset($order['basket'][$i]);
+				$prodart = $p;
+				break;
+			}
+		}
+		//$model = Cart::getFromShowcase($pos);
+		$hash = Cart::getHash($model);
+
+		$cost = $model['Цена'];
+
+		$sum = Cart::getSum($order, $model, $count);
+		if (!is_array($prodart)) { //insert
+			$sql = 'INSERT INTO cart_basket (
+				order_id, basket_title, model_id, item_num, catkit, count, hash, cost, sum, dateadd, dateedit
+			) VALUES (
+				:order_id, :basket_title, :model_id, :item_num,	:catkit, :count, :hash,	:cost, :sum, now(), now()
+			)';
+			$position_id = Db::lastId($sql, [
+				':order_id' => $order['order_id'],
+				':basket_title' => $model['Наименование'],
+				':model_id' => $model['model_id'],
+				':item_num' => $model['item_num'],
+				':catkit' => $model['catkit'],
+				':hash' => $hash,
+				':cost' => $cost,
+				':sum' => $sum,
+				':count' => $count
+			]);
+			if (!$position_id) return false;
+
+			if ($order['freeze']) {
+				if (!Cart::setToJson($position_id, $model)) return false;
+			}
+		} else { //update
+			$position_id = $prodart['position_id'];
+
+			$sql = 'UPDATE cart_basket
+				SET count = :count, hash = :hash, cost = :cost, sum = :sum, dateedit = now()
+				WHERE position_id = :position_id
+			';
+
+			if (Db::exec($sql, [
+				':position_id' => $position_id,
+				':hash' => $hash,
+				':cost' => $cost,
+				':sum' => $sum,
+				':count' => $count
+			]) === false) return false;
+		}
+
+		return Cart::recalc($order['order_id']);
+	}
+	public static function couponCheck($model, $coupon)
+	{
+		$r = true;
+		foreach ($coupon['rows'] as $row) {
+			$rr = true;
+			if (isset($row['Производители'])) {
+				if (!in_array($model['producer_nick'], $row['Производители'])) {
+					$rr = false;
+					continue;
+				}
+			}
+			if (isset($row['Группы'])) {
+				$rg = false;
+				foreach ($model['path'] as $g) {
+					if (in_array($g, $row['Группы'])) {
+						$rg = true;
+						break;
+					}
+				}
+				if (!$rg) {
+					$rr = false;
+					continue;
+				}
+			}
+			if ($rr) break;
+		}
+		if ($rr) {
+			$res = $row; //Когда пройена предварительная проверка
+		} else {
+			$res = false;
+		}
+		if ($res) {
+			$r = Event::fire('Cart.coupon', $model);
+			if (!$r) $res = false;
+		}
+		return $res;
+	}
+	public static function getSum($order, $model, $count)
+	{
+		$sum = $model['Цена'] * $count;
+		if ($order['coupon']) {
+			$coupon = Load::loadJSON('-cart/coupon?name=' . $order['coupon']);
+			if ($coupon['result']) {
+				$res = Cart::couponCheck($coupon, $pos);
+				if ($res) { //Действует
+					$discount = $pos['coupon']['Скидка'];
+					$sum = $sum * (1 - $discount);
+				}
+			}
+		}
+		$sum = round($sum, 2);
+		return $sum;
+	}
+	public static function sync($order, $data)
+	{
+		static::$once = [];
+		$sql = 'UPDATE cart_orders
+			SET 
+			phone = :phone, 
+			email = :email, 
+			lang = :lang, 
+			name = :name, 
+			dateedit = now()
+			WHERE order_id = :order_id
+		';
+		$data[':order_id'] = $order['order_id'];
+		return Db::exec($sql, $data) !== false;
+	}
+	public static function resetActive($order)
+	{
+		$sql = 'UPDATE cart_userorders
+			SET active = 0
+			WHERE order_id = :order_id
+		';
+		return Db::exec($sql, [
+			':order_id' => $order['order_id']
+		]) !== false;
+	}
+	public static function resetUserActive($user)
+	{
+		$sql = 'UPDATE cart_userorders
+			SET active = 0
+			WHERE user_id = :user_id
+		';
+		return Db::exec($sql, [
+			':user_id' => $user['user_id']
+		]) !== false;
+	}
+	public static function setActive($order, $user)
+	{
+		$r = Cart::resetUserActive($user);
+		if (!$r) return $r;
+		$sql = 'UPDATE cart_userorders
+			SET active = 1
+			WHERE order_id = :order_id
+			AND user_id = :user_id
+		';
+		return Db::exec($sql, [
+			':order_id' => $order['order_id'],
+			':user_id' => $user['user_id']
+		]) !== false;
+	}
+	public static function clear(&$order)
+	{
+
+		$sql = 'DELETE b FROM cart_basket b
+			WHERE b.order_id = :order_id 
+		';
+		if (Db::exec($sql, [
+			':order_id' => $order['order_id']
+		]) === false) return false;
+		return Cart::recalc($order['order_id']);
+	}
+	public static function removePos($position_ids)
+	{
+		$order_ids = Db::colAll('SELECT DISTINCT order_id FROM cart_basket where position_id in ('.implode(',',$position_ids).')');
+		if (!$order_ids) return true; //Позиции нет
+		if (sizeof($order_ids) > 1) return false;
+		$order_id = $order_ids[0];
+		
+		$sql = 'DELETE b FROM cart_basket b
+			WHERE b.position_id in ('.implode(',',$position_ids).')
+		';
+		if (Db::exec($sql) === false) return false;
+
+		return Cart::recalc($order_id);
+	}
+	public static function recalc($order_id)
+	{
+		unset(static::$once['getById'][$order_id]); //Без кэша
+		//Считаем сумму $order['basket'] + $model * $count
+		$order = Cart::getById($order_id);
+		if ($order['paid']) return false; //Оплаченный заказ нельзя пересчитывать
+		$sum = 0;
+		foreach ($order['basket'] as $i => $p) {
+			$sum += $p['sum'];
+		}
+		//Доставка
+		//Купон применяется к позиции. Результат с купоном хранится в описании позиции в корзине, так как его нужно замораживать и не пересчитывать для freeze
+		//У позиции есть ценаsum - после скидки и cost*count до скидки.
+
+		$sql = 'UPDATE cart_orders
+			SET sum = :sum, dateedit = now()
+			WHERE order_id = :order_id
+		';
+		if (Db::exec($sql, [
+			':order_id' => $order['order_id'],
+			':sum' => $sum
+		]) === false) return false;
+
+		return true;
+	}
+
+	public static function delete($order)
+	{
+		$sql = 'DELETE o, uo, b 
+			FROM cart_orders o
+			LEFT JOIN cart_userorders uo on o.order_id = uo.order_id
+			LEFT JOIN cart_basket b on b.order_id = o.order_id
+			WHERE o.order_id = :order_id 
+		';
+		if (Db::exec($sql, [
+			':order_id' => $order['order_id']
+		]) === false) return false;
+		return true;
+	}
+	public static function setStatus($order, $status)
+	{
+		$sql = 'UPDATE cart_orders
+			SET status = :status, dateedit = now(), date' . $status . ' = now()
+			WHERE order_id = :order_id
+		';
+		if (Db::exec($sql, [
+			':order_id' => $order['order_id'],
+			':status' => $status
+		]) === false) return false;
+		return true;
+	}
+	public static function getByNick($order_nick)
+	{
+		$order_id = static::once('getByNick', $order_nick, function ($order_nick) {
+			$sql = 'SELECT order_id
+				FROM cart_orders where order_nick = ?';
+			return Db::col($sql, [$order_nick]);
+		});
+		if (!$order_id) return false;
+		return Cart::getById($order_id);
+	}
+	public static function setEmailDate($order)
+	{
+		$sql = 'UPDATE cart_orders
+			SET dateemail = now()
+			WHERE order_id = :order_id
+		';
+		$r = Db::exec($sql, [
+			':order_id' => $order['order_id']
+		]) !== false;
+		return $r;
+	}
+
+	public static function getById($order_id)
+	{
+		return static::once('getById', $order_id, function ($order_id) {
+			$sql = 'SELECT 
+					order_id, 
+					status,
+					name,
+					freeze,
+					sum,
+					coupon,
+					paid,
+					order_nick, 
+					email, 
+					comment,
+					commentmanager,
+					UNIX_TIMESTAMP(datecreate) as datecreate,
+					UNIX_TIMESTAMP(datewait) as datewait,
+					UNIX_TIMESTAMP(dateedit) as dateedit,
+					UNIX_TIMESTAMP(datecheck) as datecheck,
+					UNIX_TIMESTAMP(datecomplete) as datecomplete,
+					UNIX_TIMESTAMP(datepay) as datepay,
+					UNIX_TIMESTAMP(datepaid) as datepaid,
+					UNIX_TIMESTAMP(dateemail) as dateemail
+				FROM cart_orders where order_id = ?
+			';
+			$order = Db::fetch($sql, [$order_id]);
+			if (!$order) return false;
+			$sql = 'SELECT 
+					position_id,
+					basket_title, 
+					model_id,
+					item_num,
+					catkit,
+					hash,
+					cost,
+					sum,
+					count
+				FROM cart_basket 
+				WHERE order_id = :order_id
+			';
+			$order['basket'] = Db::all($sql, ['order_id' => $order_id]);
+			foreach ($order['basket'] as $i => $pos) {
+				// echo '<pre>';
+				// print_r($pos);
+				$model = Cart::getFromShowcase($pos);
+				if ($order['freeze']) {
+					$hash = Cart::getHash($model); //Если модели нет, hash будет пустой строкой и будет ме5тка что есть изменение
+					$order['basket'][$i]['changed'] = $pos['hash'] !== $hash;
+					$model = Cart::getFromJson($pos);
+				} else {
+					if (!$model) continue; //Модель не заморожена и не найдена в каталоге
+					$order['basket'][$i]['changed'] = false;
+				}
+				$order['basket'][$i]['model'] = $model;
+
+				unset($order['basket'][$i]['hash']);
+			}
+			//$order['users'] = Cart::getUsers($order);
+
+
+			return $order;
+		});
+	}
+	public static function getHash($model)
+	{
+		$hash = md5(json_encode($model, JSON_UNESCAPED_UNICODE));
+		return $hash;
+	}
+	// public static function getModel($order, $pos)
+	// {
+	// 	if ($order['freeze']) {
+	// 		return Cart::getFromJson($pos);
+	// 	} else {
+	// 		return Cart::getFromShowcase($pos);
+	// 	}
+	// }
+	public static function getFromJson($pos)
+	{
+		//position_id, model_id, item_num, catkit, freeze, hash
+		$sql = 'SELECT json from cart_basket WHERE position_id = :position_id';
+		$json = Db::col($sql, [':position_id' => $pos['position_id']]);
+		$model = json_decode($json, true);
+		return $model;
+	}
+	public static function setToJson($position_id, $model)
+	{
+		$json = json_encode($model, JSON_UNESCAPED_UNICODE);
+		$sql = 'UPDATE cart_basket
+			SET json = :json
+			WHERE position_id = :position_id
+		';
+
+		$r = Db::exec($sql, [
+			':position_id' => $position_id,
+			':json' => $json
+		]) !== false;
+
+		return $r;
+	}
+	public static function getFromShowcase($pos)
+	{
+		return Showcase::getModelById($pos['model_id'], $pos['item_num'], $pos['catkit']);
+	}
+	public static function freeze($order)
+	{
+		$sql = 'UPDATE cart_orders
+			SET freeze = 1
+			WHERE order_id = :order_id
+		';
+		$r = Db::exec($sql, [
+			':order_id' => $order['order_id']
+		]) !== false;
+		if (!$r) return $r;
+
+
+		foreach ($order['basket'] as $pos) {
+			$model = Cart::getFromShowcase($pos);
+			//Если модели нет в каталоге. надо удалить её из корзины. Такая проверка должна быть раньше.
+			if (!Cart::setToJson($pos['position_id'], $model)) return false;
+
+			//position_id, model_id, item_num, catkit, freeze, hash
+			//$position_id = $pos['position_id']
+		}
+		return true;
+	}
+	public static function unfreeze($order)
+	{
+		$sql = 'UPDATE cart_orders
+			SET freeze = 0
+			WHERE order_id = :order_id
+		';
+		$r = Db::exec($sql, [
+			':order_id' => $order['order_id']
+		]) !== false;
+		if (!$r) return $r;
+
+		$sql = 'UPDATE cart_basket
+			SET json = null
+			WHERE order_id = :order_id
+		';
+
+		return Db::exec($sql, [
+			':order_id' => $order['order_id']
+		]) !== false;
+	}
+	public static function getUsers($order)
+	{
+
+		// $sql = 'SELECT user_id
+		// 	FROM cart_userorders
+		// 	WHERE order_id = :order_id AND active = 1
+		// ';{
+		// $order['acitve'] = Db::colAll($sql, ['order_id'=>$order_id]);
+		$sql = 'SELECT user_id, active
+			FROM cart_userorders
+			WHERE order_id = :order_id
+		';
+		$users = Db::all($sql, ['order_id' => $order['order_id']]);
+		return $users;
+	}
+
+
+	public static function setOwner($order, $fuser)
+	{
+		if (Cart::isOwner($order, $fuser)) return true;
+		$sql = 'INSERT INTO cart_userorders (user_id, order_id) VALUES(:user_id,:order_id)';
+		return Db::exec($sql, [
+			':user_id' => $fuser['user_id'],
+			':order_id' => $order['order_id']
+		]);
+	}
+	public static function isOwner($order, $user)
+	{ //action true совпадёт с любой строчкой
+		if (!$user) return false;
+		$users = Cart::getUsers($order);
+		foreach ($users as $u) {
+			if ($u['user_id'] == $user['user_id']) return true;
+		}
+		//Тут проверяется есть ли необходимое действие в списке действий с заявкой с таким статусом
+		return false;
 	}
 };
 
@@ -73,8 +683,27 @@ class Cart
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
 Event::$classes["Cart"] = function ($pos) {
-	return $pos["producer_nick"] . $pos["article_nick"] . $pos["item_nick"];
+	return $pos["model_id"] . $pos["item_num"] . $pos['catkit'];
 };
 Event::$classes["Order"] = function ($order) {
 	return $order['id'];
@@ -283,12 +912,12 @@ class Cart2
 				$order['alltotal'] += $order['manage']['deliverycost'];
 			}
 
-			/*if ($order['status'] == 'sbrfpay' 
-				&& isset($order['sbrfpay']['orderId']) 
-				&& empty(isset($order['sbrfpay']['info'])) ) {
-				//Есть информация что выдана ссылка, и нет информации об оплате
-				//Такое может быть если человек не переходил по ссылке success
-			}*/
+			// if ($order['status'] == 'sbrfpay' 
+			// 	&& isset($order['sbrfpay']['orderId']) 
+			// 	&& empty(isset($order['sbrfpay']['info'])) ) {
+			// 	//Есть информация что выдана ссылка, и нет информации об оплате
+			// 	//Такое может быть если человек не переходил по ссылке success
+			// }
 
 			Event::fire('Order.calc', $order);
 			return $order;
@@ -364,22 +993,22 @@ class Cart2
 		$ar = Session::get('safe.orders', array());
 		return in_array($id, $ar);
 	}
-	public static function canI($id, $action = true)
-	{ //action true совпадёт с любой строчкой
-		if (!$id) return true;
+	// public static function canI($id, $action = true)
+	// { //action true совпадёт с любой строчкой
+	// 	if (!$id) return true;
 
-		//if (Load::isphp()) return true;
-		if (Session::get('safe.manager')) return true;
-		if (!Cart::isMy($id)) return false;
-		$order = Cart::loadOrder($id);
-		if ($action === true) return true;
-		$rule = Cart::getRule($order);
-		return Each::exec($rule['user']['actions'], function & ($a) use ($action) {
-			$r = null;
-			if ($a['act'] == $action) $r = true;
-			return $r;
-		});
-	}
+	// 	//if (Load::isphp()) return true;
+	// 	if (Session::get('safe.manager')) return true;
+	// 	if (!Cart::isMy($id)) return false;
+	// 	$order = Cart::loadOrder($id);
+	// 	if ($action === true) return true;
+	// 	$rule = Cart::getRule($order);
+	// 	return Each::exec($rule['user']['actions'], function & ($a) use ($action) {
+	// 		$r = null;
+	// 		if ($a['act'] == $action) $r = true;
+	// 		return $r;
+	// 	});
+	// }
 	public static function &loadOrder($id = '')
 	{
 		//Результат этой фукции можно сохранять в файл она не добавляет лишних данных, но оптимизирует имеющиеся
@@ -438,10 +1067,10 @@ class Cart2
 
 			Each::foro($ar['buttons'], function & (&$cls, $act) use ($rules, &$order, &$ar) {
 				$r = null;
-				/*$index=array_search($act, $ar['actions']);
-				if ($index!==false) {
-					array_splice($ar['actions'],$index,1);
-				}*/
+				// $index=array_search($act, $ar['actions']);
+				// if ($index!==false) {
+				// 	array_splice($ar['actions'],$index,1);
+				// }
 
 				if (!$rules['actions'][$act]) {
 					$cls = array(
@@ -500,33 +1129,7 @@ class Cart2
 	}
 
 
-	public static function mail($to, $email, $mailroot, $data = array())
-	{
-		if (!$email) $email = 'noreplay@' . $_SERVER['HTTP_HOST'];
-		if (!$mailroot) return; //Когда не указаний в конфиге... ничего такого...
-		$rules = Load::loadJSON('-cart/rules.json');
 
-		$data['host'] = View::getHost();
-		$data['link'] = Session::getLink($email);
-		$data['email'] = $email;
-		$data['user'] = Session::getUser($email);
-		$data['time'] = time();
-		$data["site"] = $data['host'];
-
-		$subject = Template::parse(array($rules['mails'][$mailroot]), $data);
-		$body = Template::parse('-cart/cart.mail.tpl', $data, $mailroot);
-
-		//Mail::toSupport($subject.' - копия для поддержки', $email, $body);
-
-		if ($to == 'user') {
-			return Mail::html($subject, $body, true, $email);  //from, to
-			//return Mail::fromAdmin($subject, $email, $body);
-		}
-		if ($to == 'manager') {
-			return Mail::html($subject, $body, $email, true); //from, to
-			//return Mail::toAdmin($subject,$email,$body);
-		}
-	}
 	public static function mergeOrder(&$order, $place, $safe = false)
 	{
 		if (empty($order['id'])) return;
@@ -689,24 +1292,29 @@ class Cart2
 		if (!isset($pos['Цена'])) $pos['Цена'] = '';
 		else return md5($pos['Цена']);
 	}
-	public static function lang($str = null)
+	//Серверу нужно говорить какой язык нужен
+	public static function lang($lang, $str)
 	{
-		if (is_null($str)) return Lang::name('cart');
-		return Lang::str('cart', $str);
+		return Lang::lang($lang, 'cart', $str);
 	}
+	// public static function lang($str = null)
+	// {
+	// 	if (is_null($str)) return Lang::name('cart');
+	// 	return Lang::str('cart', $str);
+	// }
 	public static function ret($ans, $action)
 	{
 		$rules = Load::loadJSON('-cart/rules.json');
 		$order = $ans['order'];
 		$rule = $rules['actions'][$action];
-		/*if ($ans['place'] != 'admin'  && !empty($order['email'])) { //Админ сам решает когда, что отправлять
-			if (!empty($rule['usermail'])) {
-				Cart::mail('user', $order['email'], $rule['usermail'], $ans['order']);
-			}
-			if (!empty($rule['mangmail'])) {
-				Cart::mail('manager', $order['email'], $rule['mangmail'], $order);
-			}
-		}*/
+		// if ($ans['place'] != 'admin'  && !empty($order['email'])) { //Админ сам решает когда, что отправлять
+		// 	if (!empty($rule['usermail'])) {
+		// 		Cart::mail('user', $order['email'], $rule['usermail'], $ans['order']);
+		// 	}
+		// 	if (!empty($rule['mangmail'])) {
+		// 		Cart::mail('manager', $order['email'], $rule['mangmail'], $order);
+		// 	}
+		// }
 
 		if (!empty($order['email'])) {
 			//Клиент отправляет письма менеджеру и себе
@@ -727,3 +1335,4 @@ class Cart2
 		return Ans::ret($ans);
 	}
 }
+*/

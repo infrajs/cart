@@ -223,36 +223,7 @@
 			"title":"Сохранить",
 			"noscroll":true,
 			"silent":true,
-			"confirm2":"Сохранить данные заказа?",
 			"result":"Данные заказа сохранены."
 		}
-	},
-	"mails":{
-		"orderToCheck":"Оформлен заказ в интернет-магазине {site}",
-		"AdmOrderToCheck":"{site} {email} заказ отправлен на проверку",
-		
-		"edit":"{site} изменения по вашему заказу",
-		"AdmEdit":"{site} {email} изменения в заказе"
-	},
-	"mails-old":{
-		"orderToCheck":"{site} заказ отправлен на проверку",
-		"AdmOrderToCheck":"{site} {email} заказ отправлен на проверку",
-
-		"setPaid":"{site} зафиксирована оплата заказа",
-		"ready":"{site} заказ готов к оплате!",
-
-		"dismiss":"{site} заказ отклонён",
-		"delivery":"{site} заказ доставляется",
-		"complete":"{site} заказ выполнен",
-		"execution":"{site} заказ в исполнении",
-		"picked":"{site} заказ укомплектован",
-
-		"bankrefunds":"{site} возврат оплаты",
-		"AdmBankrefunds":"{site} {email} возврат оплаты",
-
-		"bankpaid":"{site} заказ оплачен",
-		"AdmBankpaid":"{site} {email} оплачен заказ",
-
-		"refuseable":"{site} Разрешён возврат денег по оплаченному заказу"
 	}
 }

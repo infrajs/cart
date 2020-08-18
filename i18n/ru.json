@@ -1,3 +1,14 @@
 {
-	"To your email on the website there is a registration, you need to <a href='/user/signin?back=ref'>login</a>":"На указанный email на сайте есть регистрация, необходимо <a href='/user/signin?back=ref'>авторизоваться</a>"
+	"January":"Январь",
+	"February":"Февраль",
+	"March":"Март",
+	"April":"Апрель",
+	"May":"Май",
+	"June":"Июнь",
+	"July":"Июль",
+	"August":"Август",
+	"September":"Сентябрь",
+	"October":"Октябрь",
+	"November":"Ноябрь",
+	"December":"Декабрь"
 }

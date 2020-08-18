@@ -1,6 +1,0 @@
-{
-	"onlyclient":true,
-	"tpl":"-cart/basket.tpl",
-	"global":["cart","user"],
-	"json":"-cart/?type=order&id="
-}

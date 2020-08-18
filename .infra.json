@@ -1,28 +1,12 @@
 {
-	"pub":["opt","clsadd","clsready","textadd","textready","textin","coupon","pay"],
-	"clsadd":"btn-success",
-	"hostnum":"",
-	"clsready":"btn-danger",
-	"textadd":"В корзину",
-	"textready":"Оформить",
-	"textin":"Позиция в <a href='/cart/orders/my/list'>корзине</a>",
-	"opt":false,
-	"pay":false,
+	"pub":["coupon"],
 	"paramsrc":"~auto/pages/Параметры.xlsx",
 	"coupon":true,
 	"conf":"infrajs\\cart\\Cart",
-	"delivery":true,
-	"manager":["aky@list.ru","a.kiyatkin@itlf.ru","j.nester@itlf.ru"],
-	"deliverychoice":false,
-	"external":"external",
 	"js":["Cart.js","infra.js"],
 	"css":"cart.css",
-	"fields":"-cart/fields.json",
 	"require":"infra.php",
 	"update":"update.php",
-	"tester":"tester.php",
-	"testerjs":".tester.js",
-	"dependencies":["path","event","catalog","session","showcase"],
 	"lang":{
 		"def":"ru",
 		"list":["ru","en"]
@@ -39,11 +23,6 @@
 		"server":"demo.server.paykeeper.ru"
 	},
 	"clutch":{
-		"catalog":"vendor/infrajs/cart/",
-		"session":"vendor/infrajs/cart/",
-		"pixeden-stroke-7-icon":[
-			"vendor/grimmlink/",
-			"vendor/infrajs/cart/"
-		]
+		"catalog":"vendor/infrajs/cart/"
 	}
 }

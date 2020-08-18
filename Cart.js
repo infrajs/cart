@@ -5,6 +5,7 @@ import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
 import { Load } from '/vendor/akiyatkin/load/Load.js'
+import { Lang } from '/vendor/infrajs/lang/Lang.js'
 import { Session } from '/vendor/infrajs/session/Session.js'
 let Template, Global, Autosave
 
@@ -281,10 +282,19 @@ let Cart = {
 		Cart.reach('basket');
 		Session.set(name, { count: 1 }, true, fn);
 	},
+	// lang: (lang, str) => {
+	// 	return Lang.lang(lang, 'cart', str);
+	// },
+
+	//Клиент сам знает какой язык
 	lang: function (str) {
-		if (typeof (str) == 'undefined') return Lang.name('cart');
-		return Lang.str('cart', str);
-	}
+        if (typeof (str) == 'undefined') return Lang.name('user');
+        return Lang.str('cart', str);
+    }
+	// lang: function (str) {
+	// 	if (typeof (str) == 'undefined') return Lang.name('cart');
+	// 	return Lang.str('cart', str);
+	// }
 	/*,
 	initPrice: function (div) {
 		div.find('.cat_item').each( function () {
