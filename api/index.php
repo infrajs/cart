@@ -12,12 +12,21 @@ header('Cache-Control: no-store');
 
 // Блок с глобальными переменными 
 $ans = [];
-$lang = Ans::REQ('lang', Cart::$conf['lang']['list'], Cart::$conf['lang']['def']);
-$userlang = Ans::REQ('lang', User::$conf['lang']['list'], User::$conf['lang']['def']);
+$lang = Ans::REQ('lang', Cart::$conf['lang']['list'], Cart::$conf['lang']['def']); //Для сайтов с 1 языком
+$userlang = Ans::REQ('lang', User::$conf['lang']['list'], User::$conf['lang']['def']); //Для сайтов с 1 языком
+
 $place = Ans::REQ('place', ['orders', 'admin'], 'orders');
 
+$city_id = null;
+$city = null; //Для сайтов без выбора города, когда заказ без расчёта доставки. Расширение City работает в холостую по дефолту.
+$email = null;
+$timezone = null;
+
 $silence = Ans::REQ('silence', 'bool');
-$user = User::fromToken(Ans::REQ('token', 'string', ''));
+
+$token = Ans::REQ('token', 'string', '');
+$user = User::fromToken($token);
+if ($token && !$user) return Cart::fail($ans, $lang, 'CR061.1I');
 
 if ($place == 'admin') {
     if (empty($user['admin'])) return Cart::fail($ans, $lang, 'CR003.1I');

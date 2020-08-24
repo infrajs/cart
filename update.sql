@@ -9,26 +9,19 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     `name` varchar(255) NULL,
     `status` ENUM('wait','pay','check','complete') NOT NULL DEFAULT 'wait' COMMENT 'Доступные статусы',
     `lang` ENUM('ru','en') NOT NULL COMMENT 'Определёный язык интерфейса посетителя',
-    `coupon` TINYTEXT NOT NULL DEFAULT '' COMMENT 'Привязанный купон',
+    
     `freeze` int(1) unsigned NOT NULL DEFAULT 0 COMMENT 'Метка заморожены ли позиции',
     `sum` DECIMAL(19,2) NOT NULL COMMENT 'Сумма к оплате с учётом купона и доставки. Пересчитывается при изменении корзины',
     `paid` int(1) unsigned NOT NULL COMMENT 'Метка была ли онлайн оплата',
-    `pay` ENUM('sbrfpay','paykeeper') NULL,
+    `pay` ENUM('self','card','corp') NULL,
 
     
-    `city` varchar(255) NULL COMMENT 'Город определённый или изменённый, для сортировки заявок',
-    `transport` ENUM(
-        'city','self',
-        'cdek_punkt','cdek_courier',
-        'pochta_simple','pochta_1','pochta_courier'
-    ) NULL,
-    `cdek_punkt` TEXT NULL COMMENT 'номер пункта',
-    `cdek_info` TEXT NULL COMMENT 'json о сделанном выборе',
+    `city_id` MEDIUMINT NOT NULL COMMENT 'Город определённый или изменённый, для сортировки заявок и расчёта стоимости доставки. Может отличаться от выбранного города в заказе',
+    `coupon` TINYTEXT NOT NULL DEFAULT '' COMMENT 'Привязанный купон',
+    `transport` ENUM('city','self','cdek_pvz','cdek_courier','pochta_simple','pochta_1','pochta_courier') NULL COMMENT 'Выбор пользователя',
+    `pvz` TEXT NULL COMMENT 'Адрес в городе',
     `address` TEXT NULL COMMENT 'Адрес в городе',
-    `zip` TEXT NULL COMMENT '',
-    
-
-    `json` MEDIUMTEXT NULL COMMENT 'json с данными об оплате, доставке и прочим',
+    `zip` TEXT NULL COMMENT 'Индекс',
     
 
     `datecreate` DATETIME NULL COMMENT 'Дата создания',
@@ -43,6 +36,18 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     PRIMARY KEY (`order_id`)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+
+CREATE TABLE IF NOT EXISTS `cart_transports` (
+    `order_id` MEDIUMINT unsigned NOT NULL,
+    `type` ENUM(
+        'cdek_pvz','cdek_courier',
+        'pochta_simple','pochta_1','pochta_courier'
+    ) NULL COMMENT 'Выбор пользователя',
+    `cost` SMALLINT NULL COMMENT 'Цена',
+    `min` TINYINT NULL COMMENT 'Cрок в днях',
+    `max` TINYINT NULL COMMENT 'Cрок в днях',
+
+) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cart_basket` (
     `position_id` MEDIUMINT unsigned NOT NULL AUTO_INCREMENT,

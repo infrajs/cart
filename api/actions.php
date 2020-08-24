@@ -11,6 +11,11 @@ use infrajs\path\Path;
 // Обработка actions
 if ($action == 'check') {
     if (!Cart::setStatus($order, 'check')) return Cart::fail($ans, $lang, 'CR018.1A');
+    
+    if ($ouser['user_id'] == $user['user_id']) {
+        $r = User::setEnv($ouser, $timezone, $lang, $city_id);
+        if (!$r) return Cart::fail($ans, $lang, 'CR018.22A');
+    }
     $ouser['order'] = $ouser;
     if (!$silence) {
         if ($place == 'orders') {
@@ -18,6 +23,7 @@ if ($action == 'check') {
         }
         Cart::mail($ouser, $lang, 'orderToCheck');
     }
+    
     //После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
     $r = Cart::resetActive($order);
     if (!$r) return Cart::fail($ans, $lang, 'CR018.2A');
@@ -54,14 +60,25 @@ if ($action == 'check') {
     $r = Cart::resetActive($order);
     if (!$r) return Cart::fail($ans, $lang, 'CR018.15A');
     return Cart::ret($ans, $lang, 'CR040.1A');
+} elseif ($action == 'setcommentmanager') {
+    $commentmanager = Ans::REQ('commentmanager','string','');
+    if (!$commentmanager) return Cart::fail($ans, $lang, 'CR063.2A');
+    $r = Cart::setCommentManager($order, $commentmanager);
+    if (!$r) return Cart::fail($ans, $lang, 'CR018.21A');
+    return Cart::ret($ans);
 } elseif ($action == 'email') {
+    $commentmanager = Ans::REQ('commentmanager','string','');
+    if (!$commentmanager) return Cart::fail($ans, $lang, 'CR063.1A');
+    $order['commentmanager'] = $commentmanager;
+    $r = Cart::setCommentManager($order, $commentmanager);
+    if (!$r) return Cart::fail($ans, $lang, 'CR018.20A');
     $ouser['order'] = $order;
     if (!$silence) {
         $r = Cart::mail($ouser, $lang, 'email');
         if (!$r) return Cart::fail($ans, $lang, 'CR018.16A');
     }
     Cart::setEmailDate($order);
-    return Cart::ret($ans, $lang, 'CR055.M1');
+    return Cart::ret($ans, $lang, 'CR055.A1');
 } elseif ($action == 'wait') {
     if (!Cart::setStatus($order, 'wait')) return Cart::fail($ans, $lang, 'CR018.8A');
     if (!$fuser) {
@@ -99,11 +116,32 @@ if ($action == 'check') {
     $r = Cart::add($order, $model, $count);
     if (!$r) return Cart::fail($ans, $lang, 'CR015.1');
     return Cart::ret($ans, $lang, 'CR029.1A');
-} elseif ($action == 'sync') {
+} elseif ($action == 'setlang') {
+    //Вызывается для активного заказа при изменении языка на сайте
+    //rules, $order, $lang уже есть надо его сохранить
+    $r = Cart::setLang($order, $lang);
+    if (!$r) return Cart::fail($ans, $lang, 'CR018.17A');
+    return Cart::ret($ans);
+} elseif ($action == 'setcity') {
+    //При изменении города пересчитывается корзина. Стоимость доставки будет другой.
+    $r = Cart::setCity($order, $city);
+    if (!$r) return Cart::fail($ans, $lang, 'CR018.18A');
+    return Cart::ret($ans);
+} elseif ($action == 'settransport') {
+    $transport = Ans::REQ('transport', Cart::$conf['transports']);
+    if (!$transport) return Cart::fail($ans, $lang, 'CR060.1A');
+    $r = Cart::setTransport($order, $transport);
+    if (!$r) return Cart::fail($ans, $lang, 'CR018.19A');
+    return Cart::ret($ans);
+} elseif ($action == 'setpay') {
+    $pay = Ans::REQ('pay', Cart::$conf['pays']);
+    if (!$pay) return Cart::fail($ans, $lang, 'CR062.1A');
+    $r = Cart::setPay($order, $pay);
+    if (!$r) return Cart::fail($ans, $lang, 'CR018.19A');
+    return Cart::ret($ans);
+} elseif ($action == 'edit') {
     //$rule, $order, $place
-    //Сделать freeze и получение позиций корзины
-    if (empty($rule['edit'][$place])) return Cart::err($ans, $lang, 'CR028.1A');
-
+    
     $email = Ans::REQ('email');
     if ($email && !Mail::check($email)) return Cart::err($ans, $lang, 'CR005.3A');
 
@@ -113,7 +151,9 @@ if ($action == 'check') {
     $name = Ans::REQ('name');
     if ($name && (strlen($name) < 2 || strlen($name) > 150)) return Cart::err($ans, $lang, 'CR026.1A');
 
-    //Если меняется email надо ли удалять старого владельца?
+    $comment = Ans::REQ('comment','string','');
+    $address = Ans::REQ('address','string','');
+    $zip = Ans::REQ('zip','string','');
 
     $fuser = User::getByEmail($email);
     if (!$fuser) { //Создаём пользователя
@@ -121,20 +161,28 @@ if ($action == 'check') {
         if (!$fuser) return Cart::fail($ans, $lang, 'CR009.2');
         $ans['token'] = $fuser['user_id'] . '-' . $fuser['token'];
     } else if ($fuser['user_id'] != $user['user_id'] && empty($user['admin'])) {
-        //Если на указанный email есть регистрация и это не я. Админ может указывать любой ящик без авторизации и приписать кому-то заявку
+        //Если на указанный email есть регистрация и это не я. Админ может указывать любой ящик без авторизации и приписать ему заказ
         $fuser['order'] = $order;
         $r = User::mail($fuser, $userlang, 'userdata', '/cart/orders/' . $order['order_nick']);
         if (!$r) return Cart::ret($ans, $lang, 'CR023.1A');
         return Cart::ret($ans, $lang, 'CR022.1A');
     }
 
-    $r = Cart::sync($order, [
+    $r = Cart::edit($order, [
         ':phone' => $phone,
+        ':comment' => $comment,
+        ':address' => $address,
+        ':zip' => $zip,
         ':email' => $email,
-        ':name' => $name,
-        ':lang' => $lang
+        ':name' => $name
     ]);
     if (!$r) return Cart::fail($ans, $lang, 'CR018.4A');
+    
+    if ($ouser['user_id'] == $user['user_id']) {
+        $r = User::setEnv($ouser, $timezone, $lang, $city_id);
+        if (!$r) return Cart::fail($ans, $lang, 'CR018.22A');
+    }
+
     $order = Cart::getById($order['order_id']);
     $r = Cart::setOwner($order, $fuser);
     if (!$r) return Cart::fail($ans, $lang, 'CR018.5A');
@@ -179,5 +227,5 @@ if ($action == 'check') {
     $ans['list'] = $list;
     return Cart::ret($ans);
 } else {
-    return Cart::fail($ans, $lang, 'CR001.2');
+    return Cart::fail($ans, $lang, 'CR001.2A');
 }

@@ -216,9 +216,8 @@ class Cart
 	public static function getActiveOrder($user)
 	{
 		return static::once('getActiveOrder', $user['user_id'], function ($user_id) {
-			$sql = 'SELECT o.order_id
+			$sql = 'SELECT uo.order_id
 				FROM cart_userorders uo
-				LEFT JOIN cart_orders o on (uo.order_id = o.order_id)
 				WHERE uo.user_id = ? and uo.active = 1
 			';
 			$order_id = Db::col($sql, [$user_id]);
@@ -342,14 +341,16 @@ class Cart
 		$sum = round($sum, 2);
 		return $sum;
 	}
-	public static function sync($order, $data)
+	public static function edit($order, $data)
 	{
 		static::$once = [];
 		$sql = 'UPDATE cart_orders
 			SET 
 			phone = :phone, 
 			email = :email, 
-			lang = :lang, 
+			comment = :comment,
+			address = :address,
+			zip = :zip,
 			name = :name, 
 			dateedit = now()
 			WHERE order_id = :order_id
@@ -376,6 +377,68 @@ class Cart
 		return Db::exec($sql, [
 			':user_id' => $user['user_id']
 		]) !== false;
+	}
+	public static function setLang($order, $lang)
+	{
+		$sql = 'UPDATE cart_orders
+			SET lang = :lang
+			WHERE order_id = :order_id
+		';
+		$r = Db::exec($sql, [
+			':order_id' => $order['order_id'],
+			':lang' => $lang
+		]) !== false;
+		return $r;
+	}
+	public static function setTransport($order, $transport)
+	{
+		$sql = 'UPDATE cart_orders
+			SET transport = :transport
+			WHERE order_id = :order_id
+		';
+		$r = Db::exec($sql, [
+			':order_id' => $order['order_id'],
+			':transport' => $transport
+		]) !== false;
+		if (!$r) return false;
+		return Cart::recalc($order['order_id']);
+	}
+	public static function setCommentManager($order, $commentmanager)
+	{
+		$sql = 'UPDATE cart_orders
+			SET commentmanager = :commentmanager
+			WHERE order_id = :order_id
+		';
+		$r = Db::exec($sql, [
+			':order_id' => $order['order_id'],
+			':commentmanager' => $commentmanager
+		]) !== false;
+		return $r;
+	}
+	public static function setPay($order, $pay)
+	{
+		$sql = 'UPDATE cart_orders
+			SET pay = :pay
+			WHERE order_id = :order_id
+		';
+		$r = Db::exec($sql, [
+			':order_id' => $order['order_id'],
+			':pay' => $pay
+		]) !== false;
+		return $r;
+	}
+	public static function setCity($order, $city)
+	{
+		$sql = 'UPDATE cart_orders
+			SET city_id = :city_id
+			WHERE order_id = :order_id
+		';
+		$r = Db::exec($sql, [
+			':order_id' => $order['order_id'],
+			':city_id' => $city['city_id']
+		]) !== false;
+		if (!$r) return false;
+		return Cart::recalc($order['order_id']);
 	}
 	public static function setActive($order, $user)
 	{
@@ -404,17 +467,64 @@ class Cart
 	}
 	public static function removePos($position_ids)
 	{
-		$order_ids = Db::colAll('SELECT DISTINCT order_id FROM cart_basket where position_id in ('.implode(',',$position_ids).')');
+		$order_ids = Db::colAll('SELECT DISTINCT order_id FROM cart_basket where position_id in (' . implode(',', $position_ids) . ')');
 		if (!$order_ids) return true; //Позиции нет
 		if (sizeof($order_ids) > 1) return false;
 		$order_id = $order_ids[0];
-		
+
 		$sql = 'DELETE b FROM cart_basket b
-			WHERE b.position_id in ('.implode(',',$position_ids).')
+			WHERE b.position_id in (' . implode(',', $position_ids) . ')
 		';
 		if (Db::exec($sql) === false) return false;
 
 		return Cart::recalc($order_id);
+	}
+	public static function setTransportCost($order, $type, $cost, $min, $max)
+	{
+		if (!isset($order['transport'][$type])) {
+			$sql = 'INSERT INTO cart_transports (order_id, type, cost, min, max) VALUES(:order_id, :type, :cost, :min, :max)';
+		} else {
+			$sql = 'UPDATE cart_transports SET cost = :cost, min = :min, max = :max
+			WHERE order_id = :order_id and type = :type';
+		}
+		$r = Db::exec($sql, [
+			':order_id' => $order['order_id'],
+			':type' => $type,
+			':cost' => $cost,
+			':min' => $min,
+			':max' => $max
+		]) === false;
+		return $r;
+		/*
+		$sql = 'INSERT INTO cart_basket (
+				order_id, basket_title, model_id, item_num, catkit, count, hash, cost, sum, dateadd, dateedit
+			) VALUES (
+				:order_id, :basket_title, :model_id, :item_num,	:catkit, :count, :hash,	:cost, :sum, now(), now()
+			)';
+			$position_id = Db::lastId($sql, [
+				':order_id' => $order['order_id'],
+				':basket_title' => $model['Наименование'],
+				':model_id' => $model['model_id'],
+				':item_num' => $model['item_num'],
+				':catkit' => $model['catkit'],
+				':hash' => $hash,
+				':cost' => $cost,
+				':sum' => $sum,
+				':count' => $count
+			]);
+			if (!$position_id) return false;
+
+			if ($order['freeze']) {
+				if (!Cart::setToJson($position_id, $model)) return false;
+			}
+		} else { //update
+			$position_id = $prodart['position_id'];
+
+			$sql = 'UPDATE cart_basket
+				SET count = :count, hash = :hash, cost = :cost, sum = :sum, dateedit = now()
+				WHERE position_id = :position_id
+			';
+			*/
 	}
 	public static function recalc($order_id)
 	{
@@ -426,6 +536,19 @@ class Cart
 		foreach ($order['basket'] as $i => $p) {
 			$sum += $p['sum'];
 		}
+		//order: city_id, basket - размеры, вес, 
+		$transports = Cart::$conf['transports'];
+		$type = 'cdek_pvz';
+		if (in_array($type, $transports)) Cart::setTransportCost($order, $type, 123, 1, 2);
+		$type = 'cdek_courier';
+		if (in_array($type, $transports)) Cart::setTransportCost($order, $type, 123, 3, 4);
+		$type = 'pochta_simple';
+		if (in_array($type, $transports)) Cart::setTransportCost($order, $type, 123, 2, 5);
+		$type = 'pochta_1';
+		if (in_array($type, $transports)) Cart::setTransportCost($order, $type, 123, 1, 2);
+		$type = 'pochta_courier';
+		if (in_array($type, $transports)) Cart::setTransportCost($order, $type, 123, 1, 1);
+
 		//Доставка
 		//Купон применяется к позиции. Результат с купоном хранится в описании позиции в корзине, так как его нужно замораживать и не пересчитывать для freeze
 		//У позиции есть ценаsum - после скидки и cost*count до скидки.
@@ -496,6 +619,10 @@ class Cart
 					order_id, 
 					status,
 					name,
+					phone,
+					pay,
+					transport,
+					city_id,
 					freeze,
 					sum,
 					coupon,
@@ -547,6 +674,12 @@ class Cart
 				unset($order['basket'][$i]['hash']);
 			}
 			//$order['users'] = Cart::getUsers($order);
+
+			$sql = 'SELECT cost, min, max, type
+				FROM cart_transports 
+				WHERE order_id = :order_id
+			';
+			$order['transports'] = Db::allto($sql, 'type', ['order_id' => $order_id]);
 
 
 			return $order;

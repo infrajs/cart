@@ -11,13 +11,12 @@ use infrajs\access\Access;
 use infrajs\session\Session;
 use infrajs\sequence\Sequence;
 
-
 Nostore::on();
+
+die($_SERVER['REQUEST_URI']);
+
 header('X-Robots-Tag: noindex');
 
-if (in_array(User::getEmail(),Cart::$conf['manager'])) {
-	Session::set('safe.manager',true);
-}
 $ans = array();
 $type = Ans::REQ('type', ['sync', 'orders','order','list','cart','user','admin']);
 if (!$type) $type='cart';//return Ans::err($ans, 'Указан неправильный параметр type');

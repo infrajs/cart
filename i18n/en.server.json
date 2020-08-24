@@ -55,5 +55,11 @@
     "CR054":"To send a letter",
     "CR055":"The letter has been sent!",
     "CR056":"You cannot perform this action with a paid order",
-    "CR057":"Items removed from cart"
+    "CR057":"Items removed from cart",
+    "CR058":"Сity_id required",
+    "CR059":"City not found",
+    "CR060":"Correct transport required",
+    "CR061":"Failed to login",
+    "CR062":"Correct pay required",
+    "CR063":"Comment required"
 }
