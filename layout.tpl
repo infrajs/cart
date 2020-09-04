@@ -4,32 +4,74 @@
 		</div>
 	{cartanswer:}
 		<pre>{mail}</pre>
-	{js:}
-		<script type="module">
-			import { Cart } from '/vendor/infrajs/cart/Cart.js'
-			Cart.init()
-		</script>
 	{LIST:}
 		{:listcrumb}
-		<form 
-		data-autosave="{autosavename}"
-		class="form cart">
-			<h1>{data.order.id?:numbasket?(data.result?:mybasket?:numbasket)}</h1>
-			{data.result?data.order:showlist?:adm_message}
-		</form>
-		{:js}
+		
+		<h1>{data.order?:numbasket?(data.result?:mybasket?:justbasket)}</h1>
+		{(~length(data.order.basket)|data.order.status!:wait)?data.order:showlist?:emptylist}
+
+		<script type="module" async>
+			import { Cart } from '/vendor/infrajs/cart/Cart.js'
+			let div = document.getElementById('{div}')
+			let cls = (cls) => div.getElementsByClassName(cls)[0]
+			let btn = cls('cart-search')
+			let layer = {
+				external: "-cart/search/layer.json"
+			}
+			let order_id = {data.order.order_id}
+			let place = "{:place}"
+
+			if (btn) btn.addEventListener('click', () => {
+				layer.config = { place, order_id }
+				Popup.open(layer);				
+			})
+			
+					
+				
+			//cart-search
+			// import { Popup } from '/vendor/infrajs/popup/Popup.js'
+			// let div = document.getElementById('{div}')
+			// let cls = (cls) => div.getElementsByClassName(cls)[0]
+			// let checkall = document.getElementById('checkall')
+			// let form = document.forms.basket
+			// let dels = form.elements.del
+			// if (!dels) dels = []
+			// else if (!dels.length) dels = [dels]
+			// let order_id = {data.order.order_id}
+			
+			// checkall.addEventListener('click', () => {
+			// 	for (let del of dels) del.checked = checkall.checked
+			// })
+			// cls('act-clear').addEventListener('click', async () => {
+			// 	let ids = []
+			// 	for (let del of dels) if (del.checked) ids.push(del.dataset.position_id)
+			// 	let position_ids = ids.join(',')
+			// 	if (!position_ids) return Popup.alert('Выберите позиции для удаления из корзины')
+			// 	let ans = await Cart.post('remove', { order_id, position_ids })
+			// 	if (!ans.result) return await Popup.alert(ans.msg)
+			// 	//await Popup.success(ans.msg)
+			// })
+			
+			
+		</script>
+		{searchbutton:}
+			<span class="cart-search a">Добавить</span>
+		{opencatalog:}<a href="/catalog">Открыть каталог</a>
+		{emptylist:}
+			В корзине нет товаров. {data.order.active?:opencatalog?:searchbutton}
 		{showlist:}
+			
 			{:cartlistborder}
 			{:couponinfolist}
 		{couponinfolist:}
 			<div class="d-flex flex-column flex-sm-row justify-content-between mt-3">
 				<div class="mr-sm-3 mx-auto mx-sm-0">{:couponinp}</div>
 				<div class="flex-grow-1">
-					<p class="text-center text-sm-right {data.order.coupon_data.result??:d-none}">
-						Итого со скидкой: <b class="carttotal" style="font-size:140%">{total:itemcostrub}</b> 
+					<p class="text-center text-sm-right {data.order.coupondata.result??:d-none}">
+						Сумма со скидкой: <b class="cartsum" style="font-size:140%">{sum:itemcostrub}</b> 
 					</p>
 					<div class="d-flex text-center text-sm-right flex-column">
-						<div class="mb-2"><a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-success">Перейти к {data.order.id?:заказу {data.order.id}?:оформлению заказа}</a></div>
+						<div class="mb-2"><a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-success">Перейти к {data.order.status!:wait?:заказу?:оформлению заказа}</a></div>
 						<div>Займёт не более 3 минут.</div>
 					</div>
 				</div>
@@ -38,8 +80,8 @@
 			<div class="d-flex flex-column flex-sm-row justify-content-between mt-3">
 				<div class="mr-sm-3 mx-auto mx-sm-0">{data.order:couponinp}</div>
 				<div class="flex-grow-1">
-					<p class="text-center text-sm-right {data.order.coupon_data.result??:d-none}">
-						Итого со скидкой: <b class="carttotal" style="font-size:140%">{data.order.total:itemcostrub}</b>
+					<p class="text-center text-sm-right {data.order.coupondata.result??:d-none}">
+						Сумма со скидкой: <b class="cartsum" style="font-size:140%">{data.order.total:itemcostrub}</b>
 					</p>
 				</div>
 			</div>
@@ -51,108 +93,97 @@
 				<div class="d-flex justify-content-between">
 					<div>
 						<div class="custom-control custom-checkbox">
-							<input onclick="$('.showlist :checkbox').prop('checked',$(this).is(':checked')).change();" type="checkbox" class="custom-control-input" name="checkall" id="checkall">
-							<label class="custom-control-label" for="checkall">
-								Выделенное: </label>
-								<span data-param='prodart=' data-id="{data.order.id}" data-place="{data.place}" class="act-clear a">
-									Удалить
-								</span>
-							
+							<input type="checkbox" class="custom-control-input" name="checkall" id="checkall">
+							<label class="custom-control-label" for="checkall">Выделенное: </label>
+							<span class="act-clear a">Удалить</span>
+							<script type="module" async>
+								import { Cart } from '/vendor/infrajs/cart/Cart.js'
+								import { Popup } from '/vendor/infrajs/popup/Popup.js'
+								import { DOM } from '/vendor/akiyatkin/load/DOM.js'
+								let div = document.getElementById('{div}')
+								let cls = (cls) => div.getElementsByClassName(cls)[0]
+								let checkall = document.getElementById('checkall')
+								let form = document.forms.basket
+								let dels = form.elements.del
+								if (!dels) dels = []
+								else if (!dels.length) dels = [dels]
+								let order_id = {data.order.order_id}
+								
+								checkall.addEventListener('click', () => {
+									for (let del of dels) del.checked = checkall.checked
+								})
+								cls('act-clear').addEventListener('click', async () => {
+									let ids = []
+									for (let del of dels) if (del.checked) ids.push(del.dataset.position_id)
+									let position_ids = ids.join(',')
+									if (!position_ids) return Popup.alert('Выберите позиции для удаления из корзины')
+									let ans = await Cart.post('remove', { order_id, position_ids })
+									if (!ans.result) return await Popup.alert(ans.msg)
+									DOM.puff('check')
+									//await Popup.success(ans.msg)
+								})
+								
+								
+							</script>
 						</div>		
 					</div>
 					<div class="text-right">
-						<span data-id="{data.order.id}" data-place="{data.place}" class="cart-search a">Добавить</span>
+						{:searchbutton}
 					</div>
 				</div>
 			</div>
 			
 			<hr>
-			<div class="showlist">
+			<form name="basket">
 				{basket::cartpos}
-			</div>
+			</form>
 			<div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-				<div class="mr-2">Сумма{coupon_data.result?:nodiscount}: </div><div style="font-size:120%; font-weight:bold" class="cartsum">{sum:itemcostrub}</div>
+				<div class="mr-2">Сумма{sumclear!sum?:nodiscount}: </div><div style="font-size:120%; font-weight:bold" class="cartsumclear">{sumclear:itemcostrub}</div>
 			</div>
 			<script type="module">
-				import { CDN } from '/vendor/akiyatkin/load/CDN.js'
-				let Template
-				CDN.on('load','jquery').then(async () => {
-					//При изменении инпутов. надо рассчитать Сумму и Итого с учётом coupon_discount
-					/*
-					cartsum
-					cartsumdel
-					carttotal
-					*/
+				import { Cart } from '/vendor/infrajs/cart/Cart.js'
+				import { Template } from '/vendor/infrajs/template/Template.js'
+				let div = document.getElementById('{div}')
+				let cls = (el, cls) => el.getElementsByClassName(cls)[0]
 
-					var tplcost = val => {
-						return Template.parse('-cart/cart.tpl', val, 'itemcost')
-					}
-					
-					var set = function(el, to) {
-						el = $(el);
-						el.stop();
-						var lastsum = el.data('lastsum');
-						//el.width(el.width()).css('display','inline-block');
-						$({ 
-							n: lastsum
-						}).animate({
-							n: to 
-						}, {
-							duration: 500,
-							step: function (a) {
-								$(el).html(tplcost(Math.round(a)));
-							},
-							complete:  function(){
-								$(el).html(tplcost(to));
-								//el.width('auto');
-							}
-						});
-						el.data('lastsum',to);
-					}
+				let form = document.forms.basket
+				let inputs = form.elements.count
+				if (!inputs) inputs = []
+				else if (!inputs.length) inputs = [inputs]
 
-					var proc = 0;
-					var calc = async () => {
-						Template = (await import('/vendor/infrajs/template/Template.js')).Template
-						if (proc) return;
-						proc = 1;
-						setTimeout(async () => {
-							var zero = false;
-							if (!$.fn.reduce) $.fn.reduce = [].reduce;
-							var sum = $('.cart [type=number]').reduce(function(ak, el){
-								var cost = Number($(el).attr('data-cost'));
-								if (!cost) zero = true;
-								ak+=el.value * cost;
-								return ak;
-							}, 0);
+				let order_id = {data.order.order_id}
+				let place = "{:place}"
+				let order_nick = {data.order.order_nick}
 
-							if (zero) sum = 0;
-							set('.cartsum', sum);
+				var tplcost = val => {
+					let cost = Template.scope['~cost'](val, false, true) + '&nbsp;<small>{:model.unit}</small>'
+					return cost
+				}
 
-							var total = $('.cart [type=number]').reduce(function(ak, el){
-								var cost = $(el).attr('data-coupcost');
-								if (!cost) cost = $(el).attr('data-cost');
-								var sum = el.value * cost;
-								set($(el).parents('.cartpos').find('.coupsum'), sum);
-								//$(el).parents('.cartpos').find('.coupsum').html(tplcost(sum));
-								ak+=sum;
-								return ak;
-							}, 0);
-							
-							if ({coupon_data.result?:true?:false}) {
-								//var total = sum * (1-{coupon_discount|:0});
-								set('.carttotal', total);
-							} else {
-								set('.carttotal', sum);
-								$('.carttotal').html(tplcost(sum));
-							}
-							proc = 0;
-							let { Global } = await import('/vendor/infrajs/layer-global/Global.js')
-							Global.set('cart');
-						}, 1);
-					}
-					
-					$('.cart [type=number]').change(calc);
-				});
+
+				for (let input of inputs) {
+					input.addEventListener('change', async () => {
+						let position_id = input.dataset.position_id
+						let cost = input.dataset.cost
+						let count = input.value
+						let costblock = input.closest('.costblock')
+						cls(costblock, 'sum').innerHTML = tplcost(count * cost)
+
+						let cartsum = 0;
+						let cartsumclear = 0;
+						for (let input of inputs) {
+							let cost = input.dataset.cost
+							let costclear = input.dataset.cost
+							let count = input.value
+							cartsumclear += count * costclear
+							cartsum += count * cost
+						}
+						cls(div, 'cartsum').innerHTML = tplcost(cartsum) //Сумма со скидкой
+						cls(div, 'cartsumclear').innerHTML = tplcost(cartsumclear) //Сумма без скидки
+
+						let ans = await Cart.post('add',{ position_id }, { count })
+					})
+				}
 			</script>
 			{false:}0
 			{true:}1
@@ -160,39 +191,38 @@
 			<div class="border rounded p-3">
 				{:cartlist}
 			</div>
-		{badgecoupon:}&nbsp;<span title="Скидка по купону {Купон}" class="badge badge-pill badge-danger">-{~multi(Скидка,:100)}%</span>
+		{badgecoupon:}&nbsp;<span title="Скидка по купону {data.order.coupon}" class="badge badge-pill badge-danger">-{.}%</span>
 		{cartpos:}
 			<div class="d-flex cartpos">
 				<div style="{:ishidedisabled}">
 					<div class="custom-control custom-checkbox">
-						<input onchange="if (!$.fn.reduce) $.fn.reduce = [].reduce; $('.act-clear').attr('data-param','prodart='+encodeURIComponent(encodeURIComponent($('.showlist :checkbox:checked').reduce(function (ak, el){ ak.push($(el).attr('data-prodart')); return ak },[]).join(','))))" 
-						data-prodart="{~key}" type="checkbox" class="custom-control-input" name="check[{~key}]" id="check{~key}">
+						<input data-position_id="{position_id}" type="checkbox" class="custom-control-input" id="check{~key}" name="del">
 						<label class="custom-control-label" for="check{~key}">&nbsp;</label>
 					</div>
 				</div>
 				<div class="mr-3 d-none d-lg-block" style="min-width:70px">
-					{images.0?:cartposimg}
+					{model.images.0?model:cartposimg}
 				</div>
 				<div class="flex-grow-1">
 					<div>
-						<div class="float-right">{:model.badgenalichie}{coupon:badgecoupon}</div>
-						<b>{change:star} <a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">
-							{Наименование}</a>
+						<div class="float-right">{model:model.badgenalichie}{discount:badgecoupon}</div>
+						<b>{changed?:star} <a href="/catalog/{model.producer_nick}/{model.article_nick}{model:cat.idsl}">
+							{model.Наименование}</a>
 						</b>
 					</div>
 					<div class="d-flex flex-column flex-lg-row">
-						{images.0?:cartposimgm}
+						{model.images.0?model:cartposimgm}
 						<div class="my-2 flex-grow-1">
-							{:model.CART-props}
+							{model:model.CART-props}
 						</div>
-						<div class="my-2 d-flex flex-column ml-lg-3">
+						<div class="my-2 d-flex flex-column ml-lg-3 costblock">
 							<div style="min-width:70px;" class="text-lg-right">
-								<div><del>{coupcost?Цена:itemcostrub}</del></div>
-								{(coupcost|Цена):itemcostrub}
+								<div><del>{cost!model.Цена?model.Цена:itemcostrub}</del></div>
+								{cost:itemcostrub}
 							</div>
-							<div class="my-2"><input {:isdisabled} data-coupcost="{coupcost}" data-cost="{Цена}" style="width:5em" value="{basket[{:prodart}]count}" type="number" min="0" max="999" name="basket.{producer_nick} {article_nick}{:cat.idsp}.count" class="form-control" type="number"></div>
+							<div class="my-2"><input {:isdisabled} data-position_id="{position_id}" data-cost="{cost}" data-costclear="{Цена}" style="width:5em" value="{count}" type="number" min="0" max="999" name="count" class="form-control" type="number"></div>
 							<div style="min-width:70px;" class="text-lg-right">
-								<b class="coupsum">{(coupsum|sum):itemcostrub}</b>
+								<b class="sum">{sum:itemcostrub}</b>
 							</div>
 						</div>
 					</div>
@@ -208,82 +238,168 @@
 				<a href="/{:cat.pospath}" class="my-2 mr-3 d-bock d-sm-none">
 					<img class="img-thumbnail" src="/-imager/?h=100&src={images.0}&or=-imager/empty.png">
 				</a>
-	{ADMORDER:}
-		{:ordercrumb}
-		<div class="cart">
-			{data.result?data:orderPageContent?:ordermessage}
-		</div>
-		{:js}
-		{*adm_orderPageContent:}
-			<div class="float-right" title="Последние измения">{~date(:j F H:i,time)}</div>
-			<h1>{rule.title}</h1>
-			{id?:ordernum}
-			{(data.place=:admin&status=:active)?:adm_orderinfo?:adm_orderinputs}
-		{*msg_samples:}
-			<span class="a" onclick="var t=$('[name=\'manage.comment\']'); t.val(t.val()+$(this).next().html()).change();">{~key}</span><pre style="display:none">{.}
-	</pre>{~last()|:comma}
 	{ORDER:}
-		{:ordercrumb}
-		<div class="cart">
-			{data.result?data:orderPageContent?:ordermessage}
-		</div>
-		{:js}
+		{:ordercrumb}	
+		{data.result??:ordermessage}
+		{~length(data.order.basket)|data.order.status!:wait?data.order:ordercontent?:emptylist}
+		
+		
+
 		{ordermessage:}
-			<h1>{data.order.id}</h1>
-			<h1>{data.order.id?:numorder?:myorder}</h1>
+			<h1>{data.order.order_nick}</h1>
+			<h1>{data.order?:numorder?:myorder}</h1>
 			<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>
 			{data.ismy?:activebutton}
 		{activebutton:}
 			<div style="margin-top:10px">
-				<a href="/cart/orders/my" class="btn btn-success">
+				<a href="/cart/orders/active" class="btn btn-success">
 					Показать заказ
 				</a>
 			</div>
 		{showManageComment:}
 			<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-info" role="alert"><b>Сообщение менеджера</b>
-					<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
+				<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{commentmanager}</pre>
 			</div>
 		{paylayout::}-cart/sbrfpay/layout.tpl
 		{checked:}checked
-		{orderPageContent:}
-			<div class="float-right" title="Последние измения">{~date(:j F H:i,order.time)}</div>
-			<h1>{order.rule.title} {order.id}</h1>
-			{order.manage.comment?order:showManageComment}
-
-			{order:paylayout.INFO}
-			
-			<form class="form"
-				data-autosave="{autosavename}">
-				<div class="accordion" id="accordionorder">
-					{:basket.ORDER}
-				</div>
-				
-				<div class="my-3 mb-4 row">
-					<div class="col-sm-6 mb-2">
-						<div class="mb-2">Комментарий к заказу</div>
-						<textarea {:isdisabled} name="comment" class="form-control" rows="3">{order.comment}</textarea>
+		{ordernick:}№{data.order.order_nick}
+		{orderedit:}<div class="float-right" title="Последние измения">{~date(:j F H:i,order.dateedit)}</div>
+		{autosavename:}{:place}.{order_nick}
+		{ordercontent:}
+			{status=:wait??:orderedit}
+			<form name="cart" class="form" data-autosave2="{data.rule.actions[:place]edit?:autosavename}" style="max-width:600px">
+				<h1>{data.rule.title} <span class="float-right">{:ordernick}</span></h1>
+				{commentmanager?:showManageComment}
+				{:paylayout.INFO}
+				<h2>Данные о покупателе</h2>
+				<div class="border px-5 py-4 my-4">
+					<div class="form-group">
+						<label>ФИО{:req}</label>
+						<input {:isdisabled} type="text" name="name" value="{data.order.name}" class="form-control" placeholder="">
 					</div>
-					<div class="col-sm-6">
+					<div class="form-group">
+						<label>Телефон{:req}</label>
+						<input {:isdisabled} type="tel" name="phone"  value="{data.order.phone}" class="form-control" placeholder="+7 ...">
+					</div>
+					<div class="form-group">
+						<label>Email{:req}</label>
+						<input {:isdisabled} type="email" name="email" value="{data.order.email|data.user.email}" class="form-control" placeholder="Email">
+					</div>
+				</div>
+				<h2>Доставка</h2>
+				<div class="border px-5 py-4 my-4">
+					
+					
+					<div class="mb-2"><img src="/-imager/?w=75&src=images/logo.png"></div>
+					<div class="form-check mt-1">
+						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:self?:checked} id="transport_self" value="self">
+						<label class="ml-1 form-check-label" for="transport_self">
+							Самовывоз в Тольятти
+						</label>
+					</div>
+
+					<h3 class="mt-4 mb-2">В город <span class="{:isedit?:a} citychoice">{data.order.city.city}<span></h3>
+					<script type="module" async>
+						import { City } from "/vendor/akiyatkin/city/City.js"
+						import { Cart } from '/vendor/infrajs/cart/Cart.js'
+						let isedit = {:isedit?:true?:false}
+						if (isedit) {
+							let div = document.getElementById('{div}')
+							let form = document.forms.cart
+							let cls = (cls) => form.getElementsByClassName(cls)[0]
+							let btn = cls('citychoice')
+							let order_id = {data.order.order_id|:active}
+							let place = "{:place}"
+							btn.addEventListener('click', async () => {
+								let city_id = await City.choice()
+								Cart.post('setcity', { order_id }, { city_id })
+							})
+						}
+					</script>
+						
+					<!-- 'city','self','cdek_pvz','cdek_courier','pochta_simple','pochta_1','pochta_courier' -->
+					<div class="mt-4 mb-2"><img alt="СДЕК" src="/-imager/?w=75&src=-cart/images/cdekline.png"></div>
+					<div class="form-check mt-1">
+						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:cdek_pvz?:checked} id="transport_cdek_pvz" value="cdek_pvz">
+						<label class="ml-1 form-check-label" for="transport_cdek_pvz">
+							До пункта выдачи
+						</label>
+					</div>
+					<div class="form-check mt-1">
+						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:cdek_courier?:checked} id="transport_cdek_courier" value="cdek_courier">
+						<label class="ml-1 form-check-label" for="transport_cdek_courier">
+							Курьером
+						</label>
+					</div>
+					<div class="mt-4 mb-2"><img alt="Почта России" src="/-imager/?w=75&src=-cart/images/pochtabig.png"></div>
+					<div class="form-check mt-1">
+						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:pochta_simple?:checked} id="transport_pochta_simple" value="pochta_simple">
+						<label class="ml-1 form-check-label" for="transport_pochta_simple">
+							Посылка обыкновенная
+						</label>
+					</div>
+					<div class="form-check mt-1">
+						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:pochta_1?:checked} id="transport_pochta_1" value="pochta_1">
+						<label class="ml-1 form-check-label" for="transport_pochta_1">
+							Первый класс
+						</label>
+					</div>
+					<div class="form-check mt-1">
+						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:pochta_courier?:checked} id="transport_pochta_courier" value="pochta_courier">
+						<label class="ml-1 form-check-label" for="transport_pochta_courier">
+							Курьер
+						</label>
+					</div>
+				</div>
+				<h2>Оплата</h2>
+				<div class="my-4 d-flex">
+					<div class="flex-grow-1">
+						<div class="mb-2">Комментарий к заказу</div>
+						<textarea {:isdisabled} name="comment" class="form-control" rows="3">{data.order.comment}</textarea>
+					</div>
+					<div class="ml-3">
 						<div class="mb-1">Звонок менеджера</div>
 						<div class="form-check mt-1">
-							<input {:isdisabled} class="form-check-input" type="radio" name="call" {order.call=:yes?:checked} id="exampleRadios1" value="yes">
+							<input data-autosave="false" {:isdisabled} class="form-check-input" type="radio" name="callback" {callback=:yes?:checked} id="exampleRadios1" value="yes">
 							<label class="ml-1 form-check-label" for="exampleRadios1">
-								Мне нужен звонок менеджера для уточнения деталей заказа.
+								Нужен для уточнения деталей.
 							</label>
 						</div>
 						<div class="form-check mt-1">
-							<input {:isdisabled} class="form-check-input" type="radio" name="call" {order.call=:no?:checked} id="exampleRadios2" value="no">
+							<input data-autosave="false" {:isdisabled} class="form-check-input" type="radio" name="callback" {callback=:no?:checked} id="exampleRadios2" value="no">
 							<label class="ml-1 form-check-label" for="exampleRadios2">
-								Звонок не нужен, информация по заказу понятна.
+								Не нужен, информация<br>по заказу понятна.
 							</label>
 						</div>
+						<script type="module">
+							import { Cart } from '/vendor/infrajs/cart/Cart.js'
+							import { Popup } from '/vendor/infrajs/popup/Popup.js'
+
+							let div = document.getElementById('{div}')
+							let radios = document.forms.cart.elements.callback					
+							let order_id = {data.order.order_id|:active}
+							let order_nick = {data.order.order_nick}
+							let place = "{:place}"
+							
+							for (let radio of radios) radio.addEventListener('change', async () => {
+								radio.disabled = true
+								let callback = radios.value;
+								let ans = await Cart.post('setcallback',{ order_id, callback })
+								if (!ans.result) await Popup.alert(ans.msg)
+								radio.disabled = false
+							})
+						</script>
 					</div>
 				</div>
+				{:info}
+
+				{:place=:admin?:adminactions?:useractions}
+				<div class="d-md-none" style="clear:both"></div>	
+				{data.fields.pay.Оплатить онлайн?:paydescr}
 			</form>
-			{order:info}
-			{crumb.parent.name=:admin?:adminactions?:useractions}
-			<div class="d-md-none" style="clear:both"></div>	
-			{data.fields.pay.Оплатить онлайн?:paydescr}
+			
+
+			{place:}{Crumb.child.child.name=:admin?:admin?:orders}
 			{paydescr:}
 				<div id="paydescr">
 					<style>
@@ -318,9 +434,8 @@
 					display: none
 				}
 			</style>
-cd
 			<div class="myactions" data-place="orders">
-				{order.rule.user:myactions}
+				{data.rule.actions[:place]:myactions}
 			</div>
 		
 			<script type="module">
@@ -533,27 +648,108 @@ cd
 	{payinfo:}
 			<div data-value="{~key}" class="pt-2 iteminfo"><div class="m-1 alert border more">{:basket.fields.{tpl}}</div></div>
 		{myactions:}
-			<div style="margin:20px 0;" class="cart">
+			<div class="my-4">
 				<div class="btn-toolbar" role="toolbar">
-					<div class="btn-group dropup">
+					<!-- <div class="btn-group dropup">
 						<button class="btn btn-secondary dropdown-toggle" id="dropdownActionMenu" type="button" data-toggle="dropdown">
 							
 						</button>
 						<div class="dropdown-menu" role="menu" aria-labelledby="dropdownActionMenu">
 							{actions::actprint}
 						</div>	
-					</div>
-					<div class="btn-group ml-2 actionsbtn">
+					</div> -->
+					<div class="btn-group actionsbtn">
 						{buttons::mybtns}
 					</div>
 				</div>
 			</div>
+			<script type="module">
+				import { Cart } from '/vendor/infrajs/cart/Cart.js'
+				import { Popup } from '/vendor/infrajs/popup/Popup.js'
+				import { DOM } from '/vendor/akiyatkin/load/DOM.js'
+				
+				let div = document.getElementById('{div}')
+				let cls = cls => div.getElementsByClassName(cls)[0]
+				let tag = tag => div.getElementsByTagName(tag)[0]
+				let form = document.forms.cart
+				let btn = null;
+				let order_id = {data.order.order_id|:active}
+				let order_nick = {data.order.order_nick}
+				let place = "{:place}"
+				let isedit = {:isedit?:true?:false}
+				
+				let editparam = () => {
+					let email = form.elements.email.value
+					let phone = form.elements.phone.value
+					let name = form.elements.name.value
+					let comment = form.elements.comment.value
+					return { order_id, email, phone, name, comment }
+				}
+				let proc = false;
+
+				let names = ['email','phone','name','comment']
+				let formblock = () => {
+					if (proc) return true
+					proc = true
+					for (let name of names) form.elements[name].disabled = true
+				}
+				let formunblock = () => {
+					proc = false
+					for (let name of names) form.elements[name].disabled = false
+				}
+				if (isedit) {					
+					btn = cls('act-edit')
+					if (btn) btn.addEventListener('click', async () => {
+						if (formblock()) return
+						let ans = await Cart.post('edit', editparam())
+						if (ans.result)	await Popup.success(ans.msg)
+						else await Popup.alert(ans.msg)
+						formunblock()
+					})
+				}
+				
+				btn = cls('act-check')
+				if (btn) btn.addEventListener('click', async () => {
+					if (formblock()) return
+					let ans = null
+					if (isedit) {					
+						ans = await Cart.post('edit', editparam())
+						if (!ans.result) return Popup.alert(ans.msg)
+					}
+					ans = await Cart.post('check', { order_id })
+					if (!ans.result) return await Popup.alert(ans.msg)
+					await Popup.success(ans.msg)
+					await Crumb.go('cart/')
+					formunblock()
+				})
+
+				btn = cls('act-basket')
+				if (btn) btn.addEventListener('click', async () => {						
+					if (formblock()) return
+					Crumb.go('/cart/'+place+'/'+order_nick+'/list')
+					formunblock()
+				})
+				btn = cls('act-wait')
+				if (btn) btn.addEventListener('click', async () => {	
+					if (formblock()) return					
+					let ans = await Cart.post('wait', { order_id })
+					if (!ans.result) return Popup.alert(ans.msg)
+					await DOM.emit('check')
+					formunblock()
+				})
+				btn = cls('act-print') 
+				if (btn) btn.addEventListener('click', async () => {	
+					if (formblock()) return					
+					await Crumb.go('/cart/'+place+'/'+order_nick+'/print')
+					formunblock()
+				})
+			</script>
 			{mybtns:}
-				<div class="act-{act} btn btn-{cls}" data-id="{data.order.id}">
+				<div class="act-{~key} btn btn-{cls}">
 					{title}
 				</div>
 			{actprint:}
-				<div class="dropdown-item act-{act}" style="cursor:pointer" data-id="{data.order.id}">
+				<div class="dropdown-item act-{act}" style="cursor:pointer" data-id="{data.order.order_id}">
 					{title}
 				</div>
 				{actact:}/{crumb}
@@ -563,7 +759,7 @@ cd
 			<h3>В заказе нет товаров</h3>
 			<p align="right">
 				<a href="/{crumb}/list">Редактировать корзину</a><br>
-				<span data-id="{data.order.id}" data-place="{crumb.parent.name}" class="cart-search a">Поиск позиций</span>
+				<span data-id="{data.order.order_id}" data-place="{crumb.parent.name}" class="cart-search a">Поиск позиций</span>
 			</p>
 	{dateFormat:}d.m.Y h:i:s
 {COUPONCHECK:}
@@ -574,7 +770,7 @@ cd
 		    	let name = $('[name=coupon]').val()
 		    	fetch('/-cart/coupon?name=' + name).then(req => req.json()).then(async coupon => {
 		    		let Template = (await import('/vendor/infrajs/template/Template.js')).Template
-		    		$('#coupinfo').html(Template.parse('-cart/cart.tpl', coupon, 'coupinfo'));
+		    		$('#coupinfo').html(Template.parse('-cart/layout.tpl', coupon, 'coupinfo'));
 		    	})
 		    " type="button">Проверить</button>
 		</div>
@@ -582,7 +778,7 @@ cd
 	<div class="py-2" id="coupinfo"></div>
 	{coupinfo:}
 		{result?:coupinfoshow?:coupinfoerr}
-	{coupinfoerr:}{Купон?:coupinfoerr1?:coupinfoerr2}
+	{coupinfoerr:}{Купон?:coupinfoerr1}
 		{coupinfoerr1:}<div class="alert alert-danger"><b>{Купон}</b> &mdash; купон не найден или устарел.</div>
 		{coupinfoerr2:}<div class="alert alert-danger">Укажите код купона.</div>
 	{coupinfoshow:}<div class="alert alert-success">
@@ -598,33 +794,39 @@ cd
 	{d-none:}d-none
 	{couponinp:}
 		<div style="max-width: 300px;" class="input-group">
-			<input name="coupon" {:isdisabled} value="{data.order.coupon}" type="text" class="form-control" id="coupon" placeholder="Укажите купон">
+			<input name="coupon" data-autosave="false" {:isdisabled} value="{data.order.coupon}" type="text" class="form-control" id="coupon" placeholder="Укажите купон">
 			<div class="input-group-append">
 			    <button class="couponbtn btn btn-secondary" type="button">Активировать</button>
 			</div>
 		</div>
 		<script type="module">
 			import { Cart } from '/vendor/infrajs/cart/Cart.js'
+			import { DOM } from '/vendor/akiyatkin/load/DOM.js'
 			let div = document.getElementById('{div}')
 			let cls = cls => div.getElementsByClassName(cls)
 			let btn = cls('couponbtn')[0]
+			let input = document.getElementById('coupon')
 			btn.addEventListener('click', async () => {
-				Cart.action('{crumb.parent.name}', 'sync', '{data.order.id}');
+				let order_id = {data.order.order_id|:active}
+				let coupon = input.value
+				Cart.post('setcoupon', { order_id, coupon })
+				DOM.puff('check')
 			})
 		</script>
 		<div class="py-2">
-			{coupon_data:coupinfo}
+			{coupondata:coupinfo}
 		</div>
 		{prodart:}{producer_nick} {article_nick}{:cat.idsp}
 		{mybasket:}Ваша корзина
-		{numbasket:}Корзина {data.order.id}
+		{justbasket:}Корзина
+		{numbasket:}Корзина №{data.order.order_nick}
 		{myorder:}Оформление заказа
-		{numorder:}Заказ {data.order.id}
+		{numorder:}Заказ {data.order.order_nick}
 	{cartmsg:}<p>Корзина пустая. Добавьте в корзину интересующие позиции.
 			
 			</p>
 			<p>Чтобы добавить позицию нужно кликнуть по иконке корзины рядом с ценой в <a href="/catalog">каталог</a>.</p>
-			<span data-id="{data.order.id}" data-place="{crumb.parent.parent.name}" class="cart-search a float-right">Поиск позиций</span>
+			<span data-id="{data.order.order_id}" data-place="{crumb.parent.parent.name}" class="cart-search a float-right">Поиск позиций</span>
 			<div style="margin-top:10px">
 				<a href="/catalog" style="text-decoration:none" class="btn btn-success">Открыть каталог</a>
 			</div>
@@ -636,7 +838,7 @@ cd
 		</ul>
 		{breaduser:}
 			<li class="breadcrumb-item"><a href="/user">{data.email|:Профиль}</a></li>
-			<li class="breadcrumb-item"><a href="/cart/orders/my/list">Корзина</a></li>
+			<li class="breadcrumb-item"><a href="/cart/orders/active/list">Корзина</a></li>
 		{breadguest:}
 			<li class="breadcrumb-item"><a href="/user/signin">Вход</a></li>
 			<li class="breadcrumb-item"><a href="/user/signup">Регистрация</a></li>
@@ -644,21 +846,34 @@ cd
 	{CART:}
 		{:usercrumb}
 		<h1>Личный кабинет</h1>
-		{data.email?:account?:noaccount}
+		{data.user.email?:account?:noaccount}
 		<!--<p><a href="/cart/orders">Мои заказы</a></p>-->
-		<p>{~length(data.list)?:showinfo}</p>
-		<p>
-			В вашей <a href="/cart/orders/my/list">корзине</a> <b>{data.order.count}</b> {~words(data.order.count,:позиция,:позиции,:позиций)}.
-		</p>
-		
+		<p>{~length(data.list)?:showinfo?:showempty}</p>
 		{data.manager?:mngControl}
+		{showempty:}
+			В Вашей корзине нет <a href="/catalog">товаров</a>.
 		{showinfo:}
+			<h2>Ваши заказы</h2>
+			<style>
+				#{div} .circle {
+					border-radius:50%;
+					display:inline-block;
+					border: solid 1px gray;
+					min-width:20px;
+					text-align:center;
+					padding:0 2px;
+				}
+			</style>
 			<table class="table table-striped">
-				{data.list::stinfo}
+				{data.list::orderinfo}
 			</table>
-		{stinfo:}
-			<tr class="{data.rules.rules[~key].notice}"><td>{data.rules.rules[~key].caption}</td><td>{::prorder}</td></tr>
-			{prorder:}{~key?:br}<a href="/cart/orders/{id}">{id}</a> <nobr>от {~date(:d.m.Y,time)}</nobr> <nobr>на <b>{~cost(total)}</b>&nbsp;руб.</nobr>
+		{orderinfo:}
+			<tr class="{data.rules.rules[~key].notice}">
+				<td><a href="/cart/orders/{order_nick}">{order_nick}</a></td>
+				<td>{(status=:wait&active)?data.meta.rules[status]shortactive?data.meta.rules[status]short}</td>
+				<td>{~cost(sum)}{:model.unit}&nbsp;&nbsp;<span class="circle">{~length(basket)}</span></td>
+				<td>{~date(:d.m.Y,dateedit)}</td>
+			</tr>
 		{br:}<br>
 		{noaccount:}
 			<p>
@@ -666,7 +881,7 @@ cd
 			</p>
 		{account:}
 			<p>
-				Пользователь <a href="/user"><b>{data.email}.</b></a>
+				Пользователь <a href="/user"><b>{data.user.email}.</b></a>
 			</p>
 		{youAreManager:}
 			<div class="alert alert-success" role="alert">
@@ -678,74 +893,55 @@ cd
 			</div>
 	{ORDERS:}
 		<ol class="breadcrumb">
-			<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
+			<li class="breadcrumb-item"><a class="{data.user.admin?:text-danger}" href="/cart">Личный кабинет</a></li>
 			<li class="breadcrumb-item active">Мои заказы</li>
-			<li class="breadcrumb-item"><a href="/cart/orders/my/list">Содержимое корзины</a></li>
-			<li class="breadcrumb-item"><a href="/cart/orders/my">Оформление заказа</a></li>
-			
 		</ol>
 		<h1>Мои заказы</h1>
-		{~length(data.orders)?:ordersList?:noOrders}
+		{~length(data.list)?:showinfo?:noOrders}
 		<div style="margin-top:10px">
-			<a href="/cart/orders/my/list" style="text-decoration:none" class="btn btn-success">Заказ ({data.order.count} {~words(data.order.count,:позиция,:позиции,:позиций)})</a>
+			<a href="/cart/orders/active/list" style="text-decoration:none" class="btn btn-success">Заказ ({~length(data.order.basket)} {~words(~length(data.order.basket),:позиция,:позиции,:позиций)})</a>
 		</div>
 		{noOrders:} <div>В данный момент у вас нет сохранённых заказов с товарами.</div>
-		
-		{ordersList:}
 			
-			
-			{data.orders::rowOrders}
-			
-			
-			{rowOrders:}
-				<div class="border mb-2 p-2">
-					
-					<b><a href="/cart/orders/{status=:active?:my?id}">{status=:active?:Заказ?id}</a></b>
-					 &mdash; <nobr>{rule.short}</nobr>
-					 <div class="float-right">
-					 	{~date(:j F H:i,time)}<br>
-					 	<b>{total:itemcostrub}</b>
-					 </div>
-					
-					
-					
-					<div style="text-overflow: ellipsis; 
-					overflow: hidden;">
-					{basket::product}
+		{*rowOrders:}
+			<div class="border mb-2 p-2">
+				
+				<b><a href="/cart/orders/{status=:active?:active?id}">{status=:active?:Заказ?id}</a></b>
+					&mdash; <nobr>{rule.short}</nobr>
+					<div class="float-right">
+					{~date(:j F H:i,time)}<br>
+					<b>{total:itemcostrub}</b>
 					</div>
-					<div class="clearfix"></div>
-					
+				
+				
+				
+				<div style="text-overflow: ellipsis; 
+				overflow: hidden;">
+				{basket::product}
 				</div>
+				<div class="clearfix"></div>
+				
+			</div>
 
 
-				{dateform:}d.m.Y
-		{isdisabled:}{data.order.rule.edit[data.place]|:disabled}
-		{ishidedisabled:}{data.order.rule.edit[data.place]|:disabledhide}
+			{dateform:}d.m.Y
+		{isedit:}{data.rule.actions[:place]edit?:yes}
+		{isdisabled:}{data.rule.actions[:place]edit|:disabled}
+		{ishidedisabled:}{data.rule.actions[:place]edit|:disabledhide}
 		{disabledhide:}display:none
-	{basketedit:}
+	{*basketedit:}
 		<p align="right">
 			<a href="/{crumb}/list">Редактировать корзину</a><br>
-			<span data-id="{data.order.id}" data-place="{crumb.parent.name}" class="cart-search a">Поиск позиций</span><br>
-			<span data-id="{data.order.id}" data-place="{crumb.parent.name}" class="act-clear a">Очистить</span>
+			<span data-id="{data.order.order_id}" data-place="{crumb.parent.name}" class="cart-search a">Поиск позиций</span><br>
+			<span data-id="{data.order.order_id}" data-place="{crumb.parent.name}" class="act-clear a">Очистить</span>
 		</p>
-	{tableWidthProductopt:}
-		<table class="table table-striped">
-			<tr>
-				<th>Позиция</th>
-				<th class="{merchdyn?:bg-success?:bg-info}"><span>Цена {merchdyn?: оптовая?: розничная}</span></th>
-				<th>Кол<span class="d-none d-sm-inline">ичество</span></th>
-				<th>Сумма</th>
-			</tr>
-			{basket::positionRow}
-			<tr><td class="d-none d-sm-table-cell"></td><td colspan=3 style="text-align:right">{sum:itemcostrub}</td></tr>
-		</table>
 		{manage.summary?:widthSummary}
 		{manage.deliverycost?:widthDivelery}
 
 		
 		{positionRow:}
 			<tr>
-				<td><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{producer} {article}</a>{change?:star}<br>{itemrow}</td>
+				<td><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{producer} {article}</a>{changed?:star}<br>{itemrow}</td>
 				<td>{cost:itemcost}</td>
 				<td>{count}</td>
 				<td class="d-none d-sm-table-cell">{sum:itemcost}</td>
@@ -762,7 +958,7 @@ cd
 
 	{ADMIN:}
 		<ol class="breadcrumb">
-			<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
+			<li class="breadcrumb-item"><a class="{data.user.admin?:text-danger}" href="/cart">Личный кабинет</a></li>
 			<li class="breadcrumb-item active">Все заказы</li>
 		</ol>
 		{data.result?:adm_listPage?:adm_message}
@@ -780,7 +976,7 @@ cd
 			
 				<div class="border mb-2 p-2">
 					
-					<b><a href="/cart/admin/{id}">{id}</a></b> &mdash; <nobr>{rule.short}</nobr>
+					<b><a href="/cart/admin/{order_nick}">{order_nick}</a></b> &mdash; <nobr>{rule.short}</nobr>
 				
 					<div class="float-right text-right">
 						{email}<br>
@@ -828,63 +1024,64 @@ cd
 {usersync:}
 	<script type="module">
 		import { Cart } from '/vendor/infrajs/cart/Cart.js'
-		Cart.usersync()
+		//Cart.usersync()
 	</script>
 {usercrumb:}
 	<ol class="breadcrumb">
-		<li class="breadcrumb-item active {data.manager?:text-danger}">Личный кабинет</li>
-		<li class="breadcrumb-item"><a href="/cart/orders">Мои заказы</a></li>
+		<li class="breadcrumb-item active {data.user.admin?:text-danger}">Личный кабинет</li>
+		<li class="breadcrumb-item"><a href="/cart/orders/active/list">Корзина ({~length(data.list.0.basket)|:0})</a></li>
 	</ol>
 {listcrumb:}
 	{:usersync}
 	<ol class="breadcrumb">
-		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
-		{data.place=:admin?:liallorder}
+		{:mainli}
+		{data.place=:admin?:adminli}
 		<!--<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заявки</a></li>-->
-		<!--<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заявка {crumb.parent.name=:my?:Активная?crumb.parent.name}</a></li>-->
+		<!--<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заявка {crumb.parent.name=:active?:Активная?crumb.parent.name}</a></li>-->
 		<li class="breadcrumb-item active">Содержимое корзины</li>
-		<li class="breadcrumb-item"><a href="/cart/{data.place}/{data.order.id|:my}">Оформление заказа {data.order.id}</a></li>
+		<li class="breadcrumb-item"><a href="/cart/{:place}/{data.order.order_nick|:active}">Оформление заказа {data.order.order_nick}</a></li>
 	</ol>
 {ordercrumb:}
 	{:usersync}
 	<ol class="breadcrumb">
-		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
+		{:mainli}
 		<!--<li class="breadcrumb-item"><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb.parent}">{crumb.parent.name=:admin?:Все?:Мои} заявки</a></li>-->
-		<!--<li class="breadcrumb-item active">Заявка {crumb.name=:my?:Активная?crumb.name}</li>-->
-		{data.place=:admin?:liallorder}
+		<!--<li class="breadcrumb-item active">Заявка {crumb.name=:active?:Активная?crumb.name}</li>-->
+		{data.place=:admin?:adminli}
 		<li class="breadcrumb-item"><a class="{crumb.parent.name=:admin?:text-danger}" href="/{crumb}/list">Содержимое корзины</a>
-		<li class="breadcrumb-item active">Оформление заказа {data.order.id}</li>
+		<li class="breadcrumb-item active">Оформление заказа {data.order.order_nick}</li>
 	</ol>
-	{liallorder:}<li class="breadcrumb-item"><a class="{data.place=:admin?:text-danger}" href="/cart/{data.place}">{data.place=:admin?:Все?:Мои} заказы</a></li>
-	{itemcost:}{~cost(.)}<span class="d-none d-sm-inline">&nbsp;<small>{:model.unit}</small></span>
-	{itemcostrub:}{~cost(.)}&nbsp;<small>{:model.unit}</small>
+	{mainli:}<li class="breadcrumb-item"><a class="{data.user.admin?:text-danger}" href="/cart">Личный кабинет</a></li>
+	{itemcost:}{~cost(.,~false,~true)}<span class="d-none d-sm-inline">&nbsp;<small>{:model.unit}</small></span>
+	{itemcostrub:}{~cost(.,~false,~true)}&nbsp;<small>{:model.unit}</small>
 	{star:}<span class="req" title="Позиция в каталоге изменилась">*</span> 
 	{req:} <span class="req">*</span>
-	{ordernum:}Номер заказа: <b>{id}</b>{manage.paid?:msgpaidorder}
+	{ordernum:}Номер заказа: <b>{order_nick}</b>{manage.paid?:msgpaidorder}
 		{msgpaidorder:}. Оплата <b>{~cost(manage.paid)} руб.</b> отметка {manage.paidtype=:bank?:банка?:менеджера} {~date(:d.m.Y H:i,manage.paidtime)}
 	{adm_message:}
 		<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>
 {PRINT:}
 	<ol class="breadcrumb noprint">
-		<li class="breadcrumb-item"><a class="{Session.get().safe.manager?:text-danger}" href="/cart">Личный кабинет</a></li>
-		<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заказы</a></li>
-		<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заказ {crumb.parent.name=:my??crumb.parent.name}</a></li>
+		{:mainli}
+		{:place=:admin?:adminli}
+		<li class="breadcrumb-item"><a class="{:place=:admin?:text-danger}" href="/{crumb.parent}">Заказ {crumb.parent.name=:active??crumb.parent.name}</a></li>
 		<li class="breadcrumb-item active">Версия для печати</li>
 	</ol>
-	<h1>Заказ {id}{time:ot}</h1>
+	<h1>Заказ {order_nick}{time:ot}</h1>
 	{:printorder}
 	{ot:} от {~date(:d.m.Y,.)}
+	{adminli:}<li class="breadcrumb-item"><a class="text-danger" href="/cart/admin">Все заказы</a></li>
 {printorder:}
 	<b>ФИО</b>: {name}<br>
 	<b>Почта</b>: {email}<br>
 	<b>Телефон</b>: {phone}<br>
-	{call?:pr-call}
+	{callback?:pr-call}
 	{time?:pr-time}
 	{transport:iprinttr}
 	{pay:iprintpay}
 	<hr>
 	<p>
-		<b>{count} {~words(count,:позиция,:позиции,:позиций)}</b>
+		<b>{~length(basket)} {~words(~length(basket),:позиция,:позиции,:позиций)}</b>
 	</p>
 	{:basketresume}
 	{:amount}
@@ -895,7 +1092,7 @@ cd
 	{basket::model.PRINT-item}
 {amount:}
 	<p>
-		Стоимость{coupon?:nodiscount}: <b>{~cost(sum)}&nbsp;руб.</b><br>
+		Стоимость{coupon?:nodiscount}: <b>{~cost(sumclear)}&nbsp;руб.</b><br>
 		{coupon?:prcoupon}
 	</p>
 {prcom:}
@@ -908,11 +1105,11 @@ cd
 		Комментарий менеджера:
 		<pre style="margin-top:0"><b><i>{manage.comment}</i></b></pre>
 	
-{pr-call:}<b>Перезвонить</b>: {call=:yes?:yescall?(call=:no?:nocall)}<br>
+{pr-call:}<b>Перезвонить</b>: {callback=:yes?:yescall?(callback=:no?:nocall)}<br>
 {yes:}yes
 {no:}no
 {yescall:}да
-{my:}my
+{active:}active
 {nocall:}звонок не требуется
 {iprinttr:}
 	<b>Доставка</b>: {choice} 
@@ -949,7 +1146,7 @@ cd
 	{~key}: {.}<br>
 {prcoupon:}
 	Купон: <b>{coupon}</b><br>
-	Итого со скидкой: <b>{~cost(total)}&nbsp;руб.</b><br>
+	Сумма со скидкой: <b>{~cost(sum)}&nbsp;руб.</b><br>
 {pr-time:}
 	<b>Дата изменений</b>: {~date(:H:i j F Y,time)}<br>
 {pr-deliver:}

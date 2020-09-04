@@ -32,7 +32,7 @@
 				<div class="input-group input-group-sm" title="Купить {producer} {article} {item}">
 					<input type="number" value="1" min="0" max="999" class="form-control" style="width:60px;">
 					<div class="input-group-append">
-						<span data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}{catkit:ampval}" class="add btn input-group-addon">{~conf.cart.textadd}</span>
+						<span data-model_id="{model_id}" data-item_num="{item_num}" data-catkit="{catkit:ampval}" class="add btn input-group-addon">{~conf.cart.textadd}</span>
 					</div>
 				</div>
 			</div>

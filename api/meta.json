@@ -1,7 +1,116 @@
 {
+	"rules":{
+        "wait":{
+			"notice":"default",
+
+			"short":"2.m1",
+			"shortactive":"6.m1",
+			"caption":"3.m1",
+			"title":"4.m1",
+
+			"actions":{
+				"admin":{
+					"edit":true
+				},
+				"orders":{
+					"edit":true,
+					"buttons":{
+						"sbrfpay":"success",
+						"edit":"primary",
+						"check":"success",
+						"print":"secondary"
+					},
+					"actions":["check","print","basket"]
+				}
+			}
+			
+		},
+        "check":{
+			"notice":"warning",
+
+			"short":"На проверке",
+			"caption":"Заказы ожидающие проверку менеджера",
+			"title":"Заказ находится на проверке",
+
+			"actions":{
+				"orders":{
+					"buttons":{
+						"basket":"secondary", 
+						"wait":"secondary",
+						"print":"secondary"
+					},
+					"actions":["print"]
+				},
+				"admin":{
+					"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
+					"actions":["complete","delete","edit","print"]
+				}
+			}
+		},
+		"complete":{
+			"notice":"default",
+
+			"short":"Готов",
+			"caption":"Выполненные заказы",
+			"title":"Заказ выполнен",
+
+			"actions":{
+				"orders":{
+					"buttons":{"print":"success"},
+					"actions":["print"]
+				},
+				"admin":{
+					"buttons":{"basket":"secondary", "email":"danger"},
+					"actions":["delete","email","edit","print"]
+				}
+			}
+		},
+		"paykeeper":{
+			"notice":"info",
+
+			"caption":"Заказы ожидающие оплату",
+			"short":"Ожидает оплату",
+			"title":"Заказ ожидает оплату",
+
+			"actions":{
+				"orders":{
+					"buttons":{"basket":"secondary","paykeeper":"success"},
+					"actions":["edit","print"]
+				},
+				"admin":{
+					"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
+					"actions":["complete","delete","edit","print"]
+				}
+			}
+		},
+		"sbrfpay":{
+			"notice":"info",
+
+			"caption":"Заказы ожидающие оплату",
+			"short":"Ожидает оплату",
+			"title":"Заказ ожидает оплату",
+
+			"actions":{
+				"orders":{
+					"buttons":{"basket":"secondary","sbrfpay":"success"},
+					"actions":["edit","print"]
+				},
+				"manager":{
+					"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
+					"actions":["complete","delete","edit","print"]
+				}
+			}
+        }
+	},
     "actions":{
+		"cart":{
+			"handlers":{
+			
+			}
+        },
 		"orders":{
 			"handlers":{
+				"admin":true,
 				"fuser":true
 			}
         },
@@ -22,6 +131,22 @@
 				"order":true
 			}
 		},
+		"addremove":{
+			"handlers":{
+				"rule":true,
+				"edit":true,
+				"status":["wait"],
+				"model":true
+			}
+		},
+		"remove":{
+			"handlers":{
+				"rule":true,
+				"edit":true
+			},
+			"title":"CR051",
+			"noscroll":true
+		},
 		"add":{
 			"handlers":{
 				"rule":true,
@@ -36,11 +161,8 @@
 			"handlers":{
 				"rule":true,
 				"payd":true,
-				"city":true,
 				"status":["wait"],
-				"timezone":true,
-				"freeze":true,
-				"checkdata":true
+				"freeze":true
 			}
 		},
 		"wait":{
@@ -58,8 +180,7 @@
 			"handlers":{
 				"rule":true,
 				"edit":true,
-				"status":["wait"],
-				"ouser":true
+				"status":["wait"]
 			}
 		},
         "delete":{
@@ -72,14 +193,7 @@
 			"title":"CR047",
 			"confirm":"CR048"
 		},
-		"remove":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			},
-			"title":"CR051",
-			"noscroll":true
-		},
+		
 		"settransport":{
 			"handlers":{
 				"rule":true,
@@ -92,11 +206,16 @@
 				"edit":true
 			}
 		},
+		"setcallback":{
+			"handlers":{
+				"rule":true,
+				"edit":true
+			}
+		},
 		"setcity":{
 			"handlers":{
 				"rule":true,
-				"edit":true,
-				"city":true
+				"edit":true
 			}
 		},
 		"setlang":{
@@ -105,11 +224,15 @@
 				"edit":true
 			}
 		},
-        
+		"setcoupon":{
+			"handlers":{
+				"rule":true,
+				"edit":true
+			}
+		},
 		"clear":{
 			"handlers":{
 				"status":["wait"],
-				"order":true,
 				"post":true,
 				"payd":true,
 				"rule":true
@@ -121,7 +244,6 @@
 			"handlers":{
 				"status":true,
 				"admin":true,
-				"order":true,
 				"post":true,
 				"rule":true
 			},
@@ -138,7 +260,7 @@
 			"handlers":{
 				"checkdata":true
 			},
-			"title":"Оплатить",
+			"title":"1.m1",
 			"gohistory":{
 				"orders":"/cart/orders/{order_nick}",
 				"admin":"/cart/admin/{order_nick}"
@@ -152,7 +274,7 @@
 			"handlers":{
 				"checkdata":true
 			},
-			"title":"Оплатить",
+			"title":"1.m2",
 			"gohistory":{
 				"orders":"/cart/orders/{order_nick}",
 				"admin":"/cart/admin/{order_nick}"
@@ -165,15 +287,15 @@
 		"print":{
 			"title":"CR052.1M",
 			"go":{
-				"orders":"/cart/orders/{order_nick|:my}/print",
-				"admin":"/cart/admin/{order_nick|:my}/print"
+				"orders":"/cart/orders/{order_nick|:active}/print",
+				"admin":"/cart/admin/{order_nick|:active}/print"
 			}
 		},
 		"basket":{
 			"title":"CR053.1M",
 			"go":{
-				"orders":"/cart/orders/{order_nick|:my}/list",
-				"admin":"/cart/admin/{order_nick|:my}/list"
+				"orders":"/cart/orders/{order_nick|:active}/list",
+				"admin":"/cart/admin/{order_nick|:active}/list"
 			}
 		},
 		"setcommentmanager":{
@@ -193,92 +315,5 @@
 				"tplroot":"EMAIL"
 			}
 		}
-	},
-	"rules":{
-        "wait":{
-			"notice":"default",
-			"short":"",
-			"caption":"Заказ",
-			"title":"Оформление заказа",
-			"actions":{
-				"admin":{
-					"edit":true
-				},
-				"orders":{
-					"edit":true,
-					"buttons":{
-						"basket":"secondary", 
-						"sbrfpay":"success",
-						"check":"success"
-					},
-					"actions":["check","print"]
-				}
-			}
-			
-		},
-        "check":{
-			"notice":"warning",
-			"short":"На проверке",
-			"caption":"Заказы ожидающие проверку менеджера",
-			"title":"Заказ находится на проверке",
-			"actions":{
-				"orders":{
-					"buttons":{"basket":"secondary"},
-					"actions":["print"]
-				},
-				"admin":{
-					"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
-					"actions":["complete","delete","sync","print"]
-				}
-			}
-		},
-		"complete":{
-			"notice":"default",
-			"short":"Готов",
-			"caption":"Выполненные заказы",
-			"title":"Заказ выполнен",
-			"actions":{
-				"orders":{
-					"buttons":{"print":"success"},
-					"actions":["print"]
-				},
-				"admin":{
-					"buttons":{"basket":"secondary", "email":"danger"},
-					"actions":["delete","email","sync","print"]
-				}
-			}
-		},
-		"paykeeper":{
-			"notice":"info",
-			"caption":"Заказы ожидающие оплату",
-			"short":"Ожидает оплату",
-			"title":"Заказ ожидает оплату",
-			"actions":{
-				"orders":{
-					"buttons":{"basket":"secondary","paykeeper":"success"},
-					"actions":["sync","print"]
-				},
-				"admin":{
-					"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
-					"actions":["complete","delete","sync","print"]
-				}
-			}
-		},
-		"sbrfpay":{
-			"notice":"info",
-			"caption":"Заказы ожидающие оплату",
-			"short":"Ожидает оплату",
-			"title":"Заказ ожидает оплату",
-			"actions":{
-				"orders":{
-					"buttons":{"basket":"secondary","sbrfpay":"success"},
-					"actions":["sync","print"]
-				},
-				"manager":{
-					"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
-					"actions":["complete","delete","sync","print"]
-				}
-			}
-        }
 	}
 }

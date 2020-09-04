@@ -3,10 +3,10 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     `order_nick` int(8) unsigned,
     `comment` TEXT NULL COMMENT '',
     `commentmanager` TEXT NULL COMMENT '',
-    `answer` TEXT NULL COMMENT '',
-    `email` varchar(255) NULL,
-    `phone` varchar(255) NULL,
-    `name` varchar(255) NULL,
+    `email` TINYTEXT NULL,
+    `phone` TINYTEXT NULL,
+    `name` TINYTEXT NULL,
+    `callback` ENUM('yes','no','') NOT NULL DEFAULT '',
     `status` ENUM('wait','pay','check','complete') NOT NULL DEFAULT 'wait' COMMENT 'Доступные статусы',
     `lang` ENUM('ru','en') NOT NULL COMMENT 'Определёный язык интерфейса посетителя',
     
@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     
     `city_id` MEDIUMINT NOT NULL COMMENT 'Город определённый или изменённый, для сортировки заявок и расчёта стоимости доставки. Может отличаться от выбранного города в заказе',
     `coupon` TINYTEXT NOT NULL DEFAULT '' COMMENT 'Привязанный купон',
+    `coupondata` JSON NULL DEFAULT NULL COMMENT 'Данные купона',
     `transport` ENUM('city','self','cdek_pvz','cdek_courier','pochta_simple','pochta_1','pochta_courier') NULL COMMENT 'Выбор пользователя',
     `pvz` TEXT NULL COMMENT 'Адрес в городе',
     `address` TEXT NULL COMMENT 'Адрес в городе',
@@ -56,11 +57,13 @@ CREATE TABLE IF NOT EXISTS `cart_basket` (
     
     `model_id` MEDIUMINT unsigned NULL COMMENT 'Может быть NULL -- UNIQUE INDEX будет работать, если позиция удалена из каталога - тогда null и есть json или вся запись удаляется об этой позиции из корзины.',
     `item_num` SMALLINT unsigned NULL COMMENT '',
-    `catkit` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Оригинальная строка идентифицирующая sum и комплектацию. NULL не может быть для работы unique index. Если нет указывается пустая строка.',
-    `hash` VARCHAR(255) NULL COMMENT 'хэш данных позиции - было ли изменение в описании замороженной позиции используется до распаковки json и сравнения его с позицией в каталоге',
+    `catkit` TINYTEXT NOT NULL DEFAULT '' COMMENT 'Оригинальная строка идентифицирующая sum и комплектацию. NULL не может быть для работы unique index. Если нет указывается пустая строка.',
+    `hash` TINYTEXT NULL COMMENT 'хэш данных позиции - было ли изменение в описании замороженной позиции используется до распаковки json и сравнения его с позицией в каталоге',
     `json` MEDIUMTEXT NULL COMMENT 'freeze json позиции с собранным kits. Не может быть пустой объект - если позиции на момент фриза в каталоге нет, то и в корзине позиция не покажется, так как будет удалена по событию из showcase',
     
-    `cost` DECIMAL(19,2) NULL COMMENT 'Цена',
+    `cost` DECIMAL(19,2) NULL COMMENT 'Цена с купоном',
+    `sum` DECIMAL(19,2) NULL COMMENT 'Сумма с купоном',
+    `discount` INT(2) NULL COMMENT 'Скидка по купону',
     `count` SMALLINT unsigned NOT NULL COMMENT 'Количество',
     
     `dateadd` DATETIME NULL DEFAULT NULL COMMENT 'Дата добавления',

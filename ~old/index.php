@@ -23,6 +23,7 @@ if (!$type) $type='cart';//return Ans::err($ans, 'Указан неправил�
 $place = Ans::REQ('place',['orders', 'admin'], 'orders');
 $ans['place'] = $place;
 $ans['type'] = $type;
+
 $orderid = Ans::REQ('id');
 if ($orderid == 'my') $orderid = '';
 if (!Cart::canI($orderid)) {

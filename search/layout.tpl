@@ -30,7 +30,9 @@
 			var div = $('.cart-search-complete');
 			div.find('.button').click( function () {
 				if (!prodart) return;
-				Cart.add('{config.place}', '{config.id}', prodart);
+				let place = '{config.place}'
+				let order_id = {config.order_id}
+				Cart.api('add', { place, order_id });
 				div.find('.input').val('');
 			});
 			var query = '';
@@ -42,23 +44,24 @@
 					//Template = (await import('/vendor/infrajs/template/Template.js')).Template
 				},
 				serviceUrl: function (q) {
-					query = q;
-					return '/-cart/rest/search/' + q;
+					var query = encodeURIComponent(q);
+					return '/-catalog/live/' + query;
 				},
 				onSelect: function (suggestion) {
 					var pos = suggestion.data;
-					prodart = pos['producer_nick'] + ' ' + pos['article_nick'];
-					if (pos['id']) prodart += ' ' + pos['id'];
-					Popup.confirm('Количество: <input name="count" type="number">', function (div) {
+					let place = '{config.place}'
+					let order_id = {config.order_id}
+					let mic = {	
+						model_id: pos.model_id,
+						item_num: pos.item_num,
+						catkit: pos.catkit || ''
+					}
+					
+					Popup.confirm('Количество: <input name="count" type="number">', async div => {
 						div = $(div)
 						var count = div.find('[name=count]').val();
-						Cart.set('{config.place}', '{config.id}', prodart, count, async () => {
-							await Cart.act('{config.place}', 'sync', '{config.id}', function(ans){
-								//console.log(ans);
-							});
-							Global.check('cart');	
-						});
-						
+						await Cart.api('add', { ...mic, place, order_id, count });
+						Global.check('cart');	
 					}, pos['producer'] + ' ' + pos['article'] + '<br><small>' + pos['item_nick']+'</small>');
 					
 				},
@@ -84,7 +87,7 @@
 					if (!currentValue) return suggestion;
 					//var pattern = '(' + $.Autocomplete.utils.escapeRegExChars(currentValue) + ')';
 					//var res = suggestion.value;
-					var res = Template.parse('-cart/rest/search/layout.tpl',suggestion.data, 'SUGGESTION');
+					var res = Template.parse('-cart/search/layout.tpl',suggestion.data, 'SUGGESTION');
 					return res;
 			    }
 			});

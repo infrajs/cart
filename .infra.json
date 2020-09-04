@@ -4,7 +4,6 @@
 	"coupon":true,
 	"conf":"infrajs\\cart\\Cart",
 	"js":["Cart.js","infra.js"],
-	"css":"cart.css",
 	"require":"infra.php",
 	"update":"update.php",
 	"transports":["city","self","cdek_pvz","cdek_courier","pochta_simple","pochta_1","pochta_courier"],
