@@ -17,7 +17,8 @@
 				"jsontpl":"-cart/api/order?lang={Cart.lang()}&order_nick={crumb.name}&order_nick={crumb.name}&token={User.token()}",
 				"autosavenametpl":"orders.{crumb.name}",
 				"tpl":"-cart/layout.tpl",
-				"global":["user", "cart"],
+				"global":["user", "cart-order"],
+				"globaljson":["cart"],
 				"tplroot":"ORDER",
 				"childs":{
 					"sbrfpay":{
@@ -29,7 +30,8 @@
 					"list":{					
 						"tpl":"-cart/layout.tpl",
 						"tplroot":"LIST",
-						"global":["user", "cart"],
+						"global":["user", "cart-list"],
+						"globaljson":["cart"],
 						"jsontpl":"-cart/api/order?lang={Cart.lang()}&order_nick={crumb.parent.name}&token={User.token()}"
 					},
 					"print":{

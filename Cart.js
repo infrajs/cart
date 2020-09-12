@@ -6,6 +6,7 @@ import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
 import { User } from '/vendor/infrajs/user/User.js'
 import { City } from '/vendor/akiyatkin/city/City.js'
+import { View } from '/vendor/infrajs/view/View.js'
 
 import { Load } from '/vendor/akiyatkin/load/Load.js'
 import { Lang } from '/vendor/infrajs/lang/Lang.js'
@@ -32,7 +33,12 @@ let Cart = {
 	// 	return ans
 	// },
 
-
+	
+	dis (form, val = true) {
+		if (val && form.dataset.proc == 'true') return true
+		form.dataset.proc = val
+		for (let el of document.forms.cart.elements) el.disabled = val
+	},
 	get: (type, param) => {
 		let token = User.token()
 		let lang = Cart.lang()
@@ -42,16 +48,50 @@ let Cart = {
 		Global.unload('cart', src)
 		return Load.fire('json', src)
 	},
-	//post: async (type, param, opt) => { 
-	post: (type, param, opt) => {
+	strip_tags: (html) => {
+		var tmp = document.createElement("DIV")
+		tmp.innerHTML = html
+		return tmp.textContent || tmp.innerText || ""
+	},
+	post: async (type, param, opt) => {
+		const ans = await Cart.posts(type, param, opt)
+		DOM.puff('check')
+		return ans
+	},
+	posts: async (type, param, opt) => {
 		let token = User.token()
 		let lang = Cart.lang()
 		let city_id = City.id()
 		let timezone = Intl.DateTimeFormat ? Intl.DateTimeFormat().resolvedOptions().timeZone : ''
 		let submit = 1
-		param = { ...param, lang, submit, token, city_id, timezone }
-		let args = Cart.args(param)
-		return Cart.puff('post', '-cart/api/' + type + '?' + args, opt)
+
+		const groupsrc = '-cart/api/' + type + '?' + Cart.args({ ...param, lang, submit, token, city_id, timezone })
+
+		let ans
+		if (opt) {
+			const src = groupsrc + '&' + Cart.args(opt)
+			ans = await Load.puff('json', src, groupsrc)
+		} else {
+			const src = groupsrc
+			ans = await Load.emit('json', src)
+		}
+		if (~['add','addremove','clear','check','delete'].indexOf(type)) {
+			Global.check('cart-sum')
+		}
+		Global.set('cart')
+		if (!ans) ans = {
+			"result":0,
+			"msg":"Ошибка на сервере"
+		}
+		if (ans.token || ans.token === '') {
+			View.setCOOKIE('token', ans.token)
+			Global.set('user')
+		}
+		return ans
+	},
+	maplayer: {
+		"tpl":"-cart/layout.tpl",
+		"tplroot":"MAP"				
 	},
 	args: (param) => {
 		let args = [];
@@ -472,13 +512,6 @@ let Cart = {
 // 	}
 // }
 
-
-Cart.hand('post', async (src, res, opt) => {
-	if (opt) src += '&' + Cart.args(opt)
-	let ans = await Load.emit('json', src)
-	Global.check('cart')
-	return ans
-})
 
 
 window.Cart = Cart

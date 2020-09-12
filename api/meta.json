@@ -16,7 +16,6 @@
 					"edit":true,
 					"buttons":{
 						"sbrfpay":"success",
-						"edit":"primary",
 						"check":"success",
 						"print":"secondary"
 					},
@@ -155,11 +154,15 @@
 				"model":true
 			}
         },
+        "mystat":{
+
+        },
         "check":{
 			"goal":"cart",
 			"title":"CR049.1M",
 			"handlers":{
 				"rule":true,
+				"checkdata":true,
 				"payd":true,
 				"status":["wait"],
 				"freeze":true
@@ -175,14 +178,6 @@
 				"status":["check"]
 			}
 		},
-		"edit":{
-			"title":"CR041",
-			"handlers":{
-				"rule":true,
-				"edit":true,
-				"status":["wait"]
-			}
-		},
         "delete":{
 			"handlers":{
 				"rule":true,
@@ -193,7 +188,42 @@
 			"title":"CR047",
 			"confirm":"CR048"
 		},
-		
+		"setcomment":{
+			"handlers":{
+				"rule":true,
+				"edit":true
+			}
+		},
+		"setzip":{
+			"handlers":{
+				"rule":true,
+				"edit":true
+			}
+		},
+		"setname":{
+			"handlers":{
+				"rule":true,
+				"edit":true
+			}
+		},
+		"setaddress":{
+			"handlers":{
+				"rule":true,
+				"edit":true
+			}
+		},
+		"setemail":{
+			"handlers":{
+				"rule":true,
+				"edit":true
+			}
+		},
+		"setphone":{
+			"handlers":{
+				"rule":true,
+				"edit":true
+			}
+		},
 		"settransport":{
 			"handlers":{
 				"rule":true,

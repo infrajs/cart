@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     `lang` ENUM('ru','en') NOT NULL COMMENT 'Определёный язык интерфейса посетителя',
     
     `freeze` int(1) unsigned NOT NULL DEFAULT 0 COMMENT 'Метка заморожены ли позиции',
-    `sum` DECIMAL(19,2) NOT NULL COMMENT 'Сумма к оплате с учётом купона и доставки. Пересчитывается при изменении корзины',
+    `sum` DECIMAL(19,2) NOT NULL COMMENT 'Сумма за корзину с учётом купона и доставки. Пересчитывается при изменении корзины',
     `paid` int(1) unsigned NOT NULL COMMENT 'Метка была ли онлайн оплата',
     `pay` ENUM('self','card','corp') NULL,
 
@@ -19,7 +19,11 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     `city_id` MEDIUMINT NOT NULL COMMENT 'Город определённый или изменённый, для сортировки заявок и расчёта стоимости доставки. Может отличаться от выбранного города в заказе',
     `coupon` TINYTEXT NOT NULL DEFAULT '' COMMENT 'Привязанный купон',
     `coupondata` JSON NULL DEFAULT NULL COMMENT 'Данные купона',
-    `transport` ENUM('city','self','cdek_pvz','cdek_courier','pochta_simple','pochta_1','pochta_courier') NULL COMMENT 'Выбор пользователя',
+    `transport` ENUM(
+        'city','self','cdek_pvz',
+        'cdek_courier','pochta_simple','pochta_1',
+        'pochta_courier'
+    ) NULL COMMENT 'Выбор пользователя',
     `pvz` TEXT NULL COMMENT 'Адрес в городе',
     `address` TEXT NULL COMMENT 'Адрес в городе',
     `zip` TEXT NULL COMMENT 'Индекс',
@@ -41,13 +45,14 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
 CREATE TABLE IF NOT EXISTS `cart_transports` (
     `order_id` MEDIUMINT unsigned NOT NULL,
     `type` ENUM(
-        'cdek_pvz','cdek_courier',
-        'pochta_simple','pochta_1','pochta_courier'
+        'city','self','cdek_pvz',
+        'cdek_courier','pochta_simple','pochta_1',
+        'pochta_courier'
     ) NULL COMMENT 'Выбор пользователя',
     `cost` SMALLINT NULL COMMENT 'Цена',
     `min` TINYINT NULL COMMENT 'Cрок в днях',
     `max` TINYINT NULL COMMENT 'Cрок в днях',
-
+    UNIQUE INDEX (`order_id`,`type`)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cart_basket` (

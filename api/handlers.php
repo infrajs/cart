@@ -20,10 +20,8 @@ $handlers = $meta['actions'][$action]['handlers'] ?? [];
 if (empty($handlers['rule'])) {
 	//Опции действуют только с rule
 	if (!empty($handler['freeze'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
-	if (!empty($handler['ouser'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
 	if (!empty($handler['unfreeze'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
 	if (!empty($handlers['status'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
-	if (!empty($handlers['edit'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
 	if (!empty($handlers['payd'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
 	if (!empty($handlers['checkdata'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
 }
@@ -32,7 +30,7 @@ if (!empty($handlers['rule'])) {
 	//rule создаёт заявку и пользователя если их нет
 	//Обязательные опции для rule
 	$handlers['order'] = true;
-	$handlers['ouser'] = true;
+	//$handlers['ouser'] = true;
 	$handlers['post'] = true;
 }
 
@@ -71,7 +69,7 @@ if (!empty($handlers['model'])) {
 	}
 	if ($model_id) {
 		$item_num = Ans::REQ('item_num', 'int', 1);
-		$catkit = Ans::REQ('catkit', 'string', '');
+		$catkit = Ans::REQS('catkit', 'string', '');
 		$pos = [
 			'model_id' => $model_id,
 			'item_num' => $item_num,
@@ -89,7 +87,8 @@ if (!empty($handlers['model'])) {
 if (!empty($handlers['order'])) {
 	$order_id = Ans::REQ('order_id');
 	if ($order_id === 'active') $order_id = null;
-	$order_nick = Ans::REQ('order_nick');
+
+	$order_nick = Ans::REQS('order_nick');
 	if ($order_nick === 'active') $order_nick = null;
 	if (!is_null($order_id)) {
 		$order = Cart::getById($order_id);
@@ -111,8 +110,7 @@ if (!empty($handlers['rule'])) {
 	$city_id = Ans::REQ('city_id', 'int', null);
 	if (is_null($city_id)) return Cart::fail($ans, $lang, 'CR058.h'.__LINE__);
 	
-
-	$timezone = Ans::REQ('timezone', 'string', null); //Intl.DateTimeFormat().resolvedOptions().timeZone (Asia/Dubai)
+	$timezone = Ans::REQS('timezone', 'string', null); //Intl.DateTimeFormat().resolvedOptions().timeZone (Asia/Dubai)
 	if (is_null($timezone)) return User::fail($ans, $lang, 'U036.h'.__LINE__);
 	
 	if (!$order) {
@@ -170,18 +168,19 @@ if (!empty($handlers['rule'])) {
 }
 
 
-if (!empty($handlers['ouser'])) {
-	if (empty($order['email'])) {
-		$ouser = $user;
-	} else {
-		$ouser = User::getByEmail($order['email']);
-		if (empty($ouser)) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
-	}
-}
+// if (!empty($handlers['ouser'])) {
+// 	if (empty($order['email'])) {
+// 		$ouser = $user;
+// 	} else {
+// 		$ouser = User::getByEmail($order['email']);
+// 		//if (empty($ouser)) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
+// 		if (empty($ouser)) $ouser = $user;
+// 	}
+// }
 
 if (!empty($handlers['fuser'])) {
 	$user_id = Ans::REQ('user_id', 'int', null);
-	$email = Ans::REQ('email');
+	$email = Ans::REQS('email');
 	if (!is_null($user_id)) {
 		$fuser = User::getById($user_id);
 	} else if (!is_null($email)) {

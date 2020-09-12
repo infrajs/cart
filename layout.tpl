@@ -4,21 +4,35 @@
 		</div>
 	{cartanswer:}
 		<pre>{mail}</pre>
+	{LISTgood:}
+		<h1>Корзина <span class="float-right">{:ordernick}</span></h1>
+		{(~length(data.order.basket)|data.order.status!:wait)?data.order:showlist?:emptylist}
+	{LISTbad:}
+		<h1>Корзина</h1>
+		{:emptylist}
 	{LIST:}
 		{:listcrumb}
-		
-		<h1>{data.order?:numbasket?(data.result?:mybasket?:justbasket)}</h1>
-		{(~length(data.order.basket)|data.order.status!:wait)?data.order:showlist?:emptylist}
+		<div style="max-width:600px">
+			
+			<!-- 
+				Корзина есть комбинация шапок. Как это всё выбрать в шаблоне. Когда каждый вариант может ещё дополнительно параметризироваться или лучше нет.
+
+				Если заказа ещё нет это ошибка
+			-->
+			{data.result?:LISTgood?:LISTbad}
+		</div>
 
 		<script type="module" async>
 			import { Cart } from '/vendor/infrajs/cart/Cart.js'
+			import { Popup } from '/vendor/infrajs/popup/Popup.js'
+
 			let div = document.getElementById('{div}')
 			let cls = (cls) => div.getElementsByClassName(cls)[0]
 			let btn = cls('cart-search')
 			let layer = {
 				external: "-cart/search/layer.json"
 			}
-			let order_id = {data.order.order_id}
+			const order_id = {:order_id}
 			let place = "{:place}"
 
 			if (btn) btn.addEventListener('click', () => {
@@ -58,9 +72,8 @@
 			<span class="cart-search a">Добавить</span>
 		{opencatalog:}<a href="/catalog">Открыть каталог</a>
 		{emptylist:}
-			В корзине нет товаров. {data.order.active?:opencatalog?:searchbutton}
+			В корзине нет товаров. {data.order?(data.order.active?:opencatalog?:searchbutton)?:opencatalog}.
 		{showlist:}
-			
 			{:cartlistborder}
 			{:couponinfolist}
 		{couponinfolist:}
@@ -71,7 +84,7 @@
 						Сумма со скидкой: <b class="cartsum" style="font-size:140%">{sum:itemcostrub}</b> 
 					</p>
 					<div class="d-flex text-center text-sm-right flex-column">
-						<div class="mb-2"><a href="/{crumb.parent}" style="text-decoration:none" class="btn btn-success">Перейти к {data.order.status!:wait?:заказу?:оформлению заказа}</a></div>
+						<div class="mb-2"><a href="/{crumb.parent}" style="text-decoration:none; white-space: nowrap;" class="btn btn-success">Перейти к {data.order.status!:wait?:заказу?:оформлению заказа}</a></div>
 						<div>Займёт не более 3 минут.</div>
 					</div>
 				</div>
@@ -100,27 +113,28 @@
 								import { Cart } from '/vendor/infrajs/cart/Cart.js'
 								import { Popup } from '/vendor/infrajs/popup/Popup.js'
 								import { DOM } from '/vendor/akiyatkin/load/DOM.js'
+								import { Global } from '/vendor/infrajs/layer-global/Global.js'
+
 								let div = document.getElementById('{div}')
-								let cls = (cls) => div.getElementsByClassName(cls)[0]
+								let cls = (div, cls) => div.getElementsByClassName(cls)
 								let checkall = document.getElementById('checkall')
 								let form = document.forms.basket
-								let dels = form.elements.del
+								let dels = cls(form, 'del')
 								if (!dels) dels = []
 								else if (!dels.length) dels = [dels]
-								let order_id = {data.order.order_id}
+								const order_id = {:order_id}
 								
 								checkall.addEventListener('click', () => {
 									for (let del of dels) del.checked = checkall.checked
 								})
-								cls('act-clear').addEventListener('click', async () => {
+								cls(div, 'act-clear')[0].addEventListener('click', async () => {
 									let ids = []
 									for (let del of dels) if (del.checked) ids.push(del.dataset.position_id)
 									let position_ids = ids.join(',')
 									if (!position_ids) return Popup.alert('Выберите позиции для удаления из корзины')
 									let ans = await Cart.post('remove', { order_id, position_ids })
 									if (!ans.result) return await Popup.alert(ans.msg)
-									DOM.puff('check')
-									//await Popup.success(ans.msg)
+									Global.check('cart-list')
 								})
 								
 								
@@ -134,7 +148,7 @@
 			</div>
 			
 			<hr>
-			<form name="basket">
+			<form class="form" name="basket" data-autosave="user">
 				{basket::cartpos}
 			</form>
 			<div class="d-flex align-items-center justify-content-center justify-content-sm-end">
@@ -144,18 +158,16 @@
 				import { Cart } from '/vendor/infrajs/cart/Cart.js'
 				import { Template } from '/vendor/infrajs/template/Template.js'
 				let div = document.getElementById('{div}')
-				let cls = (el, cls) => el.getElementsByClassName(cls)[0]
+				let cls = (el, cls) => el.getElementsByClassName(cls)
 
 				let form = document.forms.basket
-				let inputs = form.elements.count
-				if (!inputs) inputs = []
-				else if (!inputs.length) inputs = [inputs]
+				let inputs = cls(form, 'count')
 
-				let order_id = {data.order.order_id}
+				const order_id = {:order_id}
 				let place = "{:place}"
 				let order_nick = {data.order.order_nick}
 
-				var tplcost = val => {
+				const tplcost = val => {
 					let cost = Template.scope['~cost'](val, false, true) + '&nbsp;<small>{:model.unit}</small>'
 					return cost
 				}
@@ -163,25 +175,28 @@
 
 				for (let input of inputs) {
 					input.addEventListener('change', async () => {
-						let position_id = input.dataset.position_id
+						
+						//Установили
 						let cost = input.dataset.cost
 						let count = input.value
 						let costblock = input.closest('.costblock')
-						cls(costblock, 'sum').innerHTML = tplcost(count * cost)
+						cls(costblock, 'sum')[0].innerHTML = tplcost(count * cost)
 
+						//Всё вместе посчитали
 						let cartsum = 0;
 						let cartsumclear = 0;
 						for (let input of inputs) {
 							let cost = input.dataset.cost
-							let costclear = input.dataset.cost
+							let costclear = input.dataset.costclear
 							let count = input.value
 							cartsumclear += count * costclear
 							cartsum += count * cost
 						}
-						cls(div, 'cartsum').innerHTML = tplcost(cartsum) //Сумма со скидкой
-						cls(div, 'cartsumclear').innerHTML = tplcost(cartsumclear) //Сумма без скидки
+						cls(div, 'cartsum')[0].innerHTML = tplcost(cartsum) //Сумма со скидкой
+						cls(div, 'cartsumclear')[0].innerHTML = tplcost(cartsumclear) //Сумма без скидки
 
-						let ans = await Cart.post('add',{ position_id }, { count })
+						const position_id = input.dataset.position_id
+						const ans = await Cart.post('add',{ position_id }, { count })
 					})
 				}
 			</script>
@@ -196,7 +211,7 @@
 			<div class="d-flex cartpos">
 				<div style="{:ishidedisabled}">
 					<div class="custom-control custom-checkbox">
-						<input data-position_id="{position_id}" type="checkbox" class="custom-control-input" id="check{~key}" name="del">
+						<input data-position_id="{position_id}" type="checkbox" class="del custom-control-input" id="check{~key}" name="del{position_id}">
 						<label class="custom-control-label" for="check{~key}">&nbsp;</label>
 					</div>
 				</div>
@@ -220,7 +235,9 @@
 								<div><del>{cost!model.Цена?model.Цена:itemcostrub}</del></div>
 								{cost:itemcostrub}
 							</div>
-							<div class="my-2"><input {:isdisabled} data-position_id="{position_id}" data-cost="{cost}" data-costclear="{Цена}" style="width:5em" value="{count}" type="number" min="0" max="999" name="count" class="form-control" type="number"></div>
+							<div class="my-2">
+								<input data-autosave="false" {:isdisabled} data-position_id="{position_id}" data-cost="{cost}" data-costclear="{model.Цена}" style="width:5em" value="{count}" type="number" min="0" max="999" class="count form-control" type="number">
+							</div>
 							<div style="min-width:70px;" class="text-lg-right">
 								<b class="sum">{sum:itemcostrub}</b>
 							</div>
@@ -248,14 +265,8 @@
 		{ordermessage:}
 			<h1>{data.order.order_nick}</h1>
 			<h1>{data.order?:numorder?:myorder}</h1>
-			<div class="{data.msgclass}">{config.ans.msg?config.ans.msg?data.msg}</div>
-			{data.ismy?:activebutton}
-		{activebutton:}
-			<div style="margin-top:10px">
-				<a href="/cart/orders/active" class="btn btn-success">
-					Показать заказ
-				</a>
-			</div>
+			{:emptylist}
+
 		{showManageComment:}
 			<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-info" role="alert"><b>Сообщение менеджера</b>
 				<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{commentmanager}</pre>
@@ -265,97 +276,426 @@
 		{ordernick:}№{data.order.order_nick}
 		{orderedit:}<div class="float-right" title="Последние измения">{~date(:j F H:i,order.dateedit)}</div>
 		{autosavename:}{:place}.{order_nick}
+		{transportpochta:}
+					<div class="mt-3 mb-2"><img alt="Почта России" src="/-imager/?w=75&src=-cart/images/pochtabig.png"></div>
+					<div class="mt-1 line" style="color: {transport=:pochta_simple?:black}">
+						<div class="d-flex">
+							<div class="form-check flex-grow-1">
+								<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:pochta_simple?:checked} id="transport_pochta_simple" 
+								data-cost="{transports.pochta_simple.cost}" value="pochta_simple">
+								<label class="ml-1 form-check-label" for="transport_pochta_simple">
+									{:label_pochta_simple_short}
+								</label>
+							</div>
+							{transports.pochta_simple:transprice}
+						</div>
+						<div class="descr {transport=:pochta_simple?:show}">
+							{:descr_pochta_simple}
+						</div>
+					</div>
+					<div class="mt-1 line" style="color: {transport=:pochta_1?:black}">
+						<div class="d-flex">
+							<div class="form-check flex-grow-1">
+								<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:pochta_1?:checked} id="transport_pochta_1" 
+								data-cost="{transports.pochta_1.cost}" value="pochta_1">
+								<label class="ml-1 form-check-label" for="transport_pochta_1">
+									{:label_pochta_1_short}
+								</label>
+							</div>
+							{transports.pochta_1:transprice}
+						</div>
+						<div class="descr {transport=:pochta_1?:show}">
+							{:descr_pochta_1}
+						</div>
+					</div>
+					<div class="mt-1 line" style="color: {transport=:pochta_courier?:black}">
+						<div class="d-flex">
+							<div class="form-check flex-grow-1">
+								<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:pochta_courier?:checked} id="transport_pochta_courier" 
+								data-cost="{transports.pochta_courier.cost}" value="pochta_courier">
+								<label class="ml-1 form-check-label" for="transport_pochta_courier">
+									{:label_pochta_courier_short}
+								</label>
+							</div>
+							{transports.pochta_courier:transprice}
+						</div>
+						<div class="descr {transport=:pochta_courier?:show}">
+							{:descr_pochta_courier}
+						</div>
+					</div>
 		{ordercontent:}
 			{status=:wait??:orderedit}
 			<form name="cart" class="form" data-autosave2="{data.rule.actions[:place]edit?:autosavename}" style="max-width:600px">
 				<h1>{data.rule.title} <span class="float-right">{:ordernick}</span></h1>
 				{commentmanager?:showManageComment}
 				{:paylayout.INFO}
-				<h2>Данные о покупателе</h2>
+				
+				
+				<!-- <h2>Данные о покупателе</h2> -->
 				<div class="border px-5 py-4 my-4">
-					<div class="form-group">
-						<label>ФИО{:req}</label>
-						<input {:isdisabled} type="text" name="name" value="{data.order.name}" class="form-control" placeholder="">
+					<div class="form-group input-name">
+						<label class="w-100">Имя получателя{:req} <i class="msg float-right"></i></label>
+						<input {:isdisabled} type="text" name="name" value="{data.order.name}" class="form-control" placeholder="Иванов Иван">
+						<script type="module" async>
+							import { Cart } from '/vendor/infrajs/cart/Cart.js'
+							const form = document.forms.cart
+							const cls = (cls, div = form) => div.getElementsByClassName(cls)[0]
+							const block = cls('input-name')
+							const msg = cls('msg', block)
+							const input = form.elements.name
+							const order_id = {:order_id}
+							if (input.value) msg.innerHTML = ''
+							const change = async () => {
+								msg.innerHTML = '...'
+								msg.style.color = "black"
+								const name = Cart.strip_tags(input.value)
+								cls('nameresume').innerHTML = name ? ', ' + name : ''
+								const ans = await Cart.posts('setname', { order_id }, { name })
+								msg.innerHTML = ans.msg
+								if (ans.result) msg.style.color = "green"
+								else msg.style.color = "red"
+							}
+							//input.addEventListener('change', change)
+							input.addEventListener('keyup', change)
+						</script>
 					</div>
-					<div class="form-group">
-						<label>Телефон{:req}</label>
+					<div class="form-group input-phone">
+						<label class="w-100">Телефон для связи{:req} <i class="msg float-right"></i></label>
 						<input {:isdisabled} type="tel" name="phone"  value="{data.order.phone}" class="form-control" placeholder="+7 ...">
+						<script type="module" async>
+							import { Cart } from '/vendor/infrajs/cart/Cart.js'
+							const form = document.forms.cart
+							const cls = (cls, div = form) => div.getElementsByClassName(cls)[0]
+							const block = cls('input-phone')
+							const msg = cls('msg', block)
+							const input = form.elements.phone
+							const order_id = {:order_id}
+							if (input.value) msg.innerHTML = ''
+							const change = async () => {
+								msg.innerHTML = '...'
+								msg.style.color = "black"
+								const phone = Cart.strip_tags(input.value)
+								cls('phoneresume').innerHTML = phone ? ', ' + phone : ''
+								const ans = await Cart.posts('setphone', { order_id }, { phone })
+								msg.innerHTML = ans.msg
+								if (ans.result) msg.style.color = "green"
+								else msg.style.color = "red"
+							}
+							//input.addEventListener('change', change)
+							input.addEventListener('keyup', change)
+						</script>
 					</div>
-					<div class="form-group">
-						<label>Email{:req}</label>
-						<input {:isdisabled} type="email" name="email" value="{data.order.email|data.user.email}" class="form-control" placeholder="Email">
+					<div class="form-group input-email">
+						<label class="w-100">Email для оповещений{:req} <i class="msg float-right"></i></label>
+						<input {:isdisabled} type="email" name="email" value="{data.order.email|data.user.email}" class="form-control" placeholder="...@...">
+						<script type="module" async>
+							import { Cart } from '/vendor/infrajs/cart/Cart.js'
+							import { Session } from '/vendor/infrajs/session/Session.js'
+							const form = document.forms.cart
+							const cls = (cls, div = form) => div.getElementsByClassName(cls)[0]
+							const block = cls('input-email')
+							const msg = cls('msg', block)
+							const input = form.elements.email
+							const order_id = {:order_id}
+							if (input.value) msg.innerHTML = ''
+							const change = async () => {
+								msg.innerHTML = '...'
+								msg.style.color = "black"
+								const email = Cart.strip_tags(input.value)
+								Session.set('user.email', email)
+								cls('emailresume').innerHTML = email ? ', '+email : ''
+								const ans = await Cart.posts('setemail', { order_id }, { email })
+								msg.innerHTML = ans.msg
+								if (ans.result) msg.style.color = "green"
+								else msg.style.color = "red"
+
+							}
+							//input.addEventListener('change', change)
+							input.addEventListener('keyup', change)
+						</script>
 					</div>
 				</div>
-				<h2>Доставка</h2>
-				<div class="border px-5 py-4 my-4">
-					
-					
-					<div class="mb-2"><img src="/-imager/?w=75&src=images/logo.png"></div>
-					<div class="form-check mt-1">
-						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:self?:checked} id="transport_self" value="self">
-						<label class="ml-1 form-check-label" for="transport_self">
-							Самовывоз в Тольятти
-						</label>
-					</div>
-
-					<h3 class="mt-4 mb-2">В город <span class="{:isedit?:a} citychoice">{data.order.city.city}<span></h3>
-					<script type="module" async>
-						import { City } from "/vendor/akiyatkin/city/City.js"
-						import { Cart } from '/vendor/infrajs/cart/Cart.js'
-						let isedit = {:isedit?:true?:false}
-						if (isedit) {
-							let div = document.getElementById('{div}')
-							let form = document.forms.cart
-							let cls = (cls) => form.getElementsByClassName(cls)[0]
-							let btn = cls('citychoice')
-							let order_id = {data.order.order_id|:active}
-							let place = "{:place}"
-							btn.addEventListener('click', async () => {
-								let city_id = await City.choice()
-								Cart.post('setcity', { order_id }, { city_id })
-							})
+				<h2>Доставка в город <span class="{:isedit?:a} citychoice">{data.order.city.city}<span></h2>
+				<div class="border px-5 py-4 my-4 transblock" style="color:#777">
+					<style>
+						.transblock input,
+						.transblock label,
+						.transblock .line {
+							cursor: pointer
 						}
-					</script>
+						.transblock .descr {
+							padding-bottom:1px;
+						}
+						.transblock .descr {
+							max-height: 0;
+							opacity: 0;
+							overflow: hidden;
+							transition-property: margin-top, opacity, max-height;
+							transition-duration: 0.2s;
+						}
+						.transblock .descr.show {
+							display: block;
+							opacity: 1;
+							max-height: 100px;
+						}
+					</style>
+					
+					
 						
 					<!-- 'city','self','cdek_pvz','cdek_courier','pochta_simple','pochta_1','pochta_courier' -->
-					<div class="mt-4 mb-2"><img alt="СДЕК" src="/-imager/?w=75&src=-cart/images/cdekline.png"></div>
-					<div class="form-check mt-1">
-						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:cdek_pvz?:checked} id="transport_cdek_pvz" value="cdek_pvz">
-						<label class="ml-1 form-check-label" for="transport_cdek_pvz">
-							До пункта выдачи
-						</label>
+					<div class="mt-3 mb-2"><img src="/-imager/?w=75&src=images/logo.png"></div>
+					<div class="mt-1 line" style="color: {transport=:self?:black}">
+						<div class="d-flex">
+							<div class="form-check flex-grow-1">
+								<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:self?:checked} id="transport_self" 
+								data-cost="{transports.self.cost}" value="self">
+								<label class="ml-1 form-check-label" for="transport_self">
+									{:label_self}
+								</label>
+							</div>
+						</div>
+						<div class="descr {transport=:self?:show}">
+							{:descr_self}
+						</div>
 					</div>
-					<div class="form-check mt-1">
-						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:cdek_courier?:checked} id="transport_cdek_courier" value="cdek_courier">
-						<label class="ml-1 form-check-label" for="transport_cdek_courier">
-							Курьером
-						</label>
+					<div class="mt-1 line" style="color: {transport=:city?:black}">
+						<div class="d-flex">
+							<div class="form-check flex-grow-1">
+								<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:city?:checked} id="transport_city" 
+								data-cost="{transports.city.cost}" value="city">
+								<label class="ml-1 form-check-label" for="transport_city">
+									{:label_city}
+								</label>
+							</div>
+							{transports.city:transprice}
+							<!-- <div class="d-flex" style="width:300px">
+								<div style="width:100px">1 - 2 дня</div>
+								<div>500&nbsp;руб.</div>
+							</div> -->
+						</div>
+						<div class="descr {transport=:city?:show}">
+							{:descr_city}
+						</div>
 					</div>
-					<div class="mt-4 mb-2"><img alt="Почта России" src="/-imager/?w=75&src=-cart/images/pochtabig.png"></div>
-					<div class="form-check mt-1">
-						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:pochta_simple?:checked} id="transport_pochta_simple" value="pochta_simple">
-						<label class="ml-1 form-check-label" for="transport_pochta_simple">
-							Посылка обыкновенная
-						</label>
+					<div class="mt-3 mb-2"><img alt="СДЕК" src="/-imager/?w=75&src=-cart/images/cdekline.png"></div>
+					<div class="d-flex mt-1 line" style="color: {transport=:cdek_pvz?:black}">
+						<div class="form-check flex-grow-1">
+							<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:cdek_pvz?:checked} id="transport_cdek_pvz" 
+							data-cost="{transports.cdek_pvz.cost}" value="cdek_pvz">
+							<label class="ml-1 form-check-label" for="transport_cdek_pvz">
+								{:label_cdek_pvz_short}
+								
+							</label>
+						</div>
+						{transports.cdek_pvz:transprice}
 					</div>
-					<div class="form-check mt-1">
-						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:pochta_1?:checked} id="transport_pochta_1" value="pochta_1">
-						<label class="ml-1 form-check-label" for="transport_pochta_1">
-							Первый класс
-						</label>
+					<div class="mt-1 line" style="color: {transport=:cdek_courier?:black}">
+						<div class="d-flex">
+							<div class="form-check flex-grow-1">
+								<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:cdek_courier?:checked} id="transport_cdek_courier" 
+								data-cost="{transports.cdek_courier.cost}" value="cdek_courier">
+								<label class="ml-1 form-check-label" for="transport_cdek_courier">
+									{:label_cdek_courier_short}
+								</label>
+							</div>
+							{transports.cdek_courier:transprice}
+						</div>
+						<div class="descr {transport=:cdek_courier?:show}">
+							{:descr_cdek_courier}
+						</div>
 					</div>
-					<div class="form-check mt-1">
-						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {transport=:pochta_courier?:checked} id="transport_pochta_courier" value="pochta_courier">
-						<label class="ml-1 form-check-label" for="transport_pochta_courier">
-							Курьер
-						</label>
-					</div>
+					{:transportpochta}
+					<script type="module" async>
+						import { Cart } from '/vendor/infrajs/cart/Cart.js'
+						const form = document.forms.cart
+						const cls = (cls, div = form) => div.getElementsByClassName(cls)
+						const blocks = cls('input-zip')
+						const order_id = {:order_id}
+						for (const block of blocks) {
+							const select = cls('zip', block)[0]
+							const change = async () => {
+								const n = select.options.selectedIndex
+								const zip = select.options[n].value
+								if (Cart.dis(form)) return
+								const ans = await Cart.post('setzip', { order_id, zip })
+								if (!ans.result) Popup.alert(ans.msg)								
+								Global.check('cart-order')
+							}
+							//input.addEventListener('change', change)
+							select.addEventListener('change', change)
+						}
+					</script>
+					<script type="module" async>
+						import { Cart } from '/vendor/infrajs/cart/Cart.js'
+						const form = document.forms.cart
+						const cls = (cls, div = form) => div.getElementsByClassName(cls)
+						const blocks = cls('input-address')
+						const order_id = {:order_id}
+						for (const block of blocks) {
+							const msg = cls('msg', block)[0]
+							const input = cls('address', block)[0]
+							if (input.value) msg.innerHTML = ''
+							const change = async () => {
+								
+								const address = input.value
+								for (const block of blocks) {
+									const input = cls('address', block)[0]
+									const msg = cls('msg', block)[0]
+									msg.innerHTML = '...'
+									msg.style.color = "black"
+									input.value = address
+								}
+
+								const transport = form.elements.transport.value || 'self'
+								let data = {
+									"city":{
+										"city":"{data.order.city.city}"
+									},
+									"address":cls('address',form)[0].value,
+									"zip":"{data.order.zip}",
+									"pvz":"fwoi234"
+								}
+								cls('transresume')[0].innerHTML = Template.parse("{tpl}", data, "info_" + transport)
+
+								const ans = await Cart.posts('setaddress', { order_id }, { address })
+
+								for (const block of blocks) {
+									const input = cls('address', block)[0]
+									const msg = cls('msg', block)[0]
+									msg.innerHTML = ans.msg
+									if (ans.result) msg.style.color = "green"
+									else msg.style.color = "red"
+								}
+							}
+							//input.addEventListener('change', change)
+							input.addEventListener('keyup', change)
+						}
+					</script>
+					<script type="module" async>
+						import { Cart } from '/vendor/infrajs/cart/Cart.js'
+						import { Popup } from '/vendor/infrajs/popup/Popup.js'
+						import { Global } from '/vendor/infrajs/layer-global/Global.js'
+						import { Template } from '/vendor/infrajs/template/Template.js'
+						import { Layer } from '/vendor/infrajs/controller/src/Layer.js'
+
+						const form = document.forms.cart
+						const cls = (cls, div = form) => div.getElementsByClassName(cls)[0]
+						const transblock = cls('transblock')
+						const tag = (tag, div = form) => div.getElementsByTagName(tag)[0]
+						const clss = (cls, div = form) => div.getElementsByClassName(cls)
+						const radios = form.elements.transport
+						const order_id = {:order_id}
+						const sum = {data.order.sum}
+						const lines = clss('line')
+						const tplcost = val => {
+							let cost = Template.scope['~cost'](val) + '&nbsp;руб.'
+							return cost
+						}
+						const map = cls('showMap', transblock)
+
+						if (map) map.addEventListener('click', () => {
+							Popup.showbig(Cart.maplayer)
+						})
+
+						const descrs = clss('descr', transblock)
+						let lasttransport
+						const change = async () => {
+							const transport = radios.value
+							if (lasttransport == transport) return
+							lasttransport = transport
+							const radio = form.elements['transport_' + transport]
+							const sumtrans = Number(radio.dataset.cost)
+							const total = sum + sumtrans
+
+							for (const line of lines) line.style.color = ''
+							const line = radio.closest('.line')
+							if (line) line.style.color = 'black'
+							for(const descr of descrs) descr.classList.remove('show')
+							const descr = cls('descr', line)
+							if(descr) descr.classList.add('show')
+
+
+							cls('sumtrans').innerHTML = tplcost(sumtrans)
+							cls('total').innerHTML = tplcost(total)
+							cls('titletrans').innerHTML = Template.parse("{tpl}", true, "label_" + transport)
+							let data = {
+								"city":{
+									"city":"{data.order.city.city}"
+								},
+								"address":cls('address',form).value,
+								"zip":"{data.order.zip}",
+								"pvz":"fwoi234"
+							}
+							cls('transresume').innerHTML = Template.parse("{tpl}", data, "info_" + transport)
+							const ans = await Cart.posts('settransport', { order_id }, { transport })
+							if (!ans.result) await Popup.alert(ans.msg)
+						}
+						for (const radio of radios) radio.addEventListener('change', change)
+						for (const line of lines) line.addEventListener('click', () => {
+							let radio = tag('input', line)
+							radio.checked = true
+							change()
+						})
+					</script>
 				</div>
+				<script type="module" async>
+					//Всплывающее окно выбора города с классом citychoice
+					import { City } from "/vendor/akiyatkin/city/City.js"
+					import { Cart } from '/vendor/infrajs/cart/Cart.js'
+					import { Global } from '/vendor/infrajs/layer-global/Global.js'
+
+					const isedit = {:isedit?:true?:false}
+					if (isedit) {
+						const div = document.getElementById('{div}')
+						const form = document.forms.cart
+						const cls = (cls) => form.getElementsByClassName(cls)
+						const order_id = {:order_id}
+						const place = "{:place}"
+						const old_city_id = {data.order.city.city_id|:false}
+						for (const btn of cls('citychoice')) {
+							btn.addEventListener('click', async () => {
+								if (Cart.dis(form)) return
+								const city_id = await City.choice()
+								if (city_id !== null && city_id != old_city_id) {
+									const zip = ''
+									await Cart.post('setzip', { order_id }, { zip })
+									await Cart.post('setcity', { order_id }, { city_id })
+									Global.check('cart-order')
+								} else {
+									Cart.dis(form, false)
+								}
+							})
+						}
+					}
+				</script>
 				<h2>Оплата</h2>
 				<div class="my-4 d-flex">
-					<div class="flex-grow-1">
-						<div class="mb-2">Комментарий к заказу</div>
+					<div class="flex-grow-1 input-comment">
+						<div class="mb-2">Комментарий к заказу <i class="msg float-right"></i></div>
 						<textarea {:isdisabled} name="comment" class="form-control" rows="3">{data.order.comment}</textarea>
+						<script type="module" async>
+							import { Cart } from '/vendor/infrajs/cart/Cart.js'
+							const form = document.forms.cart
+							const cls = (cls, div = form) => div.getElementsByClassName(cls)[0]
+							const block = cls('input-comment')
+							const msg = cls('msg', block)
+							const input = form.elements.comment
+							const order_id = {:order_id}
+							if (input.value) msg.innerHTML = ''
+							const change = async () => {
+								msg.innerHTML = '...'
+								msg.style.color = "black"
+								const comment = Cart.strip_tags(input.value)
+								cls('commentresume').innerHTML = comment
+								const ans = await Cart.posts('setcomment', { order_id }, { comment })
+								msg.innerHTML = ans.msg
+								if (ans.result) msg.style.color = "green"
+								else msg.style.color = "red"
+
+							}
+							//input.addEventListener('change', change)
+							input.addEventListener('keyup', change)
+						</script>
 					</div>
 					<div class="ml-3">
 						<div class="mb-1">Звонок менеджера</div>
@@ -376,29 +716,42 @@
 							import { Popup } from '/vendor/infrajs/popup/Popup.js'
 
 							let div = document.getElementById('{div}')
+							const cls = (cls) => div.getElementsByClassName(cls)[0]
 							let radios = document.forms.cart.elements.callback					
-							let order_id = {data.order.order_id|:active}
+							const order_id = {:order_id}
 							let order_nick = {data.order.order_nick}
 							let place = "{:place}"
 							
 							for (let radio of radios) radio.addEventListener('change', async () => {
-								radio.disabled = true
+								//radio.disabled = true
 								let callback = radios.value;
-								let ans = await Cart.post('setcallback',{ order_id, callback })
+								let callresume = cls('callresume')
+								if (callback == 'yes') callresume.classList.remove('d-none')
+								if (callback == 'no') callresume.classList.add('d-none')
+
+								let ans = await Cart.posts('setcallback', { order_id }, { callback })
 								if (!ans.result) await Popup.alert(ans.msg)
-								radio.disabled = false
+
+								
+								//radio.disabled = false
 							})
 						</script>
 					</div>
 				</div>
-				{:info}
+				{:resume}
 
 				{:place=:admin?:adminactions?:useractions}
 				<div class="d-md-none" style="clear:both"></div>	
 				{data.fields.pay.Оплатить онлайн?:paydescr}
 			</form>
-			
-
+			{zipopt:}<option {.=data.order.zip?:selected}>{.}</option>
+			{transprice:}
+				<div class="d-flex" style="width:300px">
+					<div style="width:100px">{min=max?:oneday?:twodays} {~words(max,:день,:дня,:дней)}</div>
+					<div>{~cost(cost)}&nbsp;руб.</div>
+				</div>
+				{twodays:}{min}-{max}
+				{oneday:}{max}
 			{place:}{Crumb.child.child.name=:admin?:admin?:orders}
 			{paydescr:}
 				<div id="paydescr">
@@ -420,9 +773,13 @@
 						}
 					})
 				</script>
-		{info:}
+		{resume:}
 			<div class="alert alert-secondary">
+				№{order_nick}<span class="nameresume">{name:pr-comma}</span><span class="phoneresume">{phone:pr-comma}</span><span class="callresume {callback=:no?:d-none}">, требуется звонок</span><span class="emailresume">{email:pr-comma}</span>, {~length(basket)} {~words(~length(basket),:позиция,:позиции,:позиций)}
+				<pre style="white-space:pre-line; margin-top:4px; font-style: italic; font-size: 100%;" class="commentresume">{comment}</pre>
+				<hr>
 				{:basketresume}
+				<hr>
 				{:amount}
 			</div>
 		{useractions:}
@@ -667,59 +1024,44 @@
 				import { Cart } from '/vendor/infrajs/cart/Cart.js'
 				import { Popup } from '/vendor/infrajs/popup/Popup.js'
 				import { DOM } from '/vendor/akiyatkin/load/DOM.js'
-				
+				import { Global } from '/vendor/infrajs/layer-global/Global.js'
+
 				let div = document.getElementById('{div}')
 				let cls = cls => div.getElementsByClassName(cls)[0]
+				let clss = cls => div.getElementsByClassName(cls)
 				let tag = tag => div.getElementsByTagName(tag)[0]
 				let form = document.forms.cart
 				let btn = null;
-				let order_id = {data.order.order_id|:active}
+				const order_id = {:order_id}
 				let order_nick = {data.order.order_nick}
 				let place = "{:place}"
 				let isedit = {:isedit?:true?:false}
 				
-				let editparam = () => {
-					let email = form.elements.email.value
-					let phone = form.elements.phone.value
-					let name = form.elements.name.value
-					let comment = form.elements.comment.value
-					return { order_id, email, phone, name, comment }
-				}
-				let proc = false;
+				// let editparam = () => {
+				// 	const email = form.elements.email.value
+				// 	const phone = form.elements.phone.value
+				// 	const name = form.elements.name.value
+				// 	const comment = form.elements.comment.value
+				// 	return { order_id, email, phone, name, comment }
+				// }
 
-				let names = ['email','phone','name','comment']
-				let formblock = () => {
-					if (proc) return true
-					proc = true
-					for (let name of names) form.elements[name].disabled = true
-				}
-				let formunblock = () => {
-					proc = false
-					for (let name of names) form.elements[name].disabled = false
-				}
-				if (isedit) {					
-					btn = cls('act-edit')
-					if (btn) btn.addEventListener('click', async () => {
-						if (formblock()) return
-						let ans = await Cart.post('edit', editparam())
-						if (ans.result)	await Popup.success(ans.msg)
-						else await Popup.alert(ans.msg)
-						formunblock()
-					})
-				}
+				
+				let formblock = () => Cart.dis(form, true)
+				let formunblock = () => Cart.dis(form, false)
+				
+				
 				
 				btn = cls('act-check')
 				if (btn) btn.addEventListener('click', async () => {
 					if (formblock()) return
-					let ans = null
-					if (isedit) {					
-						ans = await Cart.post('edit', editparam())
-						if (!ans.result) return Popup.alert(ans.msg)
+					let ans = await Cart.post('check', { order_id })
+					if (!ans.result) {
+						await Popup.alert(ans.msg)
+					} else {
+						await Popup.success(ans.msg)
+						await Crumb.go('cart/')	
 					}
-					ans = await Cart.post('check', { order_id })
-					if (!ans.result) return await Popup.alert(ans.msg)
-					await Popup.success(ans.msg)
-					await Crumb.go('cart/')
+					
 					formunblock()
 				})
 
@@ -734,8 +1076,7 @@
 					if (formblock()) return					
 					let ans = await Cart.post('wait', { order_id })
 					if (!ans.result) return Popup.alert(ans.msg)
-					await DOM.emit('check')
-					formunblock()
+					Global.check('cart-order')
 				})
 				btn = cls('act-print') 
 				if (btn) btn.addEventListener('click', async () => {	
@@ -806,11 +1147,24 @@
 			let cls = cls => div.getElementsByClassName(cls)
 			let btn = cls('couponbtn')[0]
 			let input = document.getElementById('coupon')
+
+			let proc = false
+			let formblock = () => {
+				if (proc) return true
+				proc = true
+				for (let inp of cls('count')) inp.disabled = true
+			}
+			let formunblock = () => {
+				proc = false
+				for (let inp of cls('count')) inp.disabled = false
+			}
 			btn.addEventListener('click', async () => {
-				let order_id = {data.order.order_id|:active}
-				let coupon = input.value
-				Cart.post('setcoupon', { order_id, coupon })
-				DOM.puff('check')
+				const order_id = {:order_id}
+				let coupon = Cart.strip_tags(input.value)
+				formblock()
+				await Cart.post('setcoupon', { order_id, coupon })
+				await Global.check('cart-list')
+				formunblock()
 			})
 		</script>
 		<div class="py-2">
@@ -819,7 +1173,7 @@
 		{prodart:}{producer_nick} {article_nick}{:cat.idsp}
 		{mybasket:}Ваша корзина
 		{justbasket:}Корзина
-		{numbasket:}Корзина №{data.order.order_nick}
+		{numbasket:}Корзина <span class="float-right">{:ordernick}</span>
 		{myorder:}Оформление заказа
 		{numorder:}Заказ {data.order.order_nick}
 	{cartmsg:}<p>Корзина пустая. Добавьте в корзину интересующие позиции.
@@ -840,8 +1194,8 @@
 			<li class="breadcrumb-item"><a href="/user">{data.email|:Профиль}</a></li>
 			<li class="breadcrumb-item"><a href="/cart/orders/active/list">Корзина</a></li>
 		{breadguest:}
-			<li class="breadcrumb-item"><a href="/user/signin">Вход</a></li>
-			<li class="breadcrumb-item"><a href="/user/signup">Регистрация</a></li>
+			<li class="breadcrumb-item"><a href="/user/signin?back=ref">Вход</a></li>
+			<li class="breadcrumb-item"><a href="/user/signup?back=ref">Регистрация</a></li>
 			<li class="breadcrumb-item"><a href="/user/remind">Напомнить пароль</a></li>
 	{CART:}
 		{:usercrumb}
@@ -877,11 +1231,20 @@
 		{br:}<br>
 		{noaccount:}
 			<p>
-				<b><a href="/user/signin">Вход</a> не выполнен!</b>
+				<b><a href="/user/signin?back=ref">Вход</a> не выполнен!</b>
 			</p>
 		{account:}
 			<p>
-				Пользователь <a href="/user"><b>{data.user.email}.</b></a>
+				<div class="logout float-right btn btn-sm btn-secondary">Выход</div>
+				<script type="module" async>
+					import { User } from "/vendor/infrajs/user/User.js"
+					const div = document.getElementById('{div}');
+					const btn = div.getElementsByClassName('logout')[0]
+					btn.addEventListener('click', () => {
+						User.logout()
+					})
+				</script>
+				Пользователь <a href="/user"><b>{data.user.email}.</b></a> 
 			</p>
 		{youAreManager:}
 			<div class="alert alert-success" role="alert">
@@ -1039,7 +1402,7 @@
 		<!--<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent.parent}">{crumb.parent.parent.name=:admin?:Все?:Мои} заявки</a></li>-->
 		<!--<li class="breadcrumb-item"><a class="{crumb.parent.parent.name=:admin?:text-danger}" href="/{crumb.parent}">Заявка {crumb.parent.name=:active?:Активная?crumb.parent.name}</a></li>-->
 		<li class="breadcrumb-item active">Содержимое корзины</li>
-		<li class="breadcrumb-item"><a href="/cart/{:place}/{data.order.order_nick|:active}">Оформление заказа {data.order.order_nick}</a></li>
+		<li class="breadcrumb-item"><a href="/cart/{:place}/{data.order.order_nick|:active}">Оформление заказа</a></li>
 	</ol>
 {ordercrumb:}
 	{:usersync}
@@ -1055,7 +1418,7 @@
 	{itemcost:}{~cost(.,~false,~true)}<span class="d-none d-sm-inline">&nbsp;<small>{:model.unit}</small></span>
 	{itemcostrub:}{~cost(.,~false,~true)}&nbsp;<small>{:model.unit}</small>
 	{star:}<span class="req" title="Позиция в каталоге изменилась">*</span> 
-	{req:} <span class="req">*</span>
+	{req:}{req*:} <span class="req">*</span>
 	{ordernum:}Номер заказа: <b>{order_nick}</b>{manage.paid?:msgpaidorder}
 		{msgpaidorder:}. Оплата <b>{~cost(manage.paid)} руб.</b> отметка {manage.paidtype=:bank?:банка?:менеджера} {~date(:d.m.Y H:i,manage.paidtime)}
 	{adm_message:}
@@ -1067,10 +1430,11 @@
 		<li class="breadcrumb-item"><a class="{:place=:admin?:text-danger}" href="/{crumb.parent}">Заказ {crumb.parent.name=:active??crumb.parent.name}</a></li>
 		<li class="breadcrumb-item active">Версия для печати</li>
 	</ol>
-	<h1>Заказ {order_nick}{time:ot}</h1>
-	{:printorder}
+	<!-- <h1>Заказ {order_nick}{time:ot}</h1> -->
+	{:resume}
 	{ot:} от {~date(:d.m.Y,.)}
 	{adminli:}<li class="breadcrumb-item"><a class="text-danger" href="/cart/admin">Все заказы</a></li>
+{pr-comma:}, {.}
 {printorder:}
 	<b>ФИО</b>: {name}<br>
 	<b>Почта</b>: {email}<br>
@@ -1092,9 +1456,71 @@
 	{basket::model.PRINT-item}
 {amount:}
 	<p>
-		Стоимость{coupon?:nodiscount}: <b>{~cost(sumclear)}&nbsp;руб.</b><br>
-		{coupon?:prcoupon}
+		Стоимость{(coupondata.result&sum!sumclear)?:nodiscount}: <b class="sumclear">{~cost(sumclear)}&nbsp;руб.</b><br>
+		{(coupondata.result&sum!sumclear)?:prcoupon}
 	</p>
+	<p>
+		<span class="titletrans">{:label_{transport}}</span>: <b class="sumtrans">{~cost(sumtrans)}&nbsp;руб.</b><br>
+		<span class="transresume">{:info_{transport}}</span>
+	</p>
+	<p>
+		К оплате: <b class="total">{~cost(total)}&nbsp;руб.</b>
+	</p>
+	{prcoupon:}
+		Купон: <b>{coupon}</b><br>
+		Сумма со скидкой: <b class="sum">{~cost(sum)}&nbsp;руб.</b><br>
+
+	{info_cdek_pvz:}{pvz}<br>
+	{label_cdek_pvz:}Доставка до пункта выдачи СДЕК
+	{label_cdek_pvz_short:}До пункта выдачи
+
+	{descr_city:}Подходит для негабаритных, тяжёлых и крупных партий
+	{info_city:}{address}
+	{label_city:}Доставка по Тольятти
+	{label_city_short:}{:label_city}
+	
+	{descr_self:}ул. Новозаводская 2Б, торг.павильон №1, 1/23. <span class="a showMap">Схема проезда</span>
+	{info_self:}
+	{label_self:}Самовывоз из магазинов в Тольятти
+	{label_self_short:}{:label_self}
+
+	{descr_cdek_courier:}{:inpaddress}
+	{info_cdek_courier:}{city.city}, {address}<br>
+	{label_cdek_courier:}Доставка курьером СДЕК
+	{label_cdek_courier_short:}Курьер
+	
+	{descr_pochta_simple:}{:inpzip}
+	{info_pochta_simple:}{zip}<br>
+	{label_pochta_simple:}Доставка Почтой России
+	{label_pochta_simple_short:}Посылка обыкновенная
+
+	{descr_pochta_1:}{:inpzip}
+	{info_pochta_1:}{zip}<br>
+	{label_pochta_1:}Доставка Почтой России 1 класс
+	{label_pochta_1_short:}Первый класс
+
+	{descr_pochta_courier:}{:inpaddress}
+	{info_pochta_courier:}{city.city}, {address}<br>
+	{label_pochta_courier:}Доставка курьером Почты России
+	{label_pochta_courier_short:}Курьер
+	{inpaddress:}
+		<div class="mt-2">
+			<label class="w-100">Адрес доставки (<span class="a citychoice">{data.order.city.city}</span>) <i class="msg float-right"></i></label>
+			<input {:isdisabled} type="text" name="address" value="{data.order.address}" class="form-control address" placeholder="ул, дом, кв">
+		</div>
+	{inpzip:}
+		<div class="form-group input-zip mt-2">
+			<label class="w-100">Почтовый индекс (<span class="a citychoice">{data.order.city.city}</span>) <i class="msg float-right"></i></label>
+			<select name="zip" class="zip form-control" type="text" list="zips" autocomplete="off">
+				<option></option>
+				{data.order.city.zips::zipopt}
+			</select>
+		</div>
+		
+{MAP:}
+	<div class="embed-responsive embed-responsive-16by9">
+		<iframe class="embed-responsive-item" src="https://yandex.ru/map-widget/v1/-/CCR~5Giy" frameborder="1" allowfullscreen="true"></iframe>
+	</div>
 {prcom:}
 	
 		Комментарий:
@@ -1144,10 +1570,9 @@
 {comma:}, 
 {iprint:}
 	{~key}: {.}<br>
-{prcoupon:}
-	Купон: <b>{coupon}</b><br>
-	Сумма со скидкой: <b>{~cost(sum)}&nbsp;руб.</b><br>
 {pr-time:}
 	<b>Дата изменений</b>: {~date(:H:i j F Y,time)}<br>
 {pr-deliver:}
 	Доставка: <b>{~cost(manage.deliverycost)}&nbsp;руб.</b><br>
+{order_id:}{data.order.order_id|:stractive}
+{stractive:}"active"

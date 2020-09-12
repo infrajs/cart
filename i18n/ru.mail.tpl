@@ -2,14 +2,14 @@
 {AdmOrderToCheck-subject:}{host} {email} заказ отправлен на проверку
 {AdmOrderToCheck:}
 	<p>Заказ <b>{order.order_nick}</b> от {~date(:j.m.Y,time)} {:payorrec} и ожидает проверки.</p>
-	{:cart.printorder}
+	{:cart.resume}
 	{:AdmLinks}
 
 {orderToCheck-subject:}Оформлен заказ в интернет-магазине {host}
 {orderToCheck:}
-	<p>{order.name}, Ваш заказ <b>{order.order_nick}</b> от {~date(:j.m.Y,time)} {:payorrec} и ожидает проверки. После проверки позиций в заказе, с вами свяжется наш менеджер для подтверждения и уточнения деталей заказа.</p>
-	<p>Отслеживать состояние заказа можно в <a href="{link}&src=cart">личном кабинете</a>.</p>
-	{order:cart.printorder}
+	<p>{order.name}, Ваш заказ от {~date(:j.m.Y,time)} {:payorrec} и ожидает проверки. После проверки позиций в заказе, с вами свяжется наш менеджер для подтверждения и уточнения деталей заказа.</p>
+	<p>Отслеживать состояние заказа можно в <a href="{site}/cart">личном кабинете</a>.</p>
+	{order:cart.resume}
 	<p>
 		По всем вопросам обращайтесь по нашим <a href="{site}/contacts">контактам</a>. При возникновении вопросов наш сотрудник свяжется с вами! Спасибо, что выбрали наш магазин.
 	</p>
@@ -26,9 +26,9 @@
 
 	
 {links:}
-	<p><b><a href="{link}&src=cart/orders/{order.order_nick}">Заказ {order.order_nick}</a></b></p>
+	<p><b><a href="{site}/cart/orders/{order.order_nick}">Заказ {order.order_nick}</a></b></p>
 	<p>
-		<a href="{link}&src=catalog">Каталог товаров</a><br>
+		<a href="{site}/catalog">Каталог товаров</a><br>
 	</p>
 {AdmLinks:}
 	<p>

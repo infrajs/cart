@@ -1,13 +1,18 @@
 {::}vendor/infrajs/catalog/model.tpl
 {CART-props:}
-	<table class="props">
-		<tr>
-			<td class="d-flex"><nobr class="d-none d-sm-block">Производитель:</nobr><div class="line"></div></td><td>{producer}</td>
-		</tr>
-		<tr>
-			<td class="d-flex"><nobr>Артикул:</nobr><div class="line"></div></td><td>{article}{item:pr}</td>
-		</tr>
-	</table>
+	<div class="d-none d-sm-block">
+		<table class="props">
+			<tr>
+				<td class="d-flex"><nobr>Производитель:</nobr><div class="line"></div></td><td>{producer}</td>
+			</tr>
+			<tr>
+				<td class="d-flex"><nobr>Артикул:</nobr><div class="line"></div></td><td>{article}{item:pr}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="d-block d-sm-none">
+		{producer} {article}{item:pr}
+	</div>
 {CARDS-basket:}
 	{Цена?:basket-between}
 {ROWS-basket:}
@@ -56,16 +61,14 @@
 		
 		Cart.get('order', { order_id }).then( ans => {
 			input.value = 0
-			if (ans.result) {
-				let order = ans.order
-				btnoff()
-				for (let pos of order.basket) {
-					if (pos.model.model_id != model_id) continue
-					if (pos.model.catkit != catkit) continue
-					if (pos.model.item_num != item_num) continue
-					input.value = pos.count
-					btnon()
-				}
+			btnoff()
+			if (!ans.result) return
+			for (let pos of ans.order.basket) {
+				if (pos.model.model_id != model_id) continue
+				if (pos.model.catkit != catkit) continue
+				if (pos.model.item_num != item_num) continue
+				input.value = pos.count
+				btnon()
 			}
 		})
 		

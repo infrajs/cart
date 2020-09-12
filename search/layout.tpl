@@ -28,13 +28,14 @@
 			//https://github.com/devbridge/jQuery-Autocomplete
 			var prodart = false;
 			var div = $('.cart-search-complete');
-			div.find('.button').click( function () {
-				if (!prodart) return;
-				let place = '{config.place}'
-				let order_id = {config.order_id}
-				Cart.api('add', { place, order_id });
-				div.find('.input').val('');
-			});
+			// div.find('.button').click( function () {
+			// 	if (!prodart) return;
+			// 	let place = '{config.place}'
+			// 	let order_id = {config.order_id}
+			// 	var count = div.find('[name=count]').val();
+			// 	await Cart.post('add', { ...mic, place, order_id, count });
+			// 	div.find('.input').val('');
+			// });
 			var query = '';
 			
 			div.find('.input').autocomplete({
@@ -60,8 +61,8 @@
 					Popup.confirm('Количество: <input name="count" type="number">', async div => {
 						div = $(div)
 						var count = div.find('[name=count]').val();
-						await Cart.api('add', { ...mic, place, order_id, count });
-						Global.check('cart');	
+						await Cart.post('add', { ...mic, place, order_id, count });
+						Global.check('cart-list');	
 					}, pos['producer'] + ' ' + pos['article'] + '<br><small>' + pos['item_nick']+'</small>');
 					
 				},

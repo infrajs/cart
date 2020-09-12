@@ -1,5 +1,5 @@
 {
-	"pub":["coupon"],
+	"pub":["coupon","transports"],
 	"paramsrc":"~auto/pages/Параметры.xlsx",
 	"coupon":true,
 	"conf":"infrajs\\cart\\Cart",
@@ -24,6 +24,7 @@
 		"server":"demo.server.paykeeper.ru"
 	},
 	"clutch":{
-		"catalog":"vendor/infrajs/cart/"
+		"catalog":"vendor/infrajs/cart/",
+		"user":"vendor/infrajs/cart/"
 	}
 }
