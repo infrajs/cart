@@ -55,13 +55,17 @@ let Cart = {
 	},
 	post: async (type, param, opt) => {
 		const ans = await Cart.posts(type, param, opt)
-		DOM.puff('check')
+		await DOM.puff('check')
 		return ans
 	},
 	posts: async (type, param, opt) => {
 		let token = User.token()
 		let lang = Cart.lang()
-		let city_id = City.id()
+
+		let city_id = param.city_id
+		if (!city_id && opt) city_id = opt.city_id
+		if (!city_id) city_id = City.id()
+
 		let timezone = Intl.DateTimeFormat ? Intl.DateTimeFormat().resolvedOptions().timeZone : ''
 		let submit = 1
 
@@ -75,8 +79,12 @@ let Cart = {
 			const src = groupsrc
 			ans = await Load.emit('json', src)
 		}
-		if (~['add','addremove','clear','check','delete'].indexOf(type)) {
-			Global.check('cart-sum')
+
+		if (~['add','addremove','clear','check','delete','remove','setcoupon'].indexOf(type)) {
+			Global.set('cart-sum')
+		}
+		if (~['add','email','setcdek','setpvz','setzip', 'check','wait','complete','delete','tocheck'].indexOf(type)) {
+			Global.set('cart-order')
 		}
 		Global.set('cart')
 		if (!ans) ans = {
@@ -87,6 +95,8 @@ let Cart = {
 			View.setCOOKIE('token', ans.token)
 			Global.set('user')
 		}
+		if (ans.goal && ans.result) Goal.reach(ans.goal)
+		
 		return ans
 	},
 	maplayer: {

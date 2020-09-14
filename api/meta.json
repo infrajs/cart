@@ -16,10 +16,8 @@
 					"edit":true,
 					"buttons":{
 						"sbrfpay":"success",
-						"check":"success",
-						"print":"secondary"
-					},
-					"actions":["check","print","basket"]
+						"check":"success"
+					}
 				}
 			}
 			
@@ -34,15 +32,14 @@
 			"actions":{
 				"orders":{
 					"buttons":{
-						"basket":"secondary", 
-						"wait":"secondary",
-						"print":"secondary"
-					},
-					"actions":["print"]
+						"wait":"secondary"
+					}
 				},
 				"admin":{
-					"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
-					"actions":["complete","delete","edit","print"]
+					"buttons":{					
+						"email":"secondary", 
+						"complete":"info"
+					}
 				}
 			}
 		},
@@ -55,12 +52,14 @@
 
 			"actions":{
 				"orders":{
-					"buttons":{"print":"success"},
-					"actions":["print"]
+					"buttons":{}
 				},
 				"admin":{
-					"buttons":{"basket":"secondary", "email":"danger"},
-					"actions":["delete","email","edit","print"]
+					"buttons":{
+						"email":"secondary",
+						"tocheck":"secondary",
+						"delete":"danger"
+					}
 				}
 			}
 		},
@@ -132,6 +131,7 @@
 		},
 		"addremove":{
 			"handlers":{
+				"goal":"basket",
 				"rule":true,
 				"edit":true,
 				"status":["wait"],
@@ -158,9 +158,9 @@
 
         },
         "check":{
-			"goal":"cart",
-			"title":"CR049.1M",
+			"title":"CR049.m1",
 			"handlers":{
+				"goal":"cart",
 				"rule":true,
 				"checkdata":true,
 				"payd":true,
@@ -168,8 +168,16 @@
 				"freeze":true
 			}
 		},
+		"tocheck":{
+			"title":"CR049b.m1",
+			"handlers":{
+				"admin":true,
+				"rule":true,
+				"status":["complete"]
+			}
+		},
 		"wait":{
-			"title":"CR050.1C",
+			"title":"CR050.1m",
 			"handlers":{
 				"rule":true,
 				"fuser":true,
@@ -181,12 +189,9 @@
         "delete":{
 			"handlers":{
 				"rule":true,
-				"admin":true,
-				"edit":true,
-				"ouser":true
+				"admin":true
 			},
-			"title":"CR047",
-			"confirm":"CR048"
+			"title":"CR047"
 		},
 		"setcomment":{
 			"handlers":{
@@ -219,6 +224,18 @@
 			}
 		},
 		"setphone":{
+			"handlers":{
+				"rule":true,
+				"edit":true
+			}
+		},
+		"setcdek":{
+			"handlers":{
+				"rule":true,
+				"edit":true
+			}
+		},
+		"setpvz":{
 			"handlers":{
 				"rule":true,
 				"edit":true
@@ -267,12 +284,12 @@
 				"payd":true,
 				"rule":true
 			},
-			"title":"CR035.1M",
-			"confirm":"CR036.1M"
+			"title":"CR035.m1",
+			"confirm":"CR036.m1"
 		},
 		"complete":{
 			"handlers":{
-				"status":true,
+				"status":["check","wait"],
 				"admin":true,
 				"post":true,
 				"rule":true
@@ -281,7 +298,9 @@
 			"confirm":"CR039.1A"
 		},
 		"years":{
-
+			"handlers":{
+				"admin":true
+			}
 		},
 		"meta":{
 			
@@ -315,14 +334,14 @@
 			}
 		},
 		"print":{
-			"title":"CR052.1M",
+			"title":"CR052.m1",
 			"go":{
 				"orders":"/cart/orders/{order_nick|:active}/print",
 				"admin":"/cart/admin/{order_nick|:active}/print"
 			}
 		},
 		"basket":{
-			"title":"CR053.1M",
+			"title":"CR053.m1",
 			"go":{
 				"orders":"/cart/orders/{order_nick|:active}/list",
 				"admin":"/cart/admin/{order_nick|:active}/list"
@@ -339,11 +358,7 @@
 				"rule":true,
 				"admin":true
 			},
-			"title":"CR054.M1",
-			"confirm":{
-				"tpl":"-cart/cart.tpl",
-				"tplroot":"EMAIL"
-			}
+			"title":"CR054.M1"
 		}
 	}
 }

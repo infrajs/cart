@@ -1,5 +1,5 @@
 {
-	"pub":["coupon","transports"],
+	"pub":["yandexapikey", "coupon","transports","city_from_id"],
 	"paramsrc":"~auto/pages/Параметры.xlsx",
 	"coupon":true,
 	"conf":"infrajs\\cart\\Cart",
@@ -8,6 +8,12 @@
 	"update":"update.php",
 	"transports":["city","self","cdek_pvz","cdek_courier","pochta_simple","pochta_1","pochta_courier"],
 	"pays":["self","card","corp"],
+	"city_from_id":431,
+	"yandexapikey":"Ключ Яндекс от Геокодер",
+	"cdek":{
+		"account":"",
+		"key":""
+	},
 	"lang":{
 		"def":"ru",
 		"list":["ru","en"]

@@ -16,6 +16,7 @@ use infrajs\path\Path;
 if ($action == 'check') {
 	$email = $order['email'];
 	$ouser = User::getByEmail($email);
+	
 	if (!$ouser) {
 		//Создать пользователя может и админ и просто пользователь на свободный email
 		//Пользователь остаётся в своей авторизации если она есть
@@ -78,6 +79,13 @@ if ($action == 'check') {
 	}
 
 	return Cart::ret($ans, $lang, 'CR025.a' . __LINE__);
+} elseif ($action == 'tocheck') {
+	$email = $order['email'];
+	$ouser = User::getByEmail($email);
+	
+	if (!Cart::setStatus($order, 'check', true)) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
+	return Cart::ret($ans, $lang, 'CR025s.a' . __LINE__);
+
 // } elseif ($action == 'edit') {
 // 	$email = Ans::REQ('email');
 // 	if (!Mail::check($email)) return Cart::err($ans, $lang, 'CR005.a' . __LINE__);
@@ -163,8 +171,8 @@ if ($action == 'check') {
 	$commentmanager = Ans::REQS('commentmanager', 'string', '');
 	if (!$commentmanager) return Cart::fail($ans, $lang, 'CR063.a' . __LINE__);
 	$r = Cart::setCommentManager($order, $commentmanager);
-	if (!$r) return Cart::fail($ans, $lang, 'CR018.a5');
-	return Cart::ret($ans);
+
+	return $r ? Cart::ret($ans, $lang, 'saved.a'.__LINE__) : Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 } elseif ($action == 'email') {
 	$commentmanager = Ans::REQS('commentmanager', 'string', '');
 	if (!$commentmanager) return Cart::fail($ans, $lang, 'CR063.a' . __LINE__);
@@ -238,6 +246,7 @@ if ($action == 'check') {
 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 	//return Cart::fail($ans, $lang, 'badcoupon.a' . __LINE__);
 	return Cart::ret($ans);
+
 } elseif ($action == 'setcity') {
 	//При изменении города пересчитывается корзина. Стоимость доставки будет другой.
 
@@ -245,19 +254,6 @@ if ($action == 'check') {
 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 	return Cart::ret($ans);
 
-
-
-} elseif ($action == 'setname') {
-	$name = Ans::REQS('name');
-	if (!$name || strlen($name)<3) return Cart::err($ans, $lang, 'CR026.a' . __LINE__);
-	$r = Db::exec('UPDATE cart_orders
-		SET name = :name, dateedit = now()
-		WHERE order_id = :order_id
-	', [
-		':order_id' => $order['order_id'],
-		':name' => $name
-	]) !== false;
-	return $r ? Cart::ret($ans, $lang, 'saved.a'.__LINE__) : Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 } elseif ($action == 'setcomment') {
 	$comment = Ans::REQS('comment','string','');
 	$r = Db::exec('UPDATE cart_orders
@@ -292,6 +288,19 @@ if ($action == 'check') {
 		':address' => $address
 	]) !== false;
 	if ($err) return Cart::err($ans, $lang, 'address.a' . __LINE__);
+	return $r ? Cart::ret($ans, $lang, 'saved.a'.__LINE__) : Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
+} elseif ($action == 'setname') {
+	$name = Ans::REQS('name');
+	$err = (!$name || strlen($name) < 3 || strlen($name) > 200);
+	if ($err) $name = '';
+	$r = Db::exec('UPDATE cart_orders
+		SET name = :name, dateedit = now()
+		WHERE order_id = :order_id
+	', [
+		':order_id' => $order['order_id'],
+		':name' => $name
+	]) !== false;
+	if ($err) return Cart::err($ans, $lang, 'CR026.a' . __LINE__);
 	return $r ? Cart::ret($ans, $lang, 'saved.a'.__LINE__) : Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 } elseif ($action == 'setphone') {
 	$phone = Ans::REQS('phone');
@@ -334,7 +343,37 @@ if ($action == 'check') {
 		}
 	}
 	return Cart::ret($ans);
+} elseif ($action == 'setcdek') {
 
+	$pvz = Ans::REQ('pvz','string','');
+	if (!$pvz) $pvz = $order['pvz'];
+	$transport = Ans::REQ('transport', Cart::$conf['transports']);
+	if (!$transport) return Cart::fail($ans, $lang, 'CR060.a' . __LINE__);
+	//$city_id
+	$r = Db::exec('UPDATE cart_orders
+		SET pvz = :pvz, transport = :transport, city_id = :city_id, dateedit = now()
+		WHERE order_id = :order_id
+	', [
+		':order_id' => $order['order_id'],
+		':city_id' => $city_id,
+		':transport' => $transport,
+		':pvz' => $pvz
+	]) !== false;
+	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
+	return Cart::ret($ans);
+
+} elseif ($action == 'setpvz') {
+	$pvz = Ans::REQ('pvz');
+	if (!$pvz) return Cart::fail($ans, $lang, 'CR060.a' . __LINE__);
+	$r = Db::exec('UPDATE cart_orders
+		SET pvz = :pvz, dateedit = now()
+		WHERE order_id = :order_id
+	', [
+		':order_id' => $order['order_id'],
+		':pvz' => $pvz
+	]) !== false;
+	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
+	return Cart::ret($ans);
 } elseif ($action == 'settransport') {
 	$transport = Ans::REQ('transport', Cart::$conf['transports']);
 	if (!$transport) return Cart::fail($ans, $lang, 'CR060.a' . __LINE__);
@@ -386,26 +425,27 @@ if ($action == 'check') {
 	$status = Ans::REQ('status', 'string', '');
 	$wait = Ans::REQ('wait', 'int', 0); //Нужно ли брать в расчёт ожидающие заказы
 	$start = Ans::REQ('start', 'int', 0);
-	$end = Ans::REQ('end', 'int', 0);
-	if ($place == 'orders') {  //Заказы этого человека
-		if (!$fuser) {
-			$fuser = $user;
-			$end = time();
-		}
-		$wait = true;
-	} else {
-		if ($fuser) {
-			$wait = true;
-			$start = 0;
-			$end = time();
-		} else {
-			if (!$start) $start = strtotime('first day of month');
-			if (!$end) $end = strtotime('first day of +1 month');
-		}
-	}
+	
+	if (!$start) $start = strtotime('first day of this month 0:0');
+	
+	$end = strtotime('first day of next month 0:0', $start);
+	
+	$ans['start'] = $start;
+	//$ans['end'] = $end;
+	$ans['Y'] = date('Y', $start);
+	$ans['F'] = Cart::lang($lang, date('F', $start));
+	$ans['startstr'] = date('d.m.Y H:i:s', $start);
+	//$ans['endstr'] = date('d.m.Y H:i:s', $end);
 	$list = Cart::getOrders($fuser, $status, $wait, $start, $end);
 	if (!$list) return Cart::err($ans, $lang, 'CR006.a' . __LINE__);
 	$ans['list'] = $list;
+
+	$total = 0;
+	foreach ($list as $order) {
+		$total+=$order['total'];
+	}
+	$ans['total'] = $total;
+	$ans['meta'] = Cart::getJsMeta($meta, $lang);
 	return Cart::ret($ans);
 } else {
 	return Cart::fail($ans, $lang, 'CR001.a' . __LINE__);

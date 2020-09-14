@@ -62,7 +62,6 @@
 						div = $(div)
 						var count = div.find('[name=count]').val();
 						await Cart.post('add', { ...mic, place, order_id, count });
-						Global.check('cart-list');	
 					}, pos['producer'] + ' ' + pos['article'] + '<br><small>' + pos['item_nick']+'</small>');
 					
 				},

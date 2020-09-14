@@ -13,8 +13,7 @@
 			"jsontpl":"-cart/api/cart?lang={Cart.lang()}&token={User.token()}",
 			"global":["user", "cart"],
 			"child":{
-				"name":"order",
-				"jsontpl":"-cart/api/order?lang={Cart.lang()}&order_nick={crumb.name}&order_nick={crumb.name}&token={User.token()}",
+				"jsontpl":"-cart/api/order?lang={Cart.lang()}&order_nick={crumb.name}&token={User.token()}",
 				"autosavenametpl":"orders.{crumb.name}",
 				"tpl":"-cart/layout.tpl",
 				"global":["user", "cart-order"],
@@ -30,7 +29,7 @@
 					"list":{					
 						"tpl":"-cart/layout.tpl",
 						"tplroot":"LIST",
-						"global":["user", "cart-list"],
+						"global":["user", "cart-sum"],
 						"globaljson":["cart"],
 						"jsontpl":"-cart/api/order?lang={Cart.lang()}&order_nick={crumb.parent.name}&token={User.token()}"
 					},
@@ -45,10 +44,24 @@
 			}
 		},
 		"admin":{
-			"tpl":"-cart/layout.tpl",
-			"jsontpl":"-cart/?type=admin&all={crumb.child.name=:all?:1}",
-			"tplroot":"ADMIN",
-			"global":["user", "cart"],
+			"layers":{
+				"tpl":"-cart/layout.tpl",
+				"tplroot":"ADMIN",
+				"divs":{
+					"YEARS":{
+						"activelink":true,
+						"tpl":"-cart/layout.tpl",
+						"tplroot":"YEARS",
+						"jsontpl":"-cart/api/years?lang={Cart.lang()}&token={User.token()}"
+					},
+					"ADMINLIST":{
+						"tplroot":"ADMINLIST",
+						"tpl":"-cart/layout.tpl",
+						"global":["user", "cart"],
+						"jsontpl":"-cart/api/orders?lang={Cart.lang()}&token={User.token()}&start={Crumb.get.start}"
+					}
+				}	
+			},
 			"child":{
 				"istpl":"{crumb.name!:all?:yes}",
 				"jsontpl":"-cart/api/order?lang={Cart.lang()}&order_nick={crumb.name}&order_nick={crumb.name}&token={User.token()}",

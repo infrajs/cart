@@ -111,14 +111,20 @@ class Cart
 			$fields = 'o.order_nick, o.order_id, o.status, o.sum, o.name, o.email, o.coupon, o.paid';
 			$fields = 'o.order_id';
 			$param = [];
-			$param[":start"] = $start;
-			$param[":end"] = $end;
+			if ($start) {
+				$param[":start"] = $start;
+				$param[":end"] = $end;
+				$time = '((datecheck >= FROM_UNIXTIME(:start) and datecheck < FROM_UNIXTIME(:end)) or (datecheck is null and datecreate >= FROM_UNIXTIME(:start) and datecreate < FROM_UNIXTIME(:end)))';
+			} else {
+				$time = 'o.order_id is not null';
+			}
+
 			if ($fuser) {
 				$param[':user_id'] = $fuser['user_id'];
 				$sql = "SELECT DISTINCT $fields
 					FROM cart_orders o
 					RIGHT JOIN cart_userorders ou on (ou.user_id = :user_id and ou.order_id = o.order_id)
-					WHERE datecreate >= FROM_UNIXTIME(:start) and datecreate < FROM_UNIXTIME(:end)
+					WHERE $time
 				";
 			} else {
 				if ($status) {
@@ -128,27 +134,25 @@ class Cart
 						$sql = "SELECT DISTINCT $fields
 							FROM cart_orders o
 							RIGHT JOIN cart_userorders ou on (ou.user_id = :user_id and ou.order_id = o.order_id)
-							WHERE datecreate >= FROM_UNIXTIME(:start) and datecreate < FROM_UNIXTIME(:end)
+							WHERE $time
 							and o.status = :status
 						";
 					} else {
 						$sql = "SELECT DISTINCT $fields
 							FROM cart_orders o
-							WHERE datecreate >= FROM_UNIXTIME(:start) and datecreate < FROM_UNIXTIME(:end)
-							and o.status = :status
+							WHERE $time and o.status = :status
 						";
 					}
 				} else {
 					if ($wait) {
 						$sql = "SELECT DISTINCT $fields
 							FROM cart_orders o
-							WHERE datecreate >= FROM_UNIXTIME(:start) and datecreate < FROM_UNIXTIME(:end)
+							WHERE $time
 						";
 					} else {
 						$sql = "SELECT DISTINCT $fields
 							FROM cart_orders o
-							WHERE datecreate >= FROM_UNIXTIME(:start) and datecreate < FROM_UNIXTIME(:end)
-							AND o.status != 'wait' AND o.status != ''
+							WHERE $time AND o.status != 'wait' AND o.status != ''
 						";
 					}
 				}
@@ -223,10 +227,10 @@ class Cart
 	}
 	public static function getYears($lang = 'ru')
 	{
-		$sql = 'SELECT UNIX_TIMESTAMP(min(dateedit)) as start FROM cart_orders';
+		$sql = 'SELECT UNIX_TIMESTAMP(min(datecheck)) as start FROM cart_orders';
 		$end = time();
-		$start = Db::col($sql) ?? $end + 1;
-		$start -= 60 * 60 * 24 * 30 * 20;
+		$start = Db::col($sql) ?? $end - 1;
+		//$start -= 60 * 60 * 24 * 30 * 20;
 		$list = [];
 
 
@@ -248,6 +252,9 @@ class Cart
 			if (empty($list[$runyear])) $list[$runyear] = [];
 			$list[$runyear][] = Cart::getYearsOpt($lang, $next);
 		} while (true);
+
+		$list[$runyear][sizeof($list[$runyear])-1]['now'] = true;
+
 		return $list;
 	}
 	private static function getYearsOpt($lang, $next)
@@ -262,9 +269,24 @@ class Cart
 	}
 	public static function create($user)
 	{
-		$order_nick = Cart::createNick();
-		$sql = 'INSERT INTO cart_orders (datecreate, datewait, dateedit, order_nick, sum) VALUES(now(),now(),now(),?, 0)';
-		$order_id = Db::lastId($sql, [$order_nick]);
+
+		$fields = ['name','phone','address','zip','transport','city_id'];
+		$fieldsstr = implode(',',$fields);
+		$row = Db::fetch("SELECT $fieldsstr from cart_orders where email = :email order by dateedit DESC", [
+			':email'=> $user['email']
+		]);
+		if (!$row) {
+			$row = array_flip($fields);
+			foreach($row as $i=>$v) $row[$i] = '';
+		}
+		$row['email'] = $user['email'];
+		$row['order_nick'] = Cart::createNick();
+		$fieldsstr = implode(',', array_keys($row));
+		$param = array_values($row);
+		$valuestr = implode(',', array_fill(0, sizeof($param), '?'));
+
+		$order_id = Db::lastId("INSERT INTO cart_orders ($fieldsstr, datecreate, datewait, dateedit) 
+			VALUES($valuestr, now(),now(),now())", $param);
 		if (!$order_id) return false;
 		$sql = 'INSERT INTO cart_userorders (user_id, order_id, active) VALUES(?,?,1)';
 		Db::lastId($sql, [$user['user_id'], $order_id]);
@@ -383,7 +405,13 @@ class Cart
 		if ($order['freeze']) {
 			if (!Cart::setToJson($position_id, $model)) return false;
 		}
-
+		$r = Db::exec('UPDATE cart_orders
+			SET dateedit = now()
+			WHERE order_id = :order_id
+		', [
+			':order_id' => $order['order_id']
+		]) !== false;
+		if (!$r) return false;
 
 		$r = Cart::recalc($order['order_id']);
 		return $r;
@@ -562,8 +590,9 @@ class Cart
 	}
 	public static function setCity($order, $city_id)
 	{
+		if ($order['city_id'] == $city_id) return true;
 		$sql = 'UPDATE cart_orders
-			SET city_id = :city_id, dateedit = now()
+			SET city_id = :city_id, transport = "", zip = "", pvz = "", dateedit = now()
 			WHERE order_id = :order_id
 		';
 		$r = Db::exec($sql, [
@@ -576,7 +605,7 @@ class Cart
 	}
 	public static function setActive($order_id, $user_id)
 	{
-		$r = Cart::resetUserActive($user['user_id']);
+		$r = Cart::resetUserActive($user_id);
 		if (!$r) return $r;
 		$sql = 'UPDATE cart_userorders
 			SET active = 1
@@ -588,6 +617,7 @@ class Cart
 			':user_id' => $user_id
 		]) !== false;
 	}
+	
 	public static function clear(&$order)
 	{
 
@@ -615,6 +645,12 @@ class Cart
 		$r = Cart::recalc($order_id);
 		return $r;
 	}
+	public static function clearTransportCost($order) {
+		$r = Db::exec('DELETE FROM cart_transports WHERE order_id = :order_id', [
+			':order_id' => $order['order_id']
+		]) !== false;
+		return $r;
+	}
 	public static function saveTransportCost($order, $type, $cost, $min, $max)
 	{
 		if (!isset($order['transport'][$type])) {
@@ -629,7 +665,7 @@ class Cart
 			':cost' => $cost,
 			':min' => $min,
 			':max' => $max
-		]) === false;
+		]) !== false;
 		return $r;
 		/*
 		$sql = 'INSERT INTO cart_basket (
@@ -714,34 +750,62 @@ class Cart
 		$total = $sum;
 		//order: city_id, basket - размеры, вес, 
 		$transports = Cart::$conf['transports'];
+		Cart::clearTransportCost($order);
 
-		$type = 'city';
-		if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, 13, 1, 2);
-		if ($order['transport'] == $type) $total += 13;
+		$actionfree = 6000;
+		$type = 'city'; $cost = 100;
+		$cost = ($sum >= $actionfree) ? 0 : $cost;
+		if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, 1, 1);
+		if ($order['transport'] == $type) $total += $cost;
 
-		$type = 'self';
-		if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, 0, 1, 2);
-		if ($order['transport'] == $type) $total += 0;
+		$type = 'self'; $cost = 0;
+		$cost = ($sum >= $actionfree) ? 0 : $cost;
+		if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, 1, 2);
+		if ($order['transport'] == $type) $total += $cost;
 
-		$type = 'cdek_pvz';
-		if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, 123, 1, 2);
-		if ($order['transport'] == $type) $total += 123;
 
-		$type = 'cdek_courier';
-		if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, 123, 3, 4);
-		if ($order['transport'] == $type) $total += 123;
 
-		$type = 'pochta_simple';
-		if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, 123, 2, 5);
-		if ($order['transport'] == $type) $total += 123;
+		// echo '<pre>';
+		// //$zip = $order['zip']? $order['zip'] : $order['city']['zip'];
+		
+		$city_to_id = $order['city']['city_id'];
+		$city_from_id = Cart::$conf['city_from_id'];
+		//"pickup","courier",
+		$res = cdek\CDEK::calc($order, "pickup", $city_from_id, $city_to_id);
+		if (!empty($res['result']['price'])) {
+			$type = 'cdek_pvz'; $cost = $res['result']['price'];
+			$cost = ($sum >= $actionfree) ? 0 : $cost;
+			$min = $res['result']['deliveryPeriodMin'] ?? 1;
+			$max = $res['result']['deliveryPeriodMax'] ?? 7;
+			if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, $min, $max);
+			if ($order['transport'] == $type) $total += $cost;
+		}
 
-		$type = 'pochta_1';
-		if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, 123, 1, 2);
-		if ($order['transport'] == $type) $total += 123;
+		$res = cdek\CDEK::calc($order, "courier", $city_from_id, $city_to_id);
+		if (!empty($res['result']['price'])) {
+			$type = 'cdek_courier'; $cost = $res['result']['price'];
+			$cost = ($sum >= $actionfree) ? 0 : $cost;
+			$min = $res['result']['deliveryPeriodMin'] ?? 1;
+			$max = $res['result']['deliveryPeriodMax'] ?? 7;
+			if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, $min, $max);
+			if ($order['transport'] == $type) $total += $cost;
+		}
 
-		$type = 'pochta_courier';
-		if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, 123, 1, 1);
-		if ($order['transport'] == $type) $total += 123;
+
+		// $type = 'pochta_simple'; $cost = 123;
+		// $cost = ($sum >= $actionfree) ? 0 : $cost;
+		// if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, 1, 2);
+		// if ($order['transport'] == $type) $total += $cost;
+
+		// $type = 'pochta_1'; $cost = 0;
+		// $cost = ($sum >= $actionfree) ? 0 : $cost;
+		// if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, 1, 2);
+		// if ($order['transport'] == $type) $total += $cost;
+
+		// $type = 'pochta_courier'; $cost = 123;
+		// $cost = ($sum >= $actionfree) ? 0 : $cost;
+		// if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, 1, 2);
+		// if ($order['transport'] == $type) $total += $cost;
 
 		//Доставка
 		//Купон применяется к позиции. Результат с купоном хранится в описании позиции в корзине, так как его нужно замораживать и не пересчитывать для freeze
@@ -772,12 +836,20 @@ class Cart
 		]) === false) return false;
 		return true;
 	}
-	public static function setStatus($order, $status)
+	public static function setStatus($order, $status, $silence = false)
 	{
-		$sql = 'UPDATE cart_orders
-			SET status = :status, dateedit = now(), date' . $status . ' = now()
-			WHERE order_id = :order_id
-		';
+		if ($silence) {
+			$sql = 'UPDATE cart_orders
+				SET status = :status
+				WHERE order_id = :order_id
+			';	
+		} else {
+			$sql = 'UPDATE cart_orders
+				SET status = :status, date' . $status . ' = now()
+				WHERE order_id = :order_id
+			';	
+		}
+		
 		if (Db::exec($sql, [
 			':order_id' => $order['order_id'],
 			':status' => $status
@@ -826,6 +898,7 @@ class Cart
 					email, 
 					address,
 					zip,
+					pvz,
 					comment,
 					commentmanager,
 					UNIX_TIMESTAMP(datecreate) as datecreate,
@@ -881,15 +954,20 @@ class Cart
 			}
 			//Редактировать заявку может менеджер, и к user мы не можем обращаться. Надо знать email или phone, но у заказа они могут быть не указаны
 			//$order['user'] = User::getByEmail($order['email']);
-			if ($order['email']) {
-				$order['user'] = User::getByEmail($order['email']);
-			}
-			if (empty($order['user'])){ //Пользователь заказа есть всегда в таблице владельцев
-				$user_id = Db::col('SELECT user_id from cart_userorders WHERE order_id = :order_id', [
-					':order_id' => $order_id
-				]);
-				$order['user'] = User::getById($user_id);
-			}
+			// if ($order['email']) {
+			// 	$order['user'] = User::getByEmail($order['email']);
+			// }
+			
+			//один пользователь по email test@itlf.ru - владелец заказа
+			//Второй пользователь менеджер email aky@list.ru - автор заказа
+			//У обоих заказ активный
+			$user_id = Db::col('SELECT user_id from cart_userorders WHERE order_id = :order_id ORDER BY active DESC', [
+				':order_id' => $order_id
+			]);
+			$order['user'] = User::getById($user_id);
+			
+			//unset($order['user']['token']);
+			unset($order['user']['password']);
 
 			$city_id = $order['city_id'] ? $order['city_id'] : $order['user']['city_id'];
 			$order['city'] = City::getById($city_id, $order['user']['lang']);
@@ -904,7 +982,7 @@ class Cart
 			$order['transports'] = Db::allto($sql, 'type', [
 				'order_id' => $order_id
 			]);
-			if (!$order['transport']) $order['transport'] = 'cdek_pvz';
+			//if (!$order['transport']) $order['transport'] = 'cdek_pvz';
 			$order['sumtrans'] = 0;
 			if ($order['transport'] && isset($order['transports'][$order['transport']])) {
 				$order['sumtrans'] = $order['transports'][$order['transport']]['cost'];	

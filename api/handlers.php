@@ -16,7 +16,9 @@ use infrajs\lang\Lang;
 if (!isset($meta['actions'][$action])) return Cart::fail($ans, $lang, 'CR001.h'.__LINE__);
 $handlers = $meta['actions'][$action]['handlers'] ?? [];
 
-
+if (!empty($handlers['goal'])) {
+	$ans['goal'] = $handlers['goal'];
+}
 if (empty($handlers['rule'])) {
 	//Опции действуют только с rule
 	if (!empty($handler['freeze'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
@@ -143,7 +145,10 @@ if (!empty($handlers['rule'])) {
 	//С заказами каким статусом можно выполнить действие. Указывается если действия нет в списке действий со статусом заказа
 	if (!empty($handlers['status'])) {
 		if ($order['status'] === $action) return Cart::fail($ans, $lang, 'CR031.h'.__LINE__);
-		if (is_array($order['status']) && empty($user['admin']) && !in_array($order['status'], $handlers['status'])) return Cart::fail($ans, $lang, 'CR031.h'.__LINE__);
+		//if (is_array($order['status']) && empty($user['admin']) && !in_array($order['status'], $handlers['status'])) return Cart::fail($ans, $lang, 'CR031.h'.__LINE__);
+
+		if (!in_array($order['status'], $handlers['status'])) return Cart::fail($ans, $lang, 'CR031.h'.__LINE__);
+
 	}
 	if (empty($handlers['status']) && empty($handlers['edit']) && empty($handlers['admin'])) {
 		$actions = [];
@@ -160,10 +165,10 @@ if (!empty($handlers['rule'])) {
 	
 
 	if (!empty($handlers['checkdata'])) {
-		if (empty($order['email'])) return Cart::err($ans, $lang, 'CR005.h'.__LINE__);
 		if (empty($order['basket'])) return Cart::err($ans, $lang, 'CR020.h'.__LINE__);
 		if (empty($order['name'])) return Cart::err($ans, $lang, 'CR026.h'.__LINE__);
 		if (empty($order['phone'])) return Cart::err($ans, $lang, '5.h'.__LINE__);
+		if (empty($order['email'])) return Cart::err($ans, $lang, 'CR005.h'.__LINE__);
 	}
 }
 

@@ -7,27 +7,29 @@
 
 {orderToCheck-subject:}Оформлен заказ в интернет-магазине {host}
 {orderToCheck:}
-	<p>{order.name}, Ваш заказ от {~date(:j.m.Y,time)} {:payorrec} и ожидает проверки. После проверки позиций в заказе, с вами свяжется наш менеджер для подтверждения и уточнения деталей заказа.</p>
-	<p>Отслеживать состояние заказа можно в <a href="{site}/cart">личном кабинете</a>.</p>
+	<p>
+		{order.name}, Ваш заказ <a href="{site}/cart/orders/{order.order_nick}">№{order.order_nick}</a> от {~date(:j.m.Y,time)} {:payorrec} и ожидает проверки. При возникновении вопросов с Вами свяжется наш менеджер для подтверждения или уточнения деталей заказа. Отслеживать состояние заказа можно в <a href="{site}/cart">личном кабинете</a>.
+	</p>
 	{order:cart.resume}
 	<p>
-		По всем вопросам обращайтесь по нашим <a href="{site}/contacts">контактам</a>. При возникновении вопросов наш сотрудник свяжется с вами! Спасибо, что выбрали наш магазин.
+		По всем вопросам обращайтесь по нашим <a href="{site}/contacts">контактам</a>.<br>Спасибо, что выбрали наш магазин.
 	</p>
-	<p>С уважением, команда <a href="{site}">{host}</a></p>
 	{:links}
-
-{order.order_id-subject:}{host} изменения по вашему заказу
-{order.order_id:}
-	<p>Есть изменения по вашему заказу.</p>
-	<hr>
-	<pre>{commentmanager}</pre>
-	</hr>
-	{:links}
-
-	
-{links:}
-	<p><b><a href="{site}/cart/orders/{order.order_nick}">Заказ {order.order_nick}</a></b></p>
+{email-subject:}{host} изменения по вашему заказу
+{email:}
 	<p>
+		Добрый день!
+	</p>
+	<p>
+		Есть изменения по вашему заказу <a href="{site}/cart/orders/{order.order_nick}">№{order.order_nick}</a>
+	</p>
+	<pre>{order.commentmanager}</pre>
+	{:links}
+
+{links:}
+	<p>
+		С уважением, команда <a href="{site}">{host}</a><br>
+		<br>
 		<a href="{site}/catalog">Каталог товаров</a><br>
 	</p>
 {AdmLinks:}

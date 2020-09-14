@@ -78,7 +78,6 @@
 			else btnoff()
 			let ans = await Cart.post('addremove', { order_id, model_id, catkit, item_num }, { count })
 			if (!ans.result) return Popup.alert(ans.msg)
-			DOM.puff('check')
 		})
 		btn.addEventListener('click', async () => {
 			let count = Number(input.value)

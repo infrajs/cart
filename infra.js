@@ -4,7 +4,18 @@ import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Cart } from '/vendor/infrajs/cart/Cart.js'
 import { Popup } from '/vendor/infrajs/popup/Popup.js'
 import { DOM } from '/vendor/akiyatkin/load/DOM.js'
-let Session, Global
+import { CDEK } from '/vendor/akiyatkin/cdek/CDEK.js'
+import { Global } from '/vendor/infrajs/layer-global/Global.js'
+let Session
+
+
+CDEK.done('change', async wat => {
+	const order_id = wat.order.order_id
+	const city_id = wat.city
+	const transport = wat.id == 'courier' ? 'cdek_courier' : 'cdek_pvz'
+	const pvz = transport == 'cdek_pvz'? wat.id + ' ' + wat.PVZ.Address : ''
+	Cart.post('setcdek', { order_id }, { city_id, transport, pvz })
+})
 
 DOM.once('load', async () => {
 	await CDN.fire('load','jquery')
