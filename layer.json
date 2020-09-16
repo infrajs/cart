@@ -21,16 +21,18 @@
 				"tplroot":"ORDER",
 				"childs":{
 					"sbrfpay":{
+						"global":["user", "cart-order", "cart", "cart-sum"],
 						"external":"-cart/sbrfpay/layer.json"
 					},
 					"paykeeper":{
+						"global":["user", "cart-order", "cart", "cart-sum"],
 						"external":"-cart/paykeeper/layer.json"
 					},
-					"list":{					
+					"list":{
 						"tpl":"-cart/layout.tpl",
 						"tplroot":"LIST",
-						"global":["user", "cart-sum"],
-						"globaljson":["cart"],
+						"global":["user","cart-list"],
+						"globaljson":["cart", "cart-sum"],
 						"jsontpl":"-cart/api/order?lang={Cart.lang()}&order_nick={crumb.parent.name}&token={User.token()}"
 					},
 					"print":{
@@ -70,9 +72,6 @@
 				"global":["user", "cart"],
 				"tplroot":"ORDER",
 				"childs":{
-					"sbrfpay":{
-						"external":"-cart/sbrfpay/layer.json"
-					},
 					"print":{
 						"jsontpl":"-cart/api/order?lang={Cart.lang()}&order_nick={crumb.parent.name}&token={User.token()}",
 						"tpl":"-cart/layout.tpl",
@@ -83,10 +82,31 @@
 					"list":{
 						"tpl":"-cart/layout.tpl",
 						"tplroot":"LIST",
-						"global":["user", "cart"],
-						"jsontpl":"-cart/api/order?lang={Cart.lang()}&order_nick={crumb.parent.name}&token={User.token()}",
-						"autosavenametpl":"admin.{crumb.parent.name}"
+						"global":["user","cart-list"],
+						"globaljson":["cart"],
+						"jsontpl":"-cart/api/order?lang={Cart.lang()}&order_nick={crumb.parent.name}&token={User.token()}"
 					}
+				}
+			},
+			"childs":{
+				"wait":{
+					"tpl":"-cart/layout.tpl",
+					"tplroot":"ADMIN",
+					"divs":{
+						"YEARS":{
+							"activelink":true,
+							"tpl":"-cart/layout.tpl",
+							"tplroot":"YEARS",
+							"jsontpl":"-cart/api/years?lang={Cart.lang()}&token={User.token()}"
+						},
+						"ADMINLIST":{
+							"tplroot":"ADMINLIST",
+							"tpl":"-cart/layout.tpl",
+							"global":["user", "cart"],
+							"jsontpl":"-cart/api/orders?lang={Cart.lang()}&wait=1&token={User.token()}&start={Crumb.get.start}"
+						}
+					}
+					
 				}
 			}
 		}

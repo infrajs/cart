@@ -10,12 +10,12 @@
 
 			"actions":{
 				"admin":{
-					"edit":true
+					"edit":false
 				},
 				"orders":{
 					"edit":true,
 					"buttons":{
-						"sbrfpay":"success",
+						"paykeeper":"success",
 						"check":"success"
 					}
 				}
@@ -24,7 +24,6 @@
 		},
         "check":{
 			"notice":"warning",
-
 			"short":"На проверке",
 			"caption":"Заказы ожидающие проверку менеджера",
 			"title":"Заказ находится на проверке",
@@ -45,7 +44,6 @@
 		},
 		"complete":{
 			"notice":"default",
-
 			"short":"Готов",
 			"caption":"Выполненные заказы",
 			"title":"Заказ выполнен",
@@ -63,7 +61,21 @@
 				}
 			}
 		},
-		"paykeeper":{
+		"pay":{
+			"notice":"info",
+			"short":"pay2.m1",
+			"caption":"pay1.m2",
+			"title":"pay3.m3",
+			"actions":{
+				"orders":{
+					"buttons":{"wait":"secondary", "paykeeper":"success"}
+				},
+				"admin":{
+					"buttons":{"email":"secondary", "complete":"success"}
+				}
+			}
+		},
+		"*paykeeper":{
 			"notice":"info",
 
 			"caption":"Заказы ожидающие оплату",
@@ -81,7 +93,7 @@
 				}
 			}
 		},
-		"sbrfpay":{
+		"*sbrfpay":{
 			"notice":"info",
 
 			"caption":"Заказы ожидающие оплату",
@@ -115,6 +127,12 @@
 		"ousers":{
 			"handlers":{
 				"order":true
+			}
+        },
+        "freezeall":{
+			"handlers":{
+				"admin":true,
+				"post":true
 			}
         },
 		"create":{
@@ -163,7 +181,7 @@
 				"goal":"cart",
 				"rule":true,
 				"checkdata":true,
-				"payd":true,
+				"paid":true,
 				"status":["wait"],
 				"freeze":true
 			}
@@ -172,23 +190,71 @@
 			"title":"CR049b.m1",
 			"handlers":{
 				"admin":true,
+				"payd":true,
 				"rule":true,
 				"status":["complete"]
 			}
+		},
+		"complete":{
+			"handlers":{
+				"status":["check","wait"],
+				"admin":true,
+				"rule":true
+			},
+			"title":"CR038.m1",
+			"confirm":"CR039.m1"
 		},
 		"wait":{
 			"title":"CR050.1m",
 			"handlers":{
 				"rule":true,
-				"fuser":true,
-				"payd":true,
 				"unfreeze":true,
-				"status":["check"]
+				"status":["check","pay"]
 			}
 		},
+		"*pay":{
+			"handlers":{
+				"checkdata":true,
+				"status":["wait"],
+				"rule":true
+			},
+			"title":"1.m3"
+		},
+		"paykeeper":{
+			"handlers":{
+				"checkdata":true,
+				"status":["wait"],
+				"rule":true
+			},
+			"title":"1.m2",
+			"gohistory":{
+				"orders":"/cart/orders/{order_nick}",
+				"admin":"/cart/admin/{order_nick}"
+			},
+			"go":{
+				"orders":"/cart/orders/{order_nick}/paykeeper",
+				"admin":"/cart/admin/{order_nick}/paykeeper"
+			}
+		},
+		"*sbrfpay":{
+			"handlers":{
+				"checkdata":true
+			},
+			"title":"1.m1",
+			"gohistory":{
+				"orders":"/cart/orders/{order_nick}",
+				"admin":"/cart/admin/{order_nick}"
+			},
+			"go":{
+				"orders":"/cart/orders/{order_nick}/sbrfpay",
+				"admin":"/cart/admin/{order_nick}/sbrfpay"
+			}
+		},
+		
         "delete":{
 			"handlers":{
 				"rule":true,
+				"paid":true,
 				"admin":true
 			},
 			"title":"CR047"
@@ -281,22 +347,13 @@
 			"handlers":{
 				"status":["wait"],
 				"post":true,
-				"payd":true,
+				"paid":true,
 				"rule":true
 			},
 			"title":"CR035.m1",
 			"confirm":"CR036.m1"
 		},
-		"complete":{
-			"handlers":{
-				"status":["check","wait"],
-				"admin":true,
-				"post":true,
-				"rule":true
-			},
-			"title":"CR038.1A",
-			"confirm":"CR039.1A"
-		},
+		
 		"years":{
 			"handlers":{
 				"admin":true
@@ -305,34 +362,7 @@
 		"meta":{
 			
 		},
-		"sbrfpay":{
-			"handlers":{
-				"checkdata":true
-			},
-			"title":"1.m1",
-			"gohistory":{
-				"orders":"/cart/orders/{order_nick}",
-				"admin":"/cart/admin/{order_nick}"
-			},
-			"go":{
-				"orders":"/cart/orders/{order_nick}/sbrfpay",
-				"admin":"/cart/admin/{order_nick}/sbrfpay"
-			}
-		},
-		"paykeeper":{
-			"handlers":{
-				"checkdata":true
-			},
-			"title":"1.m2",
-			"gohistory":{
-				"orders":"/cart/orders/{order_nick}",
-				"admin":"/cart/admin/{order_nick}"
-			},
-			"go":{
-				"orders":"/cart/orders/{order_nick}/paykeeper",
-				"admin":"/cart/admin/{order_nick}/paykeeper"
-			}
-		},
+		
 		"print":{
 			"title":"CR052.m1",
 			"go":{

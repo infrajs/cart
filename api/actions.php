@@ -13,50 +13,34 @@ use akiyatkin\city\City;
 use infrajs\path\Path;
 
 // Обработка actions
-if ($action == 'check') {
-	$email = $order['email'];
-	$ouser = User::getByEmail($email);
-	
-	if (!$ouser) {
-		//Создать пользователя может и админ и просто пользователь на свободный email
-		//Пользователь остаётся в своей авторизации если она есть
+if ($action == 'check' || $action == 'paykeeper') {
+	//Проверяем email в заказе и создаём пользователя
 
-		//Создаём пользователя на указанный в заказе email и навязываем своё окружение
-		
-		//А что если это текущий пользователь?
-		if ($user['email']) { //У текущего пользователя есть email и мы его не нашли
-			//В заказе указан email, на который нет пользователя. 
-			//Пользователь будет создан
-			$ouser = User::create($lang, $city_id, $timezone, $email); 
-		} else {
-			//У текущего пользователя нет email значит это email текущего пользователя
-			$ouser = $user;
-			User::setEmail($user, $email);// Это не меняет токен и ранее сгенерированный пароль
+	$email = $order['email'];
+	//$order['user'] - это тот кому принадлежит заказ, может отличаться от указанного email
+	$ouser = User::getByEmail($email); // это тот чей email указан в заказе
+	if (!$ouser) { //Пользователя нет с указанным email в заказе
+		if ($user['email']) { //У текущего пользователя есть email и мы его не можем поменять
+			$ouser = User::create($lang, $city_id, $timezone, $email); //Создаём нового пользователя, чтобы запомнить что у него есть заказ
+		} else { //Если у текущего пользователя не было email устанавливаем его
+			$ouser = $user; // и теперь это один и тотже пользователь
+			User::setEmail($user, $email); //должно быть событие о появлении email Global.set('user')
 		}
-		if (!$ouser) return Cart::fail($ans, $lang, 'CR009.a' . __LINE__);
-		//Авторизуемся если ещё нет
 		$ans['token'] = $ouser['user_id'] . '-' . $ouser['token'];
-	} else {
-		if ($ouser['user_id'] == $user['user_id']) {
-			$r = User::setEnv($ouser, $timezone, $lang, $city_id);
-			if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
-		}
-		if ($ouser['user_id'] != $user['user_id'] && empty($user['admin'])) {
-			//Если на указанный email есть регистрация и это не я. Админ может указывать любой ящик без авторизации и приписать ему заказ
+	} else { //Если на указанный email уже есть регистрация
+		if ($ouser['user_id'] != $user['user_id']) { 
 			$ouser['order'] = $order;
-			$r = User::mail($ouser, $userlang, 'userdata', '/cart/orders/' . $order['order_nick']);
-			if (!$r) return Cart::ret($ans, $lang, 'CR023.a' . __LINE__);
-			return Cart::ret($ans, $lang, 'CR022.a' . __LINE__);
+			$r = User::mail($ouser, $userlang, 'userdata', '/cart/orders/active');
+			if (!$r) return Cart::err($ans, $lang, 'CR023.a' . __LINE__);
+			return Cart::err($ans, $lang, 'CR022.a' . __LINE__);
 		}
-	}
-	
+	}	
 	$r = Cart::setOwner($order, $ouser);
 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
+}
 
- 	// if ($place == 'orders') { При редактированнии заказа делаем его check
- 	// 	$r = Cart::setActive($order['order_id'], $ouser['user_id']);
- 	// 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
- 	// }
+if ($action == 'check') {
+	
 
 	if (!Cart::setStatus($order, 'check')) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 	//$ouser = $order['user'];
@@ -79,6 +63,13 @@ if ($action == 'check') {
 	}
 
 	return Cart::ret($ans, $lang, 'CR025.a' . __LINE__);
+} elseif ($action == 'paykeeper') {
+	if (!Cart::setStatus($order, 'pay')) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
+	//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
+	$r = Cart::resetActive($order);
+	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
+	return Cart::ret($ans, $lang, 'pay3.a' . __LINE__);
+
 } elseif ($action == 'tocheck') {
 	$email = $order['email'];
 	$ouser = User::getByEmail($email);
@@ -167,6 +158,8 @@ if ($action == 'check') {
 	$r = Cart::resetActive($order);
 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 	return Cart::ret($ans, $lang, 'CR040.a' . __LINE__);
+
+
 } elseif ($action == 'setcommentmanager') {
 	$commentmanager = Ans::REQS('commentmanager', 'string', '');
 	if (!$commentmanager) return Cart::fail($ans, $lang, 'CR063.a' . __LINE__);
@@ -179,7 +172,7 @@ if ($action == 'check') {
 	$order['commentmanager'] = $commentmanager;
 	$r = Cart::setCommentManager($order, $commentmanager);
 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
-	$ouser = $order['user'];
+	$ouser = User::getByEmail($order['email']);
 	$ouser['order'] = $order;
 	if (!$silence) {
 		$r = Cart::mail($ouser, $lang, 'email');
@@ -189,12 +182,12 @@ if ($action == 'check') {
 	return Cart::ret($ans, $lang, 'CR055.A1');
 } elseif ($action == 'wait') {
 	if (!Cart::setStatus($order, 'wait')) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
-	if (!$fuser) {
-		if ($place == 'admin') $fuser = $order['user'];
-		else if ($place == 'orders') $fuser = $user;
-	}
+	
+	$fuser = User::getByEmail($order['email']);
 	if (!$fuser) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
-	$r = Cart::setActive($order['order_id'], $fuser['user_id']);
+	Cart::setActive($order['order_id'], $fuser['user_id']);
+	if ($fuser != $user && $place == 'orders') Cart::setActive($order['order_id'], $user['user_id']);
+
 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 	return Cart::ret($ans, $lang, 'CR030.a' . __LINE__);
 } elseif ($action == 'delete') {
@@ -224,6 +217,14 @@ if ($action == 'check') {
 	$r = Cart::add($order, $model, $count);
 	if (!$r) return Cart::fail($ans, $lang, 'CR015.a' . __LINE__);
 	return Cart::ret($ans, $lang, 'CR029.a' . __LINE__);
+} elseif ($action == 'freezeall') {
+	$orders = Db::colAll('SELECT order_id from cart_orders where freeze = 1');
+	foreach ($orders as $order_id) {
+		Cart::freeze($order_id);
+	}
+
+	return Cart::ret($ans, $lang, 'Выполнена повторная заморозка');
+
 } elseif ($action == 'addremove') {
 	$count = Ans::REQ('count', 'int', false);
 	if (!$count) $count = false;
@@ -241,7 +242,6 @@ if ($action == 'check') {
 } elseif ($action == 'setcoupon') {
 	$coupon = Ans::REQS('coupon');
 	$coupondata = Load::loadJSON('-cart/coupon?name=' . $coupon);
-
 	$r = Cart::setCoupon($order, $coupon, $coupondata);
 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 	//return Cart::fail($ans, $lang, 'badcoupon.a' . __LINE__);
@@ -334,12 +334,20 @@ if ($action == 'check') {
 	if ($user) {
 		$order_id = Cart::getActiveOrderId($user['user_id']);
 		if ($order_id) {
-			$ans['sum'] = Db::col('SELECT sum from cart_orders where order_id = :order_id', [
+			$basket = Db::all('SELECT position_id, discount, count from cart_basket where order_id = :order_id', [
 				':order_id' => $order_id
 			]);
-			$ans['count'] = Db::col('SELECT count(*) from cart_basket where order_id = :order_id', [
-				':order_id' => $order_id
-			]);
+			$sum = 0;
+			$count = 0;
+			foreach ($basket as $pos) {
+				$model = Cart::getModel($pos['position_id']);
+				if (!$model) continue;
+				$count++;
+				$discount = 1 - $pos['discount'] / 100;
+				$sum += $model['Цена'] * $discount * $pos['count'];
+			}
+			$ans['sum'] = $sum;
+			$ans['count'] = $count;
 		}
 	}
 	return Cart::ret($ans);
@@ -375,14 +383,14 @@ if ($action == 'check') {
 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 	return Cart::ret($ans);
 } elseif ($action == 'settransport') {
-	$transport = Ans::REQ('transport', Cart::$conf['transports']);
-	if (!$transport) return Cart::fail($ans, $lang, 'CR060.a' . __LINE__);
+	$transport = Ans::REQ('transport', Cart::$conf['transports'], '');
+	//if (!$transport) return Cart::fail($ans, $lang, 'CR060.a' . __LINE__);
 	$r = Cart::setTransport($order, $transport);
 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 	return Cart::ret($ans);
 } elseif ($action == 'setpay') {
 	$pay = Ans::REQ('pay', Cart::$conf['pays']);
-	if (!$pay) return Cart::fail($ans, $lang, 'CR062.a' . __LINE__);
+	//if (!$pay) return Cart::fail($ans, $lang, 'CR062.a' . __LINE__);
 	$r = Cart::setPay($order, $pay);
 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 	return Cart::ret($ans);
@@ -391,8 +399,13 @@ if ($action == 'check') {
 	if ($user && $place == 'orders' && !$order) $order = Cart::getActiveOrder($user);
 	if (!$order) return Cart::err($ans, $lang, 'empty.a' . __LINE__);
 	$ans['rule'] = Cart::getJsMetaRule($meta, $order['status'], $lang);
+	$order['city'] = Cart::getCity($order['city_id'], $order['email'], $order['order_id'], $lang);
 	$ans['order'] = $order;
+	
+	
+	$ans['active'] = Cart::isActive($order, $user);
 	if (!sizeof($order['basket'])) return Cart::ret($ans, $lang, 'empty.a' . __LINE__);
+	//if (!$order['sum']) return Cart::ret($ans, $lang, 'empty.a' . __LINE__);
 	return Cart::ret($ans);
 } elseif ($action == 'ousers') {
 	if (!$order) return Cart::fail($ans, $lang, 'CR002.a' . __LINE__);
@@ -425,7 +438,7 @@ if ($action == 'check') {
 	$status = Ans::REQ('status', 'string', '');
 	$wait = Ans::REQ('wait', 'int', 0); //Нужно ли брать в расчёт ожидающие заказы
 	$start = Ans::REQ('start', 'int', 0);
-	
+	$ans['wait'] = $wait;
 	if (!$start) $start = strtotime('first day of this month 0:0');
 	
 	$end = strtotime('first day of next month 0:0', $start);
@@ -438,12 +451,19 @@ if ($action == 'check') {
 	//$ans['endstr'] = date('d.m.Y H:i:s', $end);
 	$list = Cart::getOrders($fuser, $status, $wait, $start, $end);
 	if (!$list) return Cart::err($ans, $lang, 'CR006.a' . __LINE__);
-	$ans['list'] = $list;
+	
 
 	$total = 0;
-	foreach ($list as $order) {
-		$total+=$order['total'];
+	foreach ($list as $k => $order) {
+		/*
+			Если в заказе не мой email, то изменения города в шапке на заказ не повлияют, так как не будут менять город у пользователя по email.
+			При freeze нужно фиксировать город.
+		*/
+
+		$list[$k]['city'] = Cart::getCity($order['city_id'], $order['email'], $order['order_id'], $lang);
+		$total += $order['total'];
 	}
+	$ans['list'] = $list;
 	$ans['total'] = $total;
 	$ans['meta'] = Cart::getJsMeta($meta, $lang);
 	return Cart::ret($ans);

@@ -3,9 +3,12 @@ namespace infrajs\cart\cdek;
 use infrajs\cache\Cache;
 use infrajs\ans\Ans;
 use infrajs\cart\Cart;
+use infrajs\config\Config;
 
-ISDEKservice::$account = Cart::$conf['cdek']['account'];
-ISDEKservice::$key = Cart::$conf['cdek']['key'];
+$conf = Config::get('cart');
+
+ISDEKservice::$account = $conf['cdek']['account'];
+ISDEKservice::$key = $conf['cdek']['key'];
 
 class ISDEKservice
 {

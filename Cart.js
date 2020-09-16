@@ -37,7 +37,7 @@ let Cart = {
 	dis (form, val = true) {
 		if (val && form.dataset.proc == 'true') return true
 		form.dataset.proc = val
-		for (let el of document.forms.cart.elements) el.disabled = val
+		for (let el of form.elements) el.disabled = val
 	},
 	get: (type, param) => {
 		let token = User.token()
@@ -61,15 +61,11 @@ let Cart = {
 	posts: async (type, param, opt) => {
 		let token = User.token()
 		let lang = Cart.lang()
-
-		let city_id = param.city_id
-		if (!city_id && opt) city_id = opt.city_id
-		if (!city_id) city_id = City.id()
-
+		let city_id = City.id()
 		let timezone = Intl.DateTimeFormat ? Intl.DateTimeFormat().resolvedOptions().timeZone : ''
 		let submit = 1
 
-		const groupsrc = '-cart/api/' + type + '?' + Cart.args({ ...param, lang, submit, token, city_id, timezone })
+		const groupsrc = '-cart/api/' + type + '?' + Cart.args({ city_id, ...param, lang, submit, token, timezone })
 
 		let ans
 		if (opt) {
@@ -79,11 +75,13 @@ let Cart = {
 			const src = groupsrc
 			ans = await Load.emit('json', src)
 		}
-
+		if (~['setcoupon'].indexOf(type)) {
+			Global.set('cart-list')
+		}
 		if (~['add','addremove','clear','check','delete','remove','setcoupon'].indexOf(type)) {
 			Global.set('cart-sum')
 		}
-		if (~['add','email','setcdek','setpvz','setzip', 'check','wait','complete','delete','tocheck'].indexOf(type)) {
+		if (~['add','email','setcdek','setpvz','setzip', 'paykeeper', 'check','wait','complete','delete','tocheck'].indexOf(type)) {
 			Global.set('cart-order')
 		}
 		Global.set('cart')

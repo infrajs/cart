@@ -3,7 +3,9 @@ use akiyatkin\boo\Cache;
 use infrajs\ans\Ans;
 use infrajs\cart\cdek\ISDEKservice;
 
-header('Access-Control-Allow-Origin: *');
+
+
+@header('Access-Control-Allow-Origin: *');
 
 
 

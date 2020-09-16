@@ -6,8 +6,9 @@ use infrajs\sequence\Seq;
 
 class CDEK {
 	public static $conf;
-	public static function calc($gorder, $type, $city_from_id, $city_to_id) 
+	public static function calc($basket, $type, $city_from_id, $city_to_id) 
 	{	
+		//basket[] = position_id, count
 		$conf = CDEK::$conf;
 		//type: courier, pickup
 		$get = [
@@ -19,7 +20,7 @@ class CDEK {
 				"type" => $type,
 				//"type" => "pickup",
 				//"type" => "courier",
-				"goods" => CDEK::getGoods($gorder)
+				"goods" => CDEK::getGoods($basket)
 			]
 		];
 		
@@ -29,16 +30,34 @@ class CDEK {
 		
 		return $json;
 	}
-	public static function getDim($pos) {
-		//$item['Габариты']//WxHxL
-		$item = $pos['model'];
-		$dim = !empty($item['Упаковка, см']) ? $item['Упаковка, см']: '';
-		$weight = !empty($item['Вес, кг']) ? $item['Вес, кг']: '0.4';
-
+	public static function getGoods($basket) 
+	{
+		if (empty($basket)) return [];
+		$goods = [];
+		foreach ($basket as $item) {
+			$dim = CDEK::getDim($item['position_id']);
+			if (!$dim) continue;
+			for ($i = 0; $i < $item['count']; $i++) {
+				array_push($goods, $dim);
+			}
+		}
+		return $goods;
+	}
+	public static function getDim($position_id) {
+		$model = Cart::getModel($position_id);
+		if (!$model) return false;
+		//$model['Габариты']//WxHxL
+		$model += $model['more'];
+		$dim = $model['Упаковка, см'] ?? $model['Габариты, см'] ?? $model['Габариты'] ?? '';
 		$d = preg_split('/[хx]/i', $dim, 3, PREG_SPLIT_NO_EMPTY);
-		if (empty($d[0])) $d[0] = 6;
-		if (empty($d[1])) $d[1] = 15;
-		if (empty($d[2])) $d[2] = 12;
+		$d[0] = $d[0] ?? $model['Длина, см'] ?? $model['Длина (см)'] ?? 6;
+		$d[1] = $d[1] ?? $model['Ширина, см'] ?? $model['Ширина (см)'] ?? 15;
+		$d[2] = $d[2] ?? $model['Высота, см'] ?? $model['Высота (см)'] ?? 12;
+
+		$weight = $model['Вес, кг'] ?? 0.5;
+
+		
+		
 		$weight = (float) $weight;
 
 		return [ 
@@ -48,16 +67,5 @@ class CDEK {
 			"weight" => $weight
 		];
 	}
-	public static function getGoods($gorder) 
-	{
-		if (empty($gorder['basket'])) return [];
-		$goods = [];
-		foreach ($gorder['basket'] as $item) {
-			$dim = CDEK::getDim($item);
-			for ($i = 0; $i < $item['count']; $i++) {
-				array_push($goods, $dim);
-			}
-		}
-		return $goods;
-	}
+	
 }

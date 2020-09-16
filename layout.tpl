@@ -70,7 +70,7 @@
 		</script>
 		
 		{emptylist:}
-			В корзине нет товаров. {data.order?(data.order.active?:opencatalog?:searchbutton)?:opencatalog}.
+			В корзине нет товаров. {data.order?(data.active?:opencatalog?:searchbutton)?:opencatalog}.
 			{searchbutton:}<span class="cart-search a">Добавить</span>
 			{opencatalog:}<a href="/catalog">Открыть каталог</a>
 		{showlist:}
@@ -85,7 +85,7 @@
 					</p>
 					<div class="d-flex text-center text-sm-right flex-column">
 						<div class="mb-2"><a href="/{crumb.parent}" style="text-decoration:none; white-space: nowrap;" class="btn btn-success">Перейти к {data.order.status!:wait?:заказу?:оформлению заказа}</a></div>
-						<div>Займёт не более 3 минут.</div>
+						<div>Займёт не&nbsp;более 3&nbsp;минут</div>
 					</div>
 				</div>
 			</div>
@@ -195,7 +195,7 @@
 						cls(div, 'cartsumclear')[0].innerHTML = tplcost(cartsumclear) //Сумма без скидки
 
 						const position_id = input.dataset.position_id
-						const ans = await Cart.post('add',{ position_id }, { count })
+						const ans = await Cart.post('add',{ order_id, position_id }, { count })
 
 					})
 				}
@@ -221,7 +221,7 @@
 				<div class="flex-grow-1">
 					<div>
 						<div class="float-right">{model:model.badgenalichie}{discount:badgecoupon}</div>
-						<b>{changed?:star} <a href="/catalog/{model.producer_nick}/{model.article_nick}{model:cat.idsl}">
+						<b>{model.changed?:star} <a href="/catalog/{model.producer_nick}/{model.article_nick}{model:cat.idsl}">
 							{model.Наименование}</a>
 						</b>
 					</div>
@@ -259,7 +259,7 @@
 		{:ordercrumb}
 		<div style="max-width:500px">
 			{data.result??:ordermessage}
-			{~length(data.order.basket)|data.order.status!:wait?data.order:ordercontent?:emptyorder}
+			{data.order.sum>0|data.order.status!:wait?data.order:ordercontent?:emptyorder}
 		</div>	
 		
 		{ordermessage:}
@@ -272,7 +272,8 @@
 			<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-success" role="alert"><b>Сообщение менеджера</b>
 				<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{commentmanager}</pre>
 			</div>
-		{paylayout::}-cart/sbrfpay/layout.tpl
+		{paylayout-paykeeper::}-cart/paykeeper/layout.tpl
+		{paylayout-sbrfpay::}-cart/sbrfpay/layout.tpl
 		{checked:}checked
 		{ordernick:}№{data.order.order_nick}
 		{orderedit:}<div class="float-right" title="Последние измения">{~date(:j F H:i,order.dateedit)}</div>
@@ -283,7 +284,7 @@
 			<div class="mt-1 line" style="color: {...transport=type?:black}; font-weight:{...transport=type?:600}">
 				<div class="d-flex">
 					<div class="form-check flex-grow-1">
-						<input {:isdisabled} class="form-check-input" type="radio" name="transport" {...transport=type?:checked} id="transport_{type}" 
+						<input {:isdisabled} class="radio form-check-input" type="radio" name="transport" {...transport=type?:checked} id="transport_{type}" 
 						data-cost="{cost}" value="{type}">
 						<label class="ml-1 form-check-label" for="transport_{type}">
 							{:label_{type}_short}
@@ -306,15 +307,33 @@
 				{transports.city:transportradio}
 			</div>
 		{ordercontent:}
+			<style>
+				#{div} .borderblock {
+					border: solid 1px #ddd;
+					padding: 20px 40px;
+					margin: 20px 0;
+				}
+				@media (max-width: 575px) {
+					#{div} .borderblock {
+						border: none;
+						padding: 0;
+						margin: 0;
+						margin-bottom:20px;
+						
+					}
+				}
+			</style>
 			{status=:wait??:orderedit}
 			<form name="cart" class="form" data-autosave2="{data.rule.actions[:place]edit?:autosavename}">
 				<h1>{data.rule.title} <span class="float-right">{:ordernick}</span></h1>
 				{commentmanager?:showManageComment}
-				{:paylayout.INFO}
+				
+				{data.order:paylayout-sbrfpay.INFO}
+				{data.order:paylayout-paykeeper.INFO}
 				
 				
 				<!-- <h2>Данные о покупателе</h2> -->
-				<div class="border px-5 py-4 my-4">
+				<div class="borderblock">
 					<div class="form-group input-name">
 						<label class="w-100">Имя получателя{:req} <i class="msg float-right"></i></label>
 						<input reaqired {:isdisabled} type="text" name="name" value="{data.order.name}" class="form-control" placeholder="Иванов Иван">
@@ -397,110 +416,199 @@
 						</script>
 					</div>
 				</div>
-				<h2>Доставка в город <span class="{:isedit?:a} citychoice">{data.order.city.city}<span></h2>
-				<div class="border px-5 py-4 my-4 transblock" style="color:#444">
-					<style>
-						.transblock input,
-						.transblock label,
-						.transblock .line {
-							cursor: pointer
-						}
-						.transblock .descr {
-							padding-bottom:1px;
-						}
-						.transblock .descr {
-							max-height: 0;
-							opacity: 0;
-							overflow: hidden;
-							transition-property: margin-top, opacity, max-height;
-							transition-duration: 0.2s;
-						}
-						.transblock .descr.show {
-							display: block;
-							opacity: 1;
-							max-height: 100px;
-						}
-					</style>
-					{city.city_id=Config.get().cart.city_from_id?:hometown}
-					
-					
-					{transports.cdek_pvz?:cdeklogo}
-					{transports.cdek_pvz:transportradio}
-					{transports.cdek_courier:transportradio}
-					
-					{transports.pochta_simple?:pochtalogo}
-					{transports.pochta_simple:transportradio}
-					{transports.pochta_1:transportradio}
-					{transports.pochta_courier:transportradio}
-					<script type="module" async>
-						import { Cart } from '/vendor/infrajs/cart/Cart.js'
-						const form = document.forms.cart
-						const cls = (cls, div = form) => div.getElementsByClassName(cls)
-						const blocks = cls('input-zip')
-						const order_id = {:order_id}
-						for (const block of blocks) {
-							const select = cls('zip', block)[0]
-							const change = async () => {
-								const n = select.options.selectedIndex
-								const zip = select.options[n].value
-								if (Cart.dis(form)) return
-								const ans = await Cart.post('setzip', { order_id, zip })
-								if (!ans.result) Popup.alert(ans.msg)								
-								
+				<div class="transblock">
+					<h2><span class="transportreset" style="cursor: default">Доставка</span> в город <span class="{:isedit?:a?:text-danger} citychoice">{data.order.city.city|:citynone}<span></h2>
+					<div class="borderblock" style="color:#444">
+						<style>
+							.transblock input,
+							.transblock label,
+							.transblock .line {
+								cursor: {:isedit?:pointer?:default};
 							}
-							//input.addEventListener('change', change)
-							select.addEventListener('change', change)
-						}
-					</script>
-					<script type="module" async>
-						import { Cart } from '/vendor/infrajs/cart/Cart.js'
-						import { CDEK } from '/vendor/akiyatkin/cdek/CDEK.js'
-						import { Popup } from '/vendor/infrajs/popup/Popup.js'
-						import { Load } from '/vendor/akiyatkin/load/Load.js'
-
-						const form = document.forms.cart
-						const cls = (cls, div = form) => div.getElementsByClassName(cls)
-						const order_id = {:order_id}
-						const btn = cls('showpvz')[0]
-						if (btn) btn.addEventListener('click', async () => {
-
-							//Global.set не сбарывает загрузку, а загрузка уже есть
-							//слой перепарсивается с кэшем
-							//чтобы этого не было надо прежде чем вызывать Global.set
-							//быть уверен что все пути уже добавились в Global.unload
-							Global.unload('cart-order','{json}')
-							const ans = await Load.fire('json','{json}')
-							if (!ans.result) Popup.alert(ans.msg)
-							const order = ans.order
-							CDEK.open(order)
-						})
+							.transblock .descr {
+								padding-bottom:1px;
+							}
+							.transblock .descr {
+								max-height: 0;
+								opacity: 0;
+								overflow: hidden;
+								transition-property: margin-top, opacity, max-height;
+								transition-duration: 0.2s;
+							}
+							.transblock .descr.show {
+								display: block;
+								opacity: 1;
+								max-height: 100px;
+							}
+						</style>
+						{city.city_id=Config.get().cart.city_from_id?:hometown}
 						
-					</script>
-					
-					<script type="module" async>
-						import { Cart } from '/vendor/infrajs/cart/Cart.js'
-						import { Template } from '/vendor/infrajs/template/Template.js'
+						{transports.cdek_pvz?:cdeklogo}
+						{transports.cdek_pvz:transportradio}
+						{transports.cdek_courier:transportradio}
+						
+						{transports.pochta_simple?:pochtalogo}
+						{transports.pochta_simple:transportradio}
+						{transports.pochta_1:transportradio}
+						{transports.pochta_courier:transportradio}
+						<script type="module" async>
+							import { Cart } from '/vendor/infrajs/cart/Cart.js'
+							const form = document.forms.cart
+							const cls = (cls, div = form) => div.getElementsByClassName(cls)
+							const blocks = cls('input-zip')
+							const order_id = {:order_id}
+							for (const block of blocks) {
+								const select = cls('zip', block)[0]
+								const change = async () => {
+									const n = select.options.selectedIndex
+									const zip = select.options[n].value
+									if (Cart.dis(form)) return
+									const ans = await Cart.post('setzip', { order_id, zip })
+									if (!ans.result) Popup.alert(ans.msg)								
+									
+								}
+								//input.addEventListener('change', change)
+								select.addEventListener('change', change)
+							}
+						</script>
+						<script type="module" async>
+							import { Cart } from '/vendor/infrajs/cart/Cart.js'
+							import { CDEK } from '/vendor/akiyatkin/cdek/CDEK.js'
+							import { Popup } from '/vendor/infrajs/popup/Popup.js'
+							import { Load } from '/vendor/akiyatkin/load/Load.js'
 
-						const form = document.forms.cart
-						const cls = (cls, div = form) => div.getElementsByClassName(cls)
-						const blocks = cls('input-address')
-						const order_id = {:order_id}
-						for (const block of blocks) {
-							const msg = cls('msg', block)[0]
-							const input = cls('address', block)[0]
-							if (input.value) msg.innerHTML = ''
-							const change = async () => {
+							const form = document.forms.cart
+							const cls = (cls, div = form) => div.getElementsByClassName(cls)
+							const order_id = {:order_id}
+							const btn = cls('showpvz')[0]
+							if (btn) btn.addEventListener('click', async () => {
+
+								//Global.set не сбарывает загрузку, а загрузка уже есть
+								//слой перепарсивается с кэшем
+								//чтобы этого не было надо прежде чем вызывать Global.set
+								//быть уверен что все пути уже добавились в Global.unload
+								Global.unload('cart-order','{json}')
+								const ans = await Load.fire('json','{json}')
+								if (!ans.result) Popup.alert(ans.msg)
+								const order = ans.order
+								CDEK.open(order)
+							})
+						</script>
+						<script type="module" async>
+							import { Cart } from '/vendor/infrajs/cart/Cart.js'
+							import { Template } from '/vendor/infrajs/template/Template.js'
+
+							const form = document.forms.cart
+							const cls = (cls, div = form) => div.getElementsByClassName(cls)
+							const blocks = cls('input-address')
+							const order_id = {:order_id}
+							for (const block of blocks) {
+								const msg = cls('msg', block)[0]
+								const input = cls('address', block)[0]
+								if (input.value) msg.innerHTML = ''
+								const change = async () => {
+									
+									const address = input.value
+									for (const block of blocks) {
+										const input = cls('address', block)[0]
+										const msg = cls('msg', block)[0]
+										msg.innerHTML = '...'
+										msg.style.color = "black"
+										input.value = address
+									}
+
+									const transport = form.elements.transport.value
+
+									let data = {
+										"city":{
+											"city":"{data.order.city.city}"
+										},
+										"address":cls('address',form)[0].value,
+										"zip":"{data.order.zip}",
+										"pvz":"{data.order.pvz}"
+									}
+
+									cls('transresume')[0].innerHTML = transport ? Template.parse("{tpl}", data, "info_" + transport) : ''
+
+									const ans = await Cart.posts('setaddress', { order_id }, { address })
+
+									for (const block of blocks) {
+										const input = cls('address', block)[0]
+										const msg = cls('msg', block)[0]
+										msg.innerHTML = ans.msg
+										if (ans.result) msg.style.color = "green"
+										else msg.style.color = "red"
+									}
+								}
+								//input.addEventListener('change', change)
+								input.addEventListener('keyup', change)
+							}
+						</script>
+						<script type="module" async>
+							import { Cart } from '/vendor/infrajs/cart/Cart.js'
+							import { Popup } from '/vendor/infrajs/popup/Popup.js'
+							import { Global } from '/vendor/infrajs/layer-global/Global.js'
+							import { Template } from '/vendor/infrajs/template/Template.js'
+							import { Layer } from '/vendor/infrajs/controller/src/Layer.js'
+
+							const form = document.forms.cart
+							const cls = (cls, div = form) => div.getElementsByClassName(cls)
+							const transblock = cls('transblock')[0]
+							const tag = (tag, div = form) => div.getElementsByTagName(tag)
+							const radios = cls('radio', transblock)
+							const order_id = {:order_id}
+							const sum = {data.order.sum}
+							const lines = cls('line', transblock)
+							const isedit = {:isedit?:true?:false}
+
+							const tplcost = val => {
+								let cost = Template.scope['~cost'](val) + '{:model.unit}'
+								return cost
+							}
+							for ( const map of cls('showMap', transblock)) map.addEventListener('click', () => {
+								Popup.showbig(Cart.maplayer)
+							})
+
+							const transportreset = cls('transportreset')[0]
+							if (transportreset) transportreset.addEventListener('click', () => {
+								for (const radio of radios) radio.checked = false
+								change(true)
+							})
+
+							const descrs = cls('descr', transblock)
+							let lasttransport = "{data.order.transport}"
+							const change = async (r) => {
+								if (!isedit) return
+								const transport = r === true ? '' : form.elements.transport.value
 								
-								const address = input.value
-								for (const block of blocks) {
-									const input = cls('address', block)[0]
-									const msg = cls('msg', block)[0]
-									msg.innerHTML = '...'
-									msg.style.color = "black"
-									input.value = address
+								cls('transportready')[0].style.display = transport ? 'block' : 'none'
+								
+								if (lasttransport == transport) return
+								lasttransport = transport
+
+								const radio = form.elements['transport_' + transport]
+								const sumtrans = radio ? Number(radio.dataset.cost) : 0
+								
+								const total = sum + sumtrans
+
+								for (const line of lines) {
+									line.style.color = ''
+									line.style.fontWeight = ''
+								}
+								for (const descr of descrs) descr.classList.remove('show')
+								if (transport) {
+									const line = radio.closest('.line')
+									if (line) {
+										line.style.color = 'black'
+										line.style.fontWeight = '600'
+									}
+									const descr = cls('descr', line)[0]
+									if(descr) descr.classList.add('show')
 								}
 
-								const transport = form.elements.transport.value || 'self'
+								cls('sumtrans')[0].innerHTML = tplcost(sumtrans)
+								cls('total')[0].innerHTML = tplcost(total)
+								cls('titletrans')[0].innerHTML = Template.parse("{tpl}", true, "label_" + transport)
 								let data = {
 									"city":{
 										"city":"{data.order.city.city}"
@@ -509,23 +617,86 @@
 									"zip":"{data.order.zip}",
 									"pvz":"{data.order.pvz}"
 								}
-								const transresume = cls('transresume')[0]
-								if (transresume) transresume.innerHTML = Template.parse("{tpl}", data, "info_" + transport)
+								cls('transresume')[0].innerHTML = Template.parse("{tpl}", data, "info_" + transport)
 
-								const ans = await Cart.posts('setaddress', { order_id }, { address })
-
-								for (const block of blocks) {
-									const input = cls('address', block)[0]
-									const msg = cls('msg', block)[0]
-									msg.innerHTML = ans.msg
-									if (ans.result) msg.style.color = "green"
-									else msg.style.color = "red"
-								}
+								const ans = await Cart.posts('settransport', { order_id }, { transport })
+								if (!ans.result) await Popup.alert(ans.msg)
 							}
-							//input.addEventListener('change', change)
-							input.addEventListener('keyup', change)
+							for (const radio of radios) radio.addEventListener('change', change)
+							for (const line of lines) line.addEventListener('click', () => {
+								if (!isedit) return
+								let radio = cls('radio', line)[0]
+								radio.checked = true
+								change()
+							})
+						</script>
+					</div>
+					<script type="module" async>
+						//Всплывающее окно выбора города с классом citychoice
+						import { City } from "/vendor/akiyatkin/city/City.js"
+						import { Cart } from '/vendor/infrajs/cart/Cart.js'
+						import { Global } from '/vendor/infrajs/layer-global/Global.js'
+
+						const isedit = {:isedit?:true?:false}
+						if (isedit) {
+							const div = document.getElementById('{div}')
+							const form = document.forms.cart
+							const cls = (cls) => form.getElementsByClassName(cls)
+							const order_id = {:order_id}
+							const place = "{:place}"
+							const old_city_id = {data.order.city.city_id|:false}
+							for (const btn of cls('citychoice')) {
+								btn.addEventListener('click', async () => {
+									if (Cart.dis(form)) return
+									const city_id = await City.choice()
+									if (city_id !== null && city_id != old_city_id) {
+										//const zip = ''
+										//await Cart.post('setzip', { order_id }, { zip })
+										await Cart.post('setcity', { order_id }, { city_id })
+										Global.check('cart-order')
+									} else {
+										Cart.dis(form, false)
+									}
+								})
+							}
 						}
 					</script>
+				</div>
+				<h2 class="payreset" style="cursor: default">Способ оплаты</h2>
+				<div class="borderblock payblock" style="color:#444">
+					<style>
+						.payblock input,
+						.payblock label,
+						.payblock .line {
+							cursor: {:isedit?:pointer?:default};
+						}
+						.payblock .descr {
+							padding-bottom:1px;
+						}
+						.payblock .descr {
+							max-height: 0;
+							opacity: 0;
+							overflow: hidden;
+							transition-property: margin-top, opacity, max-height;
+							transition-duration: 0.2s;
+						}
+						.payblock .descr.show {
+							display: block;
+							opacity: 1;
+							max-height: 100px;
+						}
+					</style>
+					<div class="row">
+						<div class="col-md-6">
+
+							{(:card):payradio}
+							<img src="/-imager?src=-cart/images/cards.png">
+						</div>
+						<div class="col-md-6">
+							{(:self):payradio}
+							{(:corp):payradio}
+						</div>
+					</div>
 					<script type="module" async>
 						import { Cart } from '/vendor/infrajs/cart/Cart.js'
 						import { Popup } from '/vendor/infrajs/popup/Popup.js'
@@ -534,116 +705,60 @@
 						import { Layer } from '/vendor/infrajs/controller/src/Layer.js'
 
 						const form = document.forms.cart
-						const cls = (cls, div = form) => div.getElementsByClassName(cls)[0]
-						const transblock = cls('transblock')
-						const tag = (tag, div = form) => div.getElementsByTagName(tag)[0]
-						const clss = (cls, div = form) => div.getElementsByClassName(cls)
-						const radios = form.elements.transport
+						const cls = (cls, div = form) => div.getElementsByClassName(cls)
+						const tag = (tag, div = form) => div.getElementsByTagName(tag)
+						const payblock = cls('payblock')[0]
+						
+						const radios = form.elements.pay || []
 						const order_id = {:order_id}
-						const sum = {data.order.sum}
-						const lines = clss('line')
+						const lines = cls('line', payblock)
 						const isedit = {:isedit?:true?:false}
-
-						const tplcost = val => {
-							let cost = Template.scope['~cost'](val) + '{:model.unit}'
-							return cost
-						}
-						const map = cls('showMap', transblock)
-
-						if (map) map.addEventListener('click', () => {
-							Popup.showbig(Cart.maplayer)
+						
+						const payreset = cls('payreset')[0]
+						payreset.addEventListener('click', () => {
+							for (const radio of radios) radio.checked = false
+							change(true)
 						})
 
-						const descrs = clss('descr', transblock)
-						let lasttransport = "{data.order.transport}"
-						const change = async () => {
+						let last = "{data.order.pay}"
+						const change = async (r) => {
 							if (!isedit) return
-							const transport = radios.value
-							if (lasttransport == transport) return
-							lasttransport = transport
-							const radio = form.elements['transport_' + transport]
-							const sumtrans = Number(radio.dataset.cost)
-							const total = sum + sumtrans
-
+							const pay = r === true ? '' : radios.value
+							if (last == pay) return
+							last = pay
 							for (const line of lines) {
 								line.style.color = ''
 								line.style.fontWeight = ''
 							}
-							const line = radio.closest('.line')
-							if (line) {
-								line.style.color = 'black'
-								line.style.fontWeight = '600'
+							if (pay) {
+								const radio = form.elements['pay_' + pay]
+								const line = radio.closest('.line')
+								if (line) {
+									line.style.color = 'black'
+									line.style.fontWeight = '600'
+								}
 							}
-							for(const descr of descrs) descr.classList.remove('show')
-							const descr = cls('descr', line)
-							if(descr) descr.classList.add('show')
+							for (const btn of cls('act-check')) btn.style.display = pay == 'card' ? 'none' : 'inline-block'
+							for (const btn of cls('act-sbrfpay')) btn.style.display = pay == 'card' ? 'inline-block' : 'none'
+							for (const btn of cls('act-paykeeper')) btn.style.display = pay == 'card' ? 'inline-block' : 'none'
 
-							let span = cls('sumtrans')
-							if (span) span.innerHTML = tplcost(sumtrans)
-
-							span = cls('total')
-							if (span) span.innerHTML = tplcost(total)
-
-							span = cls('titletrans')
-							if (span) span.innerHTML = Template.parse("{tpl}", true, "label_" + transport)
-							let data = {
-								"city":{
-									"city":"{data.order.city.city}"
-								},
-								"address":cls('address',form).value,
-								"zip":"{data.order.zip}",
-								"pvz":"{data.order.pvz}"
-							}
-
-							const transresume = clss('transresume')[0]
-							if (transresume) transresume.innerHTML = Template.parse("{tpl}", data, "info_" + transport)
-
-							const ans = await Cart.posts('settransport', { order_id }, { transport })
+							cls('payresume')[0].innerHTML = pay ? Template.parse("{tpl}", true, "pay_label_" + pay) : ''
+							
+							const ans = await Cart.posts('setpay', { order_id }, { pay })
 							if (!ans.result) await Popup.alert(ans.msg)
 						}
 						for (const radio of radios) radio.addEventListener('change', change)
 						for (const line of lines) line.addEventListener('click', () => {
 							if (!isedit) return
-							let radio = tag('input', line)
+							let radio = tag('input', line)[0]
 							radio.checked = true
 							change()
 						})
 					</script>
 				</div>
-				<script type="module" async>
-					//Всплывающее окно выбора города с классом citychoice
-					import { City } from "/vendor/akiyatkin/city/City.js"
-					import { Cart } from '/vendor/infrajs/cart/Cart.js'
-					import { Global } from '/vendor/infrajs/layer-global/Global.js'
-
-					const isedit = {:isedit?:true?:false}
-					if (isedit) {
-						const div = document.getElementById('{div}')
-						const form = document.forms.cart
-						const cls = (cls) => form.getElementsByClassName(cls)
-						const order_id = {:order_id}
-						const place = "{:place}"
-						const old_city_id = {data.order.city.city_id|:false}
-						for (const btn of cls('citychoice')) {
-							btn.addEventListener('click', async () => {
-								if (Cart.dis(form)) return
-								const city_id = await City.choice()
-								if (city_id !== null && city_id != old_city_id) {
-									//const zip = ''
-									//await Cart.post('setzip', { order_id }, { zip })
-									await Cart.post('setcity', { order_id }, { city_id })
-									Global.check('cart-order')
-								} else {
-									Cart.dis(form, false)
-								}
-							})
-						}
-					}
-				</script>
-				<h2>Оплата</h2>
-				<div class="my-4 d-flex">
-					<div class="flex-grow-1 input-comment">
-						<div class="mb-2">Комментарий к заказу <i class="msg float-right"></i></div>
+				<div class="mb-4 row">
+					<div class="col-sm-6 flex-grow-1 input-comment mb-2">
+						<div class="mb-2">Комментарий к&nbsp;заказу <i class="msg float-right"></i></div>
 						<textarea {:isdisabled} name="comment" class="form-control" rows="3">{data.order.comment}</textarea>
 						<script type="module" async>
 							import { Cart } from '/vendor/infrajs/cart/Cart.js'
@@ -663,21 +778,20 @@
 								msg.innerHTML = ans.msg
 								if (ans.result) msg.style.color = "green"
 								else msg.style.color = "red"
-
 							}
 							//input.addEventListener('change', change)
 							input.addEventListener('keyup', change)
 						</script>
 					</div>
-					<div class="ml-3">
-						<div class="mb-1 callback-title" style="cursor: pointer">Звонок менеджера</div>
-						<div class="form-check mt-1">
+					<div class="col-sm-6 callblock">
+						<div class="mb-1 callback-title" style="cursor: default">Звонок менеджера</div>
+						<div class="form-check mt-1 line" style="font-weight:{callback=:yes?:600}">
 							<input data-autosave="false" {:isdisabled} class="form-check-input" type="radio" name="callback" {callback=:yes?:checked} id="exampleRadios1" value="yes">
 							<label class="ml-1 form-check-label" for="exampleRadios1">
 								Нужен для уточнения деталей.
 							</label>
 						</div>
-						<div class="form-check mt-1">
+						<div class="form-check mt-1 line" style="font-weight:{callback=:no?:600}">
 							<input data-autosave="false" {:isdisabled} class="form-check-input" type="radio" name="callback" {callback=:no?:checked} id="exampleRadios2" value="no">
 							<label class="ml-1 form-check-label" for="exampleRadios2">
 								Не нужен, информация<br>по заказу понятна.
@@ -687,21 +801,28 @@
 							import { Cart } from '/vendor/infrajs/cart/Cart.js'
 							import { Popup } from '/vendor/infrajs/popup/Popup.js'
 
-							let div = document.getElementById('{div}')
-							const cls = (cls) => div.getElementsByClassName(cls)[0]
+							const div = document.getElementById('{div}')
+							const cls = (cls, el = div) => el.getElementsByClassName(cls)
 							let radios = document.forms.cart.elements.callback					
 							const order_id = {:order_id}
 							let order_nick = {data.order.order_nick}
-							let place = "{:place}"
 							let isedit = {:isedit?:true?:false}
-							let title = cls('callback-title')
+							let title = cls('callback-title')[0]
 							let oldcallback = "{data.order.callback}"
-							const change = async () => {
+							const callblock = cls('callblock')[0]
+							const lines = cls('line', callblock)
+							const change = async event => {
 								if (!isedit) return
 								let callback = radios.value
 								if (callback == oldcallback) return
 								oldcallback = callback
-								cls('callresume').innerHTML = Template.parse("{tpl}", callback, "callbackresume")
+								for (const line of lines) line.style.fontWeight = 400
+								if (event) {
+									const radio = event.currentTarget
+									const line = radio.closest('.line')
+									line.style.fontWeight = 600
+								}
+								cls('callresume')[0].innerHTML = Template.parse("{tpl}", callback, "callbackresume")
 								let ans = await Cart.posts('setcallback', { order_id }, { callback })
 								if (!ans.result) await Popup.alert(ans.msg)
 							}
@@ -717,43 +838,50 @@
 					</div>
 				</div>
 				{:resume}
-
+				<style>
+					.act-check {
+						display: {pay=:card?:none}
+					}
+					.act-tocheck,
+					.act-delete,
+					.act-wait {
+						display: {paid?:none}	
+					}
+					.act-sbrfpay,
+					.act-paykeeper {
+						display: {pay=:card??:none}
+					}
+				</style>
 				{:place=:admin?:adminactions?:useractions}
-				<div class="d-md-none" style="clear:both"></div>	
-				{data.fields.pay.Оплатить онлайн?:paydescr}
+				<div class="d-md-none" style="clear:both"></div>
 			</form>
 			{zipopt:}<option {.=data.order.zip?:selected}>{.}</option>
+			{payradio:}
+				<div class="mt-1 line" style="color: {data.order.pay=.?:black}; font-weight:{data.order.pay=.?:600}">
+					<div class="d-flex">
+						<div class="form-check flex-grow-1">
+							<input {:isdisabled} class="radio form-check-input" type="radio" name="pay" {data.order.pay=.?:checked} id="pay_{.}" 
+							data-cost="{cost}" value="{.}">
+							<label class="ml-1 form-check-label" for="pay_{.}">
+								{:pay_label_{.}}
+							</label>
+						</div>
+					</div>
+				</div>
+			{pay_label_self:}Оплата при получении
+			{pay_label_card:}Оплата картой
+			{pay_label_corp:}Оплата по счёту для юр.лиц (без НДС)
 			{transprice:}
-				<div class="d-flex" style="width:140px">
+				<div class="d-flex ml-2" style="max-width:140px">
 					<div style="width:70px">{min=max?:oneday?:twodays} {~words(max,:день,:дня,:дней)}</div>
 					<div style="color:{cost=:0?:red}">{~cost(cost)}{:model.unit}</div>
 				</div>
 				{twodays:}{min}-{max}
 				{oneday:}{max}
 			{place:}{Crumb.child.child.name=:admin?:admin?:orders}
-			{paydescr:}
-				<div id="paydescr">
-					<style>
-						#paydescr {
-							display: none
-						}
-					</style>
-					{order:paylayout.DESCR}
-				</div>
-				<script type="module">
-					import { Cart } from '/vendor/infrajs/cart/Cart.js'
-					let info = document.getElementById('paydescr')
-					Cart.done('choicepay', value => {
-						if (value == 'Оплатить онлайн') {
-							info.style.display = 'block'
-						} else {
-							info.style.display = 'none'
-						}
-					})
-				</script>
 		{resume:}
 			<div class="alert alert-secondary">
-				<b>№{order_nick}</b><span class="nameresume">{name:pr-comma}</span><span class="phoneresume">{phone:pr-comma}</span><span class="callresume">{callback:callbackresume}</span><span class="emailresume">{email:pr-comma}</span>, {~length(basket)} {~words(~length(basket),:позиция,:позиции,:позиций)}
+				<b>№{order_nick}</b><span class="nameresume">{name:pr-comma}</span><span class="phoneresume">{phone:pr-comma}</span><span class="callresume">{callback:callbackresume}</span><span class="emailresume">{email:pr-comma}</span>, {~length(basket)}&nbsp;{~words(~length(basket),:позиция,:позиции,:позиций)}
 				<pre style="white-space:pre-line; margin-top:4px; font-style: italic; font-size: 100%;" class="commentresume">{comment}</pre>
 				<hr>
 				{:basketresume}
@@ -765,19 +893,12 @@
 			{callneed:}требуется звонок
 			{callnoneed:}вопросов нет
 		{useractions:}
-			<style>
-				.act-sbrfpay {
-					display: none
-				}
-				.act-paykeeper {
-					display: none
-				}
-			</style>
+
 			<div class="myactions" data-place="orders">
 				{data.rule.actions[:place]:myactions}
 			</div>
 		
-			<script type="module">
+			<!-- <script type="module">
 				import { Cart } from '/vendor/infrajs/cart/Cart.js'
 				
 				let div = document.getElementById('{div}')
@@ -811,10 +932,10 @@
 					
 					
 				})
-			</script>
+			</script> -->
 		{adminactions:}
 			<div class="myactions" data-place="admin">
-				<p>Письмо клиенту {order.emailtime?:wasemail?:noemail}</p>
+				<p>Письмо клиенту {order.dateemail?:wasemail?:noemail}</p>
 				{data.rule.actions[:place]:myactions}
 			</div>
 		{transcardsimple:}
@@ -960,20 +1081,8 @@
 	{payinfo:}
 			<div data-value="{~key}" class="pt-2 iteminfo"><div class="m-1 alert border more">{:basket.fields.{tpl}}</div></div>
 		{myactions:}
-			<div class="my-4">
-				<div class="btn-toolbar float-right" role="toolbar">
-					<!-- <div class="btn-group dropup">
-						<button class="btn btn-secondary dropdown-toggle" id="dropdownActionMenu" type="button" data-toggle="dropdown">
-							
-						</button>
-						<div class="dropdown-menu" role="menu" aria-labelledby="dropdownActionMenu">
-							{actions::actprint}
-						</div>	
-					</div> -->
-					<div class="btn-group actionsbtn">
-						{buttons::mybtns}
-					</div>
-				</div>
+			<div class="mt-4 text-right actionsbtn">
+				{buttons::mybtns}
 			</div>
 			<script type="module">
 				import { Cart } from '/vendor/infrajs/cart/Cart.js'
@@ -983,8 +1092,7 @@
 				import { Template } from '/vendor/infrajs/template/Template.js'
 
 				let div = document.getElementById('{div}')
-				let cls = cls => div.getElementsByClassName(cls)[0]
-				let clss = cls => div.getElementsByClassName(cls)
+				let cls = cls => div.getElementsByClassName(cls)
 				let tag = tag => div.getElementsByTagName(tag)[0]
 				let form = document.forms.cart
 				let btn = null;
@@ -994,10 +1102,9 @@
 				let isedit = {:isedit?:true?:false}
 				
 				
-				btn = cls('act-check')
-				if (btn) btn.addEventListener('click', async () => {
+				for (const btn of cls('act-check')) btn.addEventListener('click', async () => {
 					if (Cart.dis(form)) return
-					let ans = await Cart.post('check', { order_id })
+					let ans = await Cart.posts('check', { order_id })
 					if (!ans.result) {
 						await Popup.alert(ans.msg)
 					} else {
@@ -1005,8 +1112,7 @@
 						await Crumb.go('/cart')	
 					}
 				})
-				btn = cls('act-tocheck')
-				if (btn) btn.addEventListener('click', async () => {
+				for (const btn of cls('act-tocheck')) btn.addEventListener('click', async () => {
 					if (Cart.dis(form)) return
 					let ans = await Cart.post('tocheck', { order_id })
 					if (!ans.result) {
@@ -1014,29 +1120,39 @@
 					}
 				})
 
-				btn = cls('act-basket')
-				if (btn) btn.addEventListener('click', async () => {						
+				for (const btn of cls('act-basket')) btn.addEventListener('click', async () => {						
 					if (Cart.dis(form)) return
 					Crumb.go('/cart/'+place+'/'+order_nick+'/list')
 					Cart.dis(form, false)
 				})
 
-				btn = cls('act-complete')
-				if (btn) btn.addEventListener('click', async () => {
+				for (const btn of cls('act-complete')) btn.addEventListener('click', async () => {
 					if (Cart.dis(form)) return
 					const ans = await Cart.post('complete', { order_id })
 					if (!ans.result) return Popup.alert(ans.msg)
 				})
+				
+				for (const btn of cls('act-paykeeper')) btn.addEventListener('click', async () => {	
+					if (Cart.dis(form)) return
+					const status = "{data.order.status}"
+					if (status != 'pay') {
+						const ans = await Cart.post('paykeeper', { order_id })
+						if (!ans.result) return Popup.alert(ans.msg)
+					}
+					//Надо сбросить active ссылку чтобы назад работал правильно
+					Crumb.go('/cart/orders/' + order_nick, false)
+					Crumb.go('/cart/orders/' + order_nick + '/paykeeper')
+					//const ans = await Cart.post('paykeeper', { order_id })
+					//if (!ans.result) return Popup.alert(ans.msg)
+				})
 
-				btn = cls('act-wait')
-				if (btn) btn.addEventListener('click', async () => {	
+				for (const btn of cls('act-wait')) btn.addEventListener('click', async () => {	
 					if (Cart.dis(form)) return
 					const ans = await Cart.post('wait', { order_id })
 					if (!ans.result) return Popup.alert(ans.msg)
 				})
 
-				btn = cls('act-delete')
-				if (btn) btn.addEventListener('click', async () => {
+				for (const btn of cls('act-delete')) btn.addEventListener('click', async () => {
 					if (Cart.dis(form)) return
 					Popup.confirm('Крайний вариант. Зказ бесследно исчезнет. Удалить?', async () => {
 						const ans = await Cart.post('delete', { order_id })
@@ -1049,8 +1165,7 @@
 					})
 				})
 
-				btn = cls('act-email')
-				if (btn) btn.addEventListener('click', async () => {	
+				for (const btn of cls('act-email')) btn.addEventListener('click', async () => {	
 					Popup.confirm(Template.parse("-cart/layout.tpl", {
 						"commentmanager":{~json(data.order.commentmanager)},
 						"email":{~json(data.order.email)},
@@ -1068,8 +1183,7 @@
 					
 				})
 
-				btn = cls('act-print') 
-				if (btn) btn.addEventListener('click', async () => {	
+				for (const btn of cls('act-print')) btn.addEventListener('click', async () => {	
 					if (Cart.dis(form)) return
 					await Crumb.go('/cart/'+place+'/'+order_nick+'/print')
 					Cart.dis(form, false)
@@ -1144,14 +1258,15 @@
 		<script type="module">
 			import { Cart } from '/vendor/infrajs/cart/Cart.js'
 			import { DOM } from '/vendor/akiyatkin/load/DOM.js'
-			let div = document.getElementById('{div}')
-			let cls = cls => div.getElementsByClassName(cls)
-			let btn = cls('couponbtn')[0]
-			let input = document.getElementById('coupon')
+			const div = document.getElementById('{div}')
+			const cls = cls => div.getElementsByClassName(cls)
+			const btn = cls('couponbtn')[0]
+			const input = document.getElementById('coupon')
+			const form = document.forms.basket
 
 			btn.addEventListener('click', async () => {
 				const order_id = {:order_id}
-				let coupon = Cart.strip_tags(input.value)
+				const coupon = Cart.strip_tags(input.value)
 				if (Cart.dis(form)) return
 				await Cart.post('setcoupon', { order_id, coupon })
 			})
@@ -1206,16 +1321,21 @@
 					padding:0 2px;
 				}
 			</style>
-			<table class="table table-striped">
-				{data.list::orderinfo}
-			</table>
+			
+			{data.list::orderinfo}
+			
 		{orderinfo:}
-			<tr class="{data.rules.rules[~key].notice}">
-				<td><a href="/cart/orders/{order_nick}">{order_nick}</a></td>
-				<td>{(status=:wait&active)?data.meta.rules[status]shortactive?data.meta.rules[status]short}</td>
-				<td>{~cost(sum)}{:model.unit}&nbsp;&nbsp;<span class="circle">{~length(basket)}</span></td>
-				<td>{~date(:d.m.Y,dateedit)}</td>
-			</tr>
+			<div class="row mb-2 bg-{data.meta.rules[~key]notice}">
+				<div class="col-12 col-sm-5 col-md-4 col-lg-4">
+					<b><a href="/cart/orders/{order_nick}">№{order_nick}</a></b>&nbsp;&nbsp;<a href="/cart/orders/{order_nick}/list" class="circle">{~length(basket)}</a> &mdash;&nbsp;<b title="Стоимость товаров и доставки">{~cost(total)}{:model.unit}</b>
+				</div>
+				<div class="col-12 col-sm-4 col-md-4 col-lg-3">
+					{(status=:wait&active)?data.meta.rules[status]shortactive?data.meta.rules[status]short}{coupon:pr-comma}{paid?(:оплачен):pr-comma}
+				</div>
+				<div class="col d-none d-sm-block text-right">
+					{~date(:d.m.Y,datecheck)}
+				</div>
+			</div>
 		{br:}<br>
 		{noaccount:}
 			<p>
@@ -1289,7 +1409,7 @@
 		
 		{positionRow:}
 			<tr>
-				<td><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{producer} {article}</a>{changed?:star}<br>{itemrow}</td>
+				<td><a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{producer} {article}</a>{model.changed?:star}<br>{itemrow}</td>
 				<td>{cost:itemcost}</td>
 				<td>{count}</td>
 				<td class="d-none d-sm-table-cell">{sum:itemcost}</td>
@@ -1315,11 +1435,11 @@
 			<div>
 				{~key} &mdash; {::month}
 			</div>
-		{month:}<a href="/cart/admin{now??:startarg}">{F}</a>{~last()??:comma}
+		{month:}<a href="/{crumb}{now??:startarg}">{F}</a>{~last()??:comma}
 		{startarg:}?start={start}
 	{ADMIN:}
 		<ol class="breadcrumb">
-			<li class="breadcrumb-item"><a class="{data.user.admin?:text-danger}" href="/cart">Личный кабинет</a></li>
+			<li class="breadcrumb-item"><a class="text-danger" href="/cart">Личный кабинет</a></li>
 			<li class="breadcrumb-item active">Все заказы</li>
 		</ol>
 		<h1>Все заказы</h1>
@@ -1328,7 +1448,7 @@
 		{ADMINLIST:}
 			{data.result?:adm_listPage?:adm_message}
 		{adm_listPage:}
-			<h2>{data.Y}, {data.F} <span class="float-right">{~cost(data.total)}{:model.unit}</span></h2>
+			<h2>{data.Y}, {data.F} <span class="float-right">{~length(data.list)} на {~cost(data.total)}{:model.unit}</span></h2>
 			{data.list::adm_row}
 			<script type="module" async>
 				import { Cart } from '/vendor/infrajs/cart/Cart.js'
@@ -1339,6 +1459,7 @@
 				const div = document.getElementById('{div}')
 				const cls = cls => div.getElementsByClassName(cls)
 				const place = "{:place}"
+				//const paid = {data.order.paid?:true?:false}
 				let btns
 				btns = cls('act-complete')
 				for (const btn of btns) btn.addEventListener('click', async () => {
@@ -1348,11 +1469,14 @@
 				})
 
 				btns = cls('act-tocheck')
-				for (const btn of btns) btn.addEventListener('click', async () => {
-					const order_id = btn.dataset.order_id
-					const ans = await Cart.post('tocheck', { order_id })
-					if (!ans.result) await Popup.alert(ans.msg)
-				})
+				for (const btn of btns) {
+					//if (!paid) btn.style.display = 'inline-block';
+					btn.addEventListener('click', async () => {
+						const order_id = btn.dataset.order_id
+						const ans = await Cart.post('tocheck', { order_id })
+						if (!ans.result) await Popup.alert(ans.msg)
+					})
+				}
 			</script>
 			
 			{adm_row:}
@@ -1369,20 +1493,16 @@
 					</style>
 					<b><a href="/cart/admin/{order_nick}">{order_nick}</a></b>
 					<a href="/cart/admin/{order_nick}/list" class="circle">{~length(basket)}</a> 
-					<nobr style="color:{status=:check?:red}">{(status=:wait&active)?data.meta.rules[status]shortactive?data.meta.rules[status]short}</nobr>
-					{status=:check?:acomplete}
-					{status=:complete?:atocheck}
-					
-						
-						
-				
+					<nobr style="color:{status=:check?:red}">{(status=:wait&active)?data.meta.rules[status]shortactive?data.meta.rules[status]short}</nobr>{status=:check?:acomplete}{status=:complete?(paid??:atocheck)}<b>{paid?(:оплачен):pr-comma}</b>
+
 					<div class="float-right text-right">
 						<span title="Отправлен на проверку">{~date(:d.m.Y,datecheck)}</span><br>{email}<br><b>{sum:itemcostrub}</b>
 					</div>
 					
 					<div>
-						{city.city}{name:pr-comma}{phone:pr-acomma}{coupon:pr-comma}
+						{city.city|:citynone}{name:pr-comma}{phone:pr-acomma}{coupon:pr-comma}
 						{transport?:adminlisttrans}
+						{pay?:adminlistpay}
 					</div>
 					<div class="clearfix">
 						{comment:usercomment}
@@ -1391,11 +1511,12 @@
 					
 				</div>
 				{adminlisttrans:}<br>{:label_{transport}}&nbsp;<b>{~cost(sumtrans)}{:model.unit}</b>
+				{adminlistpay:}<br>{:pay_label_{pay}}
 				{pr-acomma:}, <a href="tel:{~tel(.)}">{.}</a>
 				{usercomment:}<pre class="mt-2 px-2 p-1 alert-secondary">{.}</pre>
 				{admincomment:}<pre class="mt-2 px-2 p-1 alert-success">{.}</pre>	
-				{acomplete:} &mdash; <span class="a act-complete" data-order_id="{order_id}">Готов</span>
-				{atocheck:} &mdash; <span class="a act-tocheck" data-order_id="{order_id}">Вернуть на проверку</span>
+				{acomplete:} &mdash; <span class="a act-complete" data-order_id="{order_id}">готов</span>
+				{atocheck:} &mdash; <span class="a act-tocheck" data-order_id="{order_id}">на проверку</span>
 				{productlist:}
 					<div style="text-overflow: ellipsis; 
 					overflow: hidden;">
@@ -1518,27 +1639,30 @@
 	<hr>
 {basketresume:}
 	{basket::model.PRINT-item}
-{transresume:}
-	<div><span class="titletrans">{:label_{transport}}</span>: <b class="sumtrans">{~cost(sumtrans)}{:model.unit}</b></div>
-	<div class="transresume">{:info_{transport}}</div>
-	<p></p>
-	<p>
-		Всего: <b class="total">{~cost(total)}{:model.unit}</b>
-	</p>
+
+	
 {amount:}
-	<p>
+	
+	<div>
 		Стоимость{(coupondata.result&sum!sumclear)?:nodiscount}: <b class="sumclear">{~cost(sumclear)}{:model.unit}</b><br>
 		{(coupondata.result&sum!sumclear)?:prcoupon}
-	</p>
+	</div>
 	
-	{transport?:transresume}
 	
+	<div class="transportready" style="display:{transport??:none}">
+		<div><span class="titletrans">{:label_{transport}}</span>: <b class="sumtrans">{~cost(sumtrans)}{:model.unit}</b></div>
+		<div class="transresume">{:info_{transport}}</div>
+		Всего: <b class="total">{~cost(total)}{:model.unit}</b>
+	</div>
+
+	<div class="payresume">{pay?:pay_label_{pay}}</div>
+	{none:}none
 	{prcoupon:}
 		Купон: <b>{coupon}</b><br>
 		Сумма со скидкой: <b class="sum">{~cost(sum)}{:model.unit}</b><br>
 
 	{descr_cdek_pvz:}<div class="my-2">{...pvz}<div class="mb-1"><span class="a showpvz">{...pvz?:Изменить?:Выбрать} пункт выдачи</span></div></div>
-	{info_cdek_pvz:}{pvz}<br>
+	{info_cdek_pvz:}{pvz}
 	{label_cdek_pvz:}Доставка до пункта выдачи СДЕК
 	{label_cdek_pvz_short:}До пункта выдачи
 
@@ -1549,11 +1673,11 @@
 	
 	{descr_self:}ул. Новозаводская 2Б, торг.павильон №1, 1/23. <span class="a showMap">Схема проезда</span>
 	{info_self:}
-	{label_self:}Самовывоз из магазинов в Тольятти
+	{label_self:}Самовывоз из магазина в Тольятти
 	{label_self_short:}{:label_self}
 
 	{descr_cdek_courier:}{:inpaddress}
-	{info_cdek_courier:}{city.city}, {address}<br>
+	{info_cdek_courier:}{city.city|:citynone}, {address}<br>
 	{label_cdek_courier:}Доставка курьером СДЕК
 	{label_cdek_courier_short:}Курьер
 	
@@ -1568,17 +1692,18 @@
 	{label_pochta_1_short:}Первый класс
 
 	{descr_pochta_courier:}{:inpaddress}
-	{info_pochta_courier:}{city.city}, {address}<br>
+	{info_pochta_courier:}{city.city|:citynone}, {address}<br>
 	{label_pochta_courier:}Доставка курьером Почты России
 	{label_pochta_courier_short:}Курьер
+	{citynone:}Город не найден
 	{inpaddress:}
 		<div class="mt-2 input-address">
-			<label class="w-100">Адрес доставки (<span class="a citychoice">{data.order.city.city}</span>) <i class="msg float-right"></i></label>
+			<label class="w-100">Адрес доставки (<span class="{:isedit?:a?:text-danger} citychoice">{data.order.city.city}</span>) <i class="msg float-right"></i></label>
 			<input {:isdisabled} type="text" name="address" value="{data.order.address}" class="form-control address" placeholder="ул, дом, кв">
 		</div>
 	{inpzip:}
 		<div class="form-group input-zip mt-2">
-			<label class="w-100">Почтовый индекс (<span class="a citychoice">{data.order.city.city}</span>) <i class="msg float-right"></i></label>
+			<label class="w-100">Почтовый индекс (<span class="{:isedit?:a?:text-danger} citychoice">{data.order.city.city|:citynone}</span>) <i class="msg float-right"></i></label>
 			<select name="zip" class="zip form-control" type="text" list="zips" autocomplete="off">
 				<option></option>
 				{data.order.city.zips::zipopt}

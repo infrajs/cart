@@ -10,7 +10,7 @@ Path::req('vendor/infrajs/user/infra.php');
 
 Event::handler('User.merge', function ($user) {
 	$old_user_id = $user['user_id']; 
-	$new_user_id = $user['to']['user_id'];
+	$new_user_id = $user['to']['user_id'];	
 	//Во всех таблицах юзеров надо подменить
 	//Скопировать все заявки. Если получилось 2 активных, то их объединить.
 	//Может получиться что заявка уже его и получиться дубль... по этому делаем поштучно
@@ -109,6 +109,9 @@ Event::handler('User.merge', function ($user) {
 						]);
 					}
 				}
+				Db::exec('DELETE FROM cart_orders WHERE order_id = :old_order_id', [
+					':old_order_id' => $old_order_id
+				]);
 				Cart::recalc($active_order_id);
 			} else {
 				//Если заказ не активный, просто поменяли пользователя
@@ -124,6 +127,7 @@ Event::handler('User.merge', function ($user) {
 			}
 		}
 	}
+	Cart::$once = [];
 	Db::commit();
 	
 

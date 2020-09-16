@@ -28,6 +28,7 @@ use infrajs\db\Db;
 use infrajs\lang\LangAns;
 use infrajs\cache\CacheOnce;
 use infrajs\user\UserMail;
+use infrajs\cart\cdek\CDEK;
 
 class Cart
 {
@@ -91,6 +92,10 @@ class Cart
 		} else {
 			$nick = $sym . $today . $num;
 		}
+		$check = Db::col('SELECT order_nick from cart_orders where order_nick = :order_nick', [
+			':order_nick' => $nick
+		]);
+		if ($check) return Cart::createNick();
 		return $nick;
 	}
 
@@ -160,7 +165,7 @@ class Cart
 			$sql .= 'ORDER BY o.dateedit DESC';
 			$list = Db::colAll($sql, $param);
 			foreach ($list as $k => $order_id) {
-				$list[$k] = Cart::getById($order_id);
+				$list[$k] = Cart::getById($order_id, true);
 			}
 			return $list;
 		});
@@ -227,7 +232,7 @@ class Cart
 	}
 	public static function getYears($lang = 'ru')
 	{
-		$sql = 'SELECT UNIX_TIMESTAMP(min(datecheck)) as start FROM cart_orders';
+		$sql = 'SELECT UNIX_TIMESTAMP(min(datecreate)) as start FROM cart_orders';
 		$end = time();
 		$start = Db::col($sql) ?? $end - 1;
 		//$start -= 60 * 60 * 24 * 30 * 20;
@@ -270,7 +275,7 @@ class Cart
 	public static function create($user)
 	{
 
-		$fields = ['name','phone','address','zip','transport','city_id'];
+		$fields = ['name','phone','address','zip','transport','city_id','pay','pvz'];
 		$fieldsstr = implode(',',$fields);
 		$row = Db::fetch("SELECT $fieldsstr from cart_orders where email = :email order by dateedit DESC", [
 			':email'=> $user['email']
@@ -278,6 +283,9 @@ class Cart
 		if (!$row) {
 			$row = array_flip($fields);
 			foreach($row as $i=>$v) $row[$i] = '';
+			//Значения по умолчанию
+			$row['transport'] = 'cdek_pvz';
+			$row['pay'] = 'card';
 		}
 		$row['email'] = $user['email'];
 		$row['order_nick'] = Cart::createNick();
@@ -328,12 +336,12 @@ class Cart
 	}
 	public static function uniqkey($pos)
 	{
-		return $pos['model_id'] . $pos['item_num'] . $pos['catkit'];
+		return $pos['article_nick'] . $pos['producer_nick'] . $pos['item_num'] . $pos['catkit'];
 	}
-	public static function getModelTitle($model)
-	{
-		return $model['Наименование'];
-	}
+	// public static function getModelTitle($model)
+	// {
+	// 	return $model['Наименование'];
+	// }
 	public static function add(&$order, $model, $count = false)
 	{
 		// $prodart = Cart::uniqkey($model);
@@ -352,44 +360,48 @@ class Cart
 		$cost = $model['Цена'];
 
 
-
-
-		$sql = 'INSERT IGNORE INTO cart_basket (
-			order_id, basket_title, model_id, item_num, catkit, count, cost, dateadd, dateedit
-		) VALUES (
-			:order_id, :basket_title, :model_id, :item_num,	:catkit, :count, :cost, now(), now()
-		)';
-		$title = Cart::getModelTitle($model);
-		$position_id = Db::lastId($sql, [
+		$position_id = Db::col('SELECT position_id FROM cart_basket 
+			WHERE order_id = :order_id and catkit = :catkit and item_num = :item_num and article_nick = :article_nick and producer_nick = :producer_nick', [
 			':order_id' => $order['order_id'],
-			':model_id' => $model['model_id'],
+			':article_nick' => $model['article_nick'],
+			':producer_nick' => $model['producer_nick'],
 			':item_num' => $model['item_num'],
-			':catkit' => !empty($model['kit']) ? $model['catkit'] : '',
-
-			':basket_title' => $title,
-			':cost' => $cost,
-			':count' => $count
+			':catkit' => !empty($model['kit']) ? $model['catkit'] : ''
 		]);
 
 		if (!$position_id) {
+			$sql = 'INSERT IGNORE INTO cart_basket (
+				order_id, article_nick, producer_nick, item_num, catkit, count, dateadd, dateedit
+			) VALUES (
+				:order_id, :article_nick, :producer_nick, :item_num, :catkit, :count, now(), now()
+			)';
+			
+			$position_id = Db::lastId($sql, [
+				':order_id' => $order['order_id'],			
+				':article_nick' => $model['article_nick'],
+				':producer_nick' => $model['producer_nick'],
+				':item_num' => $model['item_num'],
+				':catkit' => !empty($model['kit']) ? $model['catkit'] : '',
+				':count' => $count
+			]);
+		} else {
 			//update
 			$position_id = Db::col('SELECT position_id FROM cart_basket 
-				WHERE order_id = :order_id and catkit = :catkit and item_num = :item_num and model_id = :model_id', [
+				WHERE order_id = :order_id and catkit = :catkit and item_num = :item_num and article_nick = :article_nick and producer_nick = :producer_nick', [
 				':order_id' => $order['order_id'],
-				':model_id' => $model['model_id'],
+				':article_nick' => $model['article_nick'],
+				':producer_nick' => $model['producer_nick'],
 				':item_num' => $model['item_num'],
 				':catkit' => !empty($model['kit']) ? $model['catkit'] : ''
 			]);
 			if (!$position_id) return false;
 
 			$sql = 'UPDATE cart_basket
-				SET count = :count, basket_title = :basket_title, cost = :cost, dateedit = now()
+				SET count = :count, dateedit = now()
 				WHERE position_id = :position_id
 			';
 			$r = Db::exec($sql, [
 				':position_id' => $position_id,
-				':basket_title' => $title,
-				':cost' => $cost,
 				':count' => $count
 			]) !== false;
 
@@ -558,16 +570,30 @@ class Cart
 		]) !== false;
 		return $r;
 	}
+	public static function getCity($city_id, $email, $order_id, $lang) {
+		if (!$city_id) {
+			$fuser = User::getByEmail($email);
+			if (!$fuser) {
+				$user_id = Db::col('SELECT user_id from cart_userorders WHERE order_id = :order_id ORDER BY active DESC', [
+			 		':order_id' => $order_id
+				]);
+				$fuser = User::getById($user_id);
+				if (!$fuser) return false;
+			}
+			$city_id = $fuser['city_id'];
+		}
+		return City::getById($city_id, $lang);
+	}
 	public static function setCoupon($order, $coupon, $coupondata)
 	{
 		//При изменении позиции в каталоге. Позиция не пересчитыватся. 
 		//Но пересчитывается перед freeze.
 		//Купон фризится в момент установки и применяется в поле discount у каждой позиции
-		$sql = 'UPDATE cart_orders
+
+		$r = Db::exec('UPDATE cart_orders
 			SET coupon = :coupon, coupondata = :coupondata, dateedit = now()
 			WHERE order_id = :order_id
-		';
-		$r = Db::exec($sql, [
+		', [
 			':order_id' => $order['order_id'],
 			':coupon' => $coupon,
 			':coupondata' => json_encode($coupondata, JSON_UNESCAPED_UNICODE)
@@ -599,6 +625,7 @@ class Cart
 			':order_id' => $order['order_id'],
 			':city_id' => $city_id
 		]) !== false;
+
 		if (!$r) return false;
 		$r = Cart::recalc($order['order_id']);
 		return $r;
@@ -645,22 +672,36 @@ class Cart
 		$r = Cart::recalc($order_id);
 		return $r;
 	}
-	public static function clearTransportCost($order) {
+	public static function clearTransportCost($order_id) {
 		$r = Db::exec('DELETE FROM cart_transports WHERE order_id = :order_id', [
-			':order_id' => $order['order_id']
+			':order_id' => $order_id
 		]) !== false;
 		return $r;
 	}
-	public static function saveTransportCost($order, $type, $cost, $min, $max)
+	public static function saveTransportCost($order_id, $type, $cost, $min, $max)
 	{
-		if (!isset($order['transport'][$type])) {
-			$sql = 'INSERT INTO cart_transports (order_id, type, cost, min, max) VALUES(:order_id, :type, :cost, :min, :max)';
-		} else {
-			$sql = 'UPDATE cart_transports SET cost = :cost, min = :min, max = :max
-			WHERE order_id = :order_id and type = :type';
-		}
+		$sql = 'INSERT INTO
+			cart_transports
+		SET
+			order_id = :order_id, 
+			type = :type, 
+			cost = :cost, 
+			min = :min, 
+			max =:max
+		ON DUPLICATE KEY UPDATE
+			cost = :cost, 
+			min = :min, 
+			max =:max';
+
+
+		// if (!isset($order['transport'][$type])) {
+		// 	$sql = 'INSERT IGNORE INTO cart_transports (order_id, type, cost, min, max) VALUES(:order_id, :type, :cost, :min, :max)';
+		// } else {
+		// 	$sql = 'UPDATE cart_transports SET cost = :cost, min = :min, max = :max
+		// 	WHERE order_id = :order_id and type = :type';
+		// }
 		$r = Db::exec($sql, [
-			':order_id' => $order['order_id'],
+			':order_id' => $order_id,
 			':type' => $type,
 			':cost' => $cost,
 			':min' => $min,
@@ -698,129 +739,122 @@ class Cart
 			';
 			*/
 	}
+	public static function getDiscount($order_id, $model) {
+		$coupondata = Db::col('SELECT coupondata FROM cart_orders WHERE order_id = :order_id', [
+			':order_id' => $order_id
+		]);
+		if (!$coupondata) return 0;
+		$coupondata = json_decode($coupondata, true);
+		if (!$coupondata) return 0;
+		$res = Cart::couponCheck($model, $coupondata);
+		if (!$res) return 0;
+		return $coupondata['Скидка'];
+	}
+	
 	public static function recalc($order_id)
 	{
 		//Меняются 
-		//sum, discount, cost, transports
-		unset(static::$once['getById'][$order_id]); //Без кэша
-		//Считаем сумму $order['basket'] + $model * $count
-		$order = Cart::getById($order_id);
-		if ($order['paid']) return false; //Оплаченный заказ нельзя пересчитывать
-
-		foreach ($order['basket'] as $k => $pos) {
-			$model = $pos['model'];
-
-
-			$discount = null;
-			if ($order['coupondata']) {
-				$coupondata = $order['coupondata'];
-				$res = Cart::couponCheck($model, $coupondata);
-				$cost = $model['Цена'];
-				if ($res) { //Действует
-					$discount = $coupondata['Скидка'];
-					$cost = $cost * (1 - $discount);
-				}
-			} else {
-				$cost = $model['Цена'];
-			}
-			$cost = round($cost, 2);
-
-
-
-			$sum = $cost * $pos['count'];
-
-			$order['basket'][$k]['sum'] = $sum;
-
-			$sql = 'UPDATE cart_basket
-				SET sum = :sum, cost = :cost, discount = :discount
-				WHERE position_id = :position_id
-			';
-			if (Db::exec($sql, [
-				':position_id' => $pos['position_id'],
-				':cost' => $cost,
-				':discount' => $discount ? $discount * 100 : null,
-				':sum' => $sum
-			]) === false) return false;
-		}
+		//discount - надо установить при добавлении позиции, 
+		//transports - надо пересчитать при добавлении позиции
+		$basket = Db::all('SELECT position_id, discount, count from cart_basket where order_id = :order_id', [
+			':order_id' => $order_id
+		]);
 
 		$sum = 0;
-		foreach ($order['basket'] as $p) {
-			$sum += $p['sum'];
+		$count = 0;
+		foreach ($basket as $k => $pos) {
+			$model = Cart::getModel($pos['position_id']);
+			if (!$model) continue;
+			$count++;
+			$discount = Cart::getDiscount($order_id, $model);
+			$r = Db::exec('UPDATE cart_basket
+				SET discount = :discount
+				WHERE position_id = :position_id
+			', [
+				':position_id' => $pos['position_id'],
+				':discount' => $discount ? $discount * 100 : null
+			]) !== false;
+			$discount = 1 - $pos['discount'] / 100;
+			$sum += $model['Цена'] * $discount * $pos['count'];
 		}
-		$total = $sum;
+
 		//order: city_id, basket - размеры, вес, 
 		$transports = Cart::$conf['transports'];
-		Cart::clearTransportCost($order);
+		Cart::clearTransportCost($order_id);
 
-		$actionfree = 6000;
+		$transportfree = Cart::$conf['transportfree'] ?? 100000;
+
 		$type = 'city'; $cost = 100;
-		$cost = ($sum >= $actionfree) ? 0 : $cost;
-		if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, 1, 1);
-		if ($order['transport'] == $type) $total += $cost;
+		$cost = ($sum >= $transportfree) ? 0 : $cost;
+		if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 1);
 
 		$type = 'self'; $cost = 0;
-		$cost = ($sum >= $actionfree) ? 0 : $cost;
-		if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, 1, 2);
-		if ($order['transport'] == $type) $total += $cost;
+		$cost = ($sum >= $transportfree) ? 0 : $cost;
+		if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
 
-
-
-		// echo '<pre>';
-		// //$zip = $order['zip']? $order['zip'] : $order['city']['zip'];
 		
-		$city_to_id = $order['city']['city_id'];
-		$city_from_id = Cart::$conf['city_from_id'];
-		//"pickup","courier",
-		$res = cdek\CDEK::calc($order, "pickup", $city_from_id, $city_to_id);
-		if (!empty($res['result']['price'])) {
-			$type = 'cdek_pvz'; $cost = $res['result']['price'];
-			$cost = ($sum >= $actionfree) ? 0 : $cost;
-			$min = $res['result']['deliveryPeriodMin'] ?? 1;
-			$max = $res['result']['deliveryPeriodMax'] ?? 7;
-			if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, $min, $max);
-			if ($order['transport'] == $type) $total += $cost;
+		$order = Db::fetch('SELECT city_id, email FROM cart_orders where order_id = :order_id', [
+			':order_id' => $order_id
+		]);
+
+		$city = Cart::getCity($order['city_id'], $order['email'], $order_id, 'ru');
+
+		if ($city) {
+			$city_to_id = $city['city_id'];
+			$city_from_id = Cart::$conf['city_from_id'];
+			//"pickup","courier",
+			
+			$type = 'cdek_pvz'; 
+			if (in_array($type, $transports)) {
+				$res = CDEK::calc($basket, "pickup", $city_from_id, $city_to_id);
+				if (!empty($res['result']['price'])) {
+					$cost = ($sum >= $transportfree) ? 0 : $res['result']['price'];
+					$min = $res['result']['deliveryPeriodMin'] ?? 1;
+					$max = $res['result']['deliveryPeriodMax'] ?? 7;
+					if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+				}
+			}
+
+			$type = 'cdek_courier'; 
+			if (in_array($type, $transports)) {
+				$res = CDEK::calc($basket, "courier", $city_from_id, $city_to_id);
+				if (!empty($res['result']['price'])) {
+					$cost = ($sum >= $transportfree) ? 0 : $res['result']['price'];
+					$min = $res['result']['deliveryPeriodMin'] ?? 1;
+					$max = $res['result']['deliveryPeriodMax'] ?? 7;
+					Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+				}
+			}
+
+
+			// echo '<pre>';
+			// //$zip = $order['zip']? $order['zip'] : $order['city']['zip'];
+			// $type = 'pochta_simple'; $cost = 123;
+			// $cost = ($sum >= $transportfree) ? 0 : $cost;
+			// if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
+
+			// $type = 'pochta_1'; $cost = 0;
+			// $cost = ($sum >= $transportfree) ? 0 : $cost;
+			// if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
+
+			// $type = 'pochta_courier'; $cost = 123;
+			// $cost = ($sum >= $transportfree) ? 0 : $cost;
+			// if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
+
+			//Доставка
+			//Купон применяется к позиции. Результат с купоном хранится в описании позиции в корзине, так как его нужно замораживать и не пересчитывать для freeze
+			//У позиции есть ценаsum - после скидки и cost*count до скидки.
 		}
-
-		$res = cdek\CDEK::calc($order, "courier", $city_from_id, $city_to_id);
-		if (!empty($res['result']['price'])) {
-			$type = 'cdek_courier'; $cost = $res['result']['price'];
-			$cost = ($sum >= $actionfree) ? 0 : $cost;
-			$min = $res['result']['deliveryPeriodMin'] ?? 1;
-			$max = $res['result']['deliveryPeriodMax'] ?? 7;
-			if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, $min, $max);
-			if ($order['transport'] == $type) $total += $cost;
-		}
-
-
-		// $type = 'pochta_simple'; $cost = 123;
-		// $cost = ($sum >= $actionfree) ? 0 : $cost;
-		// if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, 1, 2);
-		// if ($order['transport'] == $type) $total += $cost;
-
-		// $type = 'pochta_1'; $cost = 0;
-		// $cost = ($sum >= $actionfree) ? 0 : $cost;
-		// if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, 1, 2);
-		// if ($order['transport'] == $type) $total += $cost;
-
-		// $type = 'pochta_courier'; $cost = 123;
-		// $cost = ($sum >= $actionfree) ? 0 : $cost;
-		// if (in_array($type, $transports)) Cart::saveTransportCost($order, $type, $cost, 1, 2);
-		// if ($order['transport'] == $type) $total += $cost;
-
-		//Доставка
-		//Купон применяется к позиции. Результат с купоном хранится в описании позиции в корзине, так как его нужно замораживать и не пересчитывать для freeze
-		//У позиции есть ценаsum - после скидки и cost*count до скидки.
-
-		$sql = 'UPDATE cart_orders
-			SET sum = :sum
+		
+		$r = Db::exec('UPDATE cart_orders
+			SET count = :count
 			WHERE order_id = :order_id
-		';
-		if (Db::exec($sql, [
-			':order_id' => $order['order_id'],
-			':sum' => $sum
-		]) === false) return false;
+		', [
+			':order_id' => $order_id,
+			':count' => $count
+		]) !== false;
 
-		return true;
+		return $r;
 	}
 
 	public static function delete($order)
@@ -878,21 +912,23 @@ class Cart
 		return $r;
 	}
 
-	public static function getById($order_id)
+	public static function getById($order_id, $fast = false)
 	{
-		return static::once('getById', $order_id, function ($order_id) {
+		return static::once('getById', [$order_id, $fast], function ($order_id, $fast) {
 			$sql = 'SELECT 
 					order_id, 
 					status,
 					name,
 					phone,
-					pay,
 					callback,
 					transport,
+					pay,
+					paydata,
 					city_id,
 					freeze,
-					sum,
-					coupon, coupondata,
+					count,
+					coupon,
+					coupondata,
 					paid,
 					order_nick, 
 					email, 
@@ -913,76 +949,98 @@ class Cart
 			';
 			$order = Db::fetch($sql, [$order_id]);
 			if (!$order) return false;
-			$sql = 'SELECT 
+			
+			
+			if ($order['paydata']) $order['paydata'] = json_decode($order['paydata'], true);
+			if ($order['coupondata']) $order['coupondata'] = json_decode($order['coupondata'], true);
+
+			
+
+			// $user_id = Db::col('SELECT user_id from cart_userorders WHERE order_id = :order_id ORDER BY active DESC', [
+			// 	':order_id' => $order_id
+			// ]);
+			// if (!$user_id) return false; //Если нет ни одного владельца у заказа
+			// $order['user_id'] = $user_id;
+			// $order['user'] = User::getById($user_id);//Этот user может быть без email
+			// unset($order['user']['token']);
+			// unset($order['user']['password']);
+			// $city_id = $order['city_id'] ? $order['city_id'] : $order['user']['city_id'];
+			// $order['city'] = City::getById($city_id, $order['user']['lang']);
+			// $order['city']['zips'] = City::getIndexes($city_id);
+			
+			$order['paid'] = (bool) $order['paid'];
+
+			$order['basket'] = Db::all('SELECT 
 					position_id,
-					basket_title, 
-					model_id,
+					producer_nick,
+					article_nick,
 					item_num,
 					catkit,
+					costclear,
 					hash,
-					cost,
-					sum,
 					discount,
 					count
 				FROM cart_basket 
 				WHERE order_id = :order_id
 				order by dateadd DESC
-			';
-			$order['basket'] = Db::all($sql, ['order_id' => $order_id]);
+			', ['order_id' => $order_id]);
+
+			//Если заказ оплачен, сумма оплаты будет в paydata, также оплату можно посчитать, так как заказ будет нередактируемым и замороженным
+			$order['sum'] = 0;
 			$order['sumclear'] = 0;
+			$count = 0;
 			foreach ($order['basket'] as $i => $pos) {
-				// echo '<pre>';
-				// print_r($pos);
-				$order['basket'][$i]['cost'] = (float) $pos['cost'];
-				$model = Cart::getFromShowcase($pos);
-
-				$pos['sumclear'] = $model['Цена'] * $pos['count'];
-				$order['sumclear'] += $pos['sumclear'];
-
 				
-				if ($order['freeze']) {
-					$hash = Cart::getHash($model); //Если модели нет, hash будет пустой строкой и будет ме5тка что есть изменение
-					$order['basket'][$i]['changed'] = $pos['hash'] !== $hash;
-					$model = Cart::getFromJson($pos);
+				if (!$fast) {
+					
+					$model = Cart::getModel($pos['position_id']);
+					if (!$model) {
+						unset($order['basket'][$i]);
+						continue; //Модель не заморожена и не найдена в каталоге
+					}
+					$order['basket'][$i]['model'] = $model;
+					$costclear = $model['Цена']; //Цену надо взять или из каталога
+					Db::exec('UPDATE cart_basket
+						SET costclear = :costclear
+						WHERE position_id = :position_id', [
+							':position_id' => $pos['position_id'],
+							':costclear' => $costclear
+					]);
 				} else {
-					if (!$model) continue; //Модель не заморожена и не найдена в каталоге
-					$order['basket'][$i]['changed'] = false;
+					$costclear = $pos['costclear'];
 				}
-				$order['basket'][$i]['model'] = $model;
+				$count++;
+				/*
+					Полагаемся на Цена, discount, count
+				*/
+				
+				$order['basket'][$i]['costclear'] = $costclear;
+				$order['basket'][$i]['sumclear'] = $costclear * $pos['count'];
+				$discount = (100 - $pos['discount']) / 100;
+				$cost = $costclear * $discount;
+				$sum = $cost * $pos['count'];
 
-				unset($order['basket'][$i]['hash']);
+				$order['basket'][$i]['sum'] = $sum;
+				$order['basket'][$i]['cost'] = $cost;
+				$order['sum'] += $sum;
+				$order['sumclear'] += $order['basket'][$i]['sumclear'];
+				
+			}
+
+			if (!$fast && $order['count'] != $count) { //Пропала позиция с последнего пересчёта
+				Cart::recalc($order_id); //влияет только на transports
 			}
 			//Редактировать заявку может менеджер, и к user мы не можем обращаться. Надо знать email или phone, но у заказа они могут быть не указаны
 			//$order['user'] = User::getByEmail($order['email']);
 			// if ($order['email']) {
 			// 	$order['user'] = User::getByEmail($order['email']);
 			// }
-			
-			//один пользователь по email test@itlf.ru - владелец заказа
-			//Второй пользователь менеджер email aky@list.ru - автор заказа
-			//У обоих заказ активный
-			$user_id = Db::col('SELECT user_id from cart_userorders WHERE order_id = :order_id ORDER BY active DESC', [
-				':order_id' => $order_id
-			]);
-			$order['user'] = User::getById($user_id);
-			
-			//unset($order['user']['token']);
-			unset($order['user']['password']);
-
-			$city_id = $order['city_id'] ? $order['city_id'] : $order['user']['city_id'];
-			$order['city'] = City::getById($city_id, $order['user']['lang']);
-			$order['city']['zips'] = City::getIndexes($city_id);
-			$order['active'] = Cart::isActive($order, $order['user']);
-
-			$sql = 'SELECT cost, min, max, type
+			$order['transports'] = Db::allto('SELECT cost, min, max, type
 				FROM cart_transports 
 				WHERE order_id = :order_id
-			';
-
-			$order['transports'] = Db::allto($sql, 'type', [
+			', 'type', [
 				'order_id' => $order_id
 			]);
-			//if (!$order['transport']) $order['transport'] = 'cdek_pvz';
 			$order['sumtrans'] = 0;
 			if ($order['transport'] && isset($order['transports'][$order['transport']])) {
 				$order['sumtrans'] = $order['transports'][$order['transport']]['cost'];	
@@ -990,29 +1048,25 @@ class Cart
 			$order['total'] = $order['sumtrans'] + $order['sum'];
 
 
-			if ($order['coupondata']) $order['coupondata'] = json_decode($order['coupondata'], true);
+			
 
 			return $order;
 		});
 	}
 	public static function getHash($model)
 	{
-		$hash = md5(json_encode($model, JSON_UNESCAPED_UNICODE));
+		if (!$model) return 'none';
+		$hash = md5($model['Цена']);
+		//unset($model['model_id']);
+		//$hash = md5(json_encode($model, JSON_UNESCAPED_UNICODE));
 		return $hash;
 	}
-	// public static function getModel($order, $pos)
-	// {
-	// 	if ($order['freeze']) {
-	// 		return Cart::getFromJson($pos);
-	// 	} else {
-	// 		return Cart::getFromShowcase($pos);
-	// 	}
-	// }
-	public static function getFromJson($pos)
+
+	public static function getFromJson($position_id)
 	{
 		//position_id, model_id, item_num, catkit, freeze, hash
 		$sql = 'SELECT json from cart_basket WHERE position_id = :position_id';
-		$json = Db::col($sql, [':position_id' => $pos['position_id']]);
+		$json = Db::col($sql, [':position_id' => $position_id]);
 		$model = json_decode($json, true);
 		return $model;
 	}
@@ -1021,40 +1075,55 @@ class Cart
 	{
 		$json = json_encode($model, JSON_UNESCAPED_UNICODE);
 		$hash = Cart::getHash($model);
-		$cost = $model['Цена'];
-		$title = Cart::getModelTitle($model);
 		$sql = 'UPDATE cart_basket
-			SET json = :json, cost = :cost, hash = :hash, basket_title = :basket_title
+			SET json = :json, hash = :hash
 			WHERE position_id = :position_id
 		';
 
 		$r = Db::exec($sql, [
 			':position_id' => $position_id,
 			':json' => $json,
-			':cost' => $cost,
-			':basket_title' => $title,
 			':hash' => $hash
 		]) !== false;
 
 		return $r;
 	}
+	public static function getModel($position_id) {
+		return static::once('getModel', $position_id, function ($position_id) {
+			$pos = Db::fetch('SELECT position_id, producer_nick, article_nick, item_num, catkit, hash FROM cart_basket WHERE position_id = :position_id',[
+				':position_id' => $position_id
+			]);
+			$model = Cart::getFromShowcase($pos);
+			if ($pos['hash']) {
+				$changed = $model ? $pos['hash'] !== Cart::getHash($model) : true;
+				if ($changed) $model = Cart::getFromJson($position_id);
+			} else {
+				$changed = false;
+			}
+			if ($model) $model['changed'] = $changed;
+			return $model;
+		});
+	}
 	public static function getFromShowcase($pos)
 	{
-		return Showcase::getModelById($pos['model_id'], $pos['item_num'], $pos['catkit']);
+		return Showcase::getModel($pos['producer_nick'], $pos['article_nick'], $pos['item_num'], $pos['catkit']);
 	}
-	public static function freeze($order)
+	public static function freeze($order_id)
 	{
 		$sql = 'UPDATE cart_orders
 			SET freeze = 1
 			WHERE order_id = :order_id
 		';
 		$r = Db::exec($sql, [
-			':order_id' => $order['order_id']
+			':order_id' => $order_id
 		]) !== false;
 		if (!$r) return $r;
 
+		$basket = Db::all('SELECT position_id, producer_nick, article_nick, item_num, catkit from cart_basket where order_id = :order_id', [
+			':order_id' => $order_id
+		]);
 
-		foreach ($order['basket'] as $pos) {
+		foreach ($basket as $pos) {
 			$model = Cart::getFromShowcase($pos);
 			//Если модели нет в каталоге. надо удалить её из корзины. Такая проверка должна быть раньше.
 			if (!Cart::setToJson($pos['position_id'], $model)) return false;
@@ -1062,30 +1131,30 @@ class Cart
 			//position_id, model_id, item_num, catkit, freeze, hash
 			//$position_id = $pos['position_id']
 		}
-		$r = Cart::recalc($order['order_id']); //Установятся актуальные цены
+		$r = Cart::recalc($order_id); //Установятся актуальные цены
 		return $r;
 	}
-	public static function unfreeze($order)
+	public static function unfreeze($order_id)
 	{
 		$sql = 'UPDATE cart_orders
 			SET freeze = 0
 			WHERE order_id = :order_id
 		';
 		$r = Db::exec($sql, [
-			':order_id' => $order['order_id']
+			':order_id' => $order_id
 		]) !== false;
 		if (!$r) return $r;
 
 		$sql = 'UPDATE cart_basket
-			SET json = null
+			SET json = null, hash = null
 			WHERE order_id = :order_id
 		';
 
 		$r = Db::exec($sql, [
-			':order_id' => $order['order_id']
+			':order_id' => $order_id
 		]) !== false;
 		if (!$r) return false;
-		$r = Cart::recalc($order['order_id']);
+		$r = Cart::recalc($order_id);
 		return $r;
 	}
 	public static function getUsers($order)
@@ -1154,7 +1223,7 @@ class Cart
 
 
 Event::$classes["Cart"] = function ($pos) {
-	return $pos["model_id"] . $pos["item_num"] . $pos['catkit'];
+	return $pos["producer_nick"] . $pos["article_nick"] . $pos["item_num"] . $pos['catkit'];
 };
 /*
 

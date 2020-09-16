@@ -44,8 +44,9 @@
 		let cls = (cls) => div.getElementsByClassName(cls)[0]
 		let btn = cls('add')
 		let input = tag('input')
-		let order_id = btn.dataset.order_id
-		let model_id = btn.dataset.model_id
+		const order_id = btn.dataset.order_id
+		const producer_nick = btn.dataset.producer_nick
+		const article_nick = btn.dataset.article_nick
 		let catkit = btn.dataset.catkit
 		let item_num = btn.dataset.item_num
 		let btnoff = () => {
@@ -64,7 +65,8 @@
 			btnoff()
 			if (!ans.result) return
 			for (let pos of ans.order.basket) {
-				if (pos.model.model_id != model_id) continue
+				if (pos.model.producer_nick != producer_nick) continue
+				if (pos.model.article_nick != article_nick) continue
 				if (pos.model.catkit != catkit) continue
 				if (pos.model.item_num != item_num) continue
 				input.value = pos.count
@@ -76,13 +78,13 @@
 			let count = Number(input.value)
 			if (count) btnon() 
 			else btnoff()
-			let ans = await Cart.post('addremove', { order_id, model_id, catkit, item_num }, { count })
+			let ans = await Cart.post('addremove', { order_id, producer_nick, article_nick, catkit, item_num }, { count })
 			if (!ans.result) return Popup.alert(ans.msg)
 		})
 		btn.addEventListener('click', async () => {
 			let count = Number(input.value)
 			if (!count) count = 1
-			let ans = await Cart.post('addremove', { order_id, model_id, catkit, item_num }, { count })
+			let ans = await Cart.post('addremove', { order_id, producer_nick, article_nick, catkit, item_num }, { count })
 			if (!ans.result) return Popup.alert(ans.msg)
 			Crumb.go('/cart/orders/active/list')
 		});
@@ -103,7 +105,7 @@
 				<input type="number" value="" min="0" max="999" class="form-control" 
 				style="width: 3.9em; padding-left: 6px; padding-right: 6сpx;">
 				<div class="input-group-append">
-					<span data-order_id="active" data-model_id="{model_id}" data-item_num="{item_num}" data-catkit="{catkit:ampval}" class="add btn input-group-addon"></span>
+					<span data-order_id="active" data-producer_nick="{producer_nick}" data-article_nick="{article_nick}" data-item_num="{item_num}" data-catkit="{catkit:ampval}" class="add btn input-group-addon"></span>
 				</div>
 			</div>
 		</div>

@@ -23,7 +23,6 @@ $timezone = null;
 $silence = Ans::REQ('silence', 'bool');
 
 $token = Ans::REQS('token', 'string', '');
-
 $user = User::fromToken($token);
 
 $ans['user'] = array_intersect_key($user, array_flip(['user_id','admin','email'/*,'lang','timezone','city_id'*/]));

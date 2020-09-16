@@ -24,7 +24,7 @@ if (empty($handlers['rule'])) {
 	if (!empty($handler['freeze'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
 	if (!empty($handler['unfreeze'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
 	if (!empty($handlers['status'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
-	if (!empty($handlers['payd'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
+	if (!empty($handlers['paid'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
 	if (!empty($handlers['checkdata'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
 }
 
@@ -58,22 +58,24 @@ if (!empty($handlers['admin'])) {
 
 
 if (!empty($handlers['model'])) {
-	$model_id = Ans::REQ('model_id');
-	$position_id = Ans::REQ('position_id');
-	if (!$model_id && !$position_id) return Cart::fail($ans, $lang, 'posmod.h'.__LINE__);
+	$article_nick = Ans::REQS('article_nick');
+	$producer_nick = Ans::REQS('producer_nick');
+	$position_id = Ans::REQ('position_id', 'int');
+	if ((!$producer_nick || !$article_nick) && !$position_id) return Cart::fail($ans, $lang, 'posmod.h'.__LINE__);
 	if ($position_id) {
-		$sql = 'SELECT model_id, item_num, catkit from cart_basket where position_id = :position_id';
+		$sql = 'SELECT article_nick, producer_nick, item_num, catkit from cart_basket where position_id = :position_id';
 		$row = Db::fetch($sql, [
 			':position_id'=> $position_id
 		]);
 		if (!$row) return Cart::fail($ans, $lang, 'posmod.h'.__LINE__);
 		extract($row);
 	}
-	if ($model_id) {
+	if ($article_nick && $producer_nick) {
 		$item_num = Ans::REQ('item_num', 'int', 1);
 		$catkit = Ans::REQS('catkit', 'string', '');
 		$pos = [
-			'model_id' => $model_id,
+			'producer_nick' => $producer_nick,
+			'article_nick' => $article_nick,
 			'item_num' => $item_num,
 			'catkit' => $catkit
 		];
@@ -169,6 +171,18 @@ if (!empty($handlers['rule'])) {
 		if (empty($order['name'])) return Cart::err($ans, $lang, 'CR026.h'.__LINE__);
 		if (empty($order['phone'])) return Cart::err($ans, $lang, '5.h'.__LINE__);
 		if (empty($order['email'])) return Cart::err($ans, $lang, 'CR005.h'.__LINE__);
+
+		if (empty($order['transport'])) return Cart::err($ans, $lang, 'trans.h'.__LINE__);
+		if (empty($order['pay'])) return Cart::err($ans, $lang, 'pay.h'.__LINE__);
+		if (in_array($order['transport'],["city","cdek_courier","pochta_courier"])) {
+			if (empty($order['address'])) return Cart::err($ans, $lang, 'address.h'.__LINE__);
+		}
+		if (in_array($order['transport'],["pochta_simple","pochta_1"])) {
+			if (empty($order['zip'])) return Cart::err($ans, $lang, 'zip.h'.__LINE__);
+		}
+		if (in_array($order['transport'],["cdek_pvz"])) {
+			if (empty($order['pvz'])) return Cart::err($ans, $lang, 'pvz.h'.__LINE__);
+		}
 	}
 }
 
@@ -203,10 +217,10 @@ if (!empty($handlers['fuser'])) {
 }
 
 if (!empty($handlers['freeze'])) {
-	if (!Cart::freeze($order)) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
+	if (!Cart::freeze($order['order_id'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
 }
 if (!empty($handlers['unfreeze'])) {
-	if (!Cart::unfreeze($order)) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
+	if (!Cart::unfreeze($order['order_id'])) return Cart::fail($ans, $lang, 'CR018.h'.__LINE__);
 }
 
 

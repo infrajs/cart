@@ -6,8 +6,10 @@
 	"js":["Cart.js","infra.js"],
 	"require":"infra.php",
 	"update":"update.php",
+
 	"transports":["city","self","cdek_pvz","cdek_courier","pochta_simple","pochta_1","pochta_courier"],
 	"pays":["self","card","corp"],
+	
 	"city_from_id":431,
 	"yandexapikey":"Ключ Яндекс от Геокодер",
 	"cdek":{

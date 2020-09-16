@@ -28,17 +28,15 @@
 
 {links:}
 	<p>
-		С уважением, команда <a href="{site}">{host}</a><br>
-		<br>
-		<a href="{site}/catalog">Каталог товаров</a><br>
+		С уважением, команда <a href="{site}">{host}</a>
 	</p>
 {AdmLinks:}
 	<p>
 		<a href="{site}/cart/admin/{order.order_nick}">Заказ {order.order_nick}</a><br>
 		<a href="{site}">{host}</a>
 	</p>
-{payorrec:}{(sbrfpay.info.orderStatus=:2|paykeeper.info)?:payd?:rec}
+{payorrec:}{order.paid?:paid?:rec}
 {cart::}-cart/layout.tpl
-{payd:}<b>оплачен</b>
+{paid:}<b>оплачен</b>
 {rec:}принят
 {2:}2

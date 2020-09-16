@@ -37,11 +37,11 @@
 	</p> -->
 {model::}-catalog/model.tpl
 {INFO:}
-	{sbrfpay.info:showinfo}
-
+	{paydata:showinfo}
 	{showinfo:}
-	{orderStatus=:2?:good}
+	{orderStatus=:2?:good?:bad}
 	{2:}2
+	{bad:}<div class="alert alert-success">{actionCodeDescription}</div>
 	{good:}
 		<p>{orderDescription}</p>
 		<table style="width:auto" class="table table-sm table-striped">
