@@ -1333,7 +1333,7 @@
 					{(status=:wait&active)?data.meta.rules[status]shortactive?data.meta.rules[status]short}{coupon:pr-comma}{paid?(:оплачен):pr-comma}
 				</div>
 				<div class="col d-none d-sm-block text-right">
-					{~date(:d.m.Y,datecheck)}
+					{~date(:d.m.Y,datecheck|dateedit)}
 				</div>
 			</div>
 		{br:}<br>
@@ -1496,7 +1496,7 @@
 					<nobr style="color:{status=:check?:red}">{(status=:wait&active)?data.meta.rules[status]shortactive?data.meta.rules[status]short}</nobr>{status=:check?:acomplete}{status=:complete?(paid??:atocheck)}<b>{paid?(:оплачен):pr-comma}</b>
 
 					<div class="float-right text-right">
-						<span title="Отправлен на проверку">{~date(:d.m.Y,datecheck)}</span><br>{email}<br><b>{sum:itemcostrub}</b>
+						<span>{~date(:d.m.Y,datecheck|dateedit)}</span><br>{email}<br><b>{sum:itemcostrub}</b>
 					</div>
 					
 					<div>
