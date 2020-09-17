@@ -1548,7 +1548,7 @@
 		<i class="msg float-right"></i>
 		<div class="mb-2">Письмо <b>{email}</b> об изменениях в заказе <b>№{order_nick}</b></div>
 		<textarea rows="4" class="mngcom form-control mb-2">{commentmanager}</textarea>
-		<p>Письмо {dateemail?:was?:no}</p>
+		<p>Письмо {dateemail?:was?:notwas}</p>
 		<script type="module" async>
 			const div = document.getElementsByClassName('input-commentmanager')[0]
 			const textarea = div.getElementsByClassName('mngcom')[0]
@@ -1565,7 +1565,7 @@
 			})
 		</script>
 	</div>
-	{no:}<b>ещё не отправлялось</b>
+	{notwas:}<b>ещё не отправлялось</b>
 	{was:}было отправлено <b>{~date(:j F H:i,dateemail)}</b>
 {comma:}, 
 {text-danger:}text-danger
