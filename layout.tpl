@@ -1155,7 +1155,7 @@
 				for (const btn of cls('act-delete')) btn.addEventListener('click', async () => {
 					if (Cart.dis(form)) return
 					Popup.confirm('Крайний вариант. Зказ бесследно исчезнет. Удалить?', async () => {
-						const ans = await Cart.post('delete', { order_id })
+						const ans = await Cart.posts('delete', { order_id })
 						if (!ans.result) {
 							return Popup.alert(ans.msg)	
 						} else {
