@@ -1,5 +1,5 @@
 {
-	"pub":["yandexapikey", "coupon","transports","city_from_id"],
+	"pub":["yandexapikey", "coupon","transports","city_from_id","city_from"],
 	"paramsrc":"~auto/pages/Параметры.xlsx",
 	"coupon":true,
 	"conf":"infrajs\\cart\\Cart",
@@ -11,6 +11,7 @@
 	"pays":["self","card","corp"],
 	
 	"city_from_id":431,
+	"city_from":"Тольятти",
 	"yandexapikey":"Ключ Яндекс от Геокодер",
 	"cdek":{
 		"account":"",

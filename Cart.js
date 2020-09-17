@@ -81,6 +81,10 @@ let Cart = {
 		if (~['add','addremove','clear','check','delete','remove','setcoupon'].indexOf(type)) {
 			Global.set('cart-sum')
 		}
+		if (~['clear','check','delete','remove','setcoupon'].indexOf(type)) {
+			Global.set("cart-list")
+		}
+		
 		if (~['add','email','setcdek','setpvz','setzip', 'paykeeper', 'check','wait','complete','delete','tocheck'].indexOf(type)) {
 			Global.set('cart-order')
 		}

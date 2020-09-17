@@ -13,11 +13,11 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     `freeze` int(1) unsigned NOT NULL DEFAULT 0 COMMENT 'Метка заморожены ли позиции',
     `paid` int(1) unsigned NOT NULL COMMENT 'Метка была ли онлайн оплата',
     `pay` ENUM('self','card','corp') NULL,
-    `paydata` JSON NULL DEFAULT NULL COMMENT 'Данные оплаты',
+    `paydata` TEXT NULL DEFAULT NULL COMMENT 'Данные оплаты',
     
     `city_id` MEDIUMINT NULL COMMENT 'Город определённый или изменённый, для сортировки заявок и расчёта стоимости доставки. Может отличаться от выбранного города в заказе',
     `coupon` TINYTEXT NOT NULL DEFAULT '' COMMENT 'Привязанный купон',
-    `coupondata` JSON NULL DEFAULT NULL COMMENT 'Данные купона',
+    `coupondata` TEXT NULL DEFAULT NULL COMMENT 'Данные купона',
     `transport` ENUM(
         'city','self','cdek_pvz',
         'cdek_courier','pochta_simple','pochta_1',
@@ -80,6 +80,6 @@ CREATE TABLE IF NOT EXISTS `cart_basket` (
 CREATE TABLE IF NOT EXISTS `cart_userorders` (
     `order_id` MEDIUMINT unsigned NOT NULL,
     `user_id` MEDIUMINT unsigned NOT NULL,
-    `active` tinyint(1) unsigned NULL
+    `active` tinyint(1) unsigned NULL,
     PRIMARY KEY (`order_id`, `user_id`)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
