@@ -368,6 +368,7 @@ if ($action == 'check') {
 		':pvz' => $pvz
 	]) !== false;
 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
+	Cart::recalc($order['order_id']);
 	return Cart::ret($ans);
 
 } elseif ($action == 'setpvz') {
