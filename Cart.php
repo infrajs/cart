@@ -286,6 +286,7 @@ class Cart
 			//Значения по умолчанию
 			$row['transport'] = 'cdek_pvz';
 			$row['pay'] = 'card';
+			$row['city_id'] = $user['city_id'];
 		}
 		$row['email'] = $user['email'];
 		$row['order_nick'] = Cart::createNick();
@@ -616,9 +617,10 @@ class Cart
 	}
 	public static function setCity($order, $city_id)
 	{
+		if (!$city_id) return false;
 		if ($order['city_id'] == $city_id) return true;
 		$sql = 'UPDATE cart_orders
-			SET city_id = :city_id, transport = "", zip = "", pvz = "", dateedit = now()
+			SET city_id = :city_id, zip = "", pvz = "", dateedit = now()
 			WHERE order_id = :order_id
 		';
 		$r = Db::exec($sql, [
@@ -756,6 +758,7 @@ class Cart
 		//Меняются 
 		//discount - надо установить при добавлении позиции, 
 		//transports - надо пересчитать при добавлении позиции
+		static::$once = [];
 		$basket = Db::all('SELECT position_id, discount, count from cart_basket where order_id = :order_id', [
 			':order_id' => $order_id
 		]);
@@ -782,15 +785,19 @@ class Cart
 		$transports = Cart::$conf['transports'];
 		Cart::clearTransportCost($order_id);
 
-		$transportfree = Cart::$conf['transportfree'] ?? 100000;
+		$transportfree = Cart::$conf['transportfree'] ?? 100000000;
 
 		$type = 'city'; $cost = 100;
 		$cost = ($sum >= $transportfree) ? 0 : $cost;
 		if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 1);
 
+		$type = 'any'; $cost = 0;
+		$cost = ($sum >= $transportfree) ? 0 : $cost;
+		if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 0, 0);
+
 		$type = 'self'; $cost = 0;
 		$cost = ($sum >= $transportfree) ? 0 : $cost;
-		if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
+		if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 0, 0);
 
 		
 		$order = Db::fetch('SELECT city_id, email FROM cart_orders where order_id = :order_id', [
@@ -827,19 +834,19 @@ class Cart
 			}
 
 
-			// echo '<pre>';
-			// //$zip = $order['zip']? $order['zip'] : $order['city']['zip'];
-			// $type = 'pochta_simple'; $cost = 123;
-			// $cost = ($sum >= $transportfree) ? 0 : $cost;
-			// if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
+			
+			//$zip = $order['zip']? $order['zip'] : $order['city']['zip'];
+			$type = 'pochta_simple'; $cost = 0;
+			$cost = ($sum >= $transportfree) ? 0 : $cost;
+			if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
 
-			// $type = 'pochta_1'; $cost = 0;
-			// $cost = ($sum >= $transportfree) ? 0 : $cost;
-			// if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
+			$type = 'pochta_1'; $cost = 0;
+			$cost = ($sum >= $transportfree) ? 0 : $cost;
+			if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
 
-			// $type = 'pochta_courier'; $cost = 123;
-			// $cost = ($sum >= $transportfree) ? 0 : $cost;
-			// if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
+			$type = 'pochta_courier'; $cost = 0;
+			$cost = ($sum >= $transportfree) ? 0 : $cost;
+			if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
 
 			//Доставка
 			//Купон применяется к позиции. Результат с купоном хранится в описании позиции в корзине, так как его нужно замораживать и не пересчитывать для freeze
@@ -991,8 +998,9 @@ class Cart
 			$count = 0;
 			foreach ($order['basket'] as $i => $pos) {
 				
-				if (!$fast) {
-					
+				if ($fast) {
+					$costclear = $pos['costclear'];
+				} else {
 					$model = Cart::getModel($pos['position_id']);
 					if (!$model) {
 						unset($order['basket'][$i]);
@@ -1006,8 +1014,6 @@ class Cart
 							':position_id' => $pos['position_id'],
 							':costclear' => $costclear
 					]);
-				} else {
-					$costclear = $pos['costclear'];
 				}
 				$count++;
 				/*
@@ -1026,9 +1032,12 @@ class Cart
 				$order['sumclear'] += $order['basket'][$i]['sumclear'];
 				
 			}
+			if ($fast) {
 
-			if (!$fast && $order['count'] != $count) { //Пропала позиция с последнего пересчёта
-				Cart::recalc($order_id); //влияет только на transports
+			} else {
+				if ($order['count'] != $count) { //Пропала позиция в каталоге с последнего пересчёта
+					Cart::recalc($order_id); //влияет только на transports
+				}
 			}
 			//Редактировать заявку может менеджер, и к user мы не можем обращаться. Надо знать email или phone, но у заказа они могут быть не указаны
 			//$order['user'] = User::getByEmail($order['email']);

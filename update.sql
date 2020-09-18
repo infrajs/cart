@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     `coupon` TINYTEXT NOT NULL DEFAULT '' COMMENT 'Привязанный купон',
     `coupondata` TEXT NULL DEFAULT NULL COMMENT 'Данные купона',
     `transport` ENUM(
-        'city','self','cdek_pvz',
+        'city','self','cdek_pvz', 'any',
         'cdek_courier','pochta_simple','pochta_1',
         'pochta_courier'
     ) NULL COMMENT 'Выбор пользователя',
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
 CREATE TABLE IF NOT EXISTS `cart_transports` (
     `order_id` MEDIUMINT unsigned NOT NULL,
     `type` ENUM(
-        'city','self','cdek_pvz',
+        'city','self','cdek_pvz', 'any',
         'cdek_courier','pochta_simple','pochta_1',
         'pochta_courier'
     ) NULL COMMENT 'Выбор пользователя',

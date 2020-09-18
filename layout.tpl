@@ -290,22 +290,22 @@
 							{:label_{type}_short}
 						</label>
 					</div>
-					{type!:self?:transprice}
+					{((type!:any)&(type!:self))?:transprice}
 				</div>
 				<div class="descr {...transport=type?:show}">
 					{:descr_{type}}
 				</div>
 			</div>
 		{pochtalogo:}
-			<div class="mt-2 mb-2"><img alt="Почта России" src="/-imager/?w=75&src=-cart/images/pochtabig.png"></div>
+			<div class="mt-3 mb-2"><img alt="Почта России" src="/-imager/?w=75&src=-cart/images/pochtabig.png"></div>
 		{cdeklogo:}
-			<div class="mb-2"><img alt="СДЕК" src="/-imager/?w=75&src=-cart/images/cdekline.png"></div>
+			<div class="mt-3 mb-3"><img alt="СДЕК" src="/-imager/?w=75&src=-cart/images/cdekline.png"></div>
 		{hometown:}
-			<div class="mb-3">
-				<div class="mb-2"><img src="/-imager/?w=75&src=images/logo.png"></div>
-				{transports.self:transportradio}
-				{transports.city:transportradio}
-			</div>
+			
+			<div class="mt-3 mb-2"><img src="/-imager/?w=75&src=images/logo.png"></div>
+			{transports.self:transportradio}
+			{transports.city:transportradio}
+			
 		{ordercontent:}
 			<style>
 				#{div} .borderblock {
@@ -431,6 +431,7 @@
 							.transblock .descr {
 								max-height: 0;
 								opacity: 0;
+								font-weight: normal;
 								overflow: hidden;
 								transition-property: margin-top, opacity, max-height;
 								transition-duration: 0.2s;
@@ -441,11 +442,15 @@
 								max-height: 100px;
 							}
 						</style>
+						{transports.any:transportradio}
+						<div class="mb-2"></div>
 						{city.city_id=Config.get().cart.city_from_id?:hometown}
 						
 						{transports.cdek_pvz?:cdeklogo}
 						{transports.cdek_pvz:transportradio}
 						{transports.cdek_courier:transportradio}
+						
+
 						
 						{transports.pochta_simple?:pochtalogo}
 						{transports.pochta_simple:transportradio}
@@ -464,7 +469,8 @@
 									const zip = select.options[n].value
 									if (Cart.dis(form)) return
 									const ans = await Cart.post('setzip', { order_id, zip })
-									if (!ans.result) Popup.alert(ans.msg)								
+									if (!ans.result) Popup.alert(ans.msg)
+									//if (Cart.dis(form, false)) return
 									
 								}
 								//input.addEventListener('change', change)
@@ -605,8 +611,12 @@
 									const descr = cls('descr', line)[0]
 									if(descr) descr.classList.add('show')
 								}
-
-								cls('sumtrans')[0].innerHTML = tplcost(sumtrans)
+							
+								if (~['any','self'].indexOf(transport)) {
+									cls('sumtrans')[0].innerHTML = ''
+								} else {
+									cls('sumtrans')[0].innerHTML = ': '+tplcost(sumtrans)
+								}
 								cls('total')[0].innerHTML = tplcost(total)
 								cls('titletrans')[0].innerHTML = Template.parse("{tpl}", true, "label_" + transport)
 								let data = {
@@ -649,7 +659,7 @@
 								btn.addEventListener('click', async () => {
 									if (Cart.dis(form)) return
 									const city_id = await City.choice()
-									if (city_id !== null && city_id != old_city_id) {
+									if (city_id && city_id != old_city_id) {
 										//const zip = ''
 										//await Cart.post('setzip', { order_id }, { zip })
 										await Cart.post('setcity', { order_id }, { city_id })
@@ -874,7 +884,7 @@
 			{transprice:}
 				<div class="d-flex ml-2" style="max-width:140px">
 					<div style="width:70px">{min=max?:oneday?:twodays} {~words(max,:день,:дня,:дней)}</div>
-					<div style="color:{cost=:0?:red}">{~cost(cost)}{:model.unit}</div>
+					<div style="width:70px; color:{cost=:0?:red}">{~cost(cost)}{:model.unit}</div>
 				</div>
 				{twodays:}{min}-{max}
 				{oneday:}{max}
@@ -1650,12 +1660,13 @@
 	
 	
 	<div class="transportready" style="display:{transport??:none}">
-		<div><span class="titletrans">{:label_{transport}}</span>: <b class="sumtrans">{~cost(sumtrans)}{:model.unit}</b></div>
+		<div><span class="titletrans">{:label_{transport}}</span><b class="sumtrans">{((transport!:any)&(transport!:self))?:showsumtrans}</b></div>
 		<div class="transresume">{:info_{transport}}</div>
 		Всего: <b class="total">{~cost(total)}{:model.unit}</b>
 	</div>
 
 	<div class="payresume">{pay?:pay_label_{pay}}</div>
+	{showsumtrans:}: {~cost(sumtrans)}{:model.unit}
 	{none:}none
 	{prcoupon:}
 		Купон: <b>{coupon}</b><br>
@@ -1675,6 +1686,11 @@
 	{info_self:}
 	{label_self:}Самовывоз из магазина в Тольятти
 	{label_self_short:}{:label_self}
+
+	{descr_any:}Деловые Линии, DPD, КИТ, Байкал Сервис, Энергия, ПЭК ...
+	{info_any:}
+	{label_any:}Способ и стоимость доставки, согласовываются отдельно.
+	{label_any_short:}Согласовать оптимальную ТК с менеджером
 
 	{descr_cdek_courier:}{:inpaddress}
 	{info_cdek_courier:}{city.city|:citynone}, {address}<br>

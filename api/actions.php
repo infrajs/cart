@@ -28,15 +28,27 @@ if ($action == 'check' || $action == 'paykeeper') {
 		}
 		$ans['token'] = $ouser['user_id'] . '-' . $ouser['token'];
 	} else { //Если на указанный email уже есть регистрация
-		if ($ouser['user_id'] != $user['user_id']) { 
-			$ouser['order'] = $order;
-			$r = User::mail($ouser, $userlang, 'userdata', '/cart/orders/active');
-			if (!$r) return Cart::err($ans, $lang, 'CR023.a' . __LINE__);
-			return Cart::err($ans, $lang, 'CR022.a' . __LINE__);
+		if ($ouser['user_id'] != $user['user_id']) { //и это не мы
+			
+			if (empty($user['email'])) { 
+				//Текущий пользователь не зарегистрирован, ему нужно просто перейти в свой аккаунт
+				$ouser['order'] = $order;
+				$r = User::mail($ouser, $userlang, 'userdata', '/cart/orders/active');
+				if (!$r) return Cart::err($ans, $lang, 'CR023.a' . __LINE__);
+				return Cart::err($ans, $lang, 'CR022.a' . __LINE__);	
+			} else {
+				//У текущего пользователя есть аккаунт, ему не надо переходить, но нужно дать доступ и пользователю по указанному email
+				//Передаём доступ к текущему заказу и на этот аккаунт и делает для нового аккаунта этот заказ активным?. Злоумышленник кому-то может подсунуть новый заказ)
+				Cart::setOwner($order, $ouser);
+				//И пропускаем оформление заказа дальше
+			}
+			
 		}
 	}	
 	$r = Cart::setOwner($order, $ouser);
 	if (!$r) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
+	Cart::recalc($order['order_id']);
+	$order = Cart::getById($order['order_id']);
 }
 
 if ($action == 'check') {
@@ -401,6 +413,7 @@ if ($action == 'check') {
 	if (!$order) return Cart::err($ans, $lang, 'empty.a' . __LINE__);
 	$ans['rule'] = Cart::getJsMetaRule($meta, $order['status'], $lang);
 	$order['city'] = Cart::getCity($order['city_id'], $order['email'], $order['order_id'], $lang);
+	$order['city']['zips'] = City::getIndexes($order['city_id']);
 	$ans['order'] = $order;
 	
 	

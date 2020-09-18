@@ -7,7 +7,7 @@
 	"require":"infra.php",
 	"update":"update.php",
 
-	"transports":["city","self","cdek_pvz","cdek_courier","pochta_simple","pochta_1","pochta_courier"],
+	"transports":["city","self","cdek_pvz","cdek_courier","pochta_simple","pochta_1","pochta_courier","any"],
 	"pays":["self","card","corp"],
 	
 	"city_from_id":431,
