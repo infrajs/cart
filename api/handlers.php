@@ -179,6 +179,7 @@ if (!empty($handlers['rule'])) {
 		}
 		if (in_array($order['transport'],["pochta_simple","pochta_1"])) {
 			if (empty($order['zip'])) return Cart::err($ans, $lang, 'zip.h'.__LINE__);
+			if (empty($order['address'])) return Cart::err($ans, $lang, 'address.h'.__LINE__);
 		}
 		if (in_array($order['transport'],["cdek_pvz"])) {
 			if (empty($order['pvz'])) return Cart::err($ans, $lang, 'pvz.h'.__LINE__);

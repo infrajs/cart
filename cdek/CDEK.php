@@ -11,6 +11,8 @@ class CDEK {
 		//basket[] = position_id, count
 		$conf = CDEK::$conf;
 		//type: courier, pickup
+		$goods = CDEK::getGoods($basket);
+		if (!$goods) return false;
 		$get = [
 			"isdek_action" => "calc",
 			"shipment" => [
@@ -20,7 +22,7 @@ class CDEK {
 				"type" => $type,
 				//"type" => "pickup",
 				//"type" => "courier",
-				"goods" => CDEK::getGoods($basket)
+				"goods" => $goods
 			]
 		];
 		
@@ -36,7 +38,7 @@ class CDEK {
 		$goods = [];
 		foreach ($basket as $item) {
 			$dim = CDEK::getDim($item['position_id']);
-			if (!$dim) continue;
+			if (!$dim) return [];
 			for ($i = 0; $i < $item['count']; $i++) {
 				array_push($goods, $dim);
 			}
@@ -50,11 +52,13 @@ class CDEK {
 		$model += $model['more'];
 		$dim = $model['Упаковка, см'] ?? $model['Габариты, см'] ?? $model['Габариты'] ?? '';
 		$d = preg_split('/[хx]/i', $dim, 3, PREG_SPLIT_NO_EMPTY);
-		$d[0] = $d[0] ?? $model['Длина, см'] ?? $model['Длина (см)'] ?? 6;
-		$d[1] = $d[1] ?? $model['Ширина, см'] ?? $model['Ширина (см)'] ?? 15;
-		$d[2] = $d[2] ?? $model['Высота, см'] ?? $model['Высота (см)'] ?? 12;
+		$d[0] = $d[0] ?? $model['Длина, см'] ?? $model['Длина (см)'] ?? false;
+		$d[1] = $d[1] ?? $model['Ширина, см'] ?? $model['Ширина (см)'] ?? false;
+		$d[2] = $d[2] ?? $model['Высота, см'] ?? $model['Высота (см)'] ?? false;
 
-		$weight = $model['Вес, кг'] ?? 0.5;
+		if (!$d[0] || !$d[1] || !$d[2]) return false;
+		if (empty($model['Вес, кг'])) return false;
+		$weight = $model['Вес, кг'];
 
 		
 		

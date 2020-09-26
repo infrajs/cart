@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     
     `freeze` int(1) unsigned NOT NULL DEFAULT 0 COMMENT 'Метка заморожены ли позиции',
     `paid` int(1) unsigned NOT NULL COMMENT 'Метка была ли онлайн оплата',
-    `pay` ENUM('self','card','corp') NULL,
+    `pay` ENUM('self','card','corp','perevod') NULL,
     `paydata` TEXT NULL DEFAULT NULL COMMENT 'Данные оплаты',
     
     `city_id` MEDIUMINT NULL COMMENT 'Город определённый или изменённый, для сортировки заявок и расчёта стоимости доставки. Может отличаться от выбранного города в заказе',
@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     `address` TEXT NULL COMMENT 'Адрес в городе',
     `zip` TEXT NULL COMMENT 'Индекс',
     `count` SMALLINT unsigned NOT NULL COMMENT 'Кэш количества позиций в корзине',
+    `weight` MEDIUMINT unsigned NOT NULL COMMENT 'Кэш - расчётный вес',
 
     `datecreate` DATETIME NULL COMMENT 'Дата создания',
     `datewait` DATETIME NULL COMMENT 'Дата изменения статуса',

@@ -8,12 +8,14 @@
 	"update":"update.php",
 
 	"transports":["city","self","cdek_pvz","cdek_courier","pochta_simple","pochta_1","pochta_courier","any"],
-	"pays":["self","card","corp"],
+	"pays":["self","card","corp","perevod"],
 	
+	"zip_from":"123123",
 	"city_from_id":431,
 	"city_from":"Тольятти",
 	"yandexapikey":"Ключ Яндекс от Геокодер",
 	"hostnum":"",
+
 	"cdek":{
 		"account":"",
 		"key":""

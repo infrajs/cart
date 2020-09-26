@@ -29,6 +29,7 @@ use infrajs\lang\LangAns;
 use infrajs\cache\CacheOnce;
 use infrajs\user\UserMail;
 use infrajs\cart\cdek\CDEK;
+use infrajs\cart\pochta\Pochta;
 
 class Cart
 {
@@ -360,7 +361,6 @@ class Cart
 
 		$cost = $model['Цена'];
 
-
 		$position_id = Db::col('SELECT position_id FROM cart_basket 
 			WHERE order_id = :order_id and catkit = :catkit and item_num = :item_num and article_nick = :article_nick and producer_nick = :producer_nick', [
 			':order_id' => $order['order_id'],
@@ -408,16 +408,7 @@ class Cart
 
 			if (!$r) return false;
 		}
-		if ($count === false) {
-			$sql = 'DELETE FROM cart_basket WHERE position_id = :position_id';
-			$r = Db::exec($sql, [
-				':position_id' => $position_id
-			]) !== false;
-			return $r;
-		}
-		if ($order['freeze']) {
-			if (!Cart::setToJson($position_id, $model)) return false;
-		}
+
 		$r = Db::exec('UPDATE cart_orders
 			SET dateedit = now()
 			WHERE order_id = :order_id
@@ -425,6 +416,17 @@ class Cart
 			':order_id' => $order['order_id']
 		]) !== false;
 		if (!$r) return false;
+
+		if ($count === false) {
+			$sql = 'DELETE FROM cart_basket WHERE position_id = :position_id';
+			$r = Db::exec($sql, [
+				':position_id' => $position_id
+			]) !== false;
+		} else {
+			if ($order['freeze']) {
+				if (!Cart::setToJson($position_id, $model)) return false;
+			}
+		}
 
 		$r = Cart::recalc($order['order_id']);
 		return $r;
@@ -569,6 +571,8 @@ class Cart
 			':order_id' => $order['order_id'],
 			':pay' => $pay
 		]) !== false;
+		// if (!$r) return $r;
+		// $r = Cart::recalc($order['order_id']);
 		return $r;
 	}
 	public static function getCity($city_id, $email, $order_id, $lang) {
@@ -618,7 +622,7 @@ class Cart
 	public static function setCity($order, $city_id)
 	{
 		if (!$city_id) return false;
-		if ($order['city_id'] == $city_id) return true;
+		//if ($order['city_id'] == $city_id) return true;
 		$sql = 'UPDATE cart_orders
 			SET city_id = :city_id, zip = "", pvz = "", dateedit = now()
 			WHERE order_id = :order_id
@@ -677,6 +681,16 @@ class Cart
 	public static function clearTransportCost($order_id) {
 		$r = Db::exec('DELETE FROM cart_transports WHERE order_id = :order_id', [
 			':order_id' => $order_id
+		]) !== false;
+		if (!$r) return $r;
+
+		$r = Db::exec('UPDATE cart_orders
+			SET count = :count, weight = :weight
+			WHERE order_id = :order_id
+		', [
+			':order_id' => $order_id,
+			':weight' => null,
+			':count' => null
 		]) !== false;
 		return $r;
 	}
@@ -752,12 +766,15 @@ class Cart
 		if (!$res) return 0;
 		return $coupondata['Скидка'];
 	}
-	
+	public static function getWeight($model) {
+		return $model['Вес, кг'] ?? $model['more']['Вес, кг'] ?? false;
+	}
 	public static function recalc($order_id)
 	{
 		//Меняются 
 		//discount - надо установить при добавлении позиции, 
 		//transports - надо пересчитать при добавлении позиции
+		Cart::clearTransportCost($order_id);
 		static::$once = [];
 		$basket = Db::all('SELECT position_id, discount, count from cart_basket where order_id = :order_id', [
 			':order_id' => $order_id
@@ -765,9 +782,16 @@ class Cart
 
 		$sum = 0;
 		$count = 0;
+		$weight = 0;
+
 		foreach ($basket as $k => $pos) {
 			$model = Cart::getModel($pos['position_id']);
 			if (!$model) continue;
+
+			$w = Cart::getWeight($model);
+			if (!$w) return true;
+			
+			$weight += $w * 1000 * $pos['count'];
 			$count++;
 			$discount = Cart::getDiscount($order_id, $model);
 			$r = Db::exec('UPDATE cart_basket
@@ -783,7 +807,7 @@ class Cart
 
 		//order: city_id, basket - размеры, вес, 
 		$transports = Cart::$conf['transports'];
-		Cart::clearTransportCost($order_id);
+		
 
 		$transportfree = Cart::$conf['transportfree'] ?? 100000000;
 
@@ -791,16 +815,18 @@ class Cart
 		$cost = ($sum >= $transportfree) ? 0 : $cost;
 		if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 1);
 
-		$type = 'any'; $cost = 0;
-		$cost = ($sum >= $transportfree) ? 0 : $cost;
-		if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 0, 0);
+		if ($sum > 10000 || $weight > 5000) {
+			$type = 'any'; $cost = 0;
+			$cost = ($sum >= $transportfree) ? 0 : $cost;
+			if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 0, 0);
+		}
 
 		$type = 'self'; $cost = 0;
 		$cost = ($sum >= $transportfree) ? 0 : $cost;
 		if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 0, 0);
 
 		
-		$order = Db::fetch('SELECT city_id, email FROM cart_orders where order_id = :order_id', [
+		$order = Db::fetch('SELECT city_id, zip, email FROM cart_orders where order_id = :order_id', [
 			':order_id' => $order_id
 		]);
 
@@ -827,26 +853,43 @@ class Cart
 				$res = CDEK::calc($basket, "courier", $city_from_id, $city_to_id);
 				if (!empty($res['result']['price'])) {
 					$cost = ($sum >= $transportfree) ? 0 : $res['result']['price'];
-					$min = $res['result']['deliveryPeriodMin'] ?? 1;
-					$max = $res['result']['deliveryPeriodMax'] ?? 7;
+					$min = $res['result']['deliveryPeriodMin'] ?? false;
+					$max = $res['result']['deliveryPeriodMax'] ?? false;
 					Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
 				}
 			}
 
 
-			
-			//$zip = $order['zip']? $order['zip'] : $order['city']['zip'];
-			$type = 'pochta_simple'; $cost = 0;
-			$cost = ($sum >= $transportfree) ? 0 : $cost;
-			if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
+			$zip = $order['zip'] ? $order['zip'] : $city['zip'];
 
-			$type = 'pochta_1'; $cost = 0;
-			$cost = ($sum >= $transportfree) ? 0 : $cost;
-			if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
+			$type = 'pochta_simple';
+			$ans = Pochta::calc($type, $weight, $zip);
+			if ($ans) {
+				$cost = $ans['cost'];
+				$min = $ans['min'];
+				$max = $ans['max'];
+				$cost = ($sum >= $transportfree) ? 0 : $cost;
+				if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+			}
 
-			$type = 'pochta_courier'; $cost = 0;
-			$cost = ($sum >= $transportfree) ? 0 : $cost;
-			if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 2);
+			$type = 'pochta_1'; 
+			$ans = Pochta::calc($type, $weight, $zip);
+			if ($ans) {
+				$cost = $ans['cost'];
+				$min = $ans['min'];
+				$max = $ans['max'];
+				$cost = ($sum >= $transportfree) ? 0 : $cost;
+				if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+			}
+			$type = 'pochta_courier';
+			$ans = Pochta::calc($type, $weight, $zip);
+			if ($ans) {
+				$cost = $ans['cost'];
+				$min = $ans['min'];
+				$max = $ans['max'];
+				$cost = ($sum >= $transportfree) ? 0 : $cost;
+				if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+			}
 
 			//Доставка
 			//Купон применяется к позиции. Результат с купоном хранится в описании позиции в корзине, так как его нужно замораживать и не пересчитывать для freeze
@@ -854,10 +897,11 @@ class Cart
 		}
 		
 		$r = Db::exec('UPDATE cart_orders
-			SET count = :count
+			SET count = :count, weight = :weight
 			WHERE order_id = :order_id
 		', [
 			':order_id' => $order_id,
+			':weight' => $weight,
 			':count' => $count
 		]) !== false;
 
@@ -934,6 +978,7 @@ class Cart
 					city_id,
 					freeze,
 					count,
+					weight,
 					coupon,
 					coupondata,
 					paid,
@@ -1056,7 +1101,9 @@ class Cart
 			}
 			$order['total'] = $order['sumtrans'] + $order['sum'];
 
-
+			if ($order['pay'] == 'self' && in_array($order['transport'],['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier'])) {
+				$order['total'] = round($order['total'] * 104) / 100;
+			}
 			
 
 			return $order;
