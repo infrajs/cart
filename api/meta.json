@@ -113,6 +113,9 @@
         }
 	},
     "actions":{
+    	"estimate":{
+    		"required":["producer_nick","article_nick","city_id", "lang"]
+    	},
 		"cart":{
 			"handlers":{
 			

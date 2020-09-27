@@ -5,6 +5,7 @@ import { Cart } from '/vendor/infrajs/cart/Cart.js'
 import { Popup } from '/vendor/infrajs/popup/Popup.js'
 import { DOM } from '/vendor/akiyatkin/load/DOM.js'
 import { CDEK } from '/vendor/akiyatkin/cdek/CDEK.js'
+import { User } from '/vendor/infrajs/user/User.js'
 import { Global } from '/vendor/infrajs/layer-global/Global.js'
 let Session
 
@@ -20,6 +21,19 @@ CDEK.done('change', async wat => {
 
 DOM.once('load', async () => {
 	await CDN.fire('load','jquery')
+})
+DOM.once('check', async () => {
+	let Template = (await import('/vendor/infrajs/template/Template.js')).Template
+	Template.scope['Cart'] = {};
+	Template.scope['Cart']['lang'] = function (str) {
+		return Cart.lang(str);
+	}
+
+	// const token = User.token()
+	// const stat = await Cart.posts('mystat', { token })
+	// Template.scope['Cart']['getCityId'] = (order_id) => {	
+	// 	return stat.city_id
+	// }
 })
 //Event.handler('Controller.onshow', async () => {
 // DOM.done('load', () => {
@@ -149,11 +163,5 @@ DOM.once('load', async () => {
 // 	});
 // });
 
-DOM.once('check', async () => {
-	let Template = (await import('/vendor/infrajs/template/Template.js')).Template
-	Template.scope['Cart'] = {};
-	Template.scope['Cart']['lang'] = function (str) {
-		return Cart.lang(str);
-	}
-})
+
 

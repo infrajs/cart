@@ -11,6 +11,8 @@ use infrajs\db\Db;
 use akiyatkin\showcase\Showcase;
 use akiyatkin\city\City;
 use infrajs\path\Path;
+use infrajs\cart\cdek\CDEK;
+use infrajs\cart\pochta\Pochta;
 
 // Обработка actions
 if ($action == 'check' || $action == 'paykeeper') {
@@ -75,6 +77,42 @@ if ($action == 'check') {
 	}
 
 	return Cart::ret($ans, $lang, 'CR025.a' . __LINE__);
+} elseif ($action == 'estimate') {
+	$city = City::getById($city_id, $lang);
+	$zip = $city['zip'];
+	
+	$ans['city'] = $city;
+	$model = Showcase::getModel($producer_nick, $article_nick);
+	if (!$model) return Cart::fail($ans, $lang, 'CR013.a'.__LINE__);
+	$weight = Cart::getWeight($model);
+	if (!$weight) return Cart::err($ans, $lang, 'posweight.a'.__LINE__);
+	
+	$transports = Cart::$conf['transports'];
+	
+	$ans['transports'] = [];
+
+	$ans['transports']['pochta'] = [];
+	foreach(['pochta_simple','pochta_1','pochta_courier'] as $type) {
+		if (!in_array($type, $transports)) continue;
+		$res = Pochta::calc($type, $weight, $zip);
+		if ($res) $ans['transports']['pochta'][$type] = $res;
+	}
+	if (!$ans['transports']['pochta']) unset($ans['transports']['pochta']);
+
+	$dim = CDEK::getDim($model);
+	$ans['dim'] = $dim;
+	$goods = [$dim];
+	$ans['transports']['cdek'] = [];
+	$convert = ['cdek_pvz' => 'pickup', 'cdek_courier' => 'courier'];
+	foreach(['cdek_pvz','cdek_courier'] as $type) {
+		if (!in_array($type, $transports)) continue;
+		$res = CDEK::calc($goods, $convert[$type], $city_id);
+		if ($res) $ans['transports']['cdek'][$type] = $res;
+	}
+	if (!$ans['transports']['cdek']) unset($ans['transports']['cdek']);
+
+	return Cart::ret($ans);
+
 } elseif ($action == 'paykeeper') {
 	if (!Cart::setStatus($order, 'pay')) return Cart::fail($ans, $lang, 'CR018.a' . __LINE__);
 	//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.

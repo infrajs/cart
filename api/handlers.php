@@ -15,6 +15,12 @@ use infrajs\lang\Lang;
 
 if (!isset($meta['actions'][$action])) return Cart::fail($ans, $lang, 'CR001.h'.__LINE__);
 $handlers = $meta['actions'][$action]['handlers'] ?? [];
+$required = $meta['actions'][$action]['required'] ?? [];
+
+foreach ($required as $name) {
+	if (!Ans::REQ($name)) return Cart::fail($ans, $lang, $name.'.h'.__LINE__);
+	$$name = Ans::REQ($name);
+}
 
 if (!empty($handlers['goal'])) {
 	$ans['goal'] = $handlers['goal'];

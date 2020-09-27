@@ -297,12 +297,15 @@
 				</div>
 			</div>
 		{pochtalogo:}
-			<div class="mt-3 mb-3"><img alt="Почта России" src="/-imager/?w=75&src=-cart/images/pochtabig.png"></div>
+			<div class="mt-3 mb-3">{:pochtalogoimg}</div>
+			{pochtalogoimg:}<img alt="Почта России" src="/-imager/?w=75&src=-cart/images/pochtabig.png">
 		{cdeklogo:}
-			<div class="mt-3 mb-3"><img alt="СДЕК" src="/-imager/?w=75&src=-cart/images/cdekline.png"></div>
+			<div class="mt-3 mb-3">{:cdeklogoimg}</div>
+			{cdeklogoimg:}<img alt="СДЕК" src="/-imager/?w=75&src=-cart/images/cdekline.png">
 		{hometown:}
 			<div class="mt-3 mb-3"><img src="/-imager/?w=75&src=images/logo.png"></div>
-		{kg:}0.001
+		{noweight:}недостаточно данных
+		{showweight:}<b>{data.order.weight} кг</b>
 		{ordercontent:}
 			<style>
 				#{div} .borderblock {
@@ -419,7 +422,7 @@
 				<div class="transblock">
 					<h2><span class="transportreset" style="cursor: default">Доставка</span> в город <span class="{:isedit?:a?:text-danger} citychoice">{data.order.city.city|:citynone}</span></h2>
 					<div class="mt-n2">
-						Расчётный вес: <b>{~multi(data.order.weight,:kg)} кг</b>
+						Расчётный вес: {data.order.weight?:showweight?:noweight}
 					</div>
 					<div class="borderblock" style="color:#444; padding-top:0; padding-bottom:15px">
 						<div style="max-width:350px">
@@ -689,11 +692,13 @@
 						</div>
 					</div>
 					<script type="module" async>
-						//Всплывающее окно выбора города с классом citychoice
 						import { City } from "/vendor/akiyatkin/city/City.js"
 						import { Cart } from '/vendor/infrajs/cart/Cart.js'
 						import { Global } from '/vendor/infrajs/layer-global/Global.js'
 
+						/*
+							Всплывающее окно выбора города с классом citychoice
+						*/
 						const isedit = {:isedit?:true?:false}
 						if (isedit) {
 							const div = document.getElementById('{div}')
@@ -920,8 +925,11 @@
 						</script>
 					</div>
 				</div>
+
 				
 				{:resume}
+				<!-- <a class="float-right" href="/cart/{:place}/{:order_id}/list">Редактировать корзину</a> -->
+				
 				<style>
 					.act-check {
 						display: {:online?:none}
@@ -936,6 +944,7 @@
 						display: {:online??:none}
 					}
 				</style>
+
 				{:place=:admin?:adminactions?:useractions}
 				<div class="d-md-none" style="clear:both"></div>
 			</form>
@@ -959,9 +968,10 @@
 			{pay_label_corp:}Оплата по счёту для юр.лиц<br>Без НДС
 			{transprice:}
 				<div class="d-flex ml-2" style="max-width:140px">
-					<div style="width:70px; text-align:right;">{min=max?:oneday?:twodays} {~words(max,:день,:дня,:дней)}</div>
+					<div style="width:70px; text-align:right;">{:days}</div>
 					<div style="width:70px; text-align:right; color:{cost=:0?:red}">{~cost(cost)}{:model.unit}</div>
 				</div>
+				{days:}{min=max?:oneday?:twodays} {~words(max,:день,:дня,:дней)}
 				{twodays:}{min}-{max}
 				{oneday:}{max}
 			{place:}{Crumb.child.child.name=:admin?:admin?:orders}

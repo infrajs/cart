@@ -776,9 +776,13 @@ class Cart
 		//transports - надо пересчитать при добавлении позиции
 		Cart::clearTransportCost($order_id);
 		static::$once = [];
+
+
+
 		$basket = Db::all('SELECT position_id, discount, count from cart_basket where order_id = :order_id', [
 			':order_id' => $order_id
 		]);
+
 
 		$sum = 0;
 		$count = 0;
@@ -791,7 +795,7 @@ class Cart
 			$w = Cart::getWeight($model);
 			if (!$w) return true;
 			
-			$weight += $w * 1000 * $pos['count'];
+			$weight += $w * $pos['count'];
 			$count++;
 			$discount = Cart::getDiscount($order_id, $model);
 			$r = Db::exec('UPDATE cart_basket
@@ -815,7 +819,7 @@ class Cart
 		$cost = ($sum >= $transportfree) ? 0 : $cost;
 		if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 1, 1);
 
-		if ($sum > 10000 || $weight > 5000) {
+		if ($sum > 10000 || $weight > 5) {
 			$type = 'any'; $cost = 0;
 			$cost = ($sum >= $transportfree) ? 0 : $cost;
 			if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, 0, 0);
@@ -834,28 +838,31 @@ class Cart
 
 		if ($city) {
 			$city_to_id = $city['city_id'];
-			$city_from_id = Cart::$conf['city_from_id'];
 			//"pickup","courier",
 			
-			$type = 'cdek_pvz'; 
-			if (in_array($type, $transports)) {
-				$res = CDEK::calc($basket, "pickup", $city_from_id, $city_to_id);
-				if (!empty($res['result']['price'])) {
-					$cost = ($sum >= $transportfree) ? 0 : $res['result']['price'];
-					$min = $res['result']['deliveryPeriodMin'] ?? 1;
-					$max = $res['result']['deliveryPeriodMax'] ?? 7;
+			$goods = CDEK::getGoods($basket);
+
+			$type = 'cdek_pvz';
+			if ($goods && in_array($type, $transports)) {
+				$ans = CDEK::calc($goods, "pickup", $city_to_id);
+				if ($ans) {
+					$cost = $ans['cost'];
+					$min = $ans['min'];
+					$max = $ans['max'];
+					$cost = ($sum >= $transportfree) ? 0 : $cost;
 					if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
 				}
 			}
 
 			$type = 'cdek_courier'; 
-			if (in_array($type, $transports)) {
-				$res = CDEK::calc($basket, "courier", $city_from_id, $city_to_id);
-				if (!empty($res['result']['price'])) {
-					$cost = ($sum >= $transportfree) ? 0 : $res['result']['price'];
-					$min = $res['result']['deliveryPeriodMin'] ?? false;
-					$max = $res['result']['deliveryPeriodMax'] ?? false;
-					Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+			if ($goods && in_array($type, $transports)) {
+				$ans = CDEK::calc($goods, "courier", $city_to_id);
+				if ($ans) {
+					$cost = $ans['cost'];
+					$min = $ans['min'];
+					$max = $ans['max'];
+					$cost = ($sum >= $transportfree) ? 0 : $cost;
+					if (in_array($type, $transports)) Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
 				}
 			}
 
@@ -901,7 +908,7 @@ class Cart
 			WHERE order_id = :order_id
 		', [
 			':order_id' => $order_id,
-			':weight' => $weight,
+			':weight' => $weight * 1000,
 			':count' => $count
 		]) !== false;
 
@@ -1001,7 +1008,8 @@ class Cart
 			';
 			$order = Db::fetch($sql, [$order_id]);
 			if (!$order) return false;
-			
+
+			if ($order['weight']) $order['weight'] = $order['weight'] / 1000;
 			
 			if ($order['paydata']) $order['paydata'] = json_decode($order['paydata'], true);
 			if ($order['coupondata']) $order['coupondata'] = json_decode($order['coupondata'], true);

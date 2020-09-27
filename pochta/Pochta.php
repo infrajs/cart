@@ -8,6 +8,7 @@ use infrajs\access\Access;
 
 class Pochta {
 	public static function calc($type, $weight, $to) {
+		$weight = (int) ($weight * 1000);
 		$objects = [
 			"pochta_simple" => 27030,
 			"pochta_courier" => 28030,
@@ -24,11 +25,6 @@ class Pochta {
 			if (!$text) return false;
 			$data = Load::json_decode($text);
 			
-			// if ($object == 28030) {
-			// 	echo '<pre>';
-			// 	print_r($data);
-			// 	exit;
-			// }
 			if (!empty($data['error'])) return false;
 			$ans['cost'] = $data['paynds'] ?? false;
 			if ($ans['cost']) $ans['cost'] = $ans['cost']/100;

@@ -53,6 +53,7 @@ let Cart = {
 		tmp.innerHTML = html
 		return tmp.textContent || tmp.innerText || ""
 	},
+	
 	post: async (type, param, opt) => {
 		const ans = await Cart.posts(type, param, opt)
 		await DOM.puff('check')

@@ -7,7 +7,7 @@ use infrajs\ans\Ans;
 use infrajs\path\Path;
 use infrajs\db\Db;
 
-header('Cache-Control: no-store');
+
 
 // Блок с глобальными переменными 
 $ans = [];
@@ -25,8 +25,10 @@ $silence = Ans::REQ('silence', 'bool');
 $token = Ans::REQS('token', 'string', '');
 $user = User::fromToken($token);
 
-$ans['user'] = array_intersect_key($user, array_flip(['user_id','admin','email'/*,'lang','timezone','city_id'*/]));
+if ($user) $ans['user'] = array_intersect_key($user, array_flip(['user_id','admin','email'/*,'lang','timezone','city_id'*/]));
 //if ($token && !$user) return Cart::fail($ans, $lang, 'CR061.i'.__LINE__);
+
+if ($user) header('Cache-Control: no-store');
 
 if ($place == 'admin') {
     if (empty($user['admin'])) return Cart::fail($ans, $lang, 'CR003.i'.__LINE__);
