@@ -53,7 +53,7 @@ let Cart = {
 		tmp.innerHTML = html
 		return tmp.textContent || tmp.innerText || ""
 	},
-	
+
 	post: async (type, param, opt) => {
 		const ans = await Cart.posts(type, param, opt)
 		await DOM.puff('check')
@@ -76,17 +76,15 @@ let Cart = {
 			const src = groupsrc
 			ans = await Load.emit('json', src)
 		}
-		if (~['setcoupon'].indexOf(type)) {
-			Global.set('cart-list')
-		}
+		
 		if (~['add','addremove','clear','check','delete','remove','setcoupon'].indexOf(type)) {
 			Global.set('cart-sum')
 		}
-		if (~['clear','check','delete','remove','setcoupon'].indexOf(type)) {
+		if (~['clear','addremove','check','delete','remove','setcoupon'].indexOf(type)) {
 			Global.set("cart-list")
 		}
 		
-		if (~['add','email','setcdek','setpvz','setzip', 'paykeeper', 'check','wait','complete','delete','tocheck'].indexOf(type)) {
+		if (~['add','email','addremove','setcdek','setpvz','setzip', 'paykeeper', 'check','wait','complete','delete','tocheck'].indexOf(type)) {
 			Global.set('cart-order')
 		}
 		Global.set('cart')
