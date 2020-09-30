@@ -55,7 +55,7 @@ class CDEK {
 	}
 	public static function getDim($model) {
 		//$model['Габариты']//WxHxL
-		$model += $model['more'];
+		$model += $model['more'] ?? [];
 		$dim = $model['Упаковка, см'] ?? $model['Габариты, см'] ?? $model['Габариты'] ?? '';
 		$d = preg_split('/[хx]/i', $dim, 3, PREG_SPLIT_NO_EMPTY);
 		$d[0] = $d[0] ?? $model['Длина, см'] ?? $model['Длина (см)'] ?? false;

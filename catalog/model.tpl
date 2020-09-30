@@ -44,6 +44,7 @@
 		let cls = (cls) => div.getElementsByClassName(cls)[0]
 		let btn = cls('add')
 		let input = tag('input')
+		const place = 'orders'
 		const order_id = btn.dataset.order_id
 		const producer_nick = btn.dataset.producer_nick
 		const article_nick = btn.dataset.article_nick
@@ -60,15 +61,15 @@
 			btn.innerHTML = 'В корзину'
 		}
 		
-		Cart.get('order', { order_id }).then( ans => {
+		Cart.get('orderfast', { order_id, place }).then( ans => {
 			input.value = 0
 			btnoff()
-			if (!ans.result) return
-			for (let pos of ans.order.basket) {
-				if (pos.model.producer_nick != producer_nick) continue
-				if (pos.model.article_nick != article_nick) continue
-				if (pos.model.catkit != catkit) continue
-				if (pos.model.item_num != item_num) continue
+			if (!ans.result) Popup.alert(ans.msg)
+			for (const pos of ans.order.basket) {
+				if (pos.producer_nick != producer_nick) continue
+				if (pos.article_nick != article_nick) continue
+				if (pos.catkit != catkit) continue
+				if (pos.item_num != item_num) continue
 				input.value = pos.count
 				btnon()
 			}
@@ -78,13 +79,13 @@
 			let count = Number(input.value)
 			if (count) btnon() 
 			else btnoff()
-			let ans = await Cart.post('addremove', { order_id, producer_nick, article_nick, catkit, item_num }, { count })
+			let ans = await Cart.post('addremove', { place, order_id, producer_nick, article_nick, catkit, item_num }, { count })
 			if (!ans.result) return Popup.alert(ans.msg)
 		})
 		btn.addEventListener('click', async () => {
 			let count = Number(input.value)
 			if (!count) count = 1
-			let ans = await Cart.post('addremove', { order_id, producer_nick, article_nick, catkit, item_num }, { count })
+			let ans = await Cart.post('addremove', { place, order_id, producer_nick, article_nick, catkit, item_num }, { count })
 			if (!ans.result) return Popup.alert(ans.msg)
 			Crumb.go('/cart/orders/active/list')
 		});

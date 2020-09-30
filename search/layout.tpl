@@ -53,16 +53,18 @@
 					let place = '{config.place}'
 					let order_id = {config.order_id}
 					let mic = {	
-						model_id: pos.model_id,
+						article_nick: pos.article_nick,
+						producer_nick: pos.producer_nick,
 						item_num: pos.item_num,
 						catkit: pos.catkit || ''
 					}
 					
 					Popup.confirm('Количество: <input name="count" type="number">', async div => {
 						div = $(div)
-						var count = div.find('[name=count]').val();
-						await Cart.post('add', { ...mic, place, order_id, count });
-					}, pos['producer'] + ' ' + pos['article'] + '<br><small>' + pos['item_nick']+'</small>');
+						const count = div.find('[name=count]').val()
+						const ans = await Cart.post('addremove', { ...mic, place, order_id, count })
+						if (!ans.result) Popup.alert(ans.msg)
+					}, pos['producer'] + ' ' + pos['article'] + '<br><small>' + pos['item_nick']+'</small>')
 					
 				},
 				transformResult: function (ans) {

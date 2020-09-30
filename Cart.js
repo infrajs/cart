@@ -89,6 +89,7 @@ let Cart = {
 		}
 		Global.set('cart')
 		if (!ans) ans = {
+			"action":{ },
 			"result":0,
 			"msg":"Ошибка на сервере"
 		}
@@ -96,7 +97,7 @@ let Cart = {
 			View.setCOOKIE('token', ans.token)
 			Global.set('user')
 		}
-		if (ans.goal && ans.result) Goal.reach(ans.goal)
+		if (ans.actionmeta && ans.actionmeta.goal && ans.result) Goal.reach(ans.actionmeta.goal)
 		
 		return ans
 	},

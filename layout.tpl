@@ -33,7 +33,7 @@
 				external: "-cart/search/layer.json"
 			}
 			const order_id = {:order_id}
-			let place = "{:place}"
+			const place = "{:place}"
 
 			if (btn) btn.addEventListener('click', () => {
 				layer.config = { place, order_id }
@@ -115,11 +115,12 @@
 								import { DOM } from '/vendor/akiyatkin/load/DOM.js'
 								import { Global } from '/vendor/infrajs/layer-global/Global.js'
 
-								let div = document.getElementById('{div}')
-								let cls = (div, cls) => div.getElementsByClassName(cls)
-								let checkall = document.getElementById('checkall')
-								let form = document.forms.basket
-								let dels = cls(form, 'del')
+								const div = document.getElementById('{div}')
+								const cls = (div, cls) => div.getElementsByClassName(cls)
+								const checkall = document.getElementById('checkall')
+								const form = document.forms.basket
+								const dels = cls(form, 'del')
+								const place = "{:place}"
 								if (!dels) dels = []
 								else if (!dels.length) dels = [dels]
 								const order_id = {:order_id}
@@ -132,7 +133,7 @@
 									for (let del of dels) if (del.checked) ids.push(del.dataset.position_id)
 									let position_ids = ids.join(',')
 									if (!position_ids) return Popup.alert('Выберите позиции для удаления из корзины')
-									let ans = await Cart.post('remove', { order_id, position_ids })
+									let ans = await Cart.post('remove', { place, order_id, position_ids })
 									if (!ans.result) return await Popup.alert(ans.msg)
 								})
 								
@@ -163,8 +164,8 @@
 				let inputs = cls(form, 'count')
 
 				const order_id = {:order_id}
-				let place = "{:place}"
-				let order_nick = {data.order.order_nick}
+				const place = "{:place}"
+				const order_nick = {data.order.order_nick}
 
 				const tplcost = val => {
 					let cost = Template.scope['~cost'](val, false, true) + '{:model.unit}'
@@ -195,7 +196,8 @@
 						cls(div, 'cartsumclear')[0].innerHTML = tplcost(cartsumclear) //Сумма без скидки
 
 						const position_id = input.dataset.position_id
-						const ans = await Cart.post('add',{ order_id, position_id }, { count })
+						const ans = await Cart.post('add',{ order_id, position_id }, { place, count })
+						if (!ans.result) Popup.alert(ans.msg)
 
 					})
 				}
@@ -304,6 +306,8 @@
 			{cdeklogoimg:}<img alt="СДЕК" src="/-imager/?w=75&src=-cart/images/cdekline.png">
 		{hometown:}
 			<div class="mt-3 mb-3"><img src="/-imager/?w=75&src=images/logo.png"></div>
+		{anytranslogo:}
+			<div class="mt-3 mb-3"><img src="/-imager/?w=65&src=-cart/images/any.png"></div>
 		{noweight:}недостаточно данных
 		{showweight:}<b>{data.order.weight} кг</b>
 		{ordercontent:}
@@ -346,6 +350,7 @@
 								const block = cls('input-name')
 								const msg = cls('msg', block)
 								const input = form.elements.name
+								const place = "{:place}"
 								const order_id = {:order_id}
 								if (input.value) msg.innerHTML = ''
 								const change = async () => {
@@ -353,7 +358,7 @@
 									msg.style.color = "black"
 									const name = Cart.strip_tags(input.value)
 									cls('nameresume').innerHTML = name ? ', ' + name : ''
-									const ans = await Cart.posts('setname', { order_id }, { name })
+									const ans = await Cart.posts('setname', { place, order_id }, { name })
 									msg.innerHTML = ans.msg
 									if (ans.result) msg.style.color = "green"
 									else msg.style.color = "red"
@@ -372,6 +377,7 @@
 								const block = cls('input-phone')
 								const msg = cls('msg', block)
 								const input = form.elements.phone
+								const place = "{:place}"
 								const order_id = {:order_id}
 								if (input.value) msg.innerHTML = ''
 								const change = async () => {
@@ -379,7 +385,7 @@
 									msg.style.color = "black"
 									const phone = Cart.strip_tags(input.value)
 									cls('phoneresume').innerHTML = phone ? ', ' + phone : ''
-									const ans = await Cart.posts('setphone', { order_id }, { phone })
+									const ans = await Cart.posts('setphone', { place, order_id }, { phone })
 									msg.innerHTML = ans.msg
 									if (ans.result) msg.style.color = "green"
 									else msg.style.color = "red"
@@ -399,6 +405,7 @@
 								const block = cls('input-email')
 								const msg = cls('msg', block)
 								const input = form.elements.email
+								const place = "{:place}"
 								const order_id = {:order_id}
 								if (input.value) msg.innerHTML = ''
 								const change = async () => {
@@ -407,7 +414,7 @@
 									const email = Cart.strip_tags(input.value)
 									Session.set('user.email', email)
 									cls('emailresume').innerHTML = email ? ', '+email : ''
-									const ans = await Cart.posts('setemail', { order_id }, { email })
+									const ans = await Cart.posts('setemail', { place, order_id }, { email })
 									msg.innerHTML = ans.msg
 									if (ans.result) msg.style.color = "green"
 									else msg.style.color = "red"
@@ -470,9 +477,10 @@
 							{transports.pochta_courier:transportradio}
 
 
-							{(city.city_id=Config.get().cart.city_from_id)|transports.any?:hometown}
-							{city.city_id=Config.get().cart.city_from_id?transports.city:transportradio}
-							{city.city_id=Config.get().cart.city_from_id?transports.self:transportradio}
+							{(transports.city|transports.self)?:hometown}
+							{transports.city:transportradio}
+							{transports.self:transportradio}
+							{(transports.any)?:anytranslogo}
 							{transports.any:transportradio}
 							<script type="module" async>
 								import { Cart } from '/vendor/infrajs/cart/Cart.js'
@@ -482,6 +490,7 @@
 								const form = document.forms.cart
 								const cls = (cls, div = form) => div.getElementsByClassName(cls)
 								const blocks = cls('input-zip')
+								const place = "{:place}"
 								const order_id = {:order_id}
 								for (const block of blocks) {
 									const select = cls('zip', block)[0]
@@ -502,7 +511,7 @@
 											"pvz":"{data.order.pvz}"
 										}
 										cls('transresume')[0].innerHTML = transport ? Template.parse("{tpl}", data, "info_" + transport) : ''
-										const ans = await Cart.posts('setzip', { order_id, zip })
+										const ans = await Cart.posts('setzip', { place, order_id, zip })
 										if (!ans.result) Popup.alert(ans.msg)
 										
 									}
@@ -520,6 +529,7 @@
 								const form = document.forms.cart
 								const cls = (cls, div = form) => div.getElementsByClassName(cls)
 								const order_id = {:order_id}
+								const place = "{:place}"
 								const btn = cls('showpvz')[0]
 								if (btn) btn.addEventListener('click', async () => {
 
@@ -544,6 +554,7 @@
 								const cls = (cls, div = form) => div.getElementsByClassName(cls)
 								const blocks = cls('input-address')
 								const order_id = {:order_id}
+								const place = "{:place}"
 								for (const block of blocks) {
 									const msg = cls('msg', block)[0]
 									const input = cls('address', block)[0]
@@ -570,7 +581,7 @@
 										}
 										cls('transresume')[0].innerHTML = transport ? Template.parse("{tpl}", data, "info_" + transport) : ''
 
-										const ans = await Cart.posts('setaddress', { order_id }, { address })
+										const ans = await Cart.posts('setaddress', { place, order_id }, { address })
 
 										for (const block of blocks) {
 											const input = cls('address', block)[0]
@@ -599,6 +610,7 @@
 								const tag = (tag, div = form) => div.getElementsByTagName(tag)
 								const radios = cls('radio', transblock)
 								const order_id = {:order_id}
+								const place = "{:place}"
 								const sum = {data.order.sum}
 								const lines = cls('line', transblock)
 								const isedit = {:isedit?:true?:false}
@@ -678,7 +690,7 @@
 									}
 									cls('transresume')[0].innerHTML = Template.parse("{tpl}", data, "info_" + transport)
 
-									const ans = await Cart.posts('settransport', { order_id }, { transport })
+									const ans = await Cart.posts('settransport', { place, order_id }, { transport })
 									if (!ans.result) await Popup.alert(ans.msg)
 								}
 								for (const radio of radios) radio.addEventListener('change', change)
@@ -714,7 +726,7 @@
 									if (city_id && city_id != old_city_id) {
 										//const zip = ''
 										//await Cart.post('setzip', { order_id }, { zip })
-										await Cart.post('setcity', { order_id }, { city_id })
+										await Cart.post('setcity', { place, order_id }, { city_id })
 										Global.check('cart-order')
 									} else {
 										Cart.dis(form, false)
@@ -749,18 +761,15 @@
 								max-height: 100px;
 							}
 						</style>
-						<div class="row">
-							<div class="col-md-6">
+						
 
 								{(:card):payradio}
 								{(:perevod):payradio}
 								<!-- <img src="/-imager?src=-cart/images/cards.png"> -->
-							</div>
-							<div class="col-md-6">
+						
 								{(:self):payradio}
 								{(:corp):payradio}
-							</div>
-						</div>
+						
 						<script type="module" async>
 							import { Cart } from '/vendor/infrajs/cart/Cart.js'
 							import { Popup } from '/vendor/infrajs/popup/Popup.js'
@@ -780,15 +789,16 @@
 							
 							const radios = form.elements.pay || []
 							const order_id = {:order_id}
+							const place = "{:place}"
 							const lines = cls('line', payblock)
 							const isedit = {:isedit?:true?:false}
-							
+							const descrs = cls('descr', payblock)
 							const payreset = cls('payreset')[0]
 							payreset.addEventListener('click', () => {
 								for (const radio of radios) radio.checked = false
 								change(true)
 							})
-
+									
 							let last = "{data.order.pay}"
 							const change = async (r) => {
 								if (!isedit) return
@@ -803,9 +813,12 @@
 									line.style.color = ''
 									line.style.fontWeight = ''
 								}
+								for (const descr of descrs) descr.classList.remove('show')
 								if (pay) {
 									const radio = form.elements['pay_' + pay]
 									const line = radio.closest('.line')
+									const descr = cls('descr', line)[0]
+									if (descr) descr.classList.add('show')
 									if (line) {
 										line.style.color = 'black'
 										line.style.fontWeight = '600'
@@ -831,7 +844,7 @@
 
 								cls('payresume')[0].innerHTML = pay ? Template.parse("{tpl}", true, "pay_label_" + pay) : ''
 								
-								const ans = await Cart.posts('setpay', { order_id }, { pay })
+								const ans = await Cart.posts('setpay', { place, order_id }, { pay })
 								if (!ans.result) await Popup.alert(ans.msg)
 							}
 							for (const radio of radios) radio.addEventListener('change', change)
@@ -856,13 +869,14 @@
 							const msg = cls('msg', block)
 							const input = form.elements.comment
 							const order_id = {:order_id}
+							const place = "{:place}"
 							if (input.value) msg.innerHTML = ''
 							const change = async () => {
 								msg.innerHTML = '...'
 								msg.style.color = "black"
 								const comment = Cart.strip_tags(input.value)
 								cls('commentresume').innerHTML = comment
-								const ans = await Cart.posts('setcomment', { order_id }, { comment })
+								const ans = await Cart.posts('setcomment', { place, order_id }, { comment })
 								msg.innerHTML = ans.msg
 								if (ans.result) msg.style.color = "green"
 								else msg.style.color = "red"
@@ -893,6 +907,7 @@
 							const cls = (cls, el = div) => el.getElementsByClassName(cls)
 							let radios = document.forms.cart.elements.callback					
 							const order_id = {:order_id}
+							const place = "{:place}"
 							let order_nick = {data.order.order_nick}
 							let isedit = {:isedit?:true?:false}
 							let title = cls('callback-title')[0]
@@ -911,7 +926,7 @@
 									line.style.fontWeight = 600
 								}
 								cls('callresume')[0].innerHTML = Template.parse("{tpl}", callback, "callbackresume")
-								let ans = await Cart.posts('setcallback', { order_id }, { callback })
+								let ans = await Cart.posts('setcallback', { place, order_id }, { callback })
 								if (!ans.result) await Popup.alert(ans.msg)
 							}
 							title.addEventListener('click', () => {
@@ -962,10 +977,10 @@
 						</div>
 					</div>
 				</div>
-			{pay_label_self:}Оплата при получении<br>Страхование груза в&nbsp;ТК&nbsp;4%
-			{pay_label_card:}Оплата картой<br>VISA, Mastercard, МИР
-			{pay_label_perevod:}Перевод на карту<br>Сбербанк, Tinkoff
-			{pay_label_corp:}Оплата по счёту для юр.лиц<br>Без НДС
+			{pay_label_self:}Оплата при получении<div class2="descr {data.order.pay=.?:show}" style="font-size:13px; color:#888; margin-top:-1px; font-weight: normal;">Наличными или картой</div>
+			{pay_label_card:}Оплата картой онлайн<div class2="descr {data.order.pay=.?:show}" style="font-size:13px; color:#888; margin-top:-1px; font-weight: normal;">VISA, Mastercard, МИР</div>
+			{pay_label_perevod:}Мобильный банк<div class2="descr {data.order.pay=.?:show}" style="font-size:13px; color:#888; margin-top:-1px; font-weight: normal;">Сбербанк, Tinkoff, Альфа Банк, ВТБ</div>
+			{pay_label_corp:}Оплата по счёту для юр.лиц<div class2="descr {data.order.pay=.?:show}" style="font-size:13px; color:#888; margin-top:-1px; font-weight: normal;">Без НДС</div>
 			{transprice:}
 				<div class="d-flex ml-2" style="max-width:140px">
 					<div style="width:70px; text-align:right;">{:days}</div>
@@ -1050,20 +1065,20 @@
 			import { Global } from '/vendor/infrajs/layer-global/Global.js'
 			import { Template } from '/vendor/infrajs/template/Template.js'
 
-			let div = document.getElementById('{div}')
-			let cls = cls => div.getElementsByClassName(cls)
-			let tag = tag => div.getElementsByTagName(tag)[0]
-			let form = document.forms.cart
+			const div = document.getElementById('{div}')
+			const cls = cls => div.getElementsByClassName(cls)
+			const tag = tag => div.getElementsByTagName(tag)[0]
+			const form = document.forms.cart
 			let btn = null;
 			const order_id = {:order_id}
-			let order_nick = {data.order.order_nick}
-			let place = "{:place}"
-			let isedit = {:isedit?:true?:false}
+			const order_nick = {data.order.order_nick}
+			const place = "{:place}"
+			const isedit = {:isedit?:true?:false}
 			
 			
 			for (const btn of cls('act-check')) btn.addEventListener('click', async () => {
 				if (Cart.dis(form)) return
-				let ans = await Cart.posts('check', { order_id })
+				let ans = await Cart.posts('check', { place, order_id })
 				if (!ans.result) {
 					await Popup.alert(ans.msg)
 				} else {
@@ -1073,7 +1088,7 @@
 			})
 			for (const btn of cls('act-tocheck')) btn.addEventListener('click', async () => {
 				if (Cart.dis(form)) return
-				let ans = await Cart.post('tocheck', { order_id })
+				let ans = await Cart.post('tocheck', { place, order_id })
 				if (!ans.result) {
 					await Popup.alert(ans.msg)
 				}
@@ -1087,7 +1102,7 @@
 
 			for (const btn of cls('act-complete')) btn.addEventListener('click', async () => {
 				if (Cart.dis(form)) return
-				const ans = await Cart.post('complete', { order_id })
+				const ans = await Cart.post('complete', { place, order_id })
 				if (!ans.result) return Popup.alert(ans.msg)
 			})
 			
@@ -1095,7 +1110,7 @@
 				if (Cart.dis(form)) return
 				const status = "{data.order.status}"
 				if (status != 'pay') {
-					const ans = await Cart.post('paykeeper', { order_id })
+					const ans = await Cart.post('paykeeper', { place, order_id })
 					if (!ans.result) return Popup.alert(ans.msg)
 				}
 				//Надо сбросить active ссылку чтобы назад работал правильно
@@ -1107,14 +1122,14 @@
 
 			for (const btn of cls('act-wait')) btn.addEventListener('click', async () => {	
 				if (Cart.dis(form)) return
-				const ans = await Cart.post('wait', { order_id })
+				const ans = await Cart.post('wait', { place, order_id })
 				if (!ans.result) return Popup.alert(ans.msg)
 			})
 
 			for (const btn of cls('act-delete')) btn.addEventListener('click', async () => {
 				if (Cart.dis(form)) return
 				Popup.confirm('Крайний вариант. Зказ бесследно исчезнет. Удалить?', async () => {
-					const ans = await Cart.posts('delete', { order_id })
+					const ans = await Cart.posts('delete', { place, order_id })
 					if (!ans.result) {
 						return Popup.alert(ans.msg)	
 					} else {
@@ -1135,7 +1150,7 @@
 					const block = document.getElementsByClassName('input-commentmanager')[0]
 					const textarea = block.getElementsByTagName('textarea')[0]
 					const commentmanager = textarea.value
-					const ans = await Cart.post('email', { order_id }, { commentmanager })
+					const ans = await Cart.post('email', { place, order_id }, { commentmanager })
 					if (!ans.result) Popup.alert(ans.msg)
 					else Popup.success(ans.msg)
 				})
@@ -1178,6 +1193,7 @@
 			    	const cls = (div, cls) => div.getElementsByClassName(cls)[0]
 			    	const div = cls(document, 'input-coupon')
 			    	const coupinfo = cls(div, 'coupinfo')
+			    	const place = "{:place}"
 			    	const input = cls(div, 'form-control')
 			    	const btn = cls(div, 'btn')
 			    	btn.addEventListener('click', () => {
@@ -1222,12 +1238,13 @@
 			const btn = cls('couponbtn')[0]
 			const input = document.getElementById('coupon')
 			const form = document.forms.basket
+			const place = "{:place}"
 
 			btn.addEventListener('click', async () => {
 				const order_id = {:order_id}
 				const coupon = Cart.strip_tags(input.value)
 				if (Cart.dis(form)) return
-				await Cart.post('setcoupon', { order_id, coupon })
+				await Cart.post('setcoupon', { place, order_id, coupon })
 			})
 		</script>
 		<div class="py-2">
@@ -1423,7 +1440,7 @@
 				btns = cls('act-complete')
 				for (const btn of btns) btn.addEventListener('click', async () => {
 					const order_id = btn.dataset.order_id
-					const ans = await Cart.post('complete', { order_id })
+					const ans = await Cart.post('complete', {place, order_id })
 					if (!ans.result) await Popup.alert(ans.msg)
 				})
 
@@ -1512,7 +1529,8 @@
 			const div = document.getElementsByClassName('input-commentmanager')[0]
 			const textarea = div.getElementsByClassName('mngcom')[0]
 			const msg = div.getElementsByClassName('msg')[0]
-			const order_id = {order_id}
+			const order_id = "{:order_id}"
+			const place = "{:place}"
 			textarea.addEventListener('keyup', async () => {
 				msg.innerHTML = '...'
 				msg.style.color = "black"
@@ -1637,7 +1655,7 @@
 	{label_self:}Самовывоз из магазина в Тольятти
 	{label_self_short:}{:label_self}
 
-	{descr_any:}Деловые Линии, DPD, КИТ, Байкал Сервис, Энергия, ПЭК ...
+	{descr_any:}<div style="font-size:13px; color:#888; margin-top:-4px;">Почта России, СДЕК, Деловые Линии, DPD, КИТ, Байкал Сервис, Энергия, ПЭК ...</div>
 	{info_any:}
 	{label_any:}Способ и стоимость доставки, согласовываются отдельно.
 	{label_any_short:}Согласовать оптимальную ТК с менеджером

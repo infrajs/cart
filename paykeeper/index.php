@@ -18,7 +18,7 @@ $lang = Ans::REQ('lang', Cart::$conf['lang']['list'], Cart::$conf['lang']['def']
 $token = Ans::REQS('token', 'string', '');
 $user = User::fromToken($token);
 if (!$user) return Ans::err($ans, 'Требуется авторизация. Код p'.__LINE__);
-if ($order_nick == 'active') $order = Cart::getActiveOrder($user);
+if ($order_nick == 'active') $order = Cart::getActiveOrder($user['user_id']);
 else $order = Cart::getByNick($order_nick);
 $ans['order'] = $order;
 if (!$order) return Ans::err($ans, 'Заказ не найден. Код PK102');

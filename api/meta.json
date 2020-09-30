@@ -1,397 +1,348 @@
 {
-	"rules":{
-        "wait":{
-			"notice":"default",
+	"rules": {
+		"wait": {
+			"notice": "default",
+			"short": "2.m1",
+			"shortactive": "6.m1",
+			"caption": "3.m1",
+			"title": "4.m1",
 
-			"short":"2.m1",
-			"shortactive":"6.m1",
-			"caption":"3.m1",
-			"title":"4.m1",
-
-			"actions":{
-				"admin":{
-					"edit":false
+			"actions": {
+				"admin": {
+					"edit": false
 				},
-				"orders":{
-					"edit":true,
-					"buttons":{
-						"paykeeper":"success",
-						"check":"success"
+				"orders": {
+					"edit": true,
+					"buttons": {
+						"paykeeper": "success",
+						"check": "success"
 					}
 				}
 			}
-			
-		},
-        "check":{
-			"notice":"warning",
-			"short":"На проверке",
-			"caption":"Заказы ожидающие проверку менеджера",
-			"title":"Заказ находится на проверке",
 
-			"actions":{
-				"orders":{
-					"buttons":{
-						"wait":"secondary"
+		},
+		"check": {
+			"notice": "warning",
+			"short": "На проверке",
+			"caption": "Заказы ожидающие проверку менеджера",
+			"title": "Заказ находится на проверке",
+
+			"actions": {
+				"orders": {
+					"buttons": {
+						"wait": "secondary"
 					}
 				},
-				"admin":{
-					"buttons":{					
-						"email":"secondary", 
-						"complete":"info"
-					}
-				}
-			}
-		},
-		"complete":{
-			"notice":"default",
-			"short":"Готов",
-			"caption":"Выполненные заказы",
-			"title":"Заказ выполнен",
-
-			"actions":{
-				"orders":{
-					"buttons":{}
-				},
-				"admin":{
-					"buttons":{
-						"email":"secondary",
-						"tocheck":"secondary",
-						"delete":"danger"
+				"admin": {
+					"buttons": {
+						"email": "secondary",
+						"complete": "info"
 					}
 				}
 			}
 		},
-		"pay":{
-			"notice":"info",
-			"short":"pay2.m1",
-			"caption":"pay1.m2",
-			"title":"pay3.m3",
-			"actions":{
-				"orders":{
-					"buttons":{"wait":"secondary", "paykeeper":"success"}
+		"complete": {
+			"notice": "default",
+			"short": "Готов",
+			"caption": "Выполненные заказы",
+			"title": "Заказ выполнен",
+
+			"actions": {
+				"orders": {
+					"buttons": {}
 				},
-				"admin":{
-					"buttons":{"email":"secondary", "complete":"success"}
+				"admin": {
+					"buttons": {
+						"email": "secondary",
+						"tocheck": "secondary",
+						"delete": "danger"
+					}
 				}
 			}
 		},
-		"*paykeeper":{
-			"notice":"info",
-
-			"caption":"Заказы ожидающие оплату",
-			"short":"Ожидает оплату",
-			"title":"Заказ ожидает оплату",
-
-			"actions":{
-				"orders":{
-					"buttons":{"basket":"secondary","paykeeper":"success"},
-					"actions":["edit","print"]
+		"pay": {
+			"notice": "info",
+			"short": "pay2.m1",
+			"caption": "pay1.m2",
+			"title": "pay3.m3",
+			"actions": {
+				"orders": {
+					"buttons": {
+						"wait": "secondary",
+						"paykeeper": "success"
+					}
 				},
-				"admin":{
-					"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
-					"actions":["complete","delete","edit","print"]
+				"admin": {
+					"buttons": {
+						"email": "secondary",
+						"complete": "success"
+					}
 				}
 			}
-		},
-		"*sbrfpay":{
-			"notice":"info",
-
-			"caption":"Заказы ожидающие оплату",
-			"short":"Ожидает оплату",
-			"title":"Заказ ожидает оплату",
-
-			"actions":{
-				"orders":{
-					"buttons":{"basket":"secondary","sbrfpay":"success"},
-					"actions":["edit","print"]
-				},
-				"manager":{
-					"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
-					"actions":["complete","delete","edit","print"]
-				}
-			}
-        }
+		}
 	},
-    "actions":{
-    	"estimate":{
-    		"required":["producer_nick","article_nick","city_id", "lang"]
-    	},
-		"cart":{
-			"handlers":{
-			
-			}
-        },
-		"orders":{
-			"handlers":{
-				"admin":true,
-				"fuser":true
-			}
-        },
-		"ousers":{
-			"handlers":{
-				"order":true
-			}
-        },
-        "freezeall":{
-			"handlers":{
-				"admin":true,
-				"post":true
-			}
-        },
-		"create":{
-			"handlers":{
-				"fuser":true,
-				"admin":true,
-				"post":true
-			}
-        },
-		"order":{
-			"handlers":{
-				"order":true
-			}
-		},
-		"addremove":{
-			"handlers":{
-				"goal":"basket",
-				"rule":true,
-				"edit":true,
-				"status":["wait"],
-				"model":true
-			}
-		},
-		"remove":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			},
-			"title":"CR051",
-			"noscroll":true
-		},
-		"add":{
-			"handlers":{
-				"rule":true,
-				"edit":true,
-				"status":["wait"],
-				"model":true
-			}
-        },
-        "mystat":{
+	
 
-        },
-        "check":{
-			"title":"CR049.m1",
-			"handlers":{
-				"goal":"cart",
-				"rule":true,
-				"checkdata":true,
-				"paid":true,
-				"status":["wait"],
-				"freeze":true
-			}
+
+	"args":{
+		"coupon":[],
+		"commentmanager":["notempty"],
+		"position_ids":["intarray"],
+		"start":["int"],
+		"end":["int"],
+		"statuses":[],
+		"lang":[],
+		"count":["int", "notempty"],
+		"coupon":[],
+		"comment":["text"],
+		"name":[],
+		"zip":["int"],
+		"address":[],
+		"phone":[],
+		"pvz":[],
+		"place":[],
+		"item_num":["int"],
+		"article_nick":["notempty"],
+		"producer_nick":["notempty"],
+		"position_id":["int","notempty"],
+		"city_id":["int","notempty"],
+		"timezone":["notempty"],
+		"catkit":[],
+		"email":[],
+		"transport":[],
+		"callback":[],
+		"pay":[],
+		"token":[],
+		"order_nick":[],
+		"order_id":["int"]
+	},
+	"vars":["ans","user","active_id", "city", "model", "basket", "user_id","rule","order","status","order_id","meta"],
+	"flags":["iscreateorder"],
+	"handlers":["post","admin","paid"],	
+
+
+	"dependencies": {
+		"get": {
+			"default": ["lang","ans"],
+			"user":["user_id"],
+			"user_id":["token"],
+			"count":["order_id"],
+			"coupon":["order_id"],
+			"comment":["order_id"],
+			"name":["order_id"],
+			"transport":["order_id"],
+			"zip":["order_id"],
+			"pay":["order_id"],
+			"callback":["order_id"],
+			"address":["order_id"],
+			"phone":["order_id"],
+			"pvz":["order_id"],
+			"status":["order_id"],
+			"rule":["status"],
+			"order_id": ["user", "place"],
+			"order_nick": ["user", "place"],
+			"basket": ["order_id"],
+			"order": ["order_id"],
+			"article_nick": ["producer_nick", "item_num", "catkit"]
 		},
-		"tocheck":{
-			"title":"CR049b.m1",
-			"handlers":{
-				"admin":true,
-				"payd":true,
-				"rule":true,
-				"status":["complete"]
-			}
+		"iscreateorder": {
+			"default": ["city_id", "timezone"]
+		}
+	},
+
+
+
+	"actions": {
+		
+		"estimate": {
+			"required": ["article_nick", "city_id"]
 		},
-		"complete":{
-			"handlers":{
-				"status":["check","wait"],
-				"admin":true,
-				"rule":true
-			},
-			"title":"CR038.m1",
-			"confirm":"CR039.m1"
+		"cart": {
+			"required": ["user"]
 		},
-		"wait":{
-			"title":"CR050.1m",
-			"handlers":{
-				"rule":true,
-				"unfreeze":true,
-				"status":["check","pay"]
-			}
+		"mystat": {
+			"required": ["basket"]
 		},
-		"*pay":{
-			"handlers":{
-				"checkdata":true,
-				"status":["wait"],
-				"rule":true
-			},
-			"title":"1.m3"
+		"getmeta":{
+
 		},
-		"paykeeper":{
-			"handlers":{
-				"checkdata":true,
-				"status":["wait"],
-				"rule":true
-			},
-			"title":"1.m2",
-			"gohistory":{
-				"orders":"/cart/orders/{order_nick}",
-				"admin":"/cart/admin/{order_nick}"
-			},
-			"go":{
-				"orders":"/cart/orders/{order_nick}/paykeeper",
-				"admin":"/cart/admin/{order_nick}/paykeeper"
-			}
+		"orders": {
+			"required": ["user","statuses","start"],
+			"handlers": ["admin"]
 		},
-		"*sbrfpay":{
-			"handlers":{
-				"checkdata":true
-			},
-			"title":"1.m1",
-			"gohistory":{
-				"orders":"/cart/orders/{order_nick}",
-				"admin":"/cart/admin/{order_nick}"
-			},
-			"go":{
-				"orders":"/cart/orders/{order_nick}/sbrfpay",
-				"admin":"/cart/admin/{order_nick}/sbrfpay"
-			}
+		"refreezeall": {
+			"required": ["user"],
+			"handlers": ["admin", "post"]
+		},
+		"years": {
+			"required": ["user"],
+			"handlers": ["admin"]
+		},
+		"order": {
+			"required": ["order_nick"]
+		},
+		"orderfast": {
+			"required": ["order_id"]
+		},
+		"addremove": {
+			"required": ["count", "article_nick", "order_id"],
+			"handlers": ["post", "edit", "paid", "checkstatus"],
+			"flags":["iscreateorder"],
+			"statuses": ["wait"],
+			"goal": "basket"
+		},
+		"add": {
+			"required": ["count", "position_id", "order_id"],
+			"handlers": ["post", "checkstatus", "edit", "paid"],
+			"statuses": ["wait"]
 		},
 		
-        "delete":{
-			"handlers":{
-				"rule":true,
-				"paid":true,
-				"admin":true
-			},
-			"title":"CR047"
-		},
-		"setcomment":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"setzip":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"setname":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"setaddress":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"setemail":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"setphone":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"setcdek":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"setpvz":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"settransport":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"setpay":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"setcallback":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"setcity":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"setlang":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"setcoupon":{
-			"handlers":{
-				"rule":true,
-				"edit":true
-			}
-		},
-		"clear":{
-			"handlers":{
-				"status":["wait"],
-				"post":true,
-				"paid":true,
-				"rule":true
-			},
-			"title":"CR035.m1",
-			"confirm":"CR036.m1"
+		
+		"settransport": {
+			"required": ["transport", "order_id"],
+			"handlers": ["post", "edit", "paid"]
 		},
 		
-		"years":{
-			"handlers":{
-				"admin":true
-			}
+		"setcoupon": {
+			"required": ["coupon", "order_id"],
+			"handlers": ["post", "edit", "paid"]
 		},
-		"meta":{
+
+		"setcomment": {
+			"required": ["comment", "order_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		"setzip": {
+			"required": ["zip", "order_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		"setname": {
+			"required": ["name", "order_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		"setaddress": {
+			"required": ["address", "order_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		"setemail": {
+			"required": ["email", "place", "order_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		"setphone": {
+			"required": ["phone", "place", "order_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		"setcdek": {
+			"required": ["pvz", "transport", "place", "order_id", "city_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		"setpvz": {
+			"required": ["pvz", "order_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		"setpay": {
+			"required": ["pay", "order_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		"setcallback": {
+			"required": ["callback", "order_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		"setcity": {
+			"required": ["city_id", "order_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		"setlang": {
+			"required": ["lang", "order_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		
+		"remove": {
+			"required": ["order_id","position_ids"],
+			"handlers": ["post", "edit", "paid"],
+			"title": "CR051"
+		},
+
+
+		"check": {
+			"required": ["order_id"],
+			"title": "CR049.m1",
+			"goal": "cart",
+			"statuses": ["wait"],
+			"handlers": ["post", "checkstatus", "checkdata", "paid", "freeze"]
+		},
+		"tocheck": {
+			"required": ["order_id"],
+			"title": "CR049b.m1",
+			"statuses": ["complete"],
+			"handlers": ["post", "admin", "checkstatus", "paid"]
+		},
+		"complete": {
+			"required": ["order_id"],
+			"handlers": ["post", "admin", "checkstatus"],
+			"statuses": ["check", "wait"],
+			"title": "CR038.m1",
+			"confirm": "CR039.m1"
+		},
+		"wait": {
+			"required": ["order_id"],
+			"handlers": ["post", "checkstatus", "unfreeze"],
+			"title": "CR050.1m",
+			"statuses": ["check", "pay"]
 			
 		},
-		
-		"print":{
-			"title":"CR052.m1",
-			"go":{
-				"orders":"/cart/orders/{order_nick|:active}/print",
-				"admin":"/cart/admin/{order_nick|:active}/print"
-			}
-		},
-		"basket":{
-			"title":"CR053.m1",
-			"go":{
-				"orders":"/cart/orders/{order_nick|:active}/list",
-				"admin":"/cart/admin/{order_nick|:active}/list"
-			}
-		},
-		"setcommentmanager":{
-			"handlers":{
-				"rule":true,
-				"admin":true
-			}
-		},
-		"email":{
-			"handlers":{
-				"rule":true,
-				"admin":true
+		"paykeeper": {
+			"required": ["order_id"],
+			"statuses": ["wait"],
+			"handlers": ["post", "checkstatus", "checkdata"],
+			"title": "1.m2",
+			"gohistory": {
+				"orders": "/cart/orders/{order_nick}",
+				"admin": "/cart/admin/{order_nick}"
 			},
-			"title":"CR054.M1"
+			"go": {
+				"orders": "/cart/orders/{order_nick}/paykeeper",
+				"admin": "/cart/admin/{order_nick}/paykeeper"
+			}
+		},
+		"delete": {
+			"required": ["order_id"],
+			"handlers": ["post", "admin", "paid"],
+			"title": "CR047"
+		},
+
+
+		"clear": {
+			"required": ["order_id"],
+			"statuses": ["wait"],
+			"handlers": ["post", "checkstatus", "paid"],
+			"title": "CR035.m1",
+			"confirm": "CR036.m1"
+		},
+		"print": {
+			"required": ["order_id"],
+			"title": "CR052.m1",
+			"go": {
+				"orders": "/cart/orders/{order_nick|:active}/print",
+				"admin": "/cart/admin/{order_nick|:active}/print"
+			}
+		},
+		"basket": {
+			"required": ["order_id"],
+			"title": "CR053.m1",
+			"go": {
+				"orders": "/cart/orders/{order_nick|:active}/list",
+				"admin": "/cart/admin/{order_nick|:active}/list"
+			}
+		},
+		"setcommentmanager": {
+			"required": ["order_id"],
+			"handlers": ["post", "admin"]
+		},
+		"email": {
+			"required": ["order_id"],
+			"handlers": ["post", "admin"],
+			"title": "CR054.M1"
 		}
 	}
 }
