@@ -132,7 +132,7 @@ $context->actions = [
 		$ans['meta'] = Cart::getJsMeta($meta, $lang);
 	},	
 	'check' => function () {
-		extract($this->gets(['place', 'order', 'order_id', 'lang']), EXTR_REFS);
+		extract($this->gets(['place', 'ouser', 'order', 'order_id', 'lang']), EXTR_REFS);
 		
 		$this->handler('create_order_user');
 		if (!Cart::setStatus($order_id, 'check')) return $this->fail('CR018', 'a' . __LINE__);
@@ -210,14 +210,12 @@ $context->actions = [
 		return $this->ret('CR055', 'a' . __LINE__);
 	}, 
 	'wait' => function () {
-		extract($this->gets(['order_id','order']), EXTR_REFS);
+		extract($this->gets(['order_id','order', 'user', 'place']), EXTR_REFS);
 		if (!Cart::setStatus($order_id, 'wait')) return $this->fail('CR018', 'a' . __LINE__);
 		$fuser = User::getByEmail($order['email']);
 		if (!$fuser) return $this->fail('CR018', 'a' . __LINE__);
 		Cart::setActive($order['order_id'], $fuser['user_id']);
 		if ($fuser != $user && $place == 'orders') Cart::setActive($order['order_id'], $user['user_id']);
-
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
 		return $this->ret('CR030', 'a' . __LINE__);
 	}, 
 	'delete' => function () {

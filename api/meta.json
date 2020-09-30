@@ -116,7 +116,7 @@
 		"order_nick":[],
 		"order_id":["int"]
 	},
-	"vars":["ans","user","active_id", "city", "model", "basket", "user_id","rule","order","status","order_id","meta"],
+	"vars":["ouser", "oemail", "ans","user","active_id", "city", "model", "basket", "user_id","rule","order","status","order_id","meta"],
 	"flags":["iscreateorder"],
 	"handlers":["post","admin","paid"],	
 

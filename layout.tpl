@@ -1309,7 +1309,7 @@
 					{(status=:wait&active)?data.meta.rules[status]shortactive?data.meta.rules[status]short}{coupon:pr-comma}{paid?(:оплачен):pr-comma}
 				</div>
 				<div class="col d-none d-sm-block text-right">
-					{~date(:d.m.Y,datecheck|dateedit)}
+					{~date(:d.m.Y,dateedit)}
 				</div>
 			</div>
 		{br:}<br>

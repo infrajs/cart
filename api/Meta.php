@@ -306,7 +306,7 @@ class Meta {
 		if (empty($this->handlers[$hand])) return $this->fail('handler', $line, $hand);
 		if (is_callable($this->handlers[$hand])) {
 			$fn = \Closure::bind($this->handlers[$hand], $this);
-			$this->handlers[$hand] = $fn();
+			$this->handlers[$hand] = true;
 		}
 		return $this->handlers[$hand];
 	}

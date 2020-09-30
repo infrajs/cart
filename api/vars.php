@@ -16,6 +16,16 @@ $context->vars = [
 		extract($this->gets(['order_id'], 'v'.__LINE__), EXTR_REFS);
 		$order = Cart::getById($order_id);
 	},
+	'oemail' => function (&$oemail) {
+		$this->handler('checkdata'); //Мы должны быть уверены что order с email есть
+		extract($this->gets(['order']), EXTR_REFS);
+		$oemail = $order['email'];
+
+	},
+	'ouser' => function (&$ouser) {
+		extract($this->gets(['oemail']), EXTR_REFS);	
+		$ouser = User::getByEmail($oemail);
+	},
 	'model' => function (&$model) {
 		extract($this->gets(['producer_nick','article_nick','item_num','catkit']), EXTR_REFS);
 		$pos = [

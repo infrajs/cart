@@ -157,7 +157,9 @@ class Cart
 				}
 			}
 			$sql .= 'ORDER BY o.dateedit DESC';
+
 			$list = Db::colAll($sql, $param);
+
 			foreach ($list as $k => $order_id) {
 				$list[$k] = Cart::getById($order_id, true);
 			}
@@ -657,11 +659,8 @@ class Cart
 	}
 	public static function removePos($position_ids, $user)
 	{
-		$order_ids = Db::colAll('SELECT DISTINCT order_id FROM cart_basket where position_id in (' . implode(',', $position_ids) . ')');
-		if (!$order_ids) return true; //Позиции нет
-		if (sizeof($order_ids) > 1) return false;
-		$order_id = $order_ids[0];
-		if (!$user['admin'] && !Cart::isOwner($order_id, $user['user_id'])) return false;
+		$order_id = Db::col('SELECT DISTINCT order_id FROM cart_basket where position_id in (' . implode(',', $position_ids) . ')');
+		if (!$order_id) return true; //Позиции нет
 
 		$sql = 'DELETE b FROM cart_basket b
 			WHERE b.position_id in (' . implode(',', $position_ids) . ')
@@ -972,6 +971,7 @@ class Cart
 		} else {
 			$sql = "UPDATE cart_orders
 				SET status = :status, 
+				dateedit = now(),
 				date$status = now()
 				WHERE order_id = :order_id
 			";	
