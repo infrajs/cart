@@ -1157,7 +1157,7 @@ class Cart
 	public static function getHash($model)
 	{
 		if (!$model) return 'none';
-		$hash = md5($model['Цена']);
+		$hash = Path::encode($model['Цена']);
 		//unset($model['model_id']);
 		//$hash = md5(json_encode($model, JSON_UNESCAPED_UNICODE));
 		return $hash;
@@ -1195,6 +1195,7 @@ class Cart
 				':position_id' => $position_id
 			]);
 			$model = Cart::getFromShowcase($pos);
+			//Ключ по которому определяется заморожена позиция или нет
 			if ($pos['hash']) {
 				$changed = $model ? $pos['hash'] !== Cart::getHash($model) : true;
 				if ($changed) $model = Cart::getFromJson($position_id);

@@ -37,7 +37,9 @@ let Cart = {
 	dis (form, val = true) {
 		if (val && form.dataset.proc == 'true') return true
 		form.dataset.proc = val
-		for (let el of form.elements) el.disabled = val
+		for (let el of form.elements) {
+			el.disabled = val
+		}
 	},
 	get: (type, param) => {
 		let token = User.token()

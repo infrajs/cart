@@ -17,6 +17,7 @@ use infrajs\cart\api\Meta;
 	
 $context = new Meta([
 	'src' => '-cart/api/meta.json',
+	'action' => Rest::first(),
 	'name' => 'cart', 
 	'lang' => Cart::$conf['lang']['def']
 ]);

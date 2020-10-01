@@ -13,7 +13,7 @@ use infrajs\cart\api\Meta;
 
 $context->vars = [
 	'order' => function (&$order) {
-		extract($this->gets(['order_id'], 'v'.__LINE__), EXTR_REFS);
+		extract($this->gets(['order_id']), EXTR_REFS);
 		$order = Cart::getById($order_id);
 	},
 	'oemail' => function (&$oemail) {
@@ -35,67 +35,67 @@ $context->vars = [
 			'catkit' => $catkit
 		];
 		$model = Cart::getFromShowcase($pos);
-		if (!$model) throw $this::fail('CR013', 'v'.__LINE__);
+		if (!$model) throw $this::fail('CR013');
 	},
 	'order_id' => function (&$order_id, $pname) {
 		
-		extract($this->gets(['order_nick'], 'v'.__LINE__), EXTR_REFS);
+		extract($this->gets(['order_nick']), EXTR_REFS);
 
 		if ($order_nick == 'active') {
-			$order_id = $this->get('active_id', 'v'.__LINE__);
+			$order_id = $this->get('active_id');
 		} else {
 			$order_id = Db::col('SELECT order_id FROM cart_orders WHERE order_nick = :order_nick', [
 				':order_nick' => $order_nick
 			]);
 			
-			if (!$order_id) return $this->fail('order_nick', 'v'.__LINE__);	
+			if (!$order_id) return $this->fail('order_nick');	
 		}
-		$this->handler('Check the legality of the action', 'v'.__LINE__);
+		$this->handler('Check the legality of the action');
 	},
 	"active_id" => function (&$order_id) {
-		extract($this->gets(['user_id','user','iscreateorder'], 'v'.__LINE__));
+		extract($this->gets(['user_id','user','iscreateorder']));
 
 		$order_id = $user_id ? Cart::getActiveOrderId($user_id) : false;
 		if (!$order_id) {
 			//Заказа нет
-			if (!$iscreateorder) return $this->fail('CR004', 'v'.__LINE__);
-			extract($this->gets(['ans','lang','city_id','timezone'], 'v'.__LINE__));
+			if (!$iscreateorder) return $this->fail('CR004');
+			extract($this->gets(['ans','lang','city_id','timezone']));
 			if (!$user) {
 				$user = User::create($lang, $city_id, $timezone);
-				if (!$user) return $this->fail('CR009', 'v'.__LINE__);
+				if (!$user) return $this->fail('CR009');
 				$ans['token'] = $user['user_id'] . '-' . $user['token'];
 			}
 			$order_id = Cart::create($user_id);
-			if (!$order_id) return $this->fail('CR008', 'v'.__LINE__);
+			if (!$order_id) return $this->fail('CR008');
 		}
 	},
 	'city' => function (&$city) {
-		extract($this->gets(['city_id','lang'], 'v'.__LINE__), EXTR_REFS);
+		extract($this->gets(['city_id','lang']), EXTR_REFS);
 		$city = City::getById($city_id, $lang);
 	},
 	'user' => function (&$user) {
-		extract($this->gets(['token'], 'v'.__LINE__), EXTR_REFS);
+		extract($this->gets(['token']), EXTR_REFS);
 		$user = User::fromToken($token);
 	},
 	'user_id' => function (&$user_id) {
-		extract($this->gets(['token'], 'v'.__LINE__), EXTR_REFS);
+		extract($this->gets(['token']), EXTR_REFS);
 		$user = User::fromToken($token);
 		$user_id = $user['user_id'] ?? false;
 	},
 	
 	'status' => function (&$status) {
-		extract($this->gets(['order_id'], 'v'.__LINE__));
+		extract($this->gets(['order_id']));
 		$status = Db::col('SELECT status FROM cart_orders WHERE order_id = :order_id', [
 			':order_id' => $order_id
 		]);
 	},		
 	'rule' => function (&$rule) {
-		extract($this->gets(['status'], 'v'.__LINE__));
-		if (!$status || !isset($this->meta['rules'][$status])) return $this->fail('CR018', 'v'.__LINE__);
+		extract($this->gets(['status']));
+		if (!$status || !isset($this->meta['rules'][$status])) return $this->fail('CR018');
 		$rule = $this->meta['rules'][$status];
 	},
 	'basket' => function (&$basket) {
-		extract($this->gets(['order_id'], 'v'.__LINE__));
+		extract($this->gets(['order_id']));
 		$basket = Db::all('SELECT position_id, discount, count from cart_basket where order_id = :order_id', [
 			':order_id' => $order_id
 		]);

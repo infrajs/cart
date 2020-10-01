@@ -102,5 +102,6 @@
 	"CR059":"City not found",
 	"CR061":"Failed to login",
 	"CR062":"Correct pay required",
-	"commentmanager":"Comment required"
+	"commentmanager":"Comment required",
+	"CR063":"Actions are not in the allowed list and there are no other restrictions"
 }

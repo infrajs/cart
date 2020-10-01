@@ -37,7 +37,7 @@ $context->actions = [
 		$zip = $city['zip'];
 		$ans['city'] = $city;		
 		$weight = Cart::getWeight($model);
-		if (!$weight) return $this->err('posweight', 'a'.__LINE__);
+		if (!$weight) return $this->err('posweight');
 		$transports = Cart::$conf['transports'];
 		$ans['transports'] = [];
 		$ans['transports']['pochta'] = [];
@@ -66,20 +66,20 @@ $context->actions = [
 	'order' => function () {
 		extract($this->gets(['order','user_id', 'user','place','lang','ans']), EXTR_REFS);
 		//if ($user && $place == 'orders' && !$order) $order = Cart::getActiveOrder($user_id);
-		if (!$order) return $this->err('empty','a' . __LINE__);
+		if (!$order) return $this->err('empty');
 		$ans['rule'] = Cart::getJsMetaRule($this->meta, $order['status'], $lang);
 		$order['city'] = Cart::getCity($order['city_id'], $order['email'], $order['order_id'], $lang);
 		$order['city']['zips'] = City::getIndexes($order['city_id']);
 		$ans['order'] = $order;
 		$ans['active'] = Cart::isActive($order, $user);
-		if (!sizeof($order['basket'])) return $this->ret('empty', 'a' . __LINE__);
+		if (!sizeof($order['basket'])) return $this->ret('empty');
 	},	
 	'addremove' => function () {
 		extract($this->gets(['count','model','order_id']), EXTR_REFS);
 		if (!$count) $count = false;
 		$r = Cart::addModel($order_id, $model, $count);
-		if (!$r) return $this->fail('CR015', 'a'.__LINE__);
-		if ($count) return $this->ret('CR029', 'a'.__LINE__);
+		if (!$r) return $this->fail('CR015');
+		if ($count) return $this->ret('CR029');
 	},	
 	'cart' => function () {
 		extract($this->gets(['ans','user','meta', 'lang']), EXTR_REFS);
@@ -87,11 +87,11 @@ $context->actions = [
 		$statuses = ''; //Все статусы
 		$start = 0;
 		$end = time();
-		if (!$user) return $this->err('noorders', 'a' . __LINE__);
+		if (!$user) return $this->err('noorders');
 
 		$list = Cart::getOrders($user, $statuses, $start, $end);
 
-		if (!$list) return $this->err('CR006', 'a' . __LINE__);
+		if (!$list) return $this->err('CR006');
 		
 		foreach ($list as $k => $order) {
 			$list[$k]['active'] = Cart::isActive($order, $user);
@@ -109,7 +109,7 @@ $context->actions = [
 		$ans['F'] = Cart::lang($lang, date('F', $start));
 		$ans['startstr'] = date('d.m.Y H:i:s', $start);		
 		$list = Cart::getOrders($user, $statuses, $start, $end);
-		if (!$list) return $this->err('CR006', 'a' . __LINE__);
+		if (!$list) return $this->err('CR006');
 		$total = 0;
 		foreach ($list as $k => $order) {
 			/*
@@ -135,7 +135,7 @@ $context->actions = [
 		extract($this->gets(['place', 'ouser', 'order', 'order_id', 'lang']), EXTR_REFS);
 		
 		$this->handler('create_order_user');
-		if (!Cart::setStatus($order_id, 'check')) return $this->fail('CR018', 'a' . __LINE__);
+		if (!Cart::setStatus($order_id, 'check')) return $this->fail('CR018');
 		//$ouser = $order['user'];
 		$ouser['order'] = Cart::getById($order_id);
 		
@@ -147,103 +147,103 @@ $context->actions = [
 
 		//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
 		$r = Cart::resetActive($order);
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
 
 		$worder = Cart::getWaitOrder($ouser);
 		if ($worder) {
 			$r = Cart::setActive($worder['order_id'], $ouser['user_id']);
-			if (!$r) return $this->fail('CR018', 'a' . __LINE__);
+			if (!$r) return $this->fail('CR018');
 		}
 
-		return $this->ret('CR025', 'a' . __LINE__);
+		return $this->ret('CR025');
 	}, 
 	'settransport' => function () {
 		extract($this->gets(['transport', 'order_id']), EXTR_REFS);
-		//if (!$transport) return $this->fail('transport', 'a' . __LINE__);
+		//if (!$transport) return $this->fail('transport');
 		$r = Cart::setTransport($order_id, $transport);
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
 	}, 
 	'paykeeper' => function () {
 		extract($this->gets(['order', 'order_id']), EXTR_REFS);
 		$this->handler('create_order_user');
-		if (!Cart::setStatus($order_id, 'pay')) return $this->fail('CR018', 'a' . __LINE__);
+		if (!Cart::setStatus($order_id, 'pay')) return $this->fail('CR018');
 		//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
 		$r = Cart::resetActive($order);
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
-		return $this->ret('pay3', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
+		return $this->ret('pay3');
 	}, 
 	'tocheck' => function () {
 		extract($this->gets(['order','order_id']), EXTR_REFS);
 		$email = $order['email'];
 		$ouser = User::getByEmail($email);
-		if (!Cart::setStatus($order_id, 'check', 'noedit')) return $this->fail('CR018', 'a' . __LINE__);
-		return $this->ret('CR025s', 'a' . __LINE__);
+		if (!Cart::setStatus($order_id, 'check', 'noedit')) return $this->fail('CR018');
+		return $this->ret('CR025s');
 	}, 
 	'setcallback' => function () {
 		extract($this->gets(['order_id','callback']), EXTR_REFS);
 		$r = Cart::setCallback($order_id, $callback);
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
 	}, 
 	'complete' => function () {
 		extract($this->gets(['order_id','order']), EXTR_REFS);
-		if (!Cart::setStatus($order_id, 'complete')) return $this->fail('CR018', 'a' . __LINE__);
+		if (!Cart::setStatus($order_id, 'complete')) return $this->fail('CR018');
 		$r = Cart::resetActive($order);//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
-		return $this->ret('CR040', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
+		return $this->ret('CR040');
 
 	}, 
 	'setcommentmanager' => function () {
 		extract($this->gets(['commentmanager','order']), EXTR_REFS);
 		$r = Cart::setCommentManager($order, $commentmanager);
-		return $r ? $this->ret('saved','a'.__LINE__) : $this->fail('CR018', 'a' . __LINE__);
+		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 
 	'email' => function () {
 		extract($this->gets(['commentmanager','order', 'lang']), EXTR_REFS);
 		$order['commentmanager'] = $commentmanager;
 		$r = Cart::setCommentManager($order, $commentmanager);
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
 		$ouser = User::getByEmail($order['email']);
 		$ouser['order'] = $order;
 		$r = Cart::mail($ouser, $lang, 'email');
 		if (!$r) return $this->fail('CR018.a7');
 		Cart::setEmailDate($order);
-		return $this->ret('CR055', 'a' . __LINE__);
+		return $this->ret('CR055');
 	}, 
 	'wait' => function () {
 		extract($this->gets(['order_id','order', 'user', 'place']), EXTR_REFS);
-		if (!Cart::setStatus($order_id, 'wait')) return $this->fail('CR018', 'a' . __LINE__);
+		if (!Cart::setStatus($order_id, 'wait')) return $this->fail('CR018');
 		$fuser = User::getByEmail($order['email']);
-		if (!$fuser) return $this->fail('CR018', 'a' . __LINE__);
+		if (!$fuser) return $this->fail('CR018');
 		Cart::setActive($order['order_id'], $fuser['user_id']);
 		if ($fuser != $user && $place == 'orders') Cart::setActive($order['order_id'], $user['user_id']);
-		return $this->ret('CR030', 'a' . __LINE__);
+		return $this->ret('CR030');
 	}, 
 	'delete' => function () {
 		extract($this->gets(['order']), EXTR_REFS);
 		$r = Cart::delete($order);
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
-		return $this->ret('CR027', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
+		return $this->ret('CR027');
 	}, 
 	'remove' => function () {
 		extract($this->gets(['position_ids', 'user']), EXTR_REFS);
 		$r = Cart::removePos($position_ids, $user);
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
 		if (sizeof($position_ids) > 1) {
-			return $this->ret('CR057', 'a' . __LINE__);
+			return $this->ret('CR057');
 		} else {
-			return $this->ret('CR034', 'a' . __LINE__);
+			return $this->ret('CR034');
 		}
 	}, 
 	'clear' => function () {
 		extract($this->gets(['order']), EXTR_REFS);
-		if (!Cart::clear($order)) return $this->fail('CR018', 'a' . __LINE__);
-		return $this->ret('CR037', 'a' . __LINE__);
+		if (!Cart::clear($order)) return $this->fail('CR018');
+		return $this->ret('CR037');
 	}, 
 	'add' => function () {
 		extract($this->gets(['order_id', 'position_id', 'count']), EXTR_REFS);
 		$r = Cart::add($order_id, $position_id, $count);
-		if (!$r) return $this->fail('CR015', 'a' . __LINE__);
-		return $this->ret('CR029', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR015');
+		return $this->ret('CR029');
 	}, 
 	'refreezeall' => function () {
 		extract($this->gets(['user']), EXTR_REFS);
@@ -257,18 +257,18 @@ $context->actions = [
 		extract($this->gets(['order_id', 'lang']), EXTR_REFS);
 		//Вызывается для активного заказа при изменении языка на сайте
 		$r = Cart::setLang($order_id, $lang);
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
 	}, 'setcoupon' => function () {
 		extract($this->gets(['order_id', 'coupon']), EXTR_REFS);
 		$coupondata = Load::loadJSON('-cart/coupon?name=' . $coupon);
 		$r = Cart::setCoupon($order_id, $coupon, $coupondata);
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
 	}, 
 	'setcity' => function () {
 		//При изменении города пересчитывается корзина. Стоимость доставки будет другой.
 		extract($this->gets(['order', 'city_id']), EXTR_REFS);
 		$r = Cart::setCity($order, $city_id);
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
 	}, 
 	'setcomment' => function () {
 		extract($this->gets(['order_id', 'comment']), EXTR_REFS);
@@ -279,12 +279,12 @@ $context->actions = [
 			':order_id' => $order_id,
 			':comment' => $comment
 		]) !== false;
-		return $r ? $this->ret('saved.a'.__LINE__) : $this->fail('CR018', 'a' . __LINE__);
+		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 
 	'setzip' => function () {
 		extract($this->gets(['order_id', 'zip']), EXTR_REFS);
 		$zip = (int) $zip;
-		if ($zip && strlen($zip) != 6) return $this->err('zip', 'a' . __LINE__);
+		if ($zip && strlen($zip) != 6) return $this->err('zip');
 		$r = Db::exec('UPDATE cart_orders
 			SET zip = :zip, dateedit = now()
 			WHERE order_id = :order_id
@@ -292,7 +292,7 @@ $context->actions = [
 			':order_id' => $order_id,
 			':zip' => $zip
 		]) !== false;
-		return $r ? $this->ret('saved', 'a'.__LINE__) : $this->fail('CR018', 'a' . __LINE__);
+		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 
 	'setaddress' => function () {
 		extract($this->gets(['order_id', 'address']), EXTR_REFS);
@@ -306,8 +306,8 @@ $context->actions = [
 			':address' => $address
 		]) !== false;
 		Db::commit();
-		if ($err) return $this->err('address', 'a' . __LINE__);
-		return $r ? $this->ret('saved', 'a'.__LINE__) : $this->fail('CR018', 'a' . __LINE__);
+		if ($err) return $this->err('address');
+		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 
 	'setname' => function () {
 		extract($this->gets(['order_id', 'name']), EXTR_REFS);
@@ -321,8 +321,8 @@ $context->actions = [
 			':name' => $name
 		]) !== false;
 		Db::commit();
-		if ($err) return $this->err('CR026', 'a' . __LINE__);
-		return $r ? $this->ret('saved', 'a'.__LINE__) : $this->fail('CR018', 'a' . __LINE__);
+		if ($err) return $this->err('CR026');
+		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 
 	'setphone' => function () {
 		extract($this->gets(['order_id', 'phone']), EXTR_REFS);
@@ -336,8 +336,8 @@ $context->actions = [
 			':phone' => $phone
 		]) !== false;
 		Db::commit();
-		if ($err) return $this->err('5', 'a' . __LINE__);
-		return $r ? $this->ret('saved', 'a'.__LINE__) : $this->fail('CR018', 'a' . __LINE__);
+		if ($err) return $this->err('5');
+		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 
 	'setemail' => function () {
 		extract($this->gets(['order_id', 'email']), EXTR_REFS);
@@ -350,8 +350,8 @@ $context->actions = [
 			':email' => $email
 		]) !== false;
 		Db::commit();
-		if ($err) return $this->err('CR005', 'a' . __LINE__);
-		return $r ? $this->ret('saved', 'a'.__LINE__) : $this->fail('CR018', 'a' . __LINE__);
+		if ($err) return $this->err('CR005');
+		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 
 	'setcdek' => function () {
 		extract($this->gets(['order_id', 'city_id', 'pvz', 'transport']), EXTR_REFS);
@@ -368,12 +368,12 @@ $context->actions = [
 			':transport' => $transport,
 			':pvz' => $pvz
 		]) !== false;
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
 		Cart::recalc($order['order_id']);
 	}, 
 	'setpvz' => function () {
 		extract($this->gets(['order_id', 'pvz']), EXTR_REFS);
-		if (!$pvz) return $this->fail('pvz', 'a' . __LINE__);
+		if (!$pvz) return $this->fail('pvz');
 		$r = Db::exec('UPDATE cart_orders
 			SET pvz = :pvz, dateedit = now()
 			WHERE order_id = :order_id
@@ -381,12 +381,12 @@ $context->actions = [
 			':order_id' => $order_id,
 			':pvz' => $pvz
 		]) !== false;
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
 	}, 
 	'setpay' => function () {
 		extract($this->gets(['order_id', 'pay']), EXTR_REFS);
 		$r = Cart::setPay($order_id, $pay);
-		if (!$r) return $this->fail('CR018', 'a' . __LINE__);
+		if (!$r) return $this->fail('CR018');
 	}
 ];
 

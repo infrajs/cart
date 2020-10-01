@@ -4,17 +4,18 @@ namespace infrajs\cart\api;
 
 use infrajs\cart\Cart;
 use infrajs\user\User;
-use infrajs\rest\Rest;
 use infrajs\ans\Ans;
 use infrajs\path\Path;
 use infrajs\db\Db;
 use infrajs\mail\Mail;
+use infrajs\access\Access;
 use akiyatkin\city\City;
 use akiyatkin\showcase\Showcase;
 use infrajs\lang\Lang;
 
 class Meta {
 	public function __construct($opt) {
+		$this->action = $opt['action'];
 		$this->src = $opt['src'];
 		$this->name = $opt['name'];
 		$this->lang = $opt['lang'];
@@ -24,8 +25,8 @@ class Meta {
 		$this->vars = $opt['vars'] ?? [];
 		$this->params = ['ans'=>[]];
 	}
-	public function set($pname, $val, $line = __LINE__) {
-		if (isset($this->params[$pname])) return $this->fail('repeat', $line, $pname);
+	public function set($pname, $val) {
+		if (isset($this->params[$pname])) return $this->fail('repeat', $pname);
 		$this->params[$pname] = $val;
 	}
 	public function init() {
@@ -37,14 +38,14 @@ class Meta {
 
 	}
 	public function initnow() {
-	
+		
 		$ans = &$this->params['ans'];
-		if (!$src = Path::theme($this->src)) return $this->fail('CR018', 'm'.__LINE__);
-		if (!$json = file_get_contents($src)) return $this->fail('CR018', 'm'.__LINE__);
+		if (!$src = Path::theme($this->src)) return $this->fail('CR018');
+		if (!$json = file_get_contents($src)) return $this->fail('CR018');
 		$meta = json_decode($json, true);
 		$this->meta = $meta;
-		if (!$meta) return $this->fail('CR018', 'm'.__LINE__);		
-		$action = Rest::first();
+		if (!$meta) return $this->fail('CR018');		
+		$action = $this->action;
 		if (!$action) {
 		    $ans['meta'] = $meta;
 		    return Ans::ret($ans);
@@ -52,7 +53,7 @@ class Meta {
 		
 		$this->params['meta'] = $meta;
 
-		if (!isset($meta['actions'][$action])) return $this->fail('CR001', 'm'.__LINE__);
+		if (!isset($meta['actions'][$action])) return $this->fail('CR001');
 		
 		$this->actionmeta = $meta['actions'][$action];
 		$this->actionmeta['action'] = $action;
@@ -95,30 +96,24 @@ class Meta {
 			}
 		}
 		
-		// $vars = $required;
-		// for ($i = 0; $i < sizeof($vars); $i++) {
-		// 	$pname = $vars[$i];
-		// 	if (isset($this->meta['args'][$pname])) {
-		// 		array_splice($vars, $i, 1);
-		// 		$i--;
-		// 	}
-		// }
-		//$this->actionmeta['required'] = $required;
-		//$this->actionmeta['vars'] = $vars;
+		$this->actionmeta['required'] = array_unique($in);
+		//Инициализация закончилась
+		$ans['actionmeta'] = $this->actionmeta;
+		return $this->ready();
+	}
+	public function ready() {
 		
 		//handlers выполняется с Транзакцией если это post
 		if (in_array('post', $this->actionmeta['handlers'])) Db::start();
-		$this->actionmeta['required'] = array_unique($in);
-		$ans['actionmeta'] = $this->actionmeta;
-
+		
 		foreach ($this->actionmeta['handlers'] as $hand) {
 			//Изменения данных могут делать как будто всё ок, в случае ошибки будет откат
 			//Можно делать freeze какбудто заказ отправлен на проверку
-			$this->handler($hand, 'm'.__LINE__); //Может быть исключение ans.result = 0
+			$this->handler($hand); //Может быть исключение ans.result = 0
 		}
 
-		$action = $this->actionmeta['action'];
-		if (!isset($this->actions[$action])) return $this->fail('CR001', __LINE__, $action);
+		$action = $this->action;
+		if (!isset($this->actions[$action])) return $this->fail('CR001', $action);
 		
 		//$this->params[$action] = false;
 		
@@ -135,40 +130,20 @@ class Meta {
 		//Для положительного ответа нужен return чтобы зафиксировалась транзакция
 		return $this->ret();
 	}
-
 	
-	public function fail($code, $line, $pname = false) {
-		$ans = &$this->params['ans'];
-		$lang = $this->params['lang'] ?? $this->lang;
-		$ans['params'] = array_keys($this->params);
-		if (!$pname) {			
-			$ans = Lang::fail($ans, $lang, $this->name.'.'.$code.'.'.$line);
-			throw new \Exception();
-		}
-		$ans['missing'] = $pname;
-		$ans = Lang::failtpl($ans, $lang, $this->name.'.'.$code.'.'.$line);
-		throw new \Exception();
-	}
-	// public function args($pnames, $line = __LINE__) {
-	// 	$res = [];
-	// 	foreach ($pnames as $pname) {
-	// 		$res[$pname] = &$this->arg($pname, $line);
-	// 	}
-	// 	return $res;
-	// }
 	
-	public function &arg($pname, $line = __LINE__) {
+	public function &arg($pname) {
 		//Если параметра нет в списке нужных и это параметр из адресной строки - сообщаем об ошибки
 		if (!in_array($pname, $this->actionmeta['required'])) {
-			if (isset($this->args[$pname])) return $this->var($pname, $line);
-			return $this->fail('illegal', $line, $pname);
+			if (isset($this->args[$pname])) return $this->var($pname);
+			return $this->fail('illegal', $pname);
 		}
 		if (isset($this->params[$pname])) return $this->params[$pname];
 
 		// if (isset($this->dependencies[$pname])) {
 		// 	foreach ($this->dependencies[$pname] as $dname) {
 		// 		//if (isset($this->params[$pname])) continue;
-		// 		$this->get($dname, $line);
+		// 		$this->get($dname);
 		// 	}
 		// 	if (isset($this->params[$pname])) return $this->params[$pname];
 		// }
@@ -176,30 +151,30 @@ class Meta {
 
 		//Повторяющиеся обработки на параметры
 
-		if (is_null($val)) return $this->fail('required', __LINE__, $pname);
+		if (is_null($val)) return $this->fail('required', $pname);
 
 		$args = $this->meta['args'][$pname];
 		if (in_array('notempty', $args)) {
-			if (!$val && $val !== "0") return $this->fail('required', __LINE__, $pname);
+			if (!$val && $val !== "0") return $this->fail('required', $pname);
 		}
 		if (in_array('int', $args)) {
 			$val = (int) $val;
-			if (strlen($val) > 100) return $this->fail('required', __LINE__, $pname);
+			if (strlen($val) > 100) return $this->fail('required', $pname);
 		} else if (in_array('text', $args)) {
 			$val = (string) $val;
-			if (strlen($val) > 65000) return $this->fail('required', __LINE__, $pname);
+			if (strlen($val) > 65000) return $this->fail('required', $pname);
 		} else if (in_array('intarray', $args)) {
-			if (strlen($val) > 65000) return $this->fail('required', __LINE__, $pname);
-			if (!$val) return $this->fail('required', 'a' . __LINE__, $pname);
+			if (strlen($val) > 65000) return $this->fail('required', $pname);
+			if (!$val) return $this->fail('required', $pname);
 			$val = explode(',', $val);
 			foreach ($val as $i => $id) {
 				$val[$i] = (int) $id;
-				if (!$val[$i]) return $this->fail('required', 'a' . __LINE__, $pname);
+				if (!$val[$i]) return $this->fail('required', $pname);
 			}
 			
 		} else {
 			$val = (string) $val;
-			if (strlen($val) > 255) return $this->fail('required', __LINE__, $pname);
+			if (strlen($val) > 255) return $this->fail('required', $pname);
 		}
 
 		$this->params[$pname] = &$val;
@@ -208,106 +183,155 @@ class Meta {
 		}
 		return $this->params[$pname];
 	}
-	// public function vars($pnames, $line = __LINE__) {
-	// 	$res = [];
-	// 	foreach ($pnames as $pname) {
-	// 		$res[$pname] = &$this->var($pname, $line);
-	// 	}
-	// 	return $res;
-	// }
 	public function exec($fn, $pname, &$val) {
 		$func = \Closure::bind($fn, $this);
 		return $func($val, $pname);
 	}
-	public function &var($pname, $line = __LINE__) {
+	public function &var($pname) {
 		//Если параметра нет в списке нужных и это параметр из адресной строки - сообщаем об ошибки
 
 		if (isset($this->params[$pname])) return $this->params[$pname];
 
 		//required надо проверять
-		//if (!in_array($pname, $this->actionmeta['vars'])) return $this->fail('required', $line, $pname);
-		if (!isset($this->vars[$pname])) return $this->fail('illegal', $line, $pname);
+		//if (!in_array($pname, $this->actionmeta['vars'])) return $this->fail('required', $pname);
+		if (!isset($this->vars[$pname])) return $this->fail('illegal', $pname);
 		
 		// if (isset($this->dependencies[$pname])) {
 		// 	foreach ($this->dependencies[$pname] as $dname) {
-		// 		//if (isset($this->params[$pname])) return $this->fail('recursion', $line, $pname);
-		// 		$this->get($dname, $line);
+		// 		//if (isset($this->params[$pname])) return $this->fail('recursion', $pname);
+		// 		$this->get($dname);
 		// 	}
 		// 	if (isset($this->params[$pname])) return $this->params[$pname];
 		// }
-		if (!isset($this->vars[$pname])) return $this->fail('illegal', __LINE__, $pname);
+		if (!isset($this->vars[$pname])) return $this->fail('illegal', $pname);
 		$this->params[$pname] = false;
 		$this->exec($this->vars[$pname], $pname, $this->params[$pname]);
 		return $this->params[$pname];
 	}
 	// public function getAll () {
-	// 	return $this->gets($this->actionmeta['required'], 'm'.__LINE__);
+	// 	return $this->gets($this->actionmeta['required']);
 	// }
 	// public function handlers($pnames) {
 	// 	$pnames = func_get_args();
 	// 	return array_map([$this, 'handler'], $pnames);
 	// }
-	public function gets($pnames, $line = __LINE__) {
+	public function gets($pnames) {
 		foreach ($pnames as $pname) {
-			$res[$pname] = &$this->get($pname, $line);
+			$res[$pname] = &$this->get($pname);
 		}
 		return $res;
 	}
-	public function &flag($pname, $line = __LINE__) {
+	public function &flag($pname) {
 		//Если параметра нет в списке нужных и это параметр из адресной строки - сообщаем об ошибки
 		if (isset($this->params[$pname])) return $this->params[$pname];
 		//required надо проверять
-		if (!in_array($pname, $this->meta['flags'])) return $this->fail('illegal', $line, $pname);
+		if (!in_array($pname, $this->meta['flags'])) return $this->fail('illegal', $pname);
 		// if (isset($this->dependencies[$pname])) {
 		// 	foreach ($this->dependencies[$pname] as $dname) {
-		// 		$this->get($dname, $line);
+		// 		$this->get($dname);
 		// 	}
 		// 	if (isset($this->params[$pname])) return $this->params[$pname];
 		// }
 		$this->params[$pname] = in_array($pname, $this->actionmeta['flags'] ?? []);
 		return $this->params[$pname];
 	}
-	public function &get($pname, $line = __LINE__) {
+	public function &get($pname) {
 		if (isset($this->meta['args'][$pname])) {
-			return $this->arg($pname, $line);
+			return $this->arg($pname);
 		} else if (in_array($pname, $this->meta['flags'])) {
-			return $this->flag($pname, $line);
+			return $this->flag($pname);
 		} else if (in_array($pname, $this->meta['vars'])) {
-			return $this->var($pname, $line);
+			return $this->var($pname);
 		}
-		else return $this->fail('illegal', $line, $pname);
+		else return $this->fail('illegal', $pname);
 	}
 	public $ready = false;
-	public function ret($code = false, $line = false, $pname = false) {
-		extract($this->gets(['ans','lang'], __LINE__), EXTR_REFS);
+	public function ret($code = false, $pname = false) {
+		extract($this->gets(['ans','lang']), EXTR_REFS);
 		if ($this->ready) return $ans;
 		$this->ready = true;
+		if (Access::isDebug()) $this->addBacktrace();
 		if (!$code) {
 			return Lang::ret($ans);
 		}
 		if (!$pname) {
-			return Lang::ret($ans, $lang, $this->name.'.'.$code.'.'.$line);
+			return Lang::ret($ans, $lang, $this->name.'.'.$code);
 		}
 		$ans['payload'] = $pname;
-		return Lang::rettpl($ans, $lang, $this->name.'.'.$code.'.'.$line);
+		return Lang::rettpl($ans, $lang, $this->name.'.'.$code);
 	}
-	public function err($code, $line, $pname = false) {
-		extract($this->gets(['ans','lang'], __LINE__), EXTR_REFS);
+	public function err($code, $pname = false) {
+		extract($this->gets(['ans','lang']), EXTR_REFS);
+		if (Access::isDebug()) $this->addBacktrace();
 		$ans['params'] = array_keys($this->params);
 		if (!$pname) {
-			$ans = Lang::err($ans, $lang, $this->name.'.'.$code.'.'.$line);
+			$ans = Lang::err($ans, $lang, $this->name.'.'.$code);
 			throw new \Exception();
 		} 
 		$ans['missing'] = $pname;
-		$ans = Lang::errtpl($ans, $lang, $this->name.'.'.$code.'.'.$line);
+		$ans = Lang::errtpl($ans, $lang, $this->name.'.'.$code);
 		throw new \Exception();
 	}
-	public function handler($hand, $line = __LINE__){
-		if (empty($this->handlers[$hand])) return $this->fail('handler', $line, $hand);
+	public function handler($hand){
+
+		if (empty($this->handlers[$hand])) return $this->fail('handler', $hand);
+
 		if (is_callable($this->handlers[$hand])) {
 			$fn = \Closure::bind($this->handlers[$hand], $this);
-			$this->handlers[$hand] = true;
+			$this->handlers[$hand] = true; //Может быть рекурсия?
+			$fn();
+			
 		}
 		return $this->handlers[$hand];
+	}
+	public function addBacktraceLines($count = 8) {
+		$back = debug_backtrace();
+		array_splice($back, sizeof($back) - 5);
+		foreach ($back as $i => $e) {
+			unset($back[$i]['object']);
+			$name = basename($e['file']);
+			if ($name == 'Meta.php') unset($back[$i]);
+			if (empty($back[$i]['class'])) continue;
+		}
+		unset($back[0]);
+		$lines = [];
+		$c = 0;
+		foreach ($back as $i => $e) {
+			if (empty($e['file'])) continue;
+			if (++$c > $count) break;
+
+			$lines[] = $e['line'];
+		}
+		return implode('-', $lines);
+	}
+	public function addBacktrace() {
+		$ans = &$this->params['ans'];
+		$back = debug_backtrace();
+		foreach ($back as $i => $e) {
+			unset($back[$i]['object']);
+		}
+		unset($back[0]);
+		$lines = [];
+		foreach ($back as $i => $e) {
+			if (empty($e['file'])) continue;
+			$lines[] = basename($e['file']).', '.$e['line'].', '.$e['function'];
+		}
+		$ans['backtrace'] = $lines;
+	}
+	public function fail($code, $pname = false) {
+		$ans = &$this->params['ans'];
+		$lang = $this->params['lang'] ?? $this->lang;
+		$ans['params'] = array_keys($this->params);
+
+		if (Access::isDebug()) $this->addBacktrace();
+		$line = $this->addBacktraceLines();
+
+		if (!$pname) {			
+			$ans = Lang::fail($ans, $lang, $this->name.'.'.$code.'.'.$this->actionmeta['action'].'-'.$line);
+			throw new \Exception();
+		}
+		$ans['missing'] = $pname;
+		$ans = Lang::failtpl($ans, $lang, $this->name.'.'.$code);
+		throw new \Exception();
 	}
 }
