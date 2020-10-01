@@ -45,7 +45,7 @@ Event::handler('User.merge', function ($user) {
 				//Но добавляем в $active_order_id новые данные
 
 				//Надо замёржить $old_order_id в $active_order_id
-				$old_order = Cart::getById($old_order_id);
+				$old_order = Cart::getById($old_order_id, true);
 				//$active_order = Cart::getById($active_order_id)
 
 				//Запись о старом владельце удаляем
@@ -80,21 +80,23 @@ Event::handler('User.merge', function ($user) {
 
 				//Бежим по старой карзине и смотрим если такая позиция есть, то заменяем количество, если нет то меняем order_id
 				foreach ($old_order['basket'] as $pos) {
-					$position_id = Db::fetch('SELECT position_id FROM cart_basket 
-						WHERE order_id = :order_id and catkit = :catkit and item_num = :item_num and model_id = :model_id', [
+					$position_id = Db::col('SELECT position_id FROM cart_basket 
+						WHERE order_id = :order_id and catkit = :catkit and item_num = :item_num 
+						and article_nick = :article_nick
+						and producer_nick = :producer_nick', [
 						':order_id' => $active_order_id,
-						':model_id' => $pos['model_id'],
+						':article_nick' => $pos['article_nick'],
+						':producer_nick' => $pos['producer_nick'],
 						':item_num' => $pos['item_num'],
 						':catkit' => $pos['catkit']
 					]);
+
 					if ($position_id) { //Такая позиция есть в актуальном заказе
 						Db::exec('UPDATE cart_basket
-							SET count = :count, basket_title = :basket_title, dataedit = :dataedit
+							SET count = :count, dateedit = now()
 							WHERE position_id = :position_id
 						', [
 							':position_id' => $position_id,
-							':basket_title' => $pos['basket_title'],
-							':dataedit' => $pos['dataedit'],
 							':count' => $pos['count']
 						]);
 						//sum, discount, cost, transports меняются при пересчёте
