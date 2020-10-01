@@ -117,7 +117,7 @@
 		"order_id":["int"]
 	},
 	"vars":["ouser", "oemail", "ans","user","active_id", "city", "model", "basket", "user_id","rule","order","status","order_id","meta"],
-	"flags":["iscreateorder"],
+	"flags":["ordercreate", "orderrequired"],
 	"handlers":["post","admin","paid"],	
 
 
@@ -145,7 +145,7 @@
 			"order": ["order_id"],
 			"article_nick": ["producer_nick", "item_num", "catkit"]
 		},
-		"iscreateorder": {
+		"ordercreate": {
 			"default": ["city_id", "timezone"]
 		}
 	},
@@ -179,6 +179,7 @@
 			"handlers": ["admin"]
 		},
 		"order": {
+			"flags":["orderrequired"],
 			"required": ["order_nick"]
 		},
 		"orderfast": {
@@ -187,12 +188,13 @@
 		"addremove": {
 			"required": ["count", "article_nick", "order_id"],
 			"handlers": ["post", "edit", "paid", "checkstatus"],
-			"flags":["iscreateorder"],
+			"flags":["ordercreate"],
 			"statuses": ["wait"],
 			"goal": "basket"
 		},
 		"add": {
 			"required": ["count", "position_id", "order_id"],
+			"flags":["orderrequired"],
 			"handlers": ["post", "checkstatus", "edit", "paid"],
 			"statuses": ["wait"]
 		},

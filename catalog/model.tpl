@@ -64,7 +64,7 @@
 		Cart.get('orderfast', { order_id, place }).then( ans => {
 			input.value = 0
 			btnoff()
-			if (!ans.result) Popup.alert(ans.msg)
+			if (!ans.result) return //Нет заказа ну чтож
 			for (const pos of ans.order.basket) {
 				if (pos.producer_nick != producer_nick) continue
 				if (pos.article_nick != article_nick) continue

@@ -120,7 +120,6 @@ $context->args = [
 	"order_id" => function (&$order_id, $pname) {
 		if (!$order_id) {
 			$order_id = $this->get('active_id');
-
 		} else {
 			$order_id = Db::col('SELECT order_id FROM cart_orders WHERE order_id = :order_id', [
 				':order_id' => $order_id

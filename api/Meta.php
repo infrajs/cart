@@ -62,17 +62,15 @@ class Meta {
 
 
 		//Избавляемся от post и get
-		$dependencies = $this->meta['dependencies']['get'];
-		$keys = array_merge($this->meta['handlers'] ?? [], $this->meta['flags'] ?? []);
-		foreach($keys as $key) {
-			if (!in_array($key, $this->actionmeta['handlers'])) continue;
+		$dependencies = $this->meta['dependencies']['get']; //Зависимости по умолчанию, без такого ключа
+		$keys = array_merge($this->actionmeta['handlers'] ?? [], $this->actionmeta['flags'] ?? []);
+		foreach ($keys as $key) {
 			if (!isset($this->meta['dependencies'][$key])) continue;
 			foreach($this->meta['dependencies'][$key] as $pname => $deps) {
 				if (!isset($dependencies[$pname])) $dependencies[$pname] = $deps;
 				else $dependencies[$pname] = array_merge($dependencies[$pname], $deps);
 			}
 		}
-		
 		$this->dependencies = $dependencies;
 		
 		
@@ -84,7 +82,7 @@ class Meta {
 			if (isset($this->dependencies[$pname])) {
 				array_splice($required, $i+1, 0, $this->dependencies[$pname]);
 			}
-		}		
+		}	
 		$required = array_values(array_unique($required));
 
 		$in = $required;

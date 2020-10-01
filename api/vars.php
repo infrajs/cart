@@ -53,17 +53,16 @@ $context->vars = [
 		$this->handler('Check the legality of the action');
 	},
 	"active_id" => function (&$order_id) {
-		extract($this->gets(['user_id','user','iscreateorder']));
-
+		extract($this->gets(['user_id','user','ordercreate']), EXTR_REFS);
 		$order_id = $user_id ? Cart::getActiveOrderId($user_id) : false;
-		if (!$order_id) {
-			//Заказа нет
-			if (!$iscreateorder) return $this->fail('CR004');
-			extract($this->gets(['ans','lang','city_id','timezone']));
+		if (!$order_id) { //Заказа нет
+			if (!$ordercreate) return $this->fail('CR004');
+			extract($this->gets(['ans','lang','city_id','timezone']), EXTR_REFS);
 			if (!$user) {
 				$user = User::create($lang, $city_id, $timezone);
 				if (!$user) return $this->fail('CR009');
 				$ans['token'] = $user['user_id'] . '-' . $user['token'];
+				$user_id = $user['user_id'];
 			}
 			$order_id = Cart::create($user_id);
 			if (!$order_id) return $this->fail('CR008');
