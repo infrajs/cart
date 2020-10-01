@@ -289,7 +289,7 @@ class Meta {
 		array_splice($back, sizeof($back) - 5);
 		foreach ($back as $i => $e) {
 			unset($back[$i]['object']);
-			$name = basename($e['file']);
+			$name = basename($e['file'] ?? '');
 			if ($name == 'Meta.php') unset($back[$i]);
 			if (empty($back[$i]['class'])) continue;
 		}
