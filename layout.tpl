@@ -508,7 +508,7 @@
 						</style>
 						
 						
-						{transports.cdek_pvz?:cdeklogo}
+						{(transports.cdek_pvz|transports.cdek_courier)?:cdeklogo}
 						{transports.cdek_pvz:transportradio}
 						{transports.cdek_courier:transportradio}
 						
