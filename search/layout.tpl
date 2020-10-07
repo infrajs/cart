@@ -62,7 +62,7 @@
 					Popup.confirm('Количество: <input name="count" type="number">', async div => {
 						div = $(div)
 						const count = div.find('[name=count]').val()
-						const ans = await Cart.post('addremove', { ...mic, place, order_id, count })
+						const ans = await Cart.post('addtoorder', { ...mic, place, order_id, count })
 						if (!ans.result) Popup.alert(ans.msg)
 					}, pos['producer'] + ' ' + pos['article'] + '<br><small>' + pos['item_nick']+'</small>')
 					

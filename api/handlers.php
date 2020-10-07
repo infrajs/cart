@@ -13,7 +13,7 @@ use infrajs\cart\api\Meta;
 
 $context->handlers = [
 	"Check the legality of the action" => function () {
-		extract($this->gets(['place','rule','order_id','user', 'user_id']));
+		extract($this->gets(['order_id#', 'place','rule','user', 'user_id']));
 		if ($place != 'admin' && !Cart::isOwner($order_id, $user_id)) return $this->err('CR003');
 		if (in_array('post', $this->actionmeta['handlers'])
 			&& !in_array('admin', $this->actionmeta['handlers'])
@@ -47,14 +47,16 @@ $context->handlers = [
 		if ($paid) return $this->fail('CR056');
 	},
 	"edit" => function () {
-		extract($this->gets(['order_id','rule','place']));
+		extract($this->gets(['order_id#?','rule?','place']));
+		if (!$order_id) return;
 		if (empty($rule['actions'][$place]['edit'])) return $this->fail('CR003');
 	},
 	"checkstatus" => function () {
-		extract($this->gets(['order_id']));
+		extract($this->gets(['order_id#?']));
 		$status = Db::col('SELECT status FROM cart_orders WHERE order_id = :order_id', [
 			':order_id' => $order_id
 		]);
+		if (!$order_id) return;
 		if ($status == $this->actionmeta['action']) return $this->fail('CR031');
 		if (!in_array($status, $this->actionmeta['statuses'])) return $this->fail('CR031');
 	},

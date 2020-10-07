@@ -116,8 +116,14 @@
 		"order_nick":[],
 		"order_id":["int"]
 	},
-	"vars":["ouser", "oemail", "ans","user","active_id", "city", "model", "basket", "user_id","rule","order","status","order_id","meta"],
-	"flags":["ordercreate", "orderrequired"],
+	"vars":[
+		"ouser", "oemail", "ans","user",
+		"active_id", "active_id#", "active_id#create", 
+		"city", "model", "basket", "user_id","rule",
+		"order", "order?",
+		"order_id","order_id#",
+		"status","meta"
+	],
 	"handlers":["post","admin","paid"],	
 
 
@@ -140,13 +146,11 @@
 			"status":["order_id"],
 			"rule":["status"],
 			"order_id": ["user", "place"],
+			"active_id#create":["city_id", "timezone"],
 			"order_nick": ["user", "place"],
-			"basket": ["order_id"],
+			"basket": ["order_id*"],
 			"order": ["order_id"],
 			"article_nick": ["producer_nick", "item_num", "catkit"]
-		},
-		"ordercreate": {
-			"default": ["city_id", "timezone"]
 		}
 	},
 
@@ -161,7 +165,7 @@
 			"required": ["user"]
 		},
 		"mystat": {
-			"required": ["basket"]
+			"required": ["basket","order_id"]
 		},
 		"getmeta":{
 
@@ -178,23 +182,23 @@
 			"required": ["user"],
 			"handlers": ["admin"]
 		},
-		"order": {
-			"flags":["orderrequired"],
-			"required": ["order_nick"]
+		"getorder": {
+			"required": ["order_nick","order_id?"]
 		},
 		"orderfast": {
 			"required": ["order_id"]
 		},
-		"addremove": {
-			"required": ["count", "article_nick", "order_id"],
-			"handlers": ["post", "edit", "paid", "checkstatus"],
-			"flags":["ordercreate"],
-			"statuses": ["wait"],
+		"addtoactive": {
+			"required": ["count", "article_nick", "active_id#create"],
+			"handlers": ["post"],
 			"goal": "basket"
 		},
+		"addtoorder": {
+			"required": ["count", "article_nick", "order_id"],
+			"handlers": ["post"]
+		},
 		"add": {
-			"required": ["count", "position_id", "order_id"],
-			"flags":["orderrequired"],
+			"required": ["count", "position_id", "order_id#"],
 			"handlers": ["post", "checkstatus", "edit", "paid"],
 			"statuses": ["wait"]
 		},

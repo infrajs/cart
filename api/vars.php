@@ -13,7 +13,7 @@ use infrajs\cart\api\Meta;
 
 $context->vars = [
 	'order' => function (&$order) {
-		extract($this->gets(['order_id']), EXTR_REFS);
+		extract($this->gets(['order_id#']), EXTR_REFS);
 		$order = Cart::getById($order_id);
 	},
 	'oemail' => function (&$oemail) {
@@ -37,27 +37,35 @@ $context->vars = [
 		$model = Cart::getFromShowcase($pos);
 		if (!$model) throw $this::fail('CR013');
 	},
-	'order_id' => function (&$order_id, $pname) {
-		
-		extract($this->gets(['order_nick']), EXTR_REFS);
-
-		if ($order_nick == 'active') {
-			$order_id = $this->get('active_id');
+	'order_id#' => function (&$order_id, $pname) {
+		if (in_array('order_id', $this->actionmeta['required'])) {
+			$order_id = $this->get('order_id');
+			if (!$order_id) $order_id = $this->get('active_id#');
+			if (!$order_id) return $this->fail('заказ не найден');
 		} else {
-			$order_id = Db::col('SELECT order_id FROM cart_orders WHERE order_nick = :order_nick', [
-				':order_nick' => $order_nick
-			]);
-			
-			if (!$order_id) return $this->fail('order_nick');	
+			$order_nick = $this->get('order_nick');
+			if ($order_nick == 'active') {
+				$order_id = $this->get('active_id#?');
+				if (!$order_id) return $this->fail('order_nick');
+			} else {
+				$order_id = Db::col('SELECT order_id FROM cart_orders WHERE order_nick = :order_nick', [
+					':order_nick' => $order_nick
+				]);
+				if (!$order_id) return $this->fail('order_nick');
+			}
+			if ($order_id) $this->handler('Check the legality of the action');
 		}
-		$this->handler('Check the legality of the action');
 	},
-	"active_id" => function (&$order_id) {
-		extract($this->gets(['user_id','user','ordercreate']), EXTR_REFS);
+	
+	"active_id#" => function (&$order_id) {
+		extract($this->gets(['user_id']), EXTR_REFS);
 		$order_id = $user_id ? Cart::getActiveOrderId($user_id) : false;
+		if (!$order_id) return $this->fail('CR004');
+	},
+	"active_id#create" => function (&$order_id) {
+		extract($this->gets(['active_id#?','user', 'ans', 'lang', 'city_id','timezone']), EXTR_REFS);
+		$order_id = $active_id;
 		if (!$order_id) { //Заказа нет
-			if (!$ordercreate) return $this->fail('CR004');
-			extract($this->gets(['ans','lang','city_id','timezone']), EXTR_REFS);
 			if (!$user) {
 				$user = User::create($lang, $city_id, $timezone);
 				if (!$user) return $this->fail('CR009');
@@ -83,7 +91,7 @@ $context->vars = [
 	},
 	
 	'status' => function (&$status) {
-		extract($this->gets(['order_id']));
+		extract($this->gets(['order_id#']));
 		$status = Db::col('SELECT status FROM cart_orders WHERE order_id = :order_id', [
 			':order_id' => $order_id
 		]);
@@ -94,7 +102,7 @@ $context->vars = [
 		$rule = $this->meta['rules'][$status];
 	},
 	'basket' => function (&$basket) {
-		extract($this->gets(['order_id']));
+		extract($this->gets(['order_id#']));
 		$basket = Db::all('SELECT position_id, discount, count from cart_basket where order_id = :order_id', [
 			':order_id' => $order_id
 		]);

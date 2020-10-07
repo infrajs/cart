@@ -65,7 +65,7 @@
 			input.value = 0
 			btnoff()
 			if (!ans.result) return //Нет заказа ну чтож
-			for (const pos of ans.order.basket) {
+			for (const pos of ans.order.basket ?? []) {
 				if (pos.producer_nick != producer_nick) continue
 				if (pos.article_nick != article_nick) continue
 				if (pos.catkit != catkit) continue
@@ -79,13 +79,13 @@
 			let count = Number(input.value)
 			if (count) btnon() 
 			else btnoff()
-			let ans = await Cart.post('addremove', { place, order_id, producer_nick, article_nick, catkit, item_num }, { count })
+			let ans = await Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
 			if (!ans.result) return Popup.alert(ans.msg)
 		})
 		btn.addEventListener('click', async () => {
 			let count = Number(input.value)
 			if (!count) count = 1
-			let ans = await Cart.post('addremove', { place, order_id, producer_nick, article_nick, catkit, item_num }, { count })
+			let ans = await Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
 			if (!ans.result) return Popup.alert(ans.msg)
 			Crumb.go('/cart/orders/active/list')
 		});

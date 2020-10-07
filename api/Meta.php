@@ -14,8 +14,10 @@ use akiyatkin\showcase\Showcase;
 use infrajs\lang\Lang;
 
 class Meta {
+
 	public function __construct($opt) {
 		$this->action = $opt['action'];
+		$this->question = 0;
 		$this->src = $opt['src'];
 		$this->name = $opt['name'];
 		$this->lang = $opt['lang'];
@@ -52,6 +54,9 @@ class Meta {
 		}
 		
 		$this->params['meta'] = $meta;
+		$this->actionmeta = $meta['actions'][$action] ?? [
+			'action' => $action
+		];
 
 		if (!isset($meta['actions'][$action])) return $this->fail('CR001');
 		
@@ -63,7 +68,7 @@ class Meta {
 
 		//Избавляемся от post и get
 		$dependencies = $this->meta['dependencies']['get']; //Зависимости по умолчанию, без такого ключа
-		$keys = array_merge($this->actionmeta['handlers'] ?? [], $this->actionmeta['flags'] ?? []);
+		$keys = $this->actionmeta['handlers'] ?? [];
 		foreach ($keys as $key) {
 			if (!isset($this->meta['dependencies'][$key])) continue;
 			foreach($this->meta['dependencies'][$key] as $pname => $deps) {
@@ -84,7 +89,7 @@ class Meta {
 			}
 		}	
 		$required = array_values(array_unique($required));
-
+		
 		$in = $required;
 		for ($i = 0; $i < sizeof($in); $i++) {
 			$pname = $in[$i];
@@ -130,11 +135,11 @@ class Meta {
 	}
 	
 	
-	public function &arg($pname) {
+	public function &_arg($pname) {
 		//Если параметра нет в списке нужных и это параметр из адресной строки - сообщаем об ошибки
 		if (!in_array($pname, $this->actionmeta['required'])) {
-			if (isset($this->args[$pname])) return $this->var($pname);
-			return $this->fail('illegal', $pname);
+			//if (isset($this->args[$pname])) return $this->var($pname);
+			return $this->fail("Параметр $pname не указан в зависимостях действия", $pname);
 		}
 		if (isset($this->params[$pname])) return $this->params[$pname];
 
@@ -185,14 +190,15 @@ class Meta {
 		$func = \Closure::bind($fn, $this);
 		return $func($val, $pname);
 	}
+	
 	public function &var($pname) {
 		//Если параметра нет в списке нужных и это параметр из адресной строки - сообщаем об ошибки
-
-		if (isset($this->params[$pname])) return $this->params[$pname];
+		$rname = explode('?', $pname)[0];
+		if (isset($this->params[$rname])) return $this->params[$rname];
 
 		//required надо проверять
 		//if (!in_array($pname, $this->actionmeta['vars'])) return $this->fail('required', $pname);
-		if (!isset($this->vars[$pname])) return $this->fail('illegal', $pname);
+		if (!isset($this->vars[$rname])) return $this->fail("У параметра нет обработчика в vars или он не зарегистрирован в списке аргументов args $rname", $rname);
 		
 		// if (isset($this->dependencies[$pname])) {
 		// 	foreach ($this->dependencies[$pname] as $dname) {
@@ -201,10 +207,21 @@ class Meta {
 		// 	}
 		// 	if (isset($this->params[$pname])) return $this->params[$pname];
 		// }
-		if (!isset($this->vars[$pname])) return $this->fail('illegal', $pname);
-		$this->params[$pname] = false;
-		$this->exec($this->vars[$pname], $pname, $this->params[$pname]);
-		return $this->params[$pname];
+		$vname = preg_split('/[\*\#]/', $rname)[0];
+		$this->params[$rname] = false;
+		if ($rname != $pname) {
+			$this->question++;
+			try {
+				$this->exec($this->vars[$rname], $vname, $this->params[$rname]);
+			} catch(\Exception $e) {				
+				$this->params[$rname] = false;
+				//if (empty($this->params['ans']['result'])) throw $e;
+			}
+			$this->question--;
+		} else {
+			$this->exec($this->vars[$rname], $vname, $this->params[$rname]);
+		}
+		return $this->params[$rname];
 	}
 	// public function getAll () {
 	// 	return $this->gets($this->actionmeta['required']);
@@ -215,30 +232,17 @@ class Meta {
 	// }
 	public function gets($pnames) {
 		foreach ($pnames as $pname) {
-			$res[$pname] = &$this->get($pname);
+			$vname = preg_split('/[#\?\*]/', $pname)[0];
+			$res[$vname] = &$this->get($pname);
 		}
 		return $res;
 	}
-	public function &flag($pname) {
-		//Если параметра нет в списке нужных и это параметр из адресной строки - сообщаем об ошибки
-		if (isset($this->params[$pname])) return $this->params[$pname];
-		//required надо проверять
-		if (!in_array($pname, $this->meta['flags'])) return $this->fail('illegal', $pname);
-		// if (isset($this->dependencies[$pname])) {
-		// 	foreach ($this->dependencies[$pname] as $dname) {
-		// 		$this->get($dname);
-		// 	}
-		// 	if (isset($this->params[$pname])) return $this->params[$pname];
-		// }
-		$this->params[$pname] = in_array($pname, $this->actionmeta['flags'] ?? []);
-		return $this->params[$pname];
-	}
 	public function &get($pname) {
+		$rname = explode('?', $pname)[0];
+		
 		if (isset($this->meta['args'][$pname])) {
-			return $this->arg($pname);
-		} else if (in_array($pname, $this->meta['flags'])) {
-			return $this->flag($pname);
-		} else if (in_array($pname, $this->meta['vars'])) {
+			return $this->_arg($pname);
+		} else if (in_array($rname, $this->meta['vars'])) {
 			return $this->var($pname);
 		}
 		else return $this->fail('illegal', $pname);
@@ -258,18 +262,7 @@ class Meta {
 		$ans['payload'] = $pname;
 		return Lang::rettpl($ans, $lang, $this->name.'.'.$code);
 	}
-	public function err($code, $pname = false) {
-		extract($this->gets(['ans','lang']), EXTR_REFS);
-		if (Access::isDebug()) $this->addBacktrace();
-		$ans['params'] = array_keys($this->params);
-		if (!$pname) {
-			$ans = Lang::err($ans, $lang, $this->name.'.'.$code);
-			throw new \Exception();
-		} 
-		$ans['missing'] = $pname;
-		$ans = Lang::errtpl($ans, $lang, $this->name.'.'.$code);
-		throw new \Exception();
-	}
+
 	public function handler($hand){
 
 		if (empty($this->handlers[$hand])) return $this->fail('handler', $hand);
@@ -316,7 +309,21 @@ class Meta {
 		}
 		$ans['backtrace'] = $lines;
 	}
+	public function err($code, $pname = false) {
+		if ($this->question) throw new \Exception();
+		extract($this->gets(['ans','lang']), EXTR_REFS);
+		if (Access::isDebug()) $this->addBacktrace();
+		$ans['params'] = array_keys($this->params);
+		if (!$pname) {
+			$ans = Lang::err($ans, $lang, $this->name.'.'.$code);
+			throw new \Exception();
+		} 
+		$ans['missing'] = $pname;
+		$ans = Lang::errtpl($ans, $lang, $this->name.'.'.$code);
+		throw new \Exception();
+	}
 	public function fail($code, $pname = false) {
+		if ($this->question) throw new \Exception();
 		$ans = &$this->params['ans'];
 		$lang = $this->params['lang'] ?? $this->lang;
 		$ans['params'] = array_keys($this->params);
@@ -332,4 +339,5 @@ class Meta {
 		$ans = Lang::failtpl($ans, $lang, $this->name.'.'.$code);
 		throw new \Exception();
 	}
+
 }

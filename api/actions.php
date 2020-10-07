@@ -16,13 +16,13 @@ use infrajs\cart\pochta\Pochta;
 
 
 $context->actions = [
-	"mystat" => function () {
-		extract($this->gets(['ans','basket']), EXTR_REFS);
-		$ans['count'] = 0;
+	'mystat' => function () {
+		extract($this->gets(['ans','basket?']), EXTR_REFS);
 
+		$ans['count'] = 0;
 		$sum = 0;
 		$count = 0;
-		foreach ($basket as $pos) {
+		if ($basket) foreach ($basket as $pos) {
 			$model = Cart::getModel($pos['position_id']);
 			if (!$model) continue;
 			$count++;
@@ -60,11 +60,11 @@ $context->actions = [
 		if (!$ans['transports']['cdek']) unset($ans['transports']['cdek']);
 	},	
 	'orderfast' => function () {
-		extract($this->gets(['ans','order_id']), EXTR_REFS);
+		extract($this->gets(['ans','order_id#']), EXTR_REFS);
 		$ans['order'] = Cart::getById($order_id, true);
 	},	
-	'order' => function () {
-		extract($this->gets(['order','user_id', 'user','place','lang','ans']), EXTR_REFS);
+	'getorder' => function () {
+		extract($this->gets(['order?','user_id', 'user','place','lang','ans']), EXTR_REFS);
 		//if ($user && $place == 'orders' && !$order) $order = Cart::getActiveOrder($user_id);
 		if (!$order) return $this->err('empty');
 		$ans['rule'] = Cart::getJsMetaRule($this->meta, $order['status'], $lang);
@@ -74,13 +74,7 @@ $context->actions = [
 		$ans['active'] = Cart::isActive($order, $user);
 		if (!sizeof($order['basket'])) return $this->ret('empty');
 	},	
-	'addremove' => function () {
-		extract($this->gets(['count','model','order_id']), EXTR_REFS);
-		if (!$count) $count = false;
-		$r = Cart::addModel($order_id, $model, $count);
-		if (!$r) return $this->fail('CR015');
-		if ($count) return $this->ret('CR029');
-	},	
+	
 	'cart' => function () {
 		extract($this->gets(['ans','user','meta', 'lang']), EXTR_REFS);
 
@@ -239,6 +233,19 @@ $context->actions = [
 		if (!Cart::clear($order)) return $this->fail('CR018');
 		return $this->ret('CR037');
 	}, 
+	'addtoactive' => function () {		
+		extract($this->gets(['count','model','active_id#create']), EXTR_REFS);
+		if (!$count) $count = false;
+		$r = Cart::addModel($active_id, $model, $count);
+		if (!$r) return $this->fail('CR015');
+		if ($count) return $this->ret('CR029');
+	},
+	'addtoorder' => function () {		
+		extract($this->gets(['count','model','order_id#']), EXTR_REFS);
+		$r = Cart::addModel($order_id, $model, $count);
+		if (!$r) return $this->fail('CR015');
+		return $this->ret('CR029');
+	},
 	'add' => function () {
 		extract($this->gets(['order_id', 'position_id', 'count']), EXTR_REFS);
 		$r = Cart::add($order_id, $position_id, $count);

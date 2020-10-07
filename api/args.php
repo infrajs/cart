@@ -105,28 +105,42 @@ $context->args = [
 		$ans['user'] = array_intersect_key($user, array_flip(['user_id','admin','email']));
 		header('Cache-Control: no-store');
 	},
-	"order_nick" => function ($order_nick, $pname) {
-		if ($order_nick == 'active') {
-			$order_id = $this->get('active_id');
-		} else {
-			$order_id = Db::col('SELECT order_id FROM cart_orders WHERE order_nick = :order_nick', [
-				':order_nick' => $order_nick
-			]);
-			if (!$order_id) return $this->fail('order_nick');	
-		}
-		$order_id = $this->get('order_id');
-		
-	},
-	"order_id" => function (&$order_id, $pname) {
-		if (!$order_id) {
-			$order_id = $this->get('active_id');
-		} else {
-			$order_id = Db::col('SELECT order_id FROM cart_orders WHERE order_id = :order_id', [
-				':order_id' => $order_id
-			]);
-			if (!$order_id) throw $this::fail('order_id');
-		}
-
-		$this->handler('Check the legality of the action');
-	}
+	// "order_nick#?" => function (&$order_nick, $pname) {
+	// 	if ($order_nick == 'active') {
+	// 		$order_id = $this->get('active_id#?');
+	// 	} else {
+	// 		$order_id = Db::col('SELECT order_id FROM cart_orders WHERE order_nick = :order_nick', [
+	// 			':order_nick' => $order_nick
+	// 		]);
+	// 		if (!$order_id) return $this->fail('order_nick');	
+	// 		$this->get('order_id');
+	// 	}
+	// },
+	//"order_nick" => function ($order_nick, $pname) {
+		//Нельзя проверить наличие объекта если при этом не будет ошибки об его отсутствии - в args проверяется только формат
+		// if ($order_nick == 'active') {
+		// 	$order_id = $this->get('active_id#?');
+		// } else {
+		// 	$order_id = Db::col('SELECT order_id FROM cart_orders WHERE order_nick = :order_nick', [
+		// 		':order_nick' => $order_nick
+		// 	]);
+		// 	if (!$order_id) return $this->fail('order_nick');	
+		// 	$this->get('order_id');
+		// }
+	// },
+	// 'order_id#?' => function (&$order_id, $pname) {
+	// 	if (!$order_id) {
+	// 		$order_id = $this->get('active_id#?');
+	// 	} else {
+	// 		$order_id = Db::col('SELECT order_id FROM cart_orders WHERE order_id = :order_id', [
+	// 			':order_id' => $order_id
+	// 		]);
+	// 	}
+	// 	if ($order_id) $this->handler('Check the legality of the action');
+	// },
+	// "order_id" => function (&$order_id, $pname) {
+	// 	$order_id = $this->get('order_id#?');
+	// 	if (!$order_id) throw $this::fail('order_id');
+	// 	$this->handler('Check the legality of the action');
+	// }
 ];
