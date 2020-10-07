@@ -63,7 +63,7 @@ $context->vars = [
 		if (!$order_id) return $this->fail('CR004');
 	},
 	"active_id#create" => function (&$order_id) {
-		extract($this->gets(['active_id#?','user', 'ans', 'lang', 'city_id','timezone']), EXTR_REFS);
+		extract($this->gets(['active_id#?','user_id', 'user', 'ans', 'lang', 'city_id','timezone']), EXTR_REFS);
 		$order_id = $active_id;
 		if (!$order_id) { //Заказа нет
 			if (!$user) {
