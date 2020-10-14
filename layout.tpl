@@ -337,7 +337,7 @@
 				</div>
 
 				<div>
-					<div style="top:68px; position: sticky">
+					<div style="top:68px; position: sticky;">
 						{:resume}
 						{:orderactionsblock}
 					</div>
@@ -997,7 +997,7 @@
 						</div>
 					</div>
 				</div>
-			{pay_label_self:}Оплата при получении<div class2="descr {data.order.pay=.?:show}" style="font-size:13px; color:#888; margin-top:-1px; font-weight: normal;">Наличными или картой</div>
+			{pay_label_self:}Оплата при получении (комиссия 4%)<div class2="descr {data.order.pay=.?:show}" style="font-size:13px; color:#888; margin-top:-1px; font-weight: normal;">Наличными или картой</div>
 			{pay_label_card:}Оплата картой онлайн<div class2="descr {data.order.pay=.?:show}" style="font-size:13px; color:#888; margin-top:-1px; font-weight: normal;">VISA, Mastercard, МИР</div>
 			{pay_label_perevod:}Мобильный банк<div class2="descr {data.order.pay=.?:show}" style="font-size:13px; color:#888; margin-top:-1px; font-weight: normal;">Сбербанк, Tinkoff, Альфа Банк, ВТБ</div>
 			{pay_label_corp:}Оплата по счёту для юр.лиц<div class2="descr {data.order.pay=.?:show}" style="font-size:13px; color:#888; margin-top:-1px; font-weight: normal;">Без НДС</div>
