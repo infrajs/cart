@@ -55,25 +55,7 @@ class CDEK {
 	}
 	public static function getDim($model) {
 		//$model['Габариты']//WxHxL
-		$model += $model['more'] ?? [];
-		$dim = $model['Упаковка, см'] ?? $model['Габариты, см'] ?? $model['Габариты'] ?? '';
-		$d = preg_split('/[хx]/i', $dim, 3, PREG_SPLIT_NO_EMPTY);
-		$d[0] = $d[0] ?? $model['Длина, см'] ?? $model['Длина (см)'] ?? false;
-		$d[1] = $d[1] ?? $model['Ширина, см'] ?? $model['Ширина (см)'] ?? false;
-		$d[2] = $d[2] ?? $model['Высота, см'] ?? $model['Высота (см)'] ?? false;
-
-		if (!$d[0] || !$d[1] || !$d[2]) return false;
-		$weight = Cart::getWeight($model);
-		if (!$weight) return false;
-		
-		$weight = (float) $weight; //Должно быть в кг
-
-		return [ 
-			"width" => $d[0], 
-			"height" => $d[1], 
-			"length" => $d[2], 
-			"weight" => $weight
-		];
+		return Cart::getDim($model);
 	}
 	
 }

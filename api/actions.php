@@ -36,18 +36,20 @@ $context->actions = [
 		extract($this->gets(['ans','city_id', 'city','model']), EXTR_REFS);
 		$zip = $city['zip'];
 		$ans['city'] = $city;		
-		$weight = Cart::getWeight($model);
+		$dim = Cart::getDim($model);
+		$weight = $dim['weight'];
 		if (!$weight) return $this->err('posweight');
 		$transports = Cart::$conf['transports'];
 		$ans['transports'] = [];
-		$ans['transports']['pochta'] = [];
-		foreach(['pochta_simple','pochta_1','pochta_courier'] as $type) {
-			if (!in_array($type, $transports)) continue;
-			$res = Pochta::calc($type, $weight, $zip);
-			if ($res) $ans['transports']['pochta'][$type] = $res;
+		if ($dim['max'] < Pochta::$limit['max'] && $dim['min'] < Pochta::$limit['min']) {
+			$ans['transports']['pochta'] = [];
+			foreach(['pochta_simple','pochta_1','pochta_courier'] as $type) {
+				if (!in_array($type, $transports)) continue;
+				$res = Pochta::calc($type, $weight, $zip);
+				if ($res) $ans['transports']['pochta'][$type] = $res;
+			}
+			if (!$ans['transports']['pochta']) unset($ans['transports']['pochta']);
 		}
-		if (!$ans['transports']['pochta']) unset($ans['transports']['pochta']);
-		$dim = CDEK::getDim($model);
 		$ans['dim'] = $dim;
 		$goods = [$dim];
 		$ans['transports']['cdek'] = [];

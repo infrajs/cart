@@ -7,7 +7,12 @@ use infrajs\load\Load;
 use infrajs\access\Access;
 
 class Pochta {
+	public static $limit = [
+		'max'=> 53,
+		'min'=> 26
+	];
 	public static function calc($type, $weight, $to) {
+		//53 х 38 х 26,5
 		$weight = (int) ($weight * 1000);
 		$objects = [
 			"pochta_simple" => 27030,

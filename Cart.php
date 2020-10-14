@@ -761,6 +761,30 @@ class Cart
 	public static function getWeight($model) {
 		return $model['Вес, кг'] ?? $model['more']['Вес, кг'] ?? false;
 	}
+	public static function getDim($model) {
+		//$model['Габариты']//WxHxL
+		$model += $model['more'] ?? [];
+		$dim = $model['Упаковка, см'] ?? $model['Габариты, см'] ?? $model['Габариты'] ?? '';
+		$d = preg_split('/[хx]/i', $dim, 3, PREG_SPLIT_NO_EMPTY);
+		$d[0] = $d[0] ?? $model['Длина, см'] ?? $model['Длина (см)'] ?? false;
+		$d[1] = $d[1] ?? $model['Ширина, см'] ?? $model['Ширина (см)'] ?? false;
+		$d[2] = $d[2] ?? $model['Высота, см'] ?? $model['Высота (см)'] ?? false;
+
+		if (!$d[0] || !$d[1] || !$d[2]) return false;
+		$weight = Cart::getWeight($model);
+		if (!$weight) return false;
+		
+		$weight = (float) $weight; //Должно быть в кг
+
+		return [
+			"max" => max($d[0],$d[1],$d[2]),
+			"min" => min($d[0],$d[1],$d[2]),
+			"width" => $d[0], 
+			"height" => $d[1], 
+			"length" => $d[2], 
+			"weight" => $weight
+		];
+	}
 	public static function recalc($order_id)
 	{
 		//Меняются 
@@ -777,14 +801,24 @@ class Cart
 		$sum = 0;
 		$count = 0;
 		$weight = 0;
+		
+
+		$usepochta = false;
 
 		foreach ($basket as $k => $pos) {
 			$model = Cart::getModel($pos['position_id']);
 			if (!$model) continue;
-			$w = Cart::getWeight($model);
+			$dim = Cart::getDim($model);
+			if (!$dim) return true;
+			$w = $dim['weight'];
 			if (!$w) return true;
 			
+			if ($dim['max'] > Pochta::$limit['max'] || $dim['min'] > Pochta::$limit['min']) {
+				$usepochta = false;
+			}
+
 			$weight += $w * $pos['count'];
+			
 			$count++;
 			$discount = Cart::getDiscount($order_id, $model);
 			$r = Db::exec('UPDATE cart_basket
@@ -841,7 +875,7 @@ class Cart
 			}
 
 			//Если Весь больше 5 кг или Сумма заказа больше 10 000 руб.
-			if ($sum > 10000 || $weight > 5) {
+			if ($sum > 10000 || $weight > 5 || !$usepochta) {
 				$type = 'any'; $cost = 0;
 				$cost = ($sum >= $transportfree) ? 0 : $cost;
 				if (in_array($type, $transports)) {
@@ -887,44 +921,44 @@ class Cart
 				}
 			}
 
-
-			$zip = $order['zip'] ? $order['zip'] : $city['zip'];
-
-			$type = 'pochta_simple';
-			$ans = Pochta::calc($type, $weight, $zip);
-			if ($ans) {
-				$cost = $ans['cost'];
-				$min = $ans['min'];
-				$max = $ans['max'];
-				$cost = ($sum >= $transportfree) ? 0 : $cost;
-				if (in_array($type, $transports)) {
-					$mytransport[] = $type;
-					Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+			if ($usepochta) {
+				$zip = $order['zip'] ? $order['zip'] : $city['zip'];
+				$type = 'pochta_simple';
+				$ans = Pochta::calc($type, $weight, $zip);
+				if ($ans) {
+					$cost = $ans['cost'];
+					$min = $ans['min'];
+					$max = $ans['max'];
+					$cost = ($sum >= $transportfree) ? 0 : $cost;
+					if (in_array($type, $transports)) {
+						$mytransport[] = $type;
+						Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+					}
 				}
-			}
 
-			$type = 'pochta_1'; 
-			$ans = Pochta::calc($type, $weight, $zip);
-			if ($ans) {
-				$cost = $ans['cost'];
-				$min = $ans['min'];
-				$max = $ans['max'];
-				$cost = ($sum >= $transportfree) ? 0 : $cost;
-				if (in_array($type, $transports)) {
-					$mytransport[] = $type;
-					Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+				$type = 'pochta_1'; 
+				$ans = Pochta::calc($type, $weight, $zip);
+				if ($ans) {
+					$cost = $ans['cost'];
+					$min = $ans['min'];
+					$max = $ans['max'];
+					$cost = ($sum >= $transportfree) ? 0 : $cost;
+					if (in_array($type, $transports)) {
+						$mytransport[] = $type;
+						Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+					}
 				}
-			}
-			$type = 'pochta_courier';
-			$ans = Pochta::calc($type, $weight, $zip);
-			if ($ans) {
-				$cost = $ans['cost'];
-				$min = $ans['min'];
-				$max = $ans['max'];
-				$cost = ($sum >= $transportfree) ? 0 : $cost;
-				if (in_array($type, $transports)) {
-					$mytransport[] = $type;
-					Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+				$type = 'pochta_courier';
+				$ans = Pochta::calc($type, $weight, $zip);
+				if ($ans) {
+					$cost = $ans['cost'];
+					$min = $ans['min'];
+					$max = $ans['max'];
+					$cost = ($sum >= $transportfree) ? 0 : $cost;
+					if (in_array($type, $transports)) {
+						$mytransport[] = $type;
+						Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+					}
 				}
 			}
 
