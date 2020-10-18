@@ -111,8 +111,8 @@ $context->handlers = [
 					//Текущий пользователь не зарегистрирован, ему нужно просто перейти в свой аккаунт
 					$ouser['order'] = $order;
 					$r = User::mail($ouser, $lang, 'userdata', '/cart/orders/active');
-					if (!$r) return $this->err($ans, $lang, 'CR023');
-					return $this->err($ans, $lang, 'CR022');	
+					if (!$r) return $this->err('CR023');
+					return $this->err('CR022');	
 				} else {
 					//У текущего пользователя есть аккаунт, ему не надо переходить, но нужно дать доступ и пользователю по указанному email
 					//Передаём доступ к текущему заказу и на этот аккаунт и делает для нового аккаунта этот заказ активным?. Злоумышленник кому-то может подсунуть новый заказ)
@@ -123,7 +123,7 @@ $context->handlers = [
 			}
 		}	
 		$r = Cart::setOwner($order['order_id'], $ouser['user_id']);
-		if (!$r) return $this->fail($ans, $lang, 'CR018');
+		if (!$r) return $this->fail('CR018');
 		Cart::recalc($order['order_id']);
 		$order = Cart::getById($order['order_id']);
 	}

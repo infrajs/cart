@@ -803,7 +803,7 @@ class Cart
 		$weight = 0;
 		
 
-		$usepochta = false;
+		$usepochta = true;
 
 		foreach ($basket as $k => $pos) {
 			$model = Cart::getModel($pos['position_id']);
