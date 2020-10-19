@@ -1547,10 +1547,12 @@
 		<textarea rows="4" class="mngcom form-control mb-2">{commentmanager}</textarea>
 		<p>Письмо {dateemail?:was?:notwas}</p>
 		<script type="module" async>
+			import { Cart } from '/vendor/infrajs/cart/Cart.js'
+
 			const div = document.getElementsByClassName('input-commentmanager')[0]
 			const textarea = div.getElementsByClassName('mngcom')[0]
 			const msg = div.getElementsByClassName('msg')[0]
-			const order_id = "{:order_id}"
+			const order_id = {order_id}
 			const place = "{:place}"
 			textarea.addEventListener('keyup', async () => {
 				msg.innerHTML = '...'

@@ -547,14 +547,14 @@ class Cart
 		//$r = Cart::recalc($order_id);
 		return $r;
 	}
-	public static function setCommentManager($order, $commentmanager)
+	public static function setCommentManager($order_id, $commentmanager)
 	{
 		$sql = 'UPDATE cart_orders
 			SET commentmanager = :commentmanager
 			WHERE order_id = :order_id
 		';
 		$r = Db::exec($sql, [
-			':order_id' => $order['order_id'],
+			':order_id' => $order_id,
 			':commentmanager' => $commentmanager
 		]) !== false;
 		return $r;

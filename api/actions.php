@@ -189,14 +189,14 @@ $context->actions = [
 
 	}, 
 	'setcommentmanager' => function () {
-		extract($this->gets(['commentmanager','order']), EXTR_REFS);
-		$r = Cart::setCommentManager($order, $commentmanager);
+		extract($this->gets(['commentmanager','order_id']), EXTR_REFS);
+		$r = Cart::setCommentManager($order_id, $commentmanager);
 		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 
 	'email' => function () {
-		extract($this->gets(['commentmanager','order', 'lang']), EXTR_REFS);
+		extract($this->gets(['commentmanager','order', 'order_id', 'lang']), EXTR_REFS);
 		$order['commentmanager'] = $commentmanager;
-		$r = Cart::setCommentManager($order, $commentmanager);
+		$r = Cart::setCommentManager($order_id, $commentmanager);
 		if (!$r) return $this->fail('CR018');
 		$ouser = User::getByEmail($order['email']);
 		$ouser['order'] = $order;

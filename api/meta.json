@@ -342,7 +342,7 @@
 			}
 		},
 		"setcommentmanager": {
-			"required": ["order_id"],
+			"required": ["order_id","commentmanager"],
 			"handlers": ["post", "admin"]
 		},
 		"email": {
