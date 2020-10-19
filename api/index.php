@@ -12,8 +12,9 @@ use akiyatkin\showcase\Showcase;
 use infrajs\lang\Lang;
 use infrajs\access\Access;
 use infrajs\cart\api\Meta;
+use infrajs\nostore\Nostore;
 
-
+Nostore::on();
 	
 $context = new Meta([
 	'src' => '-cart/api/meta.json',

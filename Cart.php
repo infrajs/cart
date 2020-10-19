@@ -113,6 +113,8 @@ class Cart
 	// }
 	public static function getOrders($fuser, $status, $start, $end)
 	{
+		//$fuser = [];
+		$status = false;
 		return static::once('getOrders', [$fuser, $status, $start, $end], function ($fuser, $status, $start, $end) {
 			$fields = 'o.order_nick, o.order_id, o.status, o.sum, o.name, o.email, o.coupon, o.paid';
 			$fields = 'o.order_id';

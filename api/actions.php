@@ -104,7 +104,7 @@ $context->actions = [
 		$ans['Y'] = date('Y', $start);
 		$ans['F'] = Cart::lang($lang, date('F', $start));
 		$ans['startstr'] = date('d.m.Y H:i:s', $start);		
-		$list = Cart::getOrders($user, $statuses, $start, $end);
+		$list = Cart::getOrders(false, $statuses, $start, $end);
 		if (!$list) return $this->err('CR006');
 		$total = 0;
 		foreach ($list as $k => $order) {
