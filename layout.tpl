@@ -1459,8 +1459,9 @@
 				let btns
 				btns = cls('act-complete')
 				for (const btn of btns) btn.addEventListener('click', async () => {
+
 					const order_id = btn.dataset.order_id
-					const ans = await Cart.post('complete', {place, order_id })
+					const ans = await Cart.post('complete', { place, order_id })
 					if (!ans.result) await Popup.alert(ans.msg)
 				})
 
