@@ -875,14 +875,14 @@ class Cart
 			}
 
 			//Если Весь больше 5 кг или Сумма заказа больше 10 000 руб.
-			if ($sum > 10000 || $weight > 5 || !$usepochta) {
+			//if ($sum > 10000 || $weight > 5 || !$usepochta) {
 				$type = 'any'; $cost = 0;
 				$cost = ($sum >= $transportfree) ? 0 : $cost;
 				if (in_array($type, $transports)) {
 					$mytransport[] = $type;
 					Cart::saveTransportCost($order_id, $type, $cost, 0, 0);
 				}
-			}
+			//}
 
 			
 
