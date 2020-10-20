@@ -2,7 +2,7 @@
 {AdmOrderToCheck-subject:}{host} {email} заказ отправлен на проверку
 {AdmOrderToCheck:}
 	<p>Заказ <b>{order.order_nick}</b> от {~date(:j.m.Y,time)} {:payorrec} и ожидает проверки.</p>
-	{:cart.resume}
+	{order:cart.resume}
 	{:AdmLinks}
 
 {orderToCheck-subject:}Оформлен заказ в интернет-магазине {host}
