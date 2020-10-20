@@ -1477,7 +1477,7 @@
 					})
 				}
 			</script>
-			
+			{orderpaidb:}, <b>оплачен {~cost(total)}{:model.unit}</b>
 			{adm_row:}
 				<div class="border mb-2 p-2">
 					<style>
@@ -1492,7 +1492,7 @@
 					</style>
 					<b><a href="/cart/admin/{order_nick}">{order_nick}</a></b>
 					<a href="/cart/admin/{order_nick}/list" class="circle">{~length(basket)}</a> 
-					<nobr style="color:{status=:check?:red}">{(status=:wait&active)?data.meta.rules[status]shortactive?data.meta.rules[status]short}</nobr>{status=:check?:acomplete}{status=:complete?(paid??:atocheck)}<b>{paid?(:оплачен):pr-comma}</b>
+					<nobr style="color:{status=:check?:red}">{(status=:wait&active)?data.meta.rules[status]shortactive?data.meta.rules[status]short}</nobr>{status=:check?:acomplete}{status=:complete?(paid??:atocheck)}{paid?:orderpaidb}
 
 					<div class="float-right text-right">
 						<span>{~date(:d.m.Y,datecheck|dateedit)}</span><br>{email}<br><b>{sum:itemcostrub}</b>
