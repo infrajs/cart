@@ -167,6 +167,7 @@ class Cart
 			}
 			return $list;
 		});
+
 	}
 	public static function isActive($order, $user)
 	{
@@ -468,39 +469,7 @@ class Cart
 		}
 		return $res;
 	}
-	// public static function getCost($order, $model)
-	// {
-	// 	$cost = $model['Цена'];
-	// 	if ($order['coupondata']) {
-	// 		$coupondata = $order['coupondata'];
-	// 		//$coupon = Load::loadJSON('-cart/coupon?name=' . $order['coupon']);
-	// 		$res = Cart::couponCheck($model, $coupondata);
-	// 		if ($res) { //Действует
-	// 			$discount = $coupondata['Скидка'];
-	// 			$cost = $cost * (1 - $discount);
-	// 		}
-	// 	}
-	// 	$cost = round($cost, 2);
-	// 	return $cost;
-	// }
 	
-	// public static function edit($order, $data)
-	// {
-	// 	static::$once = [];
-	// 	$sql = 'UPDATE cart_orders
-	// 		SET 
-	// 		phone = :phone, 
-	// 		email = :email, 
-	// 		comment = :comment,
-	// 		address = :address,
-	// 		zip = :zip,
-	// 		name = :name, 
-	// 		dateedit = now()
-	// 		WHERE order_id = :order_id
-	// 	';
-	// 	$data[':order_id'] = $order['order_id'];
-	// 	return Db::exec($sql, $data) !== false;
-	// }
 	public static function resetActive($order)
 	{
 		//Найти всех пользователей и что-то сделать у них активным если есть
@@ -1120,10 +1089,20 @@ class Cart
 			$order['sum'] = 0;
 			$order['sumclear'] = 0;
 			$count = 0;
+
 			foreach ($order['basket'] as $i => $pos) {
 				
 				if ($fast) {
-					$costclear = $pos['costclear'];
+					if ($order['freeze']) {
+						$costclear = $pos['costclear'];
+					} else {
+						$costclear = Showcase::getCost($pos['producer_nick'], $pos['article_nick'], $pos['item_num']);
+						if (!$costclear) {
+							unset($order['basket'][$i]);
+							continue; //Модель не заморожена и не найдена в каталоге
+						}
+
+					}
 				} else {
 					$model = Cart::getModel($pos['position_id']);
 					if (!$model) {
@@ -1249,6 +1228,7 @@ class Cart
 	}
 	public static function freeze($order_id)
 	{
+		Db::start();
 		$sql = 'UPDATE cart_orders
 			SET freeze = 1
 			WHERE order_id = :order_id
@@ -1264,6 +1244,14 @@ class Cart
 
 		foreach ($basket as $pos) {
 			$model = Cart::getFromShowcase($pos);
+			if (!$model) { //Модели нет в каталоге и эта модель не должна была попадать в расчёты
+				$sql = 'DELETE FROM cart_basket WHERE position_id = :position_id';
+				$r = Db::exec($sql, [
+					':position_id' => $pos['position_id']
+				]) !== false;
+				if (!$r) return false;
+				continue;
+			}
 			//Если модели нет в каталоге. надо удалить её из корзины. Такая проверка должна быть раньше.
 			if (!Cart::setToJson($pos['position_id'], $model)) return false;
 
@@ -1271,6 +1259,7 @@ class Cart
 			//$position_id = $pos['position_id']
 		}
 		$r = Cart::recalc($order_id); //Установятся актуальные цены
+		Db::commit();
 		return $r;
 	}
 	public static function unfreeze($order_id)
