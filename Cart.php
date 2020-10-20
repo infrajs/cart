@@ -1051,7 +1051,13 @@ class Cart
 
 			if ($order['weight']) $order['weight'] = $order['weight'] / 1000;
 			
-			if ($order['paydata']) $order['paydata'] = json_decode($order['paydata'], true);
+			if ($order['paydata']) {
+				$order['paydata'] = json_decode($order['paydata'], true);
+				unset($order['paydata']['key']);
+				unset($order['paydata']['card_number']);
+				unset($order['paydata']['fop_receipt_key']);
+				unset($order['paydata']['fop_receipt_key']);
+			}
 			if ($order['coupondata']) $order['coupondata'] = json_decode($order['coupondata'], true);
 
 			
