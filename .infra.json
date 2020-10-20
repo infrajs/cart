@@ -1,5 +1,5 @@
 {
-	"pub":["yandexapikey", "coupon","transports","city_from_id","city_from"],
+	"pub":["yandexapikey", "coupon","transports","city_from_id","city_from","pay"],
 	"paramsrc":"~auto/pages/Параметры.xlsx",
 	"coupon":true,
 	"conf":"infrajs\\cart\\Cart",
@@ -24,12 +24,13 @@
 		"def":"ru",
 		"list":["ru","en"]
 	},
+	"pay":"paykeeper",
 	"sbrfpay":{
 		"server":"https://3dsec.sberbank.ru",
 		"userName":"",
 		"password":""
 	},
-	"paykeeper":{
+	"paykeeper":{		
 		"secret":"",
 		"userName":"",
 		"password":"",

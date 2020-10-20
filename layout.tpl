@@ -331,8 +331,8 @@
 				<div style="">
 					
 					{commentmanager?:showManageComment}
-					{data.order:paylayout-sbrfpay.INFO}
-					{data.order:paylayout-paykeeper.INFO}
+					{~conf.cart.pay=:strsbrfpay?data.order:paylayout-sbrfpay.INFO}
+					{~conf.cart.pay=:strpaykeeper?data.order:paylayout-paykeeper.INFO}
 					{:ordercontentbody}
 				</div>
 
@@ -344,6 +344,8 @@
 				</div>
 
 			</form>
+		{strpaykeeper:}paykeeper
+		{strsbrfpay:}sbrfpay
 		{orderactionsblock:}
 			<div>
 				<style>
