@@ -346,7 +346,7 @@
 			"handlers": ["post", "admin"]
 		},
 		"email": {
-			"required": ["order_id"],
+			"required": ["order_id","commentmanager"],
 			"handlers": ["post", "admin"],
 			"title": "CR054.M1"
 		}

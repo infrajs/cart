@@ -1477,7 +1477,7 @@
 					})
 				}
 			</script>
-			{orderpaidb:}, <b>оплачен {~cost(total)}{:model.unit}</b>
+			{orderpaidb:}, <b>оплачен, {~cost(total)}{:model.unit}</b>
 			{adm_row:}
 				<div class="border mb-2 p-2">
 					<style>
