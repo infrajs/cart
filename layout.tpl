@@ -471,7 +471,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="transblock">
+				<div id="transblock" class="transblock">
 					<h2><span class="transportreset" style="cursor: default">Доставка</span> в город <span class="{:isedit?:a?:text-danger} citychoice">{data.order.city.city|:citynone}</span></h2>
 					<div class="mt-n2">
 						Расчётный вес: {data.order.weight?:showweight?:noweight}

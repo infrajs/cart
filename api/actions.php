@@ -40,6 +40,9 @@ $context->actions = [
 		$weight = $dim['weight'];
 		if (!$weight) return $this->err('posweight');
 		$transports = Cart::$conf['transports'];
+		$ans['producer_nick'] = $model['producer_nick'];
+		$ans['article_nick'] = $model['article_nick'];
+		$ans['item_num'] = $model['item_num'];
 		$ans['transports'] = [];
 		if ($dim['max'] < Pochta::$limit['max'] && $dim['min'] < Pochta::$limit['min']) {
 			$ans['transports']['pochta'] = [];
@@ -234,7 +237,14 @@ $context->actions = [
 		extract($this->gets(['order']), EXTR_REFS);
 		if (!Cart::clear($order)) return $this->fail('CR018');
 		return $this->ret('CR037');
-	}, 
+	},
+	'addtoactiveifnot' => function () {		
+		extract($this->gets(['model','active_id#create']), EXTR_REFS);
+		$count = 1;
+		$r = Cart::addModel($active_id, $model, $count);
+		if (!$r) return $this->fail('CR015');
+		if ($count) return $this->ret('CR029');
+	},
 	'addtoactive' => function () {		
 		extract($this->gets(['count','model','active_id#create']), EXTR_REFS);
 		if (!$count) $count = false;

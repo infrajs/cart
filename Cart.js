@@ -79,14 +79,14 @@ let Cart = {
 			ans = await Load.emit('json', src)
 		}
 		
-		if (~['add','addtoactive','clear','check','delete','remove','setcoupon'].indexOf(type)) {
+		if (~['add','addtoactive','addtoactiveifnot','clear','check','delete','remove','setcoupon'].indexOf(type)) {
 			Global.set('cart-sum')
 		}
-		if (~['clear','addtoactive','check','delete','remove','setcoupon'].indexOf(type)) {
+		if (~['clear','addtoactive','addtoactiveifnot','check','delete','remove','setcoupon'].indexOf(type)) {
 			Global.set("cart-list")
 		}
 		
-		if (~['add','email','addtoactive','setcdek','setpvz','setzip', 'paykeeper', 'check','wait','complete','delete','tocheck'].indexOf(type)) {
+		if (~['add','email','addtoactive','addtoactiveifnot','setcdek','setpvz','setzip', 'paykeeper', 'check','wait','complete','delete','tocheck'].indexOf(type)) {
 			Global.set('cart-order')
 		}
 		Global.set('cart')

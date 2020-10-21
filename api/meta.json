@@ -146,7 +146,7 @@
 			"status":["order_id"],
 			"rule":["status"],
 			"order_id": ["user", "place"],
-			"active_id#create":["city_id", "timezone"],
+			"active_id#create":["city_id", "timezone","user"],
 			"order_nick": ["user", "place"],
 			"basket": ["order_id*"],
 			"order": ["order_id"],
@@ -187,6 +187,11 @@
 		},
 		"orderfast": {
 			"required": ["order_id"]
+		},
+		"addtoactiveifnot":{
+			"required": ["article_nick", "active_id#create"],
+			"handlers": ["post"],
+			"goal": "basket"
 		},
 		"addtoactive": {
 			"required": ["count", "article_nick", "active_id#create"],
