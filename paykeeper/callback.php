@@ -54,12 +54,15 @@ $r = Db::exec('UPDATE cart_orders
 ]) !== false;
 if (!$r) return Paykeeper::err($ans, 'Неудалось сохранить ответ. Код c'.__LINE__);
 
+
 $r = Cart::setStatus($order['order_id'], 'check');
 if (!$r) return Paykeeper::err($ans, 'Неудалось изменить статус заказа. Код c'.__LINE__);
 $ouser = $order['user'];
 $worder = Cart::getWaitOrder($ouser);
 if ($worder) Cart::setActive($worder['order_id'], $ouser['user_id']);
 
+Cart::$once = [];
+$order = Cart::getByNick($orderid);
 $r = Paykeeper::mail($order);
 if (!$r) return Paykeeper::err($ans, 'Неудалось отправить оповещение. Код c'.__LINE__);
 $ans['result'] = 1;

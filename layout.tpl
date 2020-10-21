@@ -1666,7 +1666,7 @@
 		Сумма со скидкой: <b class="sum">{~cost(sum)}{:model.unit}</b><br>
 
 	{descr_cdek_pvz:}<div class="mb-2">{...pvz} <nobr style="{:ishidedisabled}" class="a showpvz">{...pvz?:Изменить?:Выбрать} пункт выдачи</nobr></div>
-	{info_cdek_pvz:}{pvz}
+	{info_cdek_pvz:}{city.city|:citynone}, {pvz}
 	{label_cdek_pvz:}Доставка до пункта выдачи СДЕК
 	{label_cdek_pvz_short:}До пункта выдачи
 
