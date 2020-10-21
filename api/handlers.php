@@ -71,7 +71,7 @@ $context->handlers = [
 		if (empty($order['transport'])) return $this->err('trans');
 		if (empty($order['pay'])) return $this->err('pay');
 		if (in_array($order['transport'],["city","cdek_courier","pochta_courier"])) {
-			if (empty($order['address'])) $err('address');
+			if (empty($order['address'])) $this->err('address');
 		}
 		if (in_array($order['transport'],["pochta_simple","pochta_1"])) {
 			if (empty($order['zip'])) return $this->err('zip');

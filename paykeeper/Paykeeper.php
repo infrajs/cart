@@ -23,7 +23,11 @@ class Paykeeper
 	}
 	
 	public static function mail($order) {
-		$user = $order['user'];
+		$user = User::getByEmail($order['email']);
+		$order['user'] = $user;
+		$city_id = $order['city_id'] ? $order['city_id'] : $user['city_id'];
+		$order['city'] = City::getById($city_id, $order['lang']);
+		
 		$user['order'] = $order;
 		$r1 = Cart::mailtoadmin($user, $user['lang'], 'AdmOrderToCheck');
 		$r2 = Cart::mail($user, $user['lang'], 'orderToCheck');
