@@ -97,6 +97,8 @@ let Cart = {
 		}
 		if (ans.token || ans.token === '') {
 			View.setCOOKIE('token', ans.token)
+			View.setCOOKIE('infra_session_id')
+			View.setCOOKIE('infra_session_pass')
 			Global.set('user')
 		}
 		if (ans.actionmeta && ans.actionmeta.goal && ans.result) Goal.reach(ans.actionmeta.goal)

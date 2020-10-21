@@ -8,7 +8,7 @@
 {orderToCheck-subject:}Оформлен заказ в интернет-магазине {host}
 {orderToCheck:}
 	<p>
-		{order.name}, Ваш заказ <a href="{site}/cart/orders/{order.order_nick}">№{order.order_nick}</a> от {~date(:j.m.Y,time)} {:payorrec} и ожидает проверки. При возникновении вопросов с Вами свяжется наш менеджер для подтверждения или уточнения деталей заказа. Отслеживать состояние заказа можно в <a href="{site}/cart">личном кабинете</a>.
+		{order.name}, Ваш заказ <a href="{site}/cart/orders/{order.order_nick}">№{order.order_nick}</a> от {~date(:j.m.Y,time)} {:payorrec} и ожидает проверки. При возникновении вопросов с Вами свяжется менеджер для подтверждения или уточнения деталей заказа. Отслеживать состояние заказа можно в <a href="{site}/cart">личном кабинете</a>.
 	</p>
 	{order:cart.resume}
 	<p>
