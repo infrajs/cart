@@ -349,7 +349,7 @@ class Cart
 	// }
 	public static function addModel($order_id, $model, $count = false)
 	{
-		$position_id = Db::col('SELECT position_id FROM cart_basket 
+		$pos = Db::fetch('SELECT position_id, count FROM cart_basket 
 			WHERE order_id = :order_id and catkit = :catkit and item_num = :item_num and article_nick = :article_nick and producer_nick = :producer_nick', [
 			':order_id' => $order_id,
 			':article_nick' => $model['article_nick'],
@@ -357,7 +357,11 @@ class Cart
 			':item_num' => $model['item_num'],
 			':catkit' => !empty($model['kit']) ? $model['catkit'] : ''
 		]);
-		if (!$position_id) {
+		if ($count === true) {
+			if (!empty($pos['count'])) return true;
+			$count = 1;
+		}
+		if (!$pos) {
 			$position_id = Db::lastId('INSERT IGNORE INTO cart_basket (
 				order_id, article_nick, producer_nick, item_num, catkit, count, dateadd, dateedit
 			) VALUES (
@@ -370,6 +374,8 @@ class Cart
 				':catkit' => !empty($model['kit']) ? $model['catkit'] : '',
 				':count' => 0
 			]);
+		} else {
+			$position_id = $pos['position_id'];
 		}
 		return Cart::add($order_id, $position_id, $count);
 	}

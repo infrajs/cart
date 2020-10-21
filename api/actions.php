@@ -240,10 +240,9 @@ $context->actions = [
 	},
 	'addtoactiveifnot' => function () {		
 		extract($this->gets(['model','active_id#create']), EXTR_REFS);
-		$count = 1;
-		$r = Cart::addModel($active_id, $model, $count);
+		$r = Cart::addModel($active_id, $model, true);
 		if (!$r) return $this->fail('CR015');
-		if ($count) return $this->ret('CR029');
+		return $this->ret('CR029');
 	},
 	'addtoactive' => function () {		
 		extract($this->gets(['count','model','active_id#create']), EXTR_REFS);
