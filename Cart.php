@@ -1240,7 +1240,6 @@ class Cart
 	}
 	public static function freeze($order_id)
 	{
-		Db::start();
 		$sql = 'UPDATE cart_orders
 			SET freeze = 1
 			WHERE order_id = :order_id
@@ -1271,7 +1270,6 @@ class Cart
 			//$position_id = $pos['position_id']
 		}
 		$r = Cart::recalc($order_id); //Установятся актуальные цены
-		Db::commit();
 		return $r;
 	}
 	public static function unfreeze($order_id)
