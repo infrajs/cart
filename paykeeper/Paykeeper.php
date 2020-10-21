@@ -7,6 +7,8 @@ use infrajs\cart\Cart;
 use infrajs\load\Load;
 use infrajs\db\Db;
 use infrajs\ans\Ans;
+use infrajs\user\User;
+use akiyatkin\city\City;
 
 
 
