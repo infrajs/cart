@@ -12,7 +12,8 @@ use infrajs\access\Access;
 use akiyatkin\city\City;
 use akiyatkin\showcase\Showcase;
 use infrajs\lang\Lang;
-
+class MetaException extends \Exception {
+}
 class Meta {
 
 	public function __construct($opt) {
@@ -34,7 +35,7 @@ class Meta {
 	public function init() {
 		try {
 			return $this->initnow();
-		} catch (\Exception $e) {			
+		} catch (MetaException $e) {			
 			return $this->params['ans'];
 		}
 
@@ -213,7 +214,7 @@ class Meta {
 			$this->question++;
 			try {
 				$this->exec($this->vars[$rname], $vname, $this->params[$rname]);
-			} catch(\Exception $e) {				
+			} catch(MetaException $e) {				
 				$this->params[$rname] = false;
 				//if (empty($this->params['ans']['result'])) throw $e;
 			}
@@ -310,20 +311,20 @@ class Meta {
 		$ans['backtrace'] = $lines;
 	}
 	public function err($code, $pname = false) {
-		if ($this->question) throw new \Exception();
+		if ($this->question) throw new MetaException();
 		extract($this->gets(['ans','lang']), EXTR_REFS);
 		if (Access::isDebug()) $this->addBacktrace();
 		$ans['params'] = array_keys($this->params);
 		if (!$pname) {
 			$ans = Lang::err($ans, $lang, $this->name.'.'.$code);
-			throw new \Exception();
+			throw new MetaException();
 		} 
 		$ans['missing'] = $pname;
 		$ans = Lang::errtpl($ans, $lang, $this->name.'.'.$code);
-		throw new \Exception();
+		throw new MetaException();
 	}
 	public function fail($code, $pname = false) {
-		if ($this->question) throw new \Exception();
+		if ($this->question) throw new MetaException();
 		$ans = &$this->params['ans'];
 		$lang = $this->params['lang'] ?? $this->lang;
 		$ans['params'] = array_keys($this->params);
@@ -333,11 +334,11 @@ class Meta {
 
 		if (!$pname) {			
 			$ans = Lang::fail($ans, $lang, $this->name.'.'.$code.'.'.$this->actionmeta['action'].'-'.$line);
-			throw new \Exception();
+			throw new MetaException();
 		}
 		$ans['missing'] = $pname;
 		$ans = Lang::failtpl($ans, $lang, $this->name.'.'.$code);
-		throw new \Exception();
+		throw new MetaException();
 	}
 
 }
