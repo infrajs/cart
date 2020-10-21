@@ -124,7 +124,7 @@ Event::handler('User.merge', function ($user) {
 				',[
 					':old_user_id' => $old_user_id,
 					':new_user_id' => $new_user_id,
-					':order_id' => $order_id
+					':order_id' => $old_order_id
 				]);	
 			}
 		}
