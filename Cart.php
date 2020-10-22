@@ -125,7 +125,7 @@ class Cart
 			if ($start) {
 				$param[":start"] = $start;
 				$param[":end"] = $end;
-				$time = '((datecheck >= FROM_UNIXTIME(:start) and datecheck < FROM_UNIXTIME(:end)) or (datecheck is null and dateedit >= FROM_UNIXTIME(:start) and dateedit < FROM_UNIXTIME(:end)))';
+				$time = '((datecheck is not null and datecheck >= FROM_UNIXTIME(:start) and datecheck < FROM_UNIXTIME(:end)) or (datecheck is null and dateedit >= FROM_UNIXTIME(:start) and dateedit < FROM_UNIXTIME(:end)))';
 			} else {
 				$time = 'o.order_id is not null';
 			}
@@ -165,7 +165,7 @@ class Cart
 					";
 				}
 			}
-			$sql .= 'ORDER BY o.dateedit DESC';
+			$sql .= 'ORDER BY o.datecheck DESC, o.dateedit DESC';
 
 			$list = Db::colAll($sql, $param);
 

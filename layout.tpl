@@ -1441,7 +1441,7 @@
 			<li class="breadcrumb-item active">Все заказы</li>
 		</ol>
 		<h1>Все заказы</h1>
-		<p>Дата когда заказ поступил на проверку или по дате последних изменений.</p>
+		<p>Дата когда заказ поступил на проверку или дата последних изменений.</p>
 		<div id="YEARS"></div>
 		<div id="ADMINLIST"></div>
 		{ADMINLIST:}
@@ -1497,7 +1497,8 @@
 					<nobr style="color:{status=:check?:red}">{(status=:wait&active)?data.meta.rules[status]shortactive?data.meta.rules[status]short}</nobr>{status=:check?:acomplete}{status=:complete?(paid??:atocheck)}{paid?:orderpaidb}
 
 					<div class="float-right text-right">
-						<span>{~date(:d.m.Y,datecheck|dateedit)}</span><br>{email}<br><b>{sum:itemcostrub}</b>
+						<span title="Дата редактирования">{~date(:d.m.Y H:i,dateedit)}</span><br>
+						{email}<br><b>{sum:itemcostrub}</b>
 					</div>
 					
 					<div>
@@ -1511,7 +1512,8 @@
 					</div>
 					
 				</div>
-				{adminlisttrans:}<br>{:label_{transport}}&nbsp;<b>{~cost(sumtrans)}{:model.unit}</b>
+				{adminlisttrans:}<br>{:label_{transport}}{sumtrans!:0?:adminsumtrans}
+				{adminsumtrans:}&nbsp;<b>{~cost(sumtrans)}{:model.unit}</b>
 				{adminlistpay:}<br>{:pay_label_{pay}}
 				{pr-acomma:}, <a href="tel:{~tel(.)}">{.}</a>
 				{usercomment:}<pre class="mt-2 px-2 p-1 alert-secondary">{.}</pre>
