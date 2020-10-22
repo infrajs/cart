@@ -8,7 +8,10 @@
 			"title": "4.m1",
 			"actions": {
 				"admin": {
-					
+					"buttons": {
+						"check": "success",
+						"delete": "danger"
+					}
 				},
 				"orders": {
 					"edit": true,

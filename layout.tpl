@@ -350,7 +350,7 @@
 			<div>
 				<style>
 					.act-check {
-						display: {:online?:none}
+						display: {:place=:admin??(:online?:none)}
 					}
 					.act-tocheck,
 					.act-delete,
@@ -359,7 +359,7 @@
 					}
 					.act-sbrfpay,
 					.act-paykeeper {
-						display: {:online??:none}
+						display: {:place=:admin??(:online??:none)}
 					}
 				</style>
 				{:place=:admin?:adminactions?:useractions}

@@ -142,9 +142,8 @@ $context->actions = [
 		//$ouser = $order['user'];
 		$ouser['order'] = Cart::getById($order_id);
 		
-		if ($place == 'orders') {
-			Cart::mailtoadmin($ouser, $lang, 'AdmOrderToCheck');
-		}
+		
+		Cart::mailtoadmin($ouser, $lang, 'AdmOrderToCheck');
 		Cart::mail($ouser, $lang, 'orderToCheck');
 		
 
@@ -160,6 +159,13 @@ $context->actions = [
 
 		return $this->ret('CR025');
 	}, 
+	'tocheck' => function () {
+		extract($this->gets(['order','order_id']), EXTR_REFS);
+		$email = $order['email'];
+		$ouser = User::getByEmail($email);
+		if (!Cart::setStatus($order_id, 'check', 'noedit')) return $this->fail('CR018');
+		return $this->ret('CR025s');
+	},
 	'settransport' => function () {
 		extract($this->gets(['transport', 'order_id']), EXTR_REFS);
 		//if (!$transport) return $this->fail('transport');
@@ -175,13 +181,7 @@ $context->actions = [
 		if (!$r) return $this->fail('CR018');
 		return $this->ret('pay3');
 	}, 
-	'tocheck' => function () {
-		extract($this->gets(['order','order_id']), EXTR_REFS);
-		$email = $order['email'];
-		$ouser = User::getByEmail($email);
-		if (!Cart::setStatus($order_id, 'check', 'noedit')) return $this->fail('CR018');
-		return $this->ret('CR025s');
-	}, 
+	
 	'setcallback' => function () {
 		extract($this->gets(['order_id','callback']), EXTR_REFS);
 		$r = Cart::setCallback($order_id, $callback);
