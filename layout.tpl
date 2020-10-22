@@ -259,7 +259,7 @@
 				</a>
 	{ORDER:}
 		{:ordercrumb}
-		{data.result??:ordermessage}
+		{data.result??(data.msg?:ordermessage)}
 		{data.order.sum>0|(data.user.admin|data.order.status!:wait)?data.order:ordercontent?:emptyorder}		
 		{ordermessage:}
 			<h1>Ошибка</h1>
