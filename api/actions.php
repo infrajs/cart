@@ -110,14 +110,18 @@ $context->actions = [
 		$list = Cart::getOrders(false, $statuses, $start, $end);
 		if (!$list) return $this->err('CR006');
 		$total = 0;
+		$count = 0;
 		foreach ($list as $k => $order) {
 			/*
 				Если в заказе не мой email, то изменения города в шапке на заказ не повлияют, так как не будут менять город у пользователя по email. При freeze нужно фиксировать город.
 			*/
 			$list[$k]['city'] = Cart::getCity($order['city_id'], $order['email'], $order['order_id'], $lang);
+			if ($order['status'] == 'wait') continue;
 			$total += $order['total'];
+			$count++;
 		}
 		$ans['list'] = $list;
+		$ans['count'] = $count;
 		$ans['total'] = $total;
 		$ans['meta'] = Cart::getJsMeta($meta, $lang);
 	},	

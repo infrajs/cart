@@ -1447,7 +1447,7 @@
 		{ADMINLIST:}
 			{data.result?:adm_listPage?:adm_message}
 		{adm_listPage:}
-			<h2>{data.Y}, {data.F} <span class="float-right">{~length(data.list)} на {~cost(data.total)}{:model.unit}</span></h2>
+			<h2>{data.Y}, {data.F} <span title="Отправленных заказов" class="float-right">{data.count} на {~cost(data.total)}{:model.unit}</span></h2>
 			{data.list::adm_row}
 			<script type="module" async>
 				import { Cart } from '/vendor/infrajs/cart/Cart.js'
