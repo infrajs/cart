@@ -39,8 +39,7 @@
 						"jsontpl":"-cart/api/getorder?lang={Cart.lang()}&order_nick={crumb.parent.name}&place={crumb.parent.parent.name}&token={User.token()}",
 						"tpl":"-cart/layout.tpl",
 						"global":["user", "cart"],
-						"tplroot":"PRINT",
-						"dataroot":"data.order"
+						"tplroot":"PRINT"
 					}
 				}
 			}

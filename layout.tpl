@@ -286,13 +286,13 @@
 						<input {:isdisabled} class="radio form-check-input" type="radio" name="transport" {...transport=type?:checked} id="transport_{type}" 
 						data-cost="{cost}" value="{type}">
 						<label class="ml-1 form-check-label" for="transport_{type}">
-							{:label_{type}_short}
+							{...:label_{type}_short}
 						</label>
 					</div>
 					{((type!:any)&(type!:self))?:transprice}
 				</div>
 				<div class="descr {...transport=type?:show}">
-					{:descr_{type}}
+					{...:descr_{type}}
 				</div>
 			</div>
 		{pochtalogo:}
@@ -722,9 +722,6 @@
 								} else {
 									cls('sumtrans')[0].innerHTML = ': '+tplcost(sumtrans)
 								}
-
-								for (const span of cls('total')) span.innerHTML = tplcost(total)
-								cls('titletrans')[0].innerHTML = Template.parse("{tpl}", true, "label_" + transport)
 								let data = {
 									"city":{
 										"city":"{data.order.city.city}"
@@ -733,6 +730,9 @@
 									"zip":"{data.order.zip}",
 									"pvz":"{data.order.pvz}"
 								}
+								for (const span of cls('total')) span.innerHTML = tplcost(total)
+								cls('titletrans')[0].innerHTML = Template.parse("{tpl}", data, "label_" + transport)
+								
 								cls('transresume')[0].innerHTML = Template.parse("{tpl}", data, "info_" + transport)
 
 								const ans = await Cart.posts('settransport', { place, order_id }, { transport })
@@ -1618,7 +1618,7 @@
 		<li class="breadcrumb-item active">Версия для печати</li>
 	</ol>
 	<!-- <h1>Заказ {order_nick}{time:ot}</h1> -->
-	{:resume}
+	{data.order:resume|:ordermessage}
 	{ot:} от {~date(:d.m.Y,.)}
 	{adminli:}<li class="breadcrumb-item"><a class="text-danger" href="/cart/admin">Все заказы</a></li>
 {pr-comma:}, {.}
@@ -1682,7 +1682,7 @@
 
 	{descr_any:}<div style="font-size:13px; color:#888; margin-top:-4px;">Почта России, СДЕК, Деловые Линии, DPD, КИТ, Байкал Сервис, Энергия, ПЭК ...</div>
 	{info_any:}
-	{label_any:}Способ и стоимость доставки, согласовываются отдельно.
+	{label_any:}Способ и стоимость доставки, согласовываются отдельно. {city.city|:citynone}.
 	{label_any_short:}Согласовать оптимальную ТК с менеджером
 
 	{descr_cdek_courier:}{:inpaddress}

@@ -38,8 +38,11 @@ class Cart
 	use CacheOnce;
 	use LangAns;
 	use UserMail;
-	public static function mailbefore(&$data)
+	public static function mailbefore(&$user)
 	{
+		$order = $user['order'];
+		$city_id = $user['order']['city_id'] ? $user['order']['city_id'] : $user['city_id'];
+		$user['order']['city'] = City::getById($city_id, $user['lang']);
 	}
 	public static function mailafter($data, $r)
 	{
