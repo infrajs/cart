@@ -165,7 +165,7 @@ class Cart
 					";
 				}
 			}
-			$sql .= 'ORDER BY o.datecheck DESC, o.dateedit DESC';
+			$sql .= 'ORDER BY o.dateedit DESC';
 
 			$list = Db::colAll($sql, $param);
 
