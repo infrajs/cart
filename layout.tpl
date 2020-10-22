@@ -286,13 +286,13 @@
 						<input {:isdisabled} class="radio form-check-input" type="radio" name="transport" {...transport=type?:checked} id="transport_{type}" 
 						data-cost="{cost}" value="{type}">
 						<label class="ml-1 form-check-label" for="transport_{type}">
-							{...:label_{type}_short}
+							{:label_{type}_short}
 						</label>
 					</div>
 					{((type!:any)&(type!:self))?:transprice}
 				</div>
 				<div class="descr {...transport=type?:show}">
-					{...:descr_{type}}
+					{:descr_{type}}
 				</div>
 			</div>
 		{pochtalogo:}
