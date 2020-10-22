@@ -8,7 +8,7 @@
 			"title": "4.m1",
 			"actions": {
 				"admin": {
-					"edit": false
+					
 				},
 				"orders": {
 					"edit": true,
@@ -29,7 +29,7 @@
 			"actions": {
 				"orders": {
 					"buttons": {
-						"wait": "secondary"
+
 					}
 				},
 				"admin": {
