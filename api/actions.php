@@ -189,7 +189,7 @@ $context->actions = [
 	}, 
 	'complete' => function () {
 		extract($this->gets(['order_id','order']), EXTR_REFS);
-		if (!Cart::setStatus($order_id, 'complete')) return $this->fail('CR018');
+		if (!Cart::setStatus($order_id, 'complete', true)) return $this->fail('CR018');
 		$r = Cart::resetActive($order);//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
 		if (!$r) return $this->fail('CR018');
 		return $this->ret('CR040');

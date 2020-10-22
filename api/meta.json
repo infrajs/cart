@@ -9,7 +9,6 @@
 			"actions": {
 				"admin": {
 					"buttons": {
-						"check": "success",
 						"delete": "danger"
 					}
 				},
