@@ -125,7 +125,7 @@ class Cart
 			if ($start) {
 				$param[":start"] = $start;
 				$param[":end"] = $end;
-				$time = '((datecheck >= FROM_UNIXTIME(:start) and datecheck < FROM_UNIXTIME(:end)) or (datecheck is null and datecreate >= FROM_UNIXTIME(:start) and datecreate < FROM_UNIXTIME(:end)))';
+				$time = '((datecheck >= FROM_UNIXTIME(:start) and datecheck < FROM_UNIXTIME(:end)) or (datecheck is null and dateedit >= FROM_UNIXTIME(:start) and dateedit < FROM_UNIXTIME(:end)))';
 			} else {
 				$time = 'o.order_id is not null';
 			}
@@ -155,9 +155,13 @@ class Cart
 						";
 					}
 				} else {
+					// $sql = "SELECT DISTINCT $fields
+					// 	FROM cart_orders o
+					// 	WHERE $time AND o.status != 'wait' AND o.status != ''
+					// ";
 					$sql = "SELECT DISTINCT $fields
 						FROM cart_orders o
-						WHERE $time AND o.status != 'wait' AND o.status != ''
+						WHERE $time
 					";
 				}
 			}

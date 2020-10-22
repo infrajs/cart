@@ -1441,6 +1441,7 @@
 			<li class="breadcrumb-item active">Все заказы</li>
 		</ol>
 		<h1>Все заказы</h1>
+		<p>Дата когда заказ поступил на проверку или по дате последних изменений.</p>
 		<div id="YEARS"></div>
 		<div id="ADMINLIST"></div>
 		{ADMINLIST:}
@@ -1478,8 +1479,9 @@
 				}
 			</script>
 			{orderpaidb:}, <b>оплачен, {~cost(total)}{:model.unit}</b>
+			{bgwait:}opacity:0.5;
 			{adm_row:}
-				<div class="border mb-2 p-2">
+				<div class="border mb-2 p-2" style="{status=:wait?:bgwait}">
 					<style>
 						#{div} .circle {
 							border-radius:50%;
