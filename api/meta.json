@@ -37,6 +37,7 @@
 				"admin": {
 					"buttons": {
 						"email": "secondary",
+						"wait": "secondary",
 						"complete": "info",
 						"delete": "danger"
 					}
