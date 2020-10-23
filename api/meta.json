@@ -76,7 +76,8 @@
 				"admin": {
 					"buttons": {
 						"email": "secondary",
-						"complete": "success"
+						"complete": "success",
+						"delete": "danger"
 					}
 				}
 			}
