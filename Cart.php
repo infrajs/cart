@@ -631,14 +631,23 @@ class Cart
 	
 	public static function clear(&$order)
 	{
-
+		$order_id = $order['order_id'];
 		$sql = 'DELETE b FROM cart_basket b
 			WHERE b.order_id = :order_id 
 		';
 		if (Db::exec($sql, [
-			':order_id' => $order['order_id']
+			':order_id' => $order_id
 		]) === false) return false;
-		$r = Cart::recalc($order['order_id']);
+
+		$r = Db::exec('UPDATE cart_orders
+			SET dateedit = now()
+			WHERE order_id = :order_id
+		', [
+			':order_id' => $order_id
+		]) !== false;
+		if (!$r) return false;
+
+		$r = Cart::recalc($order_id);
 		return $r;
 	}
 	public static function removePos($position_ids, $user)
@@ -650,6 +659,14 @@ class Cart
 			WHERE b.position_id in (' . implode(',', $position_ids) . ')
 		';
 		if (Db::exec($sql) === false) return false;
+		
+		$r = Db::exec('UPDATE cart_orders
+			SET dateedit = now()
+			WHERE order_id = :order_id
+		', [
+			':order_id' => $order_id
+		]) !== false;
+		if (!$r) return false;
 
 		$r = Cart::recalc($order_id);
 		return $r;

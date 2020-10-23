@@ -292,7 +292,7 @@
 		"complete": {
 			"required": ["order_id"],
 			"handlers": ["post", "admin", "checkstatus"],
-			"statuses": ["check", "wait"],
+			"statuses": ["check", "wait", "pay"],
 			"title": "CR038.m1",
 			"confirm": "CR039.m1"
 		},
