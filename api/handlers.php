@@ -74,7 +74,7 @@ $context->handlers = [
 			if (empty($order['address'])) $this->err('address');
 		}
 		if (in_array($order['transport'],["pochta_simple","pochta_1"])) {
-			if (empty($order['zip'])) return $this->err('zip');
+			//if (empty($order['zip'])) return $this->err('zip');
 			if (empty($order['address'])) return $this->err('address');
 		}
 		if (in_array($order['transport'],["cdek_pvz"])) {

@@ -772,7 +772,6 @@
 									//const zip = ''
 									//await Cart.post('setzip', { order_id }, { zip })
 									await Cart.post('setcity', { place, order_id }, { city_id })
-									Global.check('cart-order')
 								} else {
 									Cart.dis(form, false)
 								}
