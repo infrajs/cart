@@ -82,7 +82,7 @@ let Cart = {
 		if (~['add','addtoactive','addtoactiveifnot','clear','check','delete','remove','setcoupon'].indexOf(type)) {
 			Global.set('cart-sum')
 		}
-		if (~['clear','addtoactive','addtoactiveifnot','check','delete','remove','setcoupon'].indexOf(type)) {
+		if (~['clear','addtoactive','addtoorder','addtoactiveifnot','check','delete','remove','setcoupon'].indexOf(type)) {
 			Global.set("cart-list")
 		}
 		
