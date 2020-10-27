@@ -333,7 +333,7 @@ class Meta {
 		$line = $this->addBacktraceLines();
 
 		if (!$pname) {			
-			$ans = Lang::fail($ans, $lang, $this->name.'.'.$code.'.'.$this->actionmeta['action'].'-'.$line);
+			$ans = Lang::fail($ans, $lang, $this->name.'.'.$code.'#'.$this->actionmeta['action'].'-'.$line);
 			throw new MetaException();
 		}
 		$ans['missing'] = $pname;

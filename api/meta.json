@@ -2,10 +2,10 @@
 	"rules": {
 		"wait": {
 			"notice": "default",
-			"short": "2.m1",
-			"shortactive": "6.m1",
-			"caption": "3.m1",
-			"title": "4.m1",
+			"short": "2#m1",
+			"shortactive": "6#m1",
+			"caption": "3#m1",
+			"title": "4#m1",
 			"actions": {
 				"admin": {
 					"buttons": {
@@ -65,9 +65,9 @@
 		},
 		"pay": {
 			"notice": "info",
-			"short": "pay2.m1",
-			"caption": "pay1.m2",
-			"title": "pay3.m3",
+			"short": "pay2#m1",
+			"caption": "pay1#m2",
+			"title": "pay3#m3",
 			"actions": {
 				"orders": {
 					"buttons": {
@@ -281,14 +281,14 @@
 
 		"check": {
 			"required": ["order_id"],
-			"title": "CR049.m1",
+			"title": "CR049#m1",
 			"goal": "cart",
 			"statuses": ["wait"],
 			"handlers": ["post", "checkstatus", "checkdata", "paid", "freeze"]
 		},
 		"tocheck": {
 			"required": ["order_id"],
-			"title": "CR049b.m1",
+			"title": "CR049b#m1",
 			"statuses": ["complete"],
 			"handlers": ["post", "admin", "checkstatus", "paid"]
 		},
@@ -296,13 +296,13 @@
 			"required": ["order_id"],
 			"handlers": ["post", "admin", "checkstatus"],
 			"statuses": ["check", "wait", "pay"],
-			"title": "CR038.m1",
-			"confirm": "CR039.m1"
+			"title": "CR038#m1",
+			"confirm": "CR039#m1"
 		},
 		"wait": {
 			"required": ["order_id"],
 			"handlers": ["post", "checkstatus", "unfreeze"],
-			"title": "CR050.1m",
+			"title": "CR050#m1",
 			"statuses": ["check", "pay"]
 			
 		},
@@ -331,12 +331,12 @@
 			"required": ["order_id"],
 			"statuses": ["wait"],
 			"handlers": ["post", "checkstatus", "paid"],
-			"title": "CR035.m1",
-			"confirm": "CR036.m1"
+			"title": "CR035#m1",
+			"confirm": "CR036#m1"
 		},
 		"print": {
 			"required": ["order_id"],
-			"title": "CR052.m1",
+			"title": "CR052#m1",
 			"go": {
 				"orders": "/cart/orders/{order_nick|:active}/print",
 				"admin": "/cart/admin/{order_nick|:active}/print"
@@ -344,7 +344,7 @@
 		},
 		"basket": {
 			"required": ["order_id"],
-			"title": "CR053.m1",
+			"title": "CR053#m1",
 			"go": {
 				"orders": "/cart/orders/{order_nick|:active}/list",
 				"admin": "/cart/admin/{order_nick|:active}/list"
@@ -357,7 +357,7 @@
 		"email": {
 			"required": ["order_id","commentmanager"],
 			"handlers": ["post", "admin"],
-			"title": "CR054.M1"
+			"title": "CR054#m1"
 		}
 	}
 }
