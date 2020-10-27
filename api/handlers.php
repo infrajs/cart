@@ -78,7 +78,7 @@ $context->handlers = [
 			if (empty($order['address'])) return $this->err('address');
 		}
 		if (in_array($order['transport'],["cdek_pvz"])) {
-			if (empty($order['pvz'])) return $this->err('pvz');
+			//if (empty($order['pvz'])) return $this->err('pvz');
 		}
 	},
 	"freeze" => function () {
