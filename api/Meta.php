@@ -108,7 +108,7 @@ class Meta {
 	public function ready() {
 		
 		//handlers выполняется с Транзакцией если это post
-		if (in_array('post', $this->actionmeta['handlers'])) Db::start();
+		//if (in_array('post', $this->actionmeta['handlers'])) Db::start();
 		
 		foreach ($this->actionmeta['handlers'] as $hand) {
 			//Изменения данных могут делать как будто всё ок, в случае ошибки будет откат
@@ -127,9 +127,9 @@ class Meta {
 
 		$this->exec($this->actions[$action], $action, $this->params[$action]); 
 		
-		if (in_array('post', $this->actionmeta['handlers'])) {
-			if (Db::isstart()) Db::commit(); //Пред error можно сделать commit, так как с исключением сюда не попадаем
-		}
+		//if (in_array('post', $this->actionmeta['handlers'])) {
+		//	if (Db::isstart()) Db::commit(); //Пред error можно сделать commit, так как с исключением сюда не попадаем
+		//}
 
 		//Для положительного ответа нужен return чтобы зафиксировалась транзакция
 		return $this->ret();

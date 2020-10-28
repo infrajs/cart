@@ -795,7 +795,7 @@ class Cart
 		
 		static::$once = [];
 
-		$basket = Db::all('SELECT position_id, discount, count from cart_basket where order_id = :order_id', [
+		$basket = Db::all('SELECT position_id, discount, count from cart_basket where order_id = :order_id FOR UPDATE', [
 			':order_id' => $order_id
 		]);
 		
@@ -836,7 +836,7 @@ class Cart
 		Cart::clearTransportCost($order_id);
 		//order: city_id, basket - размеры, вес, 
 
-		$order = Db::fetch('SELECT city_id, zip, email, transport FROM cart_orders where order_id = :order_id', [
+		$order = Db::fetch('SELECT city_id, zip, email, transport FROM cart_orders where order_id = :order_id FOR UPDATE', [
 			':order_id' => $order_id
 		]);
 

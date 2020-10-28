@@ -58,7 +58,7 @@
 		let btnon = () => {
 			btn.classList.remove('btn-success')
 			btn.classList.add('btn-danger')
-			btn.innerHTML = 'В корзину'
+			btn.innerHTML = 'Оформить'
 		}
 		
 		Cart.get('orderfast', { order_id, place }).then( ans => {
@@ -84,10 +84,17 @@
 		})
 		btn.addEventListener('click', async () => {
 			let count = Number(input.value)
-			if (!count) count = 1
-			let ans = await Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
-			if (!ans.result) return Popup.alert(ans.msg)
-			Crumb.go('/cart/orders/active/list')
+			
+			if (!count) {
+				count = 1
+				input.value = 1;
+				btnon();
+				let ans = Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
+				if (!(await ans).result) return Popup.alert(ans.msg)
+			} else {
+				let ans = Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
+				Crumb.go('/cart/orders/active/list')
+			}
 		});
 	</script>
 	{compolect:}<div style="font-size:1rem">Комплектация{iscatkit?:m}: <ul>{kit::kitlig}</ul></div>
