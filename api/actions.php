@@ -327,7 +327,7 @@ $context->actions = [
 			':order_id' => $order_id,
 			':address' => $address
 		]) !== false;
-		Db::commit();
+		//Db::commit();
 		if ($err) return $this->err('address');
 		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 
@@ -342,7 +342,7 @@ $context->actions = [
 			':order_id' => $order_id,
 			':name' => $name
 		]) !== false;
-		Db::commit();
+		//Db::commit();
 		if ($err) return $this->err('CR026');
 		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 
@@ -357,7 +357,7 @@ $context->actions = [
 			':order_id' => $order_id,
 			':phone' => $phone
 		]) !== false;
-		Db::commit();
+		//Db::commit();
 		if ($err) return $this->err('5');
 		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 
@@ -371,7 +371,7 @@ $context->actions = [
 			':order_id' => $order_id,
 			':email' => $email
 		]) !== false;
-		Db::commit();
+		//Db::commit();
 		if ($err) return $this->err('CR005');
 		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 
