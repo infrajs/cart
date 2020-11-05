@@ -307,6 +307,7 @@
 			
 		},
 		"paykeeper": {
+			"goal": "cart",
 			"required": ["order_id"],
 			"statuses": ["wait"],
 			"handlers": ["post", "checkstatus", "checkdata"],
