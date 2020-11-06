@@ -5,6 +5,7 @@ use infrajs\cart\paykeeper\Paykeeper;
 use infrajs\nostore\Nostore;
 use infrajs\config\Config;
 use infrajs\cart\Cart;
+use infrajs\user\User;
 use infrajs\load\Load;
 use infrajs\db\Db;
 
@@ -57,7 +58,7 @@ if (!$r) return Paykeeper::err($ans, 'Неудалось сохранить от
 
 $r = Cart::setStatus($order['order_id'], 'check');
 if (!$r) return Paykeeper::err($ans, 'Неудалось изменить статус заказа. Код c'.__LINE__);
-$ouser = $order['user'];
+$ouser = User::getByEmail($order['email']);
 $worder = Cart::getWaitOrder($ouser);
 if ($worder) Cart::setActive($worder['order_id'], $ouser['user_id']);
 
