@@ -17,7 +17,9 @@ class Paykeeper
 	public static function err($ans, $msg) {
 		$ans['msg'] = $msg;
 		$ans['result'] = 0;
-		
+		$ans['post'] = $_POST;
+		$ans['request'] = $_SERVER['QUERY_STRING'];
+		$ans['date'] = date('d.m.Y H:i');
 		$json = json_encode($ans, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 		$save = 'data/auto/.paykeeper-callback-error.json';
 		file_put_contents($save, $json);
