@@ -46,7 +46,7 @@
 				},
 				serviceUrl: function (q) {
 					var query = encodeURIComponent(q);
-					return '/-showcase/api2/live?search=' + query;
+					return '/-showcase/api2/live?query=' + query;
 				},
 				onSelect: function (suggestion) {
 					var pos = suggestion.data;

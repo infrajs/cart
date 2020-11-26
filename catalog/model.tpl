@@ -29,7 +29,7 @@
 	</div>
 {basket:}
 	<div class="cart-basket">
-		{min?(show?:showonecost?:showitemscost)?(~length(items)?:showitemonecost?:showonecost)}
+		{min?(show?:showonecost?:showitemscost)?(~length(items)?(data.pos?:showonecost?:showitemonecost)?:showonecost)}
 		{~length(kit)?:compolect}
 	</div>
 	<script type="module" async id="scriptadd{~key}">
@@ -43,59 +43,61 @@
 		let tag = tag => div.getElementsByTagName(tag)[0]
 		let cls = (cls) => div.getElementsByClassName(cls)[0]
 		let btn = cls('add')
-		let input = tag('input')
-		const place = 'orders'
-		const order_id = btn.dataset.order_id
-		const producer_nick = btn.dataset.producer_nick
-		const article_nick = btn.dataset.article_nick
-		let catkit = btn.dataset.catkit
-		let item_num = btn.dataset.item_num
-		let btnoff = () => {
-			btn.classList.add('btn-success')
-			btn.classList.remove('btn-danger')
-			btn.innerHTML = 'В корзину'
-		}
-		let btnon = () => {
-			btn.classList.remove('btn-success')
-			btn.classList.add('btn-danger')
-			btn.innerHTML = 'Оформить'
-		}
-		
-		Cart.get('orderfast', { order_id, place }).then( ans => {
-			input.value = 0
-			btnoff()
-			if (!ans.result) return //Нет заказа ну чтож
-			for (const pos of ans.order.basket ?? []) {
-				if (pos.producer_nick != producer_nick) continue
-				if (pos.article_nick != article_nick) continue
-				if (pos.catkit != catkit) continue
-				if (pos.item_num != item_num) continue
-				input.value = pos.count
-				btnon()
+		if (btn) {
+			let input = tag('input')
+			const place = 'orders'
+			const order_id = btn.dataset.order_id
+			const producer_nick = btn.dataset.producer_nick
+			const article_nick = btn.dataset.article_nick
+			let catkit = btn.dataset.catkit
+			let item_num = btn.dataset.item_num
+			let btnoff = () => {
+				btn.classList.add('btn-success')
+				btn.classList.remove('btn-danger')
+				btn.innerHTML = 'В корзину'
 			}
-		})
-		
-		input.addEventListener('change', async () => {
-			let count = Number(input.value)
-			if (count) btnon() 
-			else btnoff()
-			let ans = await Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
-			if (!ans.result) return Popup.alert(ans.msg)
-		})
-		btn.addEventListener('click', async () => {
-			let count = Number(input.value)
+			let btnon = () => {
+				btn.classList.remove('btn-success')
+				btn.classList.add('btn-danger')
+				btn.innerHTML = 'Оформить'
+			}
 			
-			if (!count) {
-				count = 1
-				input.value = 1;
-				btnon();
-				let ans = Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
-				if (!(await ans).result) return Popup.alert(ans.msg)
-			} else {
-				let ans = Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
-				Crumb.go('/cart/orders/active/list')
-			}
-		});
+			Cart.get('orderfast', { order_id, place }).then( ans => {
+				input.value = 0
+				btnoff()
+				if (!ans.result) return //Нет заказа ну чтож
+				for (const pos of ans.order.basket ?? []) {
+					if (pos.producer_nick != producer_nick) continue
+					if (pos.article_nick != article_nick) continue
+					if (pos.catkit != catkit) continue
+					if (pos.item_num != item_num) continue
+					input.value = pos.count
+					btnon()
+				}
+			})
+			
+			input.addEventListener('change', async () => {
+				let count = Number(input.value)
+				if (count) btnon() 
+				else btnoff()
+				let ans = await Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
+				if (!ans.result) return Popup.alert(ans.msg)
+			})
+			btn.addEventListener('click', async () => {
+				let count = Number(input.value)
+				
+				if (!count) {
+					count = 1
+					input.value = 1;
+					btnon();
+					let ans = Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
+					if (!(await ans).result) return Popup.alert(ans.msg)
+				} else {
+					let ans = Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
+					Crumb.go('/cart/orders/active/list')
+				}
+			});
+		}
 	</script>
 	{compolect:}<div style="font-size:1rem">Комплектация{iscatkit?:m}: <ul>{kit::kitlig}</ul></div>
 		{kitlig:}{::kitli}
@@ -104,14 +106,14 @@
 	{showitemonecost:}
 		<div class="form-inline has-success">
 			<div>{:cost-one}</div>
-			<a class="ml-2 my-1 btn btn-sm {~conf.cart.clsadd}" href="{:link-pos}">Выбрать</a>
+			<a class="ml-2 my-1 btn btn-sm btn-success" href="{:link-pos}">Выбрать</a>
 		</div>
 	{showonecost:}
 		<div class="form-inline has-success">
 			<div class="mr-2">{:cost-one}</div>
-			<div class="input-group" title="Купить {producer|...producer} {article|...article} {item|...item}">
+			<div class="input-group" title="Купить {producer|...producer} {article|...article}">
 				<input type="number" value="" min="0" max="999" class="form-control" 
-				style="width: 3.9em; padding-left: 6px; padding-right: 6сpx;">
+				style="width: 3.9em; padding-left: 6px; padding-right: 6px;">
 				<div class="input-group-append">
 					<span data-order_id="active" data-producer_nick="{producer_nick}" data-article_nick="{article_nick}" data-item_num="{item_num}" data-catkit="{catkit:ampval}" class="add btn input-group-addon"></span>
 				</div>
