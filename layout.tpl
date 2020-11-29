@@ -321,28 +321,23 @@
 					}
 				}
 			</style>
-			<form name="cart" style="
-				
-			">
+			<form name="cart">
 				<div>
 					<h1 class="mb-0">{data.rule.title} <span title="Последние измения {~date(:j F H:i,data.order.dateedit)}" class="float-right">{:ordernick}</span></h1>
 				</div>
 				<div class="d-none d-md-block"></div>
 				<div style="">
-					
 					{commentmanager?:showManageComment}
 					{~conf.cart.pay=:strsbrfpay?data.order:paylayout-sbrfpay.INFO}
 					{~conf.cart.pay=:strpaykeeper?data.order:paylayout-paykeeper.INFO}
 					{:ordercontentbody}
 				</div>
-
 				<div>
 					<div style="top:68px; position: sticky;">
 						{:resume}
 						{:orderactionsblock}
 					</div>
 				</div>
-
 			</form>
 		{strpaykeeper:}paykeeper
 		{strsbrfpay:}sbrfpay
@@ -363,6 +358,10 @@
 					}
 				</style>
 				{:place=:admin?:adminactions?:useractions}
+			</div>
+		{raschetniives:}
+			<div class="mt-n2">
+				Расчётный вес: {data.order.weight?:showweight?:noweight}
 			</div>
 		{ordercontentbody:}			
 			
@@ -473,9 +472,8 @@
 				</div>
 				<div id="transblock" class="transblock">
 					<h2><span class="transportreset" style="cursor: default">Доставка</span> в город <span class="{:isedit?:a?:text-danger} citychoice">{data.order.city.city|:citynone}</span></h2>
-					<div class="mt-n2">
-						Расчётный вес: {data.order.weight?:showweight?:noweight}
-					</div>
+					{:raschetniives}
+					
 					<div class="borderblock" style="color:#444; padding-top:0; padding-bottom:15px">
 						<div style="max-width:350px">
 							<style>
@@ -616,12 +614,18 @@
 									}
 
 									const transport = form.elements.transport.value
+									
+									const address_value = address;
+
+									const zip = cls('zip',form)[0]
+									const zip_value = zip ? zip.value : '';
+
 									const data = {
 										"city":{
 											"city":"{data.order.city.city}"
 										},
-										"address":cls('address',form)[0].value,
-										"zip":cls('zip',form)[0].value,
+										"address":address_value,
+										"zip":zip_value,
 										"pvz":"{data.order.pvz}"
 									}
 									cls('transresume')[0].innerHTML = transport ? Template.parse("{tpl}", data, "info_" + transport) : ''
@@ -698,7 +702,7 @@
 
 								let total = sum + sumtrans
 								if (pay == 'self' && ~['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier'].indexOf(transport)) {
-									total = Math.round(total * 104)/100
+									total = Math.round(total * (100 + Config.conf.cart.payselfcost)) / 100
 								}
 
 
@@ -809,13 +813,12 @@
 						}
 					</style>
 					
-
-							{(:card):payradio}
-							{(:perevod):payradio}
+							{payments.card?(:card):payradio}
+							{payments.perevod?(:perevod):payradio}
 							<!-- <img src="/-imager?src=-cart/images/cards.png"> -->
 					
-							{(:self):payradio}
-							{(:corp):payradio}
+							{payments.self?(:self):payradio}
+							{payments.corp?(:corp):payradio}
 					
 					<script type="module" async>
 						import { Cart } from '/vendor/infrajs/cart/Cart.js'
@@ -877,7 +880,8 @@
 							const radio = form.elements['transport_' + transport]
 							const sumtrans = radio ? Number(radio.dataset.cost) : 0
 							if (pay == 'self' && ~['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier'].indexOf(transport)) {
-								for (const span of cls('total')) span.innerHTML = tplcost(Math.round((sum + sumtrans) * 104)/100)
+								//for (const span of cls('total')) span.innerHTML = tplcost(Math.round((sum + sumtrans) * 104)/100)
+								for (const span of cls('total')) span.innerHTML = tplcost(Math.round((sum + sumtrans) * (100 + Config.conf.cart.payselfcost))/100)
 							} else {
 								for (const span of cls('total')) span.innerHTML = tplcost(sum + sumtrans)
 							}

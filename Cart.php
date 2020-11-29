@@ -1197,14 +1197,19 @@ class Cart
 				'order_id' => $order_id
 			]);
 
+			$order['payments'] = [];
+			foreach(Cart::$conf['pays'] as $v) {
+				$order['payments'][$v] = true;
+			}
 			$order['sumtrans'] = 0;
 			if ($order['transport'] && isset($order['transports'][$order['transport']])) {
 				$order['sumtrans'] = $order['transports'][$order['transport']]['cost'];	
 			}
 			$order['total'] = $order['sumtrans'] + $order['sum'];
 
+
 			if ($order['pay'] == 'self' && in_array($order['transport'],['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier'])) {
-				$order['total'] = round($order['total'] * 104) / 100;
+				$order['total'] = round($order['total'] * 100 + Cart::$conf['payselfcost']) / 100;
 			}
 			
 

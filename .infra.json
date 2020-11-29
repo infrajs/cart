@@ -1,8 +1,9 @@
 {
-	"pub":["yandexapikey", "coupon","transports","city_from_id","city_from","pay"],
+	"pub":["yandexapikey", "payselfcost", "coupon","transports","city_from_id","city_from","pay"],
 	"paramsrc":"~auto/pages/Параметры.xlsx",
 	"coupon":true,
 	"conf":"infrajs\\cart\\Cart",
+	"payselfcost":4,
 	"js":["Cart.js","infra.js"],
 	"require":"infra.php",
 	"update":"update.php",
