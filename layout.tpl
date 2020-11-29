@@ -565,7 +565,7 @@
 						</script>
 						<script type="module" async>
 							import { Cart } from '/vendor/infrajs/cart/Cart.js'
-							import { CDEK } from '/vendor/akiyatkin/cdek/CDEK.js'
+							import { CDEK } from '/vendor/infrajs/cart/cdek/CDEK.js'
 							import { Popup } from '/vendor/infrajs/popup/Popup.js'
 							import { Load } from '/vendor/akiyatkin/load/Load.js'
 							/*
@@ -722,11 +722,14 @@
 								} else {
 									cls('sumtrans')[0].innerHTML = ': '+tplcost(sumtrans)
 								}
+								const address = cls('address',form)[0]
+								const address_value = address ? address.value : '';
+
 								let data = {
 									"city":{
 										"city":"{data.order.city.city}"
 									},
-									"address":cls('address',form)[0].value,
+									"address":address_value,
 									"zip":"{data.order.zip}",
 									"pvz":"{data.order.pvz}"
 								}

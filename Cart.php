@@ -804,16 +804,21 @@ class Cart
 		$count = 0;
 		$weight = 0;
 		
-
 		$usepochta = true;
-
+		$sizeerror = false;
 		foreach ($basket as $k => $pos) {
 			$model = Cart::getModel($pos['position_id']);
 			if (!$model) continue;
 			$dim = Cart::getDim($model);
-			if (!$dim) return true;
+			if (!$dim) {
+				$sizeerror = true;
+				break;
+			}
 			$w = $dim['weight'];
-			if (!$w) return true;
+			if (!$w) {
+				$sizeerror = true;
+				break;	
+			}
 			
 			if ($dim['max'] > Pochta::$limit['max'] || $dim['min'] > Pochta::$limit['min']) {
 				$usepochta = false;
@@ -887,79 +892,78 @@ class Cart
 			//}
 
 			
+			if (!$sizeerror) {
+				//"pickup","courier",
+				$goods = CDEK::getGoods($basket);
 
-			
-			//"pickup","courier",
-			
-			$goods = CDEK::getGoods($basket);
-
-			$type = 'cdek_pvz';
-			if ($goods && in_array($type, $transports)) {
-				$ans = CDEK::calc($goods, "pickup", $city_to_id);
-				if ($ans) {
-					$cost = $ans['cost'];
-					$min = $ans['min'];
-					$max = $ans['max'];
-					$cost = ($sum >= $transportfree) ? 0 : $cost;
-					if (in_array($type, $transports)) {
-						$mytransport[] = $type;
-						Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
-					}
-				}
-			}
-
-			$type = 'cdek_courier'; 
-			if ($goods && in_array($type, $transports)) {
-				$ans = CDEK::calc($goods, "courier", $city_to_id);
-				if ($ans) {
-					$cost = $ans['cost'];
-					$min = $ans['min'];
-					$max = $ans['max'];
-					$cost = ($sum >= $transportfree) ? 0 : $cost;
-					if (in_array($type, $transports)) {
-						$mytransport[] = $type;
-						Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
-					}
-				}
-			}
-
-			if ($usepochta) {
-				$zip = $order['zip'] ? $order['zip'] : $city['zip'];
-				$type = 'pochta_simple';
-				$ans = Pochta::calc($type, $weight, $zip);
-				if ($ans) {
-					$cost = $ans['cost'];
-					$min = $ans['min'];
-					$max = $ans['max'];
-					$cost = ($sum >= $transportfree) ? 0 : $cost;
-					if (in_array($type, $transports)) {
-						$mytransport[] = $type;
-						Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+				$type = 'cdek_pvz';
+				if ($goods && in_array($type, $transports)) {
+					$ans = CDEK::calc($goods, "pickup", $city_to_id);
+					if ($ans) {
+						$cost = $ans['cost'];
+						$min = $ans['min'];
+						$max = $ans['max'];
+						$cost = ($sum >= $transportfree) ? 0 : $cost;
+						if (in_array($type, $transports)) {
+							$mytransport[] = $type;
+							Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+						}
 					}
 				}
 
-				$type = 'pochta_1'; 
-				$ans = Pochta::calc($type, $weight, $zip);
-				if ($ans) {
-					$cost = $ans['cost'];
-					$min = $ans['min'];
-					$max = $ans['max'];
-					$cost = ($sum >= $transportfree) ? 0 : $cost;
-					if (in_array($type, $transports)) {
-						$mytransport[] = $type;
-						Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+				$type = 'cdek_courier'; 
+				if ($goods && in_array($type, $transports)) {
+					$ans = CDEK::calc($goods, "courier", $city_to_id);
+					if ($ans) {
+						$cost = $ans['cost'];
+						$min = $ans['min'];
+						$max = $ans['max'];
+						$cost = ($sum >= $transportfree) ? 0 : $cost;
+						if (in_array($type, $transports)) {
+							$mytransport[] = $type;
+							Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+						}
 					}
 				}
-				$type = 'pochta_courier';
-				$ans = Pochta::calc($type, $weight, $zip);
-				if ($ans) {
-					$cost = $ans['cost'];
-					$min = $ans['min'];
-					$max = $ans['max'];
-					$cost = ($sum >= $transportfree) ? 0 : $cost;
-					if (in_array($type, $transports)) {
-						$mytransport[] = $type;
-						Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+
+				if ($usepochta) {
+					$zip = $order['zip'] ? $order['zip'] : $city['zip'];
+					$type = 'pochta_simple';
+					$ans = Pochta::calc($type, $weight, $zip);
+					if ($ans) {
+						$cost = $ans['cost'];
+						$min = $ans['min'];
+						$max = $ans['max'];
+						$cost = ($sum >= $transportfree) ? 0 : $cost;
+						if (in_array($type, $transports)) {
+							$mytransport[] = $type;
+							Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+						}
+					}
+
+					$type = 'pochta_1'; 
+					$ans = Pochta::calc($type, $weight, $zip);
+					if ($ans) {
+						$cost = $ans['cost'];
+						$min = $ans['min'];
+						$max = $ans['max'];
+						$cost = ($sum >= $transportfree) ? 0 : $cost;
+						if (in_array($type, $transports)) {
+							$mytransport[] = $type;
+							Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+						}
+					}
+					$type = 'pochta_courier';
+					$ans = Pochta::calc($type, $weight, $zip);
+					if ($ans) {
+						$cost = $ans['cost'];
+						$min = $ans['min'];
+						$max = $ans['max'];
+						$cost = ($sum >= $transportfree) ? 0 : $cost;
+						if (in_array($type, $transports)) {
+							$mytransport[] = $type;
+							Cart::saveTransportCost($order_id, $type, $cost, $min, $max);
+						}
 					}
 				}
 			}
@@ -1192,6 +1196,7 @@ class Cart
 			', 'type', [
 				'order_id' => $order_id
 			]);
+
 			$order['sumtrans'] = 0;
 			if ($order['transport'] && isset($order['transports'][$order['transport']])) {
 				$order['sumtrans'] = $order['transports'][$order['transport']]['cost'];	
