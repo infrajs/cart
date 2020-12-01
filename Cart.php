@@ -247,26 +247,35 @@ class Cart
 
 
 		$runyear = (int) date('Y', $start);
+
 		$runmonth = (int) date('m', $start);
 		$next = strtotime('1.' . $runmonth . '.' . $runyear);
 		if (empty($list[$runyear])) $list[$runyear] = [];
 
+		
 		$list[$runyear][] = Cart::getYearsOpt($lang, $next);
 
 		do {
+
 			$runmonth++;
 			if ($runmonth == 13) {
 				$runyear++;
 				$runmonth = 1;
 			}
 			$next = strtotime('1.' . $runmonth . '.' . $runyear);
-			if ($next > $end) break;
+			if ($next > $end) {
+				if ($runmonth == 1) {
+					$runyear--;
+				}
+				break;
+			}
 			if (empty($list[$runyear])) $list[$runyear] = [];
 			$list[$runyear][] = Cart::getYearsOpt($lang, $next);
 		} while (true);
 
+		
 		$list[$runyear][sizeof($list[$runyear])-1]['now'] = true;
-
+		
 		return $list;
 	}
 	private static function getYearsOpt($lang, $next)

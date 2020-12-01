@@ -105,6 +105,7 @@ $context->actions = [
 		$end = strtotime('first day of next month 0:0', $start);
 		$ans['start'] = $start;
 		$ans['Y'] = date('Y', $start);
+
 		$ans['F'] = Cart::lang($lang, date('F', $start));
 		$ans['startstr'] = date('d.m.Y H:i:s', $start);		
 		$list = Cart::getOrders(false, $statuses, $start, $end);
@@ -128,6 +129,7 @@ $context->actions = [
 	'years' => function () {
 		extract($this->gets(['ans']), EXTR_REFS);
 		$years = Cart::getYears();
+		
 		$ans['years'] = $years;
 	},	
 	'getmeta' => function () {
