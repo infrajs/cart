@@ -471,7 +471,7 @@
 					</div>
 				</div>
 				<div id="transblock" class="transblock">
-					<h2><span class="transportreset" style="cursor: default">Доставка</span> в город <span class="{:isedit?:a?:text-danger} citychoice">{data.order.city.city|:citynone}</span></h2>
+					<h2><span class="transportreset" style="cursor: default">Населённый пункт</span> <span class="{:isedit?:a?:text-danger} citychoice">{data.order.city.city|:citynone}</span></h2>
 					{:raschetniives}
 					
 					<div class="borderblock" style="color:#444; padding-top:0; padding-bottom:15px">
