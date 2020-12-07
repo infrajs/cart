@@ -1218,7 +1218,9 @@ class Cart
 
 
 			if ($order['pay'] == 'self' && in_array($order['transport'],['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier'])) {
-				$order['total'] = round($order['total'] * 100 + Cart::$conf['payselfcost']) / 100;
+				$order['total'] = round($order['total'] * (100 + Cart::$conf['payselfcost'])) / 100;
+
+
 			}
 			
 
