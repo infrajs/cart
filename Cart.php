@@ -1217,7 +1217,8 @@ class Cart
 			$order['total'] = $order['sumtrans'] + $order['sum'];
 
 
-			if ($order['pay'] == 'self' && in_array($order['transport'],['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier'])) {
+			$payselfcost = $order['pay'] == 'self' && (!$order['transport'] || in_array($order['transport'],['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier']));
+			if ($payselfcost) {
 				$order['total'] = round($order['total'] * (100 + Cart::$conf['payselfcost'])) / 100;
 
 

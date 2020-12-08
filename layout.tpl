@@ -701,7 +701,9 @@
 								for (const btn of cls('act-paykeeper')) btn.style.display = online ? 'inline-block' : 'none'
 
 								let total = sum + sumtrans
-								if (pay == 'self' && ~['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier'].indexOf(transport)) {
+
+								const payselfcost = pay == 'self' && (!transport || ~['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier'].indexOf(transport));
+								if (payselfcost) {
 									total = Math.round(total * (100 + Config.conf.cart.payselfcost)) / 100
 								}
 
@@ -879,7 +881,9 @@
 							const transport = form.elements.transport.value
 							const radio = form.elements['transport_' + transport]
 							const sumtrans = radio ? Number(radio.dataset.cost) : 0
-							if (pay == 'self' && ~['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier'].indexOf(transport)) {
+
+							const payselfcost = pay == 'self' && (!transport || ~['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier'].indexOf(transport));
+							if (payselfcost) {
 								//for (const span of cls('total')) span.innerHTML = tplcost(Math.round((sum + sumtrans) * 104)/100)
 								for (const span of cls('total')) span.innerHTML = tplcost(Math.round((sum + sumtrans) * (100 + Config.conf.cart.payselfcost))/100)
 							} else {
@@ -1664,10 +1668,9 @@
 	<div class="transportready" style="display:{transport??:none}">
 		<div><span class="titletrans">{:label_{transport}}</span><b class="sumtrans">{((transport!:any)&(transport!:self))?:showsumtrans}</b></div>
 		<div class="transresume">{:info_{transport}}</div>
-		<div class="payresume">{pay?:pay_label_{pay}}</div>
-		Всего: <b class="total">{~cost(total)}{:model.unit}</b>
 	</div>
-
+	<div class="payresume">{pay?:pay_label_{pay}}</div>
+	Всего: <b class="total">{~cost(total)}{:model.unit}</b>
 	
 	{showsumtrans:}: {~cost(sumtrans)}{:model.unit}
 	{none:}none
