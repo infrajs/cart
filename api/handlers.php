@@ -104,6 +104,9 @@ $context->handlers = [
 				User::setEmail($user, $email); //должно быть событие о появлении email Global.set('user')
 			}
 			$ans['token'] = $ouser['user_id'] . '-' . $ouser['token'];
+			
+			$r = Cart::setOwner($order['order_id'], $ouser['user_id']);
+			if (!$r) return $this->fail('CR018');
 		} else { //Если на указанный email уже есть регистрация
 			if ($ouser['user_id'] != $user['user_id']) { //и это не мы
 				
@@ -122,8 +125,7 @@ $context->handlers = [
 				
 			}
 		}	
-		$r = Cart::setOwner($order['order_id'], $ouser['user_id']);
-		if (!$r) return $this->fail('CR018');
+		
 		Cart::recalc($order['order_id']);
 		$order = Cart::getById($order['order_id']);
 	}
