@@ -308,7 +308,7 @@
 		},
 		"paykeeper": {
 			"goal": "cart",
-			"required": ["order_id"],
+			"required": ["order_id", "city_id", "timezone"],
 			"statuses": ["wait"],
 			"handlers": ["post", "checkstatus", "checkdata"],
 			"title": "1.m2",
