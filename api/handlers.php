@@ -106,7 +106,7 @@ $context->handlers = [
 			$ans['token'] = $ouser['user_id'] . '-' . $ouser['token'];
 			
 			$r = Cart::setOwner($order['order_id'], $ouser['user_id']);
-			if (!$r) return $this->fail('CR018');
+			if (!$r) return $this->fail('CR018.e1');
 		} else { //Если на указанный email уже есть регистрация
 			if ($ouser['user_id'] != $user['user_id']) { //и это не мы
 				
@@ -120,12 +120,12 @@ $context->handlers = [
 					//У текущего пользователя есть аккаунт, ему не надо переходить, но нужно дать доступ и пользователю по указанному email
 					//Передаём доступ к текущему заказу и на этот аккаунт и делает для нового аккаунта этот заказ активным?. Злоумышленник кому-то может подсунуть новый заказ)
 					Cart::setOwner($order['order_id'], $ouser['user_id']);
+					if (!$r) return $this->fail('CR018.e2');
 					//И пропускаем оформление заказа дальше
 				}
 				
 			}
-		}	
-		
+		}
 		Cart::recalc($order['order_id']);
 		$order = Cart::getById($order['order_id']);
 	}
