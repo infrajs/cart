@@ -280,11 +280,11 @@
 
 
 		"check": {
-			"required": ["order_id"],
+			"required": ["order_id", "city_id", "timezone"],
 			"title": "CR049#m1",
 			"goal": "cart",
 			"statuses": ["wait"],
-			"handlers": ["city_id", "city_id", "timezone", "post", "checkstatus", "checkdata", "paid", "freeze"]
+			"handlers": ["post", "checkstatus", "checkdata", "paid", "freeze"]
 		},
 		"tocheck": {
 			"required": ["order_id"],
