@@ -284,7 +284,7 @@
 			"title": "CR049#m1",
 			"goal": "cart",
 			"statuses": ["wait"],
-			"handlers": ["post", "checkstatus", "checkdata", "paid", "freeze"]
+			"handlers": ["city_id", "city_id", "timezone", "post", "checkstatus", "checkdata", "paid", "freeze"]
 		},
 		"tocheck": {
 			"required": ["order_id"],
