@@ -8,8 +8,8 @@ use infrajs\access\Access;
 
 class Pochta {
 	public static $limit = [
-		'max'=> 53,
-		'min'=> 26
+		'max'=> 150,
+		'min'=> 50
 	];
 	public static function calc($type, $weight, $to) {
 		//53 х 38 х 26,5
