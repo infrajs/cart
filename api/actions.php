@@ -118,6 +118,7 @@ $context->actions = [
 			*/
 			$list[$k]['city'] = Cart::getCity($order['city_id'], $order['email'], $order['order_id'], $lang);
 			if ($order['status'] == 'wait') continue;
+			if ($order['status'] == 'pay') continue;
 			$total += $order['total'];
 			$count++;
 		}

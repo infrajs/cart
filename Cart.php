@@ -42,7 +42,7 @@ class Cart
 	{
 		$order = $user['order'];
 		$city_id = $user['order']['city_id'] ? $user['order']['city_id'] : $user['city_id'];
-		$user['order']['city'] = City::getById($city_id, $user['lang']);
+		$user['order']['city'] = City::getById($city_id, 'ru');
 	}
 	public static function mailafter($data, $r)
 	{
