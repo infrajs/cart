@@ -1,6 +1,6 @@
 import { Crumb } from '/vendor/infrajs/controller/src/Crumb.js'
-import { Ascroll } from '/vendor/infrajs/ascroll/Ascroll.js'
-import { Popup } from '/vendor/infrajs/popup/Popup.js'
+//import { Ascroll } from '/vendor/infrajs/ascroll/Ascroll.js'
+//import { Popup } from '/vendor/infrajs/popup/Popup.js'
 import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
@@ -11,7 +11,7 @@ import { View } from '/vendor/infrajs/view/View.js'
 import { Load } from '/vendor/akiyatkin/load/Load.js'
 import { Lang } from '/vendor/infrajs/lang/Lang.js'
 import { Global } from '/vendor/infrajs/layer-global/Global.js'
-import { Session } from '/vendor/infrajs/session/Session.js'
+//import { Session } from '/vendor/infrajs/session/Session.js'
 //let Template, Global, Autosave
 
 let Cart = {

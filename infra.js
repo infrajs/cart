@@ -1,12 +1,12 @@
-import { Crumb } from '/vendor/infrajs/controller/src/Crumb.js'
-import { Event } from '/vendor/infrajs/event/Event.js'
+//import { Crumb } from '/vendor/infrajs/controller/src/Crumb.js'
+//import { Event } from '/vendor/infrajs/event/Event.js'
 import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Cart } from '/vendor/infrajs/cart/Cart.js'
-import { Popup } from '/vendor/infrajs/popup/Popup.js'
+//import { Popup } from '/vendor/infrajs/popup/Popup.js'
 import { DOM } from '/vendor/akiyatkin/load/DOM.js'
-import { User } from '/vendor/infrajs/user/User.js'
+//import { User } from '/vendor/infrajs/user/User.js'
 import { Config } from '/vendor/infrajs/config/Config.js'
-import { Global } from '/vendor/infrajs/layer-global/Global.js'
+//import { Global } from '/vendor/infrajs/layer-global/Global.js'
 
 
 if (~Config.get('cart').transports.indexOf('cdek_pvz')) {
@@ -24,9 +24,9 @@ if (~Config.get('cart').transports.indexOf('cdek_pvz')) {
 	})()
 }
 
-DOM.once('load', async () => {
-	await CDN.fire('load','jquery')
-})
+// DOM.once('load', async () => {
+// 	await CDN.fire('load','jquery')
+// })
 DOM.once('check', async () => {
 	let Template = (await import('/vendor/infrajs/template/Template.js')).Template
 	Template.scope['Cart'] = {};
