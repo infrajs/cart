@@ -66,7 +66,8 @@
 				input.value = 0
 				btnoff()
 				if (!ans.result) return //Нет заказа ну чтож
-				for (const pos of ans.order.basket ?? []) {
+				const list = ans.order.basket ?? []
+				for (const pos of list) {
 					if (pos.producer_nick != producer_nick) continue
 					if (pos.article_nick != article_nick) continue
 					if (pos.catkit != catkit) continue
@@ -115,7 +116,7 @@
 				<input type="number" value="" min="0" max="999" class="form-control" 
 				style="width: 3.9em; padding-left: 6px; padding-right: 6px;">
 				<div class="input-group-append">
-					<span data-order_id="active" data-producer_nick="{producer_nick}" data-article_nick="{article_nick}" data-item_num="{item_num}" data-catkit="{catkit:ampval}" class="add btn input-group-addon"></span>
+					<span data-order_id="active"  style="min-width:100px" data-producer_nick="{producer_nick}" data-article_nick="{article_nick}" data-item_num="{item_num}" data-catkit="{catkit:ampval}" class="add btn input-group-addon"></span>
 				</div>
 			</div>
 		</div>

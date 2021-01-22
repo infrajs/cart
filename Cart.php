@@ -1186,6 +1186,7 @@ class Cart
 				$order['sumclear'] += $order['basket'][$i]['sumclear'];
 				
 			}
+			$order['basket'] = array_values($order['basket']);
 
 			if ($fast) {
 
@@ -1231,6 +1232,7 @@ class Cart
 	public static function getHash($model)
 	{
 		if (!$model) return 'none';
+		if (empty($model['Цена'])) return '';
 		$hash = Path::encode($model['Цена']);
 		//unset($model['model_id']);
 		//$hash = md5(json_encode($model, JSON_UNESCAPED_UNICODE));
