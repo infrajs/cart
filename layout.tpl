@@ -1491,7 +1491,7 @@
 			{orderpaidb:}, <b>оплачен, {~cost(total)}{:model.unit}</b>
 			{bgwait:}opacity:0.5;
 			{adm_row:}
-				<div class="border mb-2 p-2" style="{status=:wait?:bgwait}">
+				<div class="border mb-2 p-2" style="{(status=:wait|status=:pay)?:bgwait}">
 					<style>
 						#{div} .circle {
 							border-radius:50%;
@@ -1688,7 +1688,7 @@
 	{label_city:}Доставка по Тольятти
 	{label_city_short:}{:label_city}
 	
-	{descr_self:}ул. Новозаводская 2Б, торг.павильон №1, 1/23. <span class="a showMap">Схема проезда</span>
+	{descr_self:}ул. Новозаводская 2Б, торг.павильон №1, 1/23. <span class="a showMap">Схема&nbsp;проезда</span>
 	{info_self:}
 	{label_self:}Самовывоз из магазина в Тольятти
 	{label_self_short:}{:label_self}

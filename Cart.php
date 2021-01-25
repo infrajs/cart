@@ -302,8 +302,8 @@ class Cart
 		if (!$row) {
 			$row = array_flip($fields);
 			foreach($row as $i => $v) $row[$i] = '';
-			$row['transport'] = 'cdek_pvz';
-			$row['pay'] = 'card';
+			$row['transport'] = Cart::$conf['transports'][0];
+			$row['pay'] = Cart::$conf['pays'][0];
 			$row['city_id'] = $user['city_id'];
 		}
 		$row['email'] = $user['email'];
@@ -1159,14 +1159,22 @@ class Cart
 						unset($order['basket'][$i]);
 						continue; //Модель не заморожена и не найдена в каталоге
 					}
+
 					$order['basket'][$i]['model'] = $model;
-					$costclear = $model['Цена']; //Цену надо взять или из каталога
-					Db::exec('UPDATE cart_basket
-						SET costclear = :costclear
-						WHERE position_id = :position_id', [
-							':position_id' => $pos['position_id'],
-							':costclear' => $costclear
-					]);
+
+					if ($order['freeze']) {
+						$costclear = $pos['costclear'];
+					} else {
+						$costclear = $model['Цена']; //Цену надо взять или из каталога
+						Db::exec('UPDATE cart_basket
+							SET costclear = :costclear
+							WHERE position_id = :position_id', [
+								':position_id' => $pos['position_id'],
+								':costclear' => $costclear
+						]);
+					}
+					
+					
 					
 				}
 				$count++;
