@@ -8,4 +8,4 @@
 	<div>
 		{Скрыть фильтры в полном описании??:print_more}
 	</div>
-	{Цена?:model.basket-between}
+	{Цена?:model.basket}
