@@ -30,25 +30,47 @@ class Pochta {
 		$ans = Access::cache('Pochta-calc', function ($object, $weight, $to) {
 			$ans = [];
 			$from = Cart::$conf['zip_from'];
-			https://tariff.pochta.ru/tariff/v1/calculate?html&object=23030&from=445028&to=445003&weight=312&closed=1&date=20201018
-			$base = 'https://tariff.pochta.ru/tariff/v1/calculate?json&closed=1&object='.$object;
+			
+			
+
+			$base = 'https://tariff.pochta.ru/v2/calculate/tariff/delivery?json&object='.$object;
 			$src = $base.'&from='.$from.'&to='.$to.'&weight='.$weight.'&pack=10';
 			$text = @file_get_contents($src);
+
 			if (!$text) return false;
 			$data = Load::json_decode($text);
-			
+
 			if (!empty($data['error'])) return false;
 			$ans['cost'] = $data['paynds'] ?? false;
-			if ($ans['cost']) $ans['cost'] = $ans['cost']/100;
+			if ($ans['cost']) $ans['cost'] = $ans['cost'] / 100;
 
-
-			$base = 'https://tariff.pochta.ru/delivery/v1/calculate?json&object='.$object;
-			$src = $base.'&from='.$from.'&to='.$to.'&weight='.$weight.'&pack=10';
-			$text = @file_get_contents($src);
-			if (!$text) return false;
-			$data = Load::json_decode($text);
 			$ans['min'] = $data['delivery']['min'] ?? false;
 			$ans['max'] = $data['delivery']['max'] ?? false;
+
+
+			// //$base = 'https://tariff.pochta.ru/tariff/v1/calculate?json&closed=1&object='.$object;
+			// $base = 'https://tariff.pochta.ru/v2/calculate/tariff?json&object='.$object;
+			// $src = $base.'&from='.$from.'&to='.$to.'&weight='.$weight.'&pack=10';
+			// $text = @file_get_contents($src);
+
+			// if (!$text) return false;
+			// $data = Load::json_decode($text);
+			
+			// if (!empty($data['error'])) return false;
+			// $ans['cost'] = $data['paynds'] ?? false;
+			// if ($ans['cost']) $ans['cost'] = $ans['cost'] / 100;
+
+
+			// //$base = 'https://tariff.pochta.ru/delivery/v1/calculate?json&object='.$object;
+			// $base = 'https://tariff.pochta.ru/v2/calculate/delivery?json&object='.$object;
+			// $src = $base.'&from='.$from.'&to='.$to.'&weight='.$weight.'&pack=10';
+			
+			// $text = @file_get_contents($src);
+			
+			// if (!$text) return false;
+			// $data = Load::json_decode($text);
+			// $ans['min'] = $data['delivery']['min'] ?? false;
+			// $ans['max'] = $data['delivery']['max'] ?? false;
 
 			return $ans;
 		},[$object, $weight, $to]);
