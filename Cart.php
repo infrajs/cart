@@ -196,13 +196,24 @@ class Cart
 
 		//$new['heading'] = Cart::code($lang, $orig['heading']);
 		$new['actions'] = $orig['actions'];
+		$delactions = [];
+		if (Cart::$conf['pay'] == 'sbrfpay') $delactions[] = 'paykeeper';
+		if (Cart::$conf['pay'] == 'paykeeper') $delactions[] = 'sbrfpay';
 		foreach (['orders', 'admin'] as $place) {
 			foreach ($new['actions'][$place]['buttons'] ?? [] as $act => $cls) {
+				if (in_array($act, $delactions)) {
+					unset($new['actions'][$place]['buttons'][$act]);
+					continue;
+				}
 				$action = Cart::getJsMetaAction($meta, $act, $lang);
 				$action['cls'] = $cls;
 				$new['actions'][$place]['buttons'][$act] = $action;
 			}
 			foreach ($new['actions'][$place]['actions'] ?? [] as $i => $act) {
+				if (in_array($act, $delactions)) {
+					unset($new['actions'][$place]['actions'][$i]);
+					continue;
+				}
 				$action = Cart::getJsMetaAction($meta, $act, $lang);
 				unset($new['actions'][$place]['actions'][$i]);
 				$new['actions'][$place]['actions'][$act] = $action;

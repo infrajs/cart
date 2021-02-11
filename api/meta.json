@@ -16,6 +16,7 @@
 					"edit": true,
 					"buttons": {
 						"paykeeper": "success",
+						"sbrfpay": "success",
 						"check": "success"
 					}
 				}
@@ -72,7 +73,8 @@
 				"orders": {
 					"buttons": {
 						"wait": "secondary",
-						"paykeeper": "success"
+						"paykeeper": "success",
+						"sbrfpay": "success"
 					}
 				},
 				"admin": {
@@ -319,6 +321,21 @@
 			"go": {
 				"orders": "/cart/orders/{order_nick}/paykeeper",
 				"admin": "/cart/admin/{order_nick}/paykeeper"
+			}
+		},
+		"sbrfpay": {
+			"goal": "cart",
+			"required": ["order_id", "city_id", "timezone"],
+			"statuses": ["wait"],
+			"handlers": ["post", "checkstatus", "checkdata"],
+			"title": "1.m2",
+			"gohistory": {
+				"orders": "/cart/orders/{order_nick}",
+				"admin": "/cart/admin/{order_nick}"
+			},
+			"go": {
+				"orders": "/cart/orders/{order_nick}/sbrfpay",
+				"admin": "/cart/admin/{order_nick}/sbrfpay"
 			}
 		},
 		"delete": {

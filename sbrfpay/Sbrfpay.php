@@ -27,7 +27,6 @@ class Sbrfpay {
 		$vars['userName'] = $conf['userName'];
 		$vars['password'] = $conf['password'];
 		$vars['server'] = $conf['server'];
-		
 		/* ID заказа в магазине */
 
 		$vars['orderNumber'] = $id;

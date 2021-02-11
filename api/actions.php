@@ -183,6 +183,15 @@ $context->actions = [
 		$r = Cart::resetActive($order);
 		if (!$r) return $this->fail('CR018');
 		return $this->ret('pay3');
+	},
+	'sbrfpay' => function () {
+		extract($this->gets(['order', 'order_id']), EXTR_REFS);
+		$this->handler('create_order_user');
+		if (!Cart::setStatus($order_id, 'pay')) return $this->fail('CR018');
+		//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
+		$r = Cart::resetActive($order);
+		if (!$r) return $this->fail('CR018');
+		return $this->ret('pay3');
 	}, 
 	
 	'setcallback' => function () {

@@ -1137,7 +1137,17 @@
 				const ans = await Cart.post('complete', { place, order_id })
 				if (!ans.result) return Popup.alert(ans.msg)
 			})
-			
+			for (const btn of cls('act-sbrfpay')) btn.addEventListener('click', async () => {	
+				if (Cart.dis(form)) return
+				const status = "{data.order.status}"
+				if (status != 'pay') {
+					const ans = await Cart.post('sbrfpay', { place, order_id })
+					if (!ans.result) return Popup.alert(ans.msg)
+				}
+				//Надо сбросить active ссылку чтобы назад работал правильно
+				Crumb.go('/cart/orders/' + order_nick, false)
+				Crumb.go('/cart/orders/' + order_nick + '/sbrfpay')
+			})
 			for (const btn of cls('act-paykeeper')) btn.addEventListener('click', async () => {	
 				if (Cart.dis(form)) return
 				const status = "{data.order.status}"
