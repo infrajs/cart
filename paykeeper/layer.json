@@ -1,4 +1,0 @@
-{
-	"tpl":"-cart/paykeeper/layout.tpl",
-	"jsontpl":"-cart/paykeeper/?order_nick={crumb.parent.name}&place={crumb.parent.parent.name}&lang={Cart.lang()}&token={User.token()}"
-}

@@ -20,13 +20,9 @@
 				"globaljson":["cart"],
 				"tplroot":"ORDER",
 				"childs":{
-					"sbrfpay":{
+					"pay":{
 						"global":["user", "cart-order", "cart", "cart-sum"],
-						"external":"-cart/sbrfpay/layer.json"
-					},
-					"paykeeper":{
-						"global":["user", "cart-order", "cart", "cart-sum"],
-						"external":"-cart/paykeeper/layer.json"
+						"external":"-pay/cartapi/layer.json"
 					},
 					"list":{
 						"tpl":"-cart/layout.tpl",

@@ -26,17 +26,7 @@
 		"list":["ru","en"]
 	},
 	"pay":"paykeeper",
-	"sbrfpay":{
-		"server":"https://3dsec.sberbank.ru",
-		"userName":"",
-		"password":""
-	},
-	"paykeeper":{		
-		"secret":"",
-		"userName":"",
-		"password":"",
-		"server":"demo.server.paykeeper.ru"
-	},
+	
 	"clutch":{
 		"catalog":"vendor/infrajs/cart/",
 		"user":"vendor/infrajs/cart/"
