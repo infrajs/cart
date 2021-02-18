@@ -80,7 +80,7 @@ class Cart
 	public static function createNick()
 	{
 		// Первая дата
-		$d1_ts = strtotime('2018-01-01 12:00:00');
+		$d1_ts = strtotime('2018-01-01 00:00:00');
 
 		// Вторая дата
 		$d2_ts = time();
