@@ -151,7 +151,7 @@ $context->actions = [
 		
 
 		//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
-		$r = Cart::resetActive($order);
+		$r = Cart::resetActive($order['order_id']);
 		if (!$r) return $this->fail('CR018');
 
 		$worder = Cart::getWaitOrder($ouser);
@@ -175,25 +175,15 @@ $context->actions = [
 		$r = Cart::setTransport($order_id, $transport);
 		if (!$r) return $this->fail('CR018');
 	}, 
-	'paykeeper' => function () {
-		extract($this->gets(['order', 'order_id']), EXTR_REFS);
+	'pay' => function () {
+		extract($this->gets(['order_id']), EXTR_REFS);
 		$this->handler('create_order_user');
 		if (!Cart::setStatus($order_id, 'pay')) return $this->fail('CR018');
 		//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
-		$r = Cart::resetActive($order);
+		$r = Cart::resetActive($order_id);
 		if (!$r) return $this->fail('CR018');
 		return $this->ret('pay3');
 	},
-	'sbrfpay' => function () {
-		extract($this->gets(['order', 'order_id']), EXTR_REFS);
-		$this->handler('create_order_user');
-		if (!Cart::setStatus($order_id, 'pay')) return $this->fail('CR018');
-		//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
-		$r = Cart::resetActive($order);
-		if (!$r) return $this->fail('CR018');
-		return $this->ret('pay3');
-	}, 
-	
 	'setcallback' => function () {
 		extract($this->gets(['order_id','callback']), EXTR_REFS);
 		$r = Cart::setCallback($order_id, $callback);
@@ -202,7 +192,7 @@ $context->actions = [
 	'complete' => function () {
 		extract($this->gets(['order_id','order']), EXTR_REFS);
 		if (!Cart::setStatus($order_id, 'complete', true)) return $this->fail('CR018');
-		$r = Cart::resetActive($order);//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
+		$r = Cart::resetActive($order['order_id']);//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
 		if (!$r) return $this->fail('CR018');
 		return $this->ret('CR040');
 

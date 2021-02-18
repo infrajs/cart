@@ -257,6 +257,8 @@
 				<a href="/{:cat.pospath}" class="my-2 mr-3 d-bock d-sm-none">
 					<img class="img-thumbnail" src="/-imager/?h=100&src={images.0}&or=-imager/empty.png">
 				</a>
+	{pay::}-pay/cartapi/layout.tpl
+	{paylayout:}{:pay.INFO}
 	{ORDER:}
 		{:ordercrumb}
 		{data.result??(data.msg?:ordermessage)}
@@ -270,9 +272,7 @@
 		{showManageComment:}
 			<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-success" role="alert"><b>Сообщение менеджера</b>
 				<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{commentmanager}</pre>
-			</div>
-		{paylayout-paykeeper::}-cart/paykeeper/layout.tpl
-		{paylayout-sbrfpay::}-cart/sbrfpay/layout.tpl
+			</div>		
 		{checked:}checked
 		{ordernick:}№{data.order.order_nick}
 		
@@ -328,8 +328,7 @@
 				<div class="d-none d-md-block"></div>
 				<div style="">
 					{commentmanager?:showManageComment}
-					{~conf.cart.pay=:strsbrfpay?data.order:paylayout-sbrfpay.INFO}
-					{~conf.cart.pay=:strpaykeeper?data.order:paylayout-paykeeper.INFO}
+					{data.order.paydata:paylayout}
 					{:ordercontentbody}
 				</div>
 				<div>
@@ -339,8 +338,6 @@
 					</div>
 				</div>
 			</form>
-		{strpaykeeper:}paykeeper
-		{strsbrfpay:}sbrfpay
 		{orderactionsblock:}
 			<div>
 				<style>
@@ -352,8 +349,7 @@
 					.act-wait {
 						display: {paid?:none}	
 					}
-					.act-sbrfpay,
-					.act-paykeeper {
+					.act-pay {
 						display: {:place=:admin??(:online??:none)}
 					}
 				</style>
@@ -693,12 +689,11 @@
 								const sumtrans = radio ? Number(radio.dataset.cost) : 0
 								
 								const pay = form.elements.pay.value
-								
-								const online = (pay == 'card' && transport != 'any')
+
+								const online = (pay == 'card' && transport != 'any' && transport)
 								for (const img of cls('visalogo')) img.style.display = online ? '' : 'none'
 								for (const btn of cls('act-check')) btn.style.display = online ? 'none' : 'inline-block'
-								for (const btn of cls('act-sbrfpay')) btn.style.display = online ? 'inline-block' : 'none'
-								for (const btn of cls('act-paykeeper')) btn.style.display = online ? 'inline-block' : 'none'
+								for (const btn of cls('act-pay')) btn.style.display = online ? 'inline-block' : 'none'
 
 								let total = sum + sumtrans
 
@@ -891,11 +886,10 @@
 							}
 
 
-							const online = (pay == 'card' && transport != 'any')
+							const online = (pay == 'card' && transport != 'any' && transport)
 							for (const img of cls('visalogo')) img.style.display = online ? '' : 'none'
 							for (const btn of cls('act-check')) btn.style.display = online ? 'none' : 'inline-block'
-							for (const btn of cls('act-sbrfpay')) btn.style.display = online ? 'inline-block' : 'none'
-							for (const btn of cls('act-paykeeper')) btn.style.display = online ? 'inline-block' : 'none'
+							for (const btn of cls('act-pay')) btn.style.display = online ? 'inline-block' : 'none'
 
 							cls('payresume')[0].innerHTML = pay ? Template.parse("{tpl}", true, "pay_label_" + pay) : ''
 							
@@ -995,7 +989,7 @@
 					</script>
 				</div>
 			</div>
-			{online:}{((pay=:card)&(transport!:any))?:yes}
+			{online:}{((pay=:card)&(transport!:any))&transport?:yes}
 			{zipopt:}<option {.=data.order.zip?:selected}>{.}</option>
 			{payradio:}
 				<div class="mt-1 line" style="color: {data.order.pay=.?:black}; font-weight:{data.order.pay=.?:600}">
@@ -1035,9 +1029,14 @@
 			{yes:}yes
 			{callneed:}требуется звонок
 			{callnoneed:}вопросов нет
+		{PAYINFO:}<img src="/-cart/images/cards.png">
 		{useractions:}
-				<div class="d-flex mt-4 align-items-center">
-					<div><img style="display:{:online??:none}" class="visalogo" src="/-cart/images/cards.png"></div>
+				<div class="d-flex mt-4">
+					<div style="margin-right: 5px">
+						<div style="display:{:online??:none}" class="visalogo">
+							{:PAYINFO}
+						</div>
+					</div>
 					<div class="myactions flex-grow-1" data-place="orders">	
 						{data.rule.actions[:place]:myactions}
 					</div>
@@ -1129,43 +1128,35 @@
 			for (const btn of cls('act-basket')) btn.addEventListener('click', async () => {						
 				if (Cart.dis(form)) return
 				Crumb.go('/cart/'+place+'/'+order_nick+'/list')
-				Cart.dis(form, false)
 			})
 
 			for (const btn of cls('act-complete')) btn.addEventListener('click', async () => {
 				if (Cart.dis(form)) return
 				const ans = await Cart.post('complete', { place, order_id })
-				if (!ans.result) return Popup.alert(ans.msg)
+				if (!ans.result) {
+					return Popup.alert(ans.msg)
+				}
 			})
-			for (const btn of cls('act-sbrfpay')) btn.addEventListener('click', async () => {	
+			for (const btn of cls('act-pay')) btn.addEventListener('click', async () => {	
 				if (Cart.dis(form)) return
 				const status = "{data.order.status}"
 				if (status != 'pay') {
-					const ans = await Cart.post('sbrfpay', { place, order_id })
-					if (!ans.result) return Popup.alert(ans.msg)
+					const ans = await Cart.post('pay', { place, order_id })
+					if (!ans.result) {
+						return Popup.alert(ans.msg)
+					}
 				}
 				//Надо сбросить active ссылку чтобы назад работал правильно
 				Crumb.go('/cart/orders/' + order_nick, false)
-				Crumb.go('/cart/orders/' + order_nick + '/sbrfpay')
-			})
-			for (const btn of cls('act-paykeeper')) btn.addEventListener('click', async () => {	
-				if (Cart.dis(form)) return
-				const status = "{data.order.status}"
-				if (status != 'pay') {
-					const ans = await Cart.post('paykeeper', { place, order_id })
-					if (!ans.result) return Popup.alert(ans.msg)
-				}
-				//Надо сбросить active ссылку чтобы назад работал правильно
-				Crumb.go('/cart/orders/' + order_nick, false)
-				Crumb.go('/cart/orders/' + order_nick + '/paykeeper')
-				//const ans = await Cart.post('paykeeper', { order_id })
-				//if (!ans.result) return Popup.alert(ans.msg)
+				Crumb.go('/cart/orders/' + order_nick + '/pay')
 			})
 
 			for (const btn of cls('act-wait')) btn.addEventListener('click', async () => {	
 				if (Cart.dis(form)) return
 				const ans = await Cart.post('wait', { place, order_id })
-				if (!ans.result) return Popup.alert(ans.msg)
+				if (!ans.result) {
+					return Popup.alert(ans.msg)
+				}
 			})
 
 			for (const btn of cls('act-delete')) btn.addEventListener('click', async () => {
@@ -1202,7 +1193,6 @@
 			for (const btn of cls('act-print')) btn.addEventListener('click', async () => {	
 				if (Cart.dis(form)) return
 				await Crumb.go('/cart/'+place+'/'+order_nick+'/print')
-				Cart.dis(form, false)
 			})
 		</script>
 		{mybtns:}

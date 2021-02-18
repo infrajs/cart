@@ -15,8 +15,7 @@
 				"orders": {
 					"edit": true,
 					"buttons": {
-						"paykeeper": "success",
-						"sbrfpay": "success",
+						"pay": "success",
 						"check": "success"
 					}
 				}
@@ -72,13 +71,12 @@
 			"actions": {
 				"orders": {
 					"buttons": {
-						"wait": "secondary",
-						"paykeeper": "success",
-						"sbrfpay": "success"
+						"pay": "success"
 					}
 				},
 				"admin": {
 					"buttons": {
+						"wait": "secondary",
 						"email": "secondary",
 						"complete": "success",
 						"delete": "danger"
@@ -308,7 +306,7 @@
 			"statuses": ["check", "pay"]
 			
 		},
-		"paykeeper": {
+		"pay": {
 			"goal": "cart",
 			"required": ["order_id", "city_id", "timezone"],
 			"statuses": ["wait"],
@@ -319,23 +317,8 @@
 				"admin": "/cart/admin/{order_nick}"
 			},
 			"go": {
-				"orders": "/cart/orders/{order_nick}/paykeeper",
-				"admin": "/cart/admin/{order_nick}/paykeeper"
-			}
-		},
-		"sbrfpay": {
-			"goal": "cart",
-			"required": ["order_id", "city_id", "timezone"],
-			"statuses": ["wait"],
-			"handlers": ["post", "checkstatus", "checkdata"],
-			"title": "1.m2",
-			"gohistory": {
-				"orders": "/cart/orders/{order_nick}",
-				"admin": "/cart/admin/{order_nick}"
-			},
-			"go": {
-				"orders": "/cart/orders/{order_nick}/sbrfpay",
-				"admin": "/cart/admin/{order_nick}/sbrfpay"
+				"orders": "/cart/orders/{order_nick}/pay",
+				"admin": "/cart/admin/{order_nick}/pay"
 			}
 		},
 		"delete": {

@@ -12,6 +12,7 @@ use infrajs\session\Session;
 use infrajs\once\Once;
 use infrajs\mem\Mem;
 use akiyatkin\showcase\Showcase;
+use akiyatkin\pay\Pay;
 use infrajs\load\Load;
 use infrajs\template\Template;
 use infrajs\each\Each;
@@ -47,6 +48,7 @@ class Cart
 	public static function mailafter($data, $r)
 	{
 	}
+
 	/*
 	public static function mail($to, $email, $mailroot, $data = array())
 	{
@@ -312,7 +314,7 @@ class Cart
 		]);
 		if (!$row) {
 			$row = array_flip($fields);
-			foreach($row as $i => $v) $row[$i] = '';
+			foreach ($row as $i => $v) $row[$i] = '';
 			$row['transport'] = Cart::$conf['transports'][0];
 			$row['pay'] = Cart::$conf['pays'][0];
 			$row['city_id'] = $user['city_id'];
@@ -432,10 +434,11 @@ class Cart
 				':position_id' => $position_id
 			]) !== false;
 		} else {
-			$freeze = Db::col('SELECT order_id FROM cart_orders WHERE order_id = :order_id', [
+			$freeze = Db::col('SELECT freeze FROM cart_orders WHERE order_id = :order_id', [
 				':order_id' => $order_id
 			]);
 			if ($freeze) {
+				//При добавлении позиции которая freeze пересохраняем её
 				$pos = Db::fetch('SELECT article_nick, producer_nick, item_num, catkit from cart_basket 
 					where position_id = :position_id', [
 					':position_id'=> $position_id
@@ -504,7 +507,7 @@ class Cart
 		return $res;
 	}
 	
-	public static function resetActive($order)
+	public static function resetActive($order_id)
 	{
 		//Найти всех пользователей и что-то сделать у них активным если есть
 		$sql = 'UPDATE cart_userorders
@@ -512,7 +515,7 @@ class Cart
 			WHERE order_id = :order_id
 		';
 		return Db::exec($sql, [
-			':order_id' => $order['order_id']
+			':order_id' => $order_id
 		]) !== false;
 	}
 	public static function resetUserActive($user_id)
@@ -819,7 +822,28 @@ class Cart
 			':order_id' => $order_id
 		]);
 		
-		
+		foreach ($basket as $k => $pos) {
+			$model = Cart::getModel($pos['position_id']);
+			if (!$model) continue;
+
+			$discount = Cart::getDiscount($order_id, $model);
+
+			if ($discount) {
+				$discount = $discount * 100;
+			} else {
+				$discount = null;
+			}
+			$basket[$k]['discount'] = $discount;	
+			
+			Db::exec('UPDATE cart_basket
+				SET discount = :discount
+				WHERE position_id = :position_id
+			', [
+				':position_id' => $pos['position_id'],
+				':discount' => $discount
+			]) !== false;
+
+		}
 		$sum = 0;
 		$count = 0;
 		$weight = 0;
@@ -830,6 +854,7 @@ class Cart
 			$model = Cart::getModel($pos['position_id']);
 			if (!$model) continue;
 			$dim = Cart::getDim($model);
+
 			if (!$dim) {
 				$sizeerror = true;
 				break;
@@ -847,15 +872,7 @@ class Cart
 			$weight += $w * $pos['count'];
 			
 			$count++;
-			$discount = Cart::getDiscount($order_id, $model);
-			$r = Db::exec('UPDATE cart_basket
-				SET discount = :discount
-				WHERE position_id = :position_id
-			', [
-				':position_id' => $pos['position_id'],
-				':discount' => $discount ? $discount * 100 : null
-			]) !== false;
-			$discount = 1 - $pos['discount'] / 100;
+			$discount = (100 - $pos['discount']) / 100;
 			$sum += $model['Цена'] * $discount * $pos['count'];
 		}
 		Cart::clearTransportCost($order_id);
@@ -1107,12 +1124,11 @@ class Cart
 			if ($order['weight']) $order['weight'] = $order['weight'] / 1000;
 			
 			if ($order['paydata']) {
-				$order['paydata'] = json_decode($order['paydata'], true);
-				unset($order['paydata']['key']);
-				unset($order['paydata']['card_number']);
-				unset($order['paydata']['fop_receipt_key']);
-				unset($order['paydata']['fop_receipt_key']);
+				$paydata = json_decode($order['paydata'], true);
+				if ($paydata) $order['paydata'] = Pay::safePayData($paydata);
+				else $order['paydata'] = false;
 			}
+			
 			if ($order['coupondata']) $order['coupondata'] = json_decode($order['coupondata'], true);
 
 			
@@ -1248,6 +1264,7 @@ class Cart
 			return $order;
 		});
 	}
+	
 	public static function getHash($model)
 	{
 		if (!$model) return 'none';
@@ -1289,7 +1306,9 @@ class Cart
 			$pos = Db::fetch('SELECT position_id, producer_nick, article_nick, item_num, catkit, hash FROM cart_basket WHERE position_id = :position_id',[
 				':position_id' => $position_id
 			]);
+
 			$model = Cart::getFromShowcase($pos);
+			
 			//Ключ по которому определяется заморожена позиция или нет
 			if ($pos['hash']) {
 				$changed = $model ? $pos['hash'] !== Cart::getHash($model) : true;
@@ -1429,7 +1448,8 @@ class Cart
 
 
 Event::$classes["Cart"] = function ($pos) {
-	return $pos["producer_nick"] . $pos["article_nick"] . $pos["item_num"] . $pos['catkit'];
+	$catkit = isset($pos['catkit']) ? $pos['catkit'] : '';
+	return $pos["producer_nick"] . $pos["article_nick"] . $pos["item_num"] . $catkit;
 };
 /*
 

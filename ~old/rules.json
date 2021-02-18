@@ -1,5 +1,5 @@
 {
-	"list":["check","wait","sbrfpay"],
+	"list":["check","wait","pay"],
 	"def":"wait",
 	"rules":{
 		"check":{
@@ -71,13 +71,13 @@
 			"user":{
 				"buttons":{
 					"basket":"secondary", 
-					"sbrfpay":"success",
+					"pay":"success",
 					"check":"success"
 				},
 				"actions":["check","print"]
 			}
 		},
-		"paykeeper":{
+		"pay":{
 			"freeze":true,
 			"notice":"info",
 			"edit":{
@@ -88,26 +88,7 @@
 			"short":"Ожидает оплату",
 			"title":"Заказ ожидает оплату",
 			"user":{
-				"buttons":{"basket":"secondary","paykeeper":"success"},
-				"actions":["sync","print"]
-			},
-			"manager":{
-				"buttons":{"basket":"secondary", "email":"secondary", "complete":"success"},
-				"actions":["complete","delete","sync","print"]
-			}
-		},
-		"sbrfpay":{
-			"freeze":true,
-			"notice":"info",
-			"edit":{
-				"orders":false,
-				"admin":false
-			},
-			"caption":"Заказы ожидающие оплату",
-			"short":"Ожидает оплату",
-			"title":"Заказ ожидает оплату",
-			"user":{
-				"buttons":{"basket":"secondary","sbrfpay":"success"},
+				"buttons":{"basket":"secondary","pay":"success"},
 				"actions":["sync","print"]
 			},
 			"manager":{
@@ -117,7 +98,7 @@
 		}
 	},
 	"actions":{
-		"sbrfpay":{
+		"pay":{
 			"checkdata":true,
 			"title":"Оплатить",
 			"gohistory":{
@@ -125,20 +106,8 @@
 				"admin":"/cart/admin/{id}"
 			},
 			"go":{
-				"orders":"/cart/orders/{id}/sbrfpay",
-				"admin":"/cart/admin/{id}/sbrfpay"
-			}
-		},
-		"paykeeper":{
-			"checkdata":true,
-			"title":"Оплатить",
-			"gohistory":{
-				"orders":"/cart/orders/{id}",
-				"admin":"/cart/admin/{id}"
-			},
-			"go":{
-				"orders":"/cart/orders/{id}/paykeeper",
-				"admin":"/cart/admin/{id}/paykeeper"
+				"orders":"/cart/orders/{id}/pay",
+				"admin":"/cart/admin/{id}/pay"
 			}
 		},
 		"print":{
@@ -200,7 +169,7 @@
 			"go":{
 				"orders":"/cart/orders/my"
 			},
-			"title":"Отозвать заказ",
+			"title":"Отозвать",
 			"confirm":"В заказ снова можно будет добавлять новые позиции из каталога."
 		},
 		"remove":{
