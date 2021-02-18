@@ -79,7 +79,7 @@ class Cart
 	}*/
 	public static function createNick()
 	{
-		$today = (int) ((date('m') + 10) . (date('j') + 10));
+		$today = (int) ((date('Y') - 2000) . (date('m') + 10) . (date('j') + 10));
 		$last_day = Mem::get('cart_last_day');
 		$sym = Cart::$conf['hostnum'];
 		if ($last_day == $today) {
