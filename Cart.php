@@ -79,25 +79,41 @@ class Cart
 	}*/
 	public static function createNick()
 	{
-		$today = (int) ((date('Y') - 2000) . (date('m') + 10) . (date('j') + 10));
+		// Первая дата
+		$d1_ts = strtotime('2018-01-01 12:00:00');
+
+		// Вторая дата
+		$d2_ts = time();
+
+		// Функция abs нужна, чтобы не проверять какая из двух дат больше
+		$seconds = abs($d1_ts - $d2_ts);
+
+		// Количество дней нужно округлить в меньшую сторону,
+		// чтобы узнать точное количество прошедших дней
+		// 86400 - количество секунд в 1 дней (60 * 60 * 24)
+		$today = floor($seconds / 86400);
+
+		//$today = (int) ((date('Y') - 2000) . (date('m') + 10) . (date('j') + 10));
+
 		$last_day = Mem::get('cart_last_day');
-		$sym = Cart::$conf['hostnum'];
+		
 		if ($last_day == $today) {
 			$num = Mem::get('cart_last_num');
-			if (!$num) $num = 0;
-			$num = $num + 1;
+			$num = $num ? $num + 1 : 1;
 		} else {
-			$num = 0;
+			$num = 1;
 		}
 		Mem::set('cart_last_day', $today);
 		Mem::set('cart_last_num', $num);
 
-		if ($num < 100) {
-			$today = (int) ($today . '00');
-			$nick = $sym . ($today + $num);
-		} else {
-			$nick = $sym . $today . $num;
-		}
+		$sym = Cart::$conf['hostnum'];
+		$nick = $sym . $today . $num;
+		// if ($num < 100) {
+		// 	$today = (int) ($today . '00');
+		// 	$nick = $sym . ($today + $num);
+		// } else {
+		// 	$nick = $sym . $today . $num;
+		// }
 		$check = Db::col('SELECT order_nick from cart_orders where order_nick = :order_nick', [
 			':order_nick' => $nick
 		]);
