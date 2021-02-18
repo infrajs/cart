@@ -258,7 +258,7 @@
 					<img class="img-thumbnail" src="/-imager/?h=100&src={images.0}&or=-imager/empty.png">
 				</a>
 	{pay::}-pay/cartapi/layout.tpl
-	{paylayout:}{:pay.INFO}
+	{PAYLAYOUT:}{:pay.INFO}
 	{ORDER:}
 		{:ordercrumb}
 		{data.result??(data.msg?:ordermessage)}
@@ -328,7 +328,7 @@
 				<div class="d-none d-md-block"></div>
 				<div style="">
 					{commentmanager?:showManageComment}
-					{data.order.paydata:paylayout}
+					{data.order.paydata:PAYLAYOUT}
 					{:ordercontentbody}
 				</div>
 				<div>
