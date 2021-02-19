@@ -2,8 +2,16 @@
 <div class="cart-search-complete">
 	<style>
 		.autocomplete-suggestions { border: 1px solid #999; background: #FFF; overflow: auto; }
-		.autocomplete-suggestion { padding: 2px 5px; white-space: nowrap; overflow: hidden; }
-		.autocomplete-selected { background: #F0F0F0; }
+		.autocomplete-suggestion { padding: 2px 5px; 
+			/*white-space: nowrap; */
+			overflow: hidden; 
+			transition: 0.3s;
+			border-left: solid 10px #eee;
+		}
+		.autocomplete-selected { 
+			border-left: solid 10px var(--blue);			
+			/*background: #F0F0F0; */
+		}
 		.autocomplete-suggestions strong { font-weight: normal; color: #3399FF; cursor:pointer;}
 		.autocomplete-group { padding: 2px 5px; }
 		.autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
@@ -97,11 +105,13 @@
 	</script>
 </div>
 {extend::}-catalog/extend.tpl
+
 {SUGGESTION:}
-		<a href="/catalog/{producer_nick}/{article_nick}{:extend.cat.idsl}">{images.0?:img}
-		{producer} {article}</a>{Наименование:br}{Цена?:cost}<br>
-		<a class="float-right" href="/catalog/{group_nick}">{group}</a>
-		<hr class="my-2" style="clear:both">
-	{br:} <br>{.}
+		<div style="cursor: pointer; clear:both; padding: 5px">
+			{images.0?:img}
+			<b>{producer} {article}</b>
+			<br>{Наименование:br}{Цена?:cost}
+		</div>
+	{br:} {.}<br>
 	{cost:} <b>{~cost(Цена)}{:extend.unit}</b>
 	{img:}<img style="clear:both; margin-left:5px; float:right; position:relative" src="/-imager/?src={images.0}&h=70&w=70&crop=1">
