@@ -136,7 +136,16 @@ $context->actions = [
 	'getmeta' => function () {
 		extract($this->gets(['ans', 'meta', 'lang']), EXTR_REFS);
 		$ans['meta'] = Cart::getJsMeta($meta, $lang);
-	},	
+	},
+	'pay' => function () {
+		extract($this->gets(['order_id']), EXTR_REFS);
+		$this->handler('create_order_user'); //Как знать или помнить, в какой момент у заказа точно есть созданный аккаунт пользователя по email
+		if (!Cart::setStatus($order_id, 'pay')) return $this->fail('CR018');
+		//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
+		$r = Cart::resetActive($order_id);
+		if (!$r) return $this->fail('CR018');
+		return $this->ret('pay3');
+	},
 	'check' => function () {
 		extract($this->gets(['place', 'ouser', 'order', 'order_id', 'lang']), EXTR_REFS);
 		
@@ -175,15 +184,7 @@ $context->actions = [
 		$r = Cart::setTransport($order_id, $transport);
 		if (!$r) return $this->fail('CR018');
 	}, 
-	'pay' => function () {
-		extract($this->gets(['order_id']), EXTR_REFS);
-		$this->handler('create_order_user');
-		if (!Cart::setStatus($order_id, 'pay')) return $this->fail('CR018');
-		//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
-		$r = Cart::resetActive($order_id);
-		if (!$r) return $this->fail('CR018');
-		return $this->ret('pay3');
-	},
+	
 	'setcallback' => function () {
 		extract($this->gets(['order_id','callback']), EXTR_REFS);
 		$r = Cart::setCallback($order_id, $callback);
@@ -209,6 +210,7 @@ $context->actions = [
 		if (!$r) return $this->fail('CR018');
 		$ouser = User::getByEmail($order['email']);
 		$ouser['order'] = $order;
+		
 		$r = Cart::mail($ouser, $lang, 'email');
 		if (!$r) return $this->fail('CR018.a7');
 		Cart::setEmailDate($order);
