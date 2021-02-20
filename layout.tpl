@@ -1103,7 +1103,9 @@
 			<div>datecomplete: {~date(:d.m.Y H:i,datecomplete)}</div>
 			<div>city.country: {city.country}</div>
 			<div>city.zip: {city.zip}</div>
+			<div>coupon: HELLO</div>
 			{basket::techbasket}
+			
 			{techbasket:}
 				<div><b>{producer_nick} {article_nick} {item_num}</b></div>
 				<div>count: {count}</div>
