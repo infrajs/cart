@@ -149,6 +149,11 @@
 			
 			<hr>
 			<form class="form" name="basket" data-autosave="user">
+				<style>
+					#{div} del {
+						color: gray;
+					}
+				</style>
 				{basket::cartpos}
 			</form>
 			<div class="d-flex align-items-center justify-content-center justify-content-sm-end">
@@ -234,7 +239,7 @@
 						</div>
 						<div class="my-2 d-flex flex-column ml-lg-3 costblock">
 							<div style="min-width:70px;" class="text-lg-right">
-								<div><del>{cost!model.Цена?model.Цена:itemcostrub}</del></div>
+								<div><del>{cost!model.Цена?model.Цена:itemcostrub?model.Старая цена:itemcostrub}</del></div>
 								{cost:itemcostrub}
 							</div>
 							<div class="my-2">
