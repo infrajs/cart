@@ -263,6 +263,7 @@
 		{:ordercrumb}
 		{data.result??(data.msg?:ordermessage)}
 		{data.order.sum>0|(data.user.admin|data.order.status!:wait)?data.order:ordercontent?:emptyorder}		
+
 		{ordermessage:}
 			<h1>Ошибка</h1>
 			{data.msg}
@@ -323,7 +324,7 @@
 			</style>
 			<form name="cart">
 				<div>
-					<h1 class="mb-0">{data.rule.title} <span title="Последние измения {~date(:j F H:i,data.order.dateedit)}" class="float-right">{:ordernick}</span></h1>
+					<h1 class="mb-0">{data.rule.title} <span style="margin-left: 5px" title="Последние измения {~date(:j F H:i,data.order.dateedit)}" class="float-right">{:ordernick}</span></h1>
 				</div>
 				<div class="d-none d-md-block"></div>
 				<div style="">
@@ -1083,7 +1084,41 @@
 				<p>Письмо клиенту {order.dateemail?:wasemail?:noemail}</p>
 				{data.rule.actions[:place]:myactions}
 			</div>
-
+			<h2 style="margin-top: 40px">Техническая информация</h2>
+			<div>order_id: {order_id}</div>
+			<div>user_id: {user_id}</div>
+			<div>order_nick: {order_nick}</div>
+			<div>status: {status}</div>
+			<div>paid: {paid?:да?:нет}</div>
+			<div>freeze: {freeze?:да?:нет}</div>
+			<div>sumclear: {sumclear}</div>
+			<div>sum: {sum}</div>
+			<div>sumtrans: {sumtrans}</div>
+			<div>total: {total}</div>
+			<div>datefreeze: {~date(:d.m.Y H:i,datefreeze)}</div>
+			<div>datecreate: {~date(:d.m.Y H:i,datecreate)}</div>
+			<div>dateedit: {~date(:d.m.Y H:i,dateedit)}</div>
+			<div>datewait: {~date(:d.m.Y H:i,datewait)}</div>
+			<div>datepaid: {~date(:d.m.Y H:i,datepaid)}</div>
+			<div>datecomplete: {~date(:d.m.Y H:i,datecomplete)}</div>
+			<div>city.country: {city.country}</div>
+			<div>city.zip: {city.zip}</div>
+			{basket::techbasket}
+			{techbasket:}
+				<div><b>{producer_nick} {article_nick} {item_num}</b></div>
+				<div>count: {count}</div>
+				<div>costclear: {costclear}</div>
+				<div>sumclear: {sumclear}</div>
+				<div>sum: {sum}</div>
+				<div>cost: {sum}</div>
+				<div>dateedit: {~date(:d.m.Y H:i,dateedit)}</div>
+				<div>dateadd: {~date(:d.m.Y H:i,dateadd)}</div>
+				<div>model.change: {model.change?:да?:нет}</div>
+				<div>model.discount: {model.discount}%</div>
+				<div>model.Прайс: {model.Прайс}</div>
+				<div>model.Цена: {model.Цена}</div>
+				<div>model.Старая цена: {model.Старая цена}</div>
+				<div>model.Наличие: {model.Наличие}</div>
 	{disabled:}disabled
 	{myactions:}
 		<div class="text-right actionsbtn">

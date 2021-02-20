@@ -340,9 +340,9 @@ class Cart
 		$fieldsstr = implode(',', array_keys($row));
 		$param = array_values($row);
 		$valuestr = implode(',', array_fill(0, sizeof($param), '?'));
-
-		$order_id = Db::lastId("INSERT INTO cart_orders ($fieldsstr, datecreate, datewait, dateedit) 
-			VALUES($valuestr, now(),now(),now())", $param);
+		$param[] = $user_id;
+		$order_id = Db::lastId("INSERT INTO cart_orders ($fieldsstr, user_id, datecreate, datewait, dateedit) 
+			VALUES($valuestr, ?, now(),now(),now())", $param);
 		if (!$order_id) return false;
 		
 		Db::exec('INSERT INTO cart_userorders (user_id, order_id, active) VALUES(:user_id, :order_id, 1)', [
@@ -868,7 +868,7 @@ class Cart
 		$sizeerror = false;
 		foreach ($basket as $k => $pos) {
 			$model = Cart::getModel($pos['position_id']);
-			if (!$model) continue;
+			if (!$model || empty($model['Цена'])) continue;
 			$dim = Cart::getDim($model);
 
 			if (!$dim) {
@@ -1102,7 +1102,8 @@ class Cart
 	{
 		return static::once('getById', [$order_id, $fast], function ($order_id, $fast) {
 			$sql = 'SELECT 
-					order_id, 
+					order_id,
+					user_id, 
 					status,
 					name,
 					phone,
@@ -1125,6 +1126,7 @@ class Cart
 					comment,
 					commentmanager,
 					UNIX_TIMESTAMP(datecreate) as datecreate,
+					UNIX_TIMESTAMP(datefreeze) as datefreeze,
 					UNIX_TIMESTAMP(datewait) as datewait,
 					UNIX_TIMESTAMP(dateedit) as dateedit,
 					UNIX_TIMESTAMP(datecheck) as datecheck,
@@ -1162,6 +1164,7 @@ class Cart
 			// $order['city']['zips'] = City::getIndexes($city_id);
 			
 			$order['paid'] = (bool) $order['paid'];
+			$order['freeze'] = (bool) $order['freeze'];
 
 			$order['basket'] = Db::all('SELECT 
 					position_id,
@@ -1172,7 +1175,9 @@ class Cart
 					costclear,
 					hash,
 					discount,
-					count
+					count,
+					UNIX_TIMESTAMP(dateedit) as dateedit,
+					UNIX_TIMESTAMP(dateadd) as dateadd
 				FROM cart_basket 
 				WHERE order_id = :order_id
 				order by dateadd DESC
@@ -1197,18 +1202,16 @@ class Cart
 
 					}
 				} else {
+
 					$model = Cart::getModel($pos['position_id']);
-					if (!$model) {
+					if (!$model || empty($model['Цена'])) {
 						unset($order['basket'][$i]);
 						continue; //Модель не заморожена и не найдена в каталоге
 					}
-
+					
 					$order['basket'][$i]['model'] = $model;
-
-					if ($order['freeze']) {
-						$costclear = $pos['costclear'];
-					} else {
-						$costclear = $model['Цена']; //Цену надо взять или из каталога
+					$costclear = $model['Цена']; //Цену может быть как из каталога так и если freeze из json
+					if (!$order['freeze']) { //Оптимизация, пересохраняем для быстрого доступа только если заказ не заморожен
 						Db::exec('UPDATE cart_basket
 							SET costclear = :costclear
 							WHERE position_id = :position_id', [
@@ -1216,9 +1219,6 @@ class Cart
 								':costclear' => $costclear
 						]);
 					}
-					
-					
-					
 				}
 				$count++;
 				/*
@@ -1318,21 +1318,33 @@ class Cart
 		return $r;
 	}
 	public static function getModel($position_id) {
-		return static::once('getModel', $position_id, function ($position_id) {
+		return static::once('getModel', [$position_id], function ($position_id) {
 			$pos = Db::fetch('SELECT position_id, producer_nick, article_nick, item_num, catkit, hash FROM cart_basket WHERE position_id = :position_id',[
 				':position_id' => $position_id
 			]);
-
+			if (!$pos) return false;
 			$model = Cart::getFromShowcase($pos);
-			
-			//Ключ по которому определяется заморожена позиция или нет
-			if ($pos['hash']) {
-				$changed = $model ? $pos['hash'] !== Cart::getHash($model) : true;
-				if ($changed) $model = Cart::getFromJson($position_id);
-			} else {
-				$changed = false;
+			$freeze = Db::col('SELECT o.freeze 
+				FROM cart_orders o, cart_basket b 
+				WHERE o.order_id = b.order_id and b.position_id = :position_id', [
+				':position_id' => $position_id
+			]);
+			if (!$freeze) {
+				if ($model) {
+					$model['changed'] = false;
+					return $model;
+				}
+				return false;
 			}
-			if ($model) $model['changed'] = $changed;
+			
+			if ($model) {
+				$changed = $pos['hash'] !== Cart::getHash($model);
+			} else {
+				$changed = true;
+			}
+
+			$model = Cart::getFromJson($position_id);
+			$model['changed'] = $changed;
 			return $model;
 		});
 	}
@@ -1344,7 +1356,7 @@ class Cart
 	public static function freeze($order_id)
 	{
 		$sql = 'UPDATE cart_orders
-			SET freeze = 1
+			SET freeze = 1, datefreeze = now()
 			WHERE order_id = :order_id
 		';
 		$r = Db::exec($sql, [

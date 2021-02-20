@@ -310,7 +310,7 @@
 			"goal": "cart",
 			"required": ["order_id", "city_id", "timezone"],
 			"statuses": ["wait"],
-			"handlers": ["post", "checkstatus", "checkdata"],
+			"handlers": ["post", "checkstatus", "checkdata", "freeze"],
 			"title": "1.m2",
 			"gohistory": {
 				"orders": "/cart/orders/{order_nick}",

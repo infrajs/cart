@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     `callback` ENUM('yes','no','') NOT NULL DEFAULT '',
     `status` ENUM('wait','pay','check','complete') NOT NULL DEFAULT 'wait' COMMENT 'Доступные статусы',
     `lang` ENUM('ru','en') NOT NULL COMMENT 'Определёный язык интерфейса посетителя',
-    
-    `freeze` int(1) unsigned NOT NULL DEFAULT 0 COMMENT 'Метка заморожены ли позиции',
-    `paid` int(1) unsigned NOT NULL COMMENT 'Метка была ли онлайн оплата',
+    `user_id` MEDIUMINT unsigned NOT NULL COMMENT 'Автор кто непосредственно создал заказ',
+    `freeze` int(1) unsigned NULL COMMENT 'Метка заморожены ли позиции',
+    `paid` int(1) unsigned NULL COMMENT 'Метка была ли онлайн оплата',
     `pay` ENUM('self','card','corp','perevod') NULL,
     `paydata` TEXT NULL DEFAULT NULL COMMENT 'Данные оплаты',
     
@@ -29,12 +29,13 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     `count` SMALLINT unsigned NOT NULL COMMENT 'Кэш количества позиций в корзине',
     `weight` MEDIUMINT unsigned NOT NULL COMMENT 'Кэш - расчётный вес',
 
-    `datecreate` DATETIME NULL COMMENT 'Дата создания',
-    `datewait` DATETIME NULL COMMENT 'Дата изменения статуса',
-    `datepay` DATETIME NULL COMMENT 'Дата изменения статуса',
+    `datecreate` DATETIME NULL COMMENT 'Дата создания заказа, в момент добавления первой позиции',
+    `datefreeze` DATETIME NULL COMMENT 'Дата последней заморозки заказа, если такая была',
+    `datewait` DATETIME NULL COMMENT 'Дата изменения статуса ожидание, активные заказы в этом статусе',
+    `datepay` DATETIME NULL COMMENT 'Дата изменения статуса ожидает оплаты',
     `datepaid` DATETIME NULL COMMENT 'Дата подтверждения оплаты',
-    `datecheck` DATETIME NULL COMMENT 'Дата изменения статуса',
-    `datecomplete` DATETIME NULL COMMENT 'Дата изменения статуса',
+    `datecheck` DATETIME NULL COMMENT 'Дата изменения статуса отправлен на проверку',
+    `datecomplete` DATETIME NULL COMMENT 'Дата изменения статуса выполнен',
     `dateemail` DATETIME NULL COMMENT 'Дата email пользователю',
     `dateedit` DATETIME NULL COMMENT 'Дата редактирования',
     
@@ -71,8 +72,8 @@ CREATE TABLE IF NOT EXISTS `cart_basket` (
     `discount` INT(2) NULL COMMENT 'Скидка по купону',
     `count` SMALLINT unsigned NOT NULL COMMENT '',
     
-    `dateadd` DATETIME NULL DEFAULT NULL COMMENT 'Дата добавления',
-    `dateedit` DATETIME NULL DEFAULT NULL COMMENT 'Дата изменений',
+    `dateadd` DATETIME NULL DEFAULT NULL COMMENT 'Дата добавления, в том числе в замороженный заказ менеджером, позиция не обновляется из каталога если уже была',
+    `dateedit` DATETIME NULL DEFAULT NULL COMMENT 'Дата изменений, в том числе в замороженном заказ менеджером, позиция не обновляется с каталога',
 
     PRIMARY KEY (`position_id`)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
