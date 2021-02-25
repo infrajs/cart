@@ -13,7 +13,7 @@ class CDEK {
 		$get = [
 			"isdek_action" => "calc",
 			"shipment" => [
-				"timestamp" => mktime(),
+				"timestamp" => time(),
 				"cityFromId" => $city_from_id, //Москва
 				"cityToId" => $city_to_id,
 				"type" => $type,

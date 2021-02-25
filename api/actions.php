@@ -39,7 +39,8 @@ $context->actions = [
 		$dim = Cart::getDim($model);
 		$weight = $dim['weight'];
 		if (!$weight) return $this->err('posweight');
-		$transports = Cart::$conf['transports'];
+		$conf = Cart::$conf;
+		$transports = $conf['transports'];
 		$ans['producer_nick'] = $model['producer_nick'];
 		$ans['article_nick'] = $model['article_nick'];
 		$ans['item_num'] = $model['item_num'];
@@ -49,7 +50,9 @@ $context->actions = [
 			foreach(['pochta_simple','pochta_1','pochta_courier'] as $type) {
 				if (!in_array($type, $transports)) continue;
 				$res = Pochta::calc($type, $weight, $zip);
-				if ($res) $ans['transports']['pochta'][$type] = $res;
+				if (!$res) continue;
+				if ($res['cost'] >= $conf['transportcostlimit']) continue;
+				$ans['transports']['pochta'][$type] = $res;
 			}
 			if (!$ans['transports']['pochta']) unset($ans['transports']['pochta']);
 		}
@@ -60,7 +63,9 @@ $context->actions = [
 		foreach(['cdek_pvz','cdek_courier'] as $type) {
 			if (!in_array($type, $transports)) continue;
 			$res = CDEK::calc($goods, $convert[$type], $city_id);
-			if ($res) $ans['transports']['cdek'][$type] = $res;
+			if (!$res) continue;
+			if ($res['cost'] >= $conf['transportcostlimit']) continue;
+			$ans['transports']['cdek'][$type] = $res;
 		}
 		if (!$ans['transports']['cdek']) unset($ans['transports']['cdek']);
 	},	

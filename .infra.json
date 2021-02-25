@@ -14,6 +14,7 @@
 	"zip_from":"123123",
 	"city_from_id":431,
 	"city_from":"Тольятти",
+	"transportcostlimit":2000,
 	"yandexapikey":"Ключ Яндекс от Геокодер",
 	"hostnum":"",
 
