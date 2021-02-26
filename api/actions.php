@@ -51,7 +51,6 @@ $context->actions = [
 				if (!in_array($type, $transports)) continue;
 				$res = Pochta::calc($type, $weight, $zip);
 				if (!$res) continue;
-				if ($res['cost'] >= $conf['transportcostlimit']) continue;
 				$ans['transports']['pochta'][$type] = $res;
 			}
 			if (!$ans['transports']['pochta']) unset($ans['transports']['pochta']);
@@ -61,10 +60,11 @@ $context->actions = [
 		$ans['transports']['cdek'] = [];
 		$convert = ['cdek_pvz' => 'pickup', 'cdek_courier' => 'courier'];
 		foreach(['cdek_pvz','cdek_courier'] as $type) {
+
 			if (!in_array($type, $transports)) continue;
+
 			$res = CDEK::calc($goods, $convert[$type], $city_id);
 			if (!$res) continue;
-			if ($res['cost'] >= $conf['transportcostlimit']) continue;
 			$ans['transports']['cdek'][$type] = $res;
 		}
 		if (!$ans['transports']['cdek']) unset($ans['transports']['cdek']);

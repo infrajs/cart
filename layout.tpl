@@ -1708,7 +1708,7 @@
 	
 	
 	<div class="transportready" style="display:{transport??:none}">
-		<div><span class="titletrans">{:label_{transport}}</span><b class="sumtrans">{((transport!:any)&(transport!:self))?:showsumtrans}</b></div>
+		<div><span class="titletrans">{:label_{transport}}</span><b class="sumtrans">{(transport!:any)&(transport!:self)?:showsumtrans}</b></div>
 		<div class="transresume">{:info_{transport}}</div>
 	</div>
 	<div class="payresume">{pay?:pay_label_{pay}}</div>
@@ -1716,6 +1716,8 @@
 	
 	{showsumtrans:}: {~cost(sumtrans)}{:model.unit}
 	{none:}none
+	{any:}any
+	{self:}self
 	{prcoupon:}
 		Купон: <b>{coupon}</b><br>
 		Сумма со скидкой: <b class="sum">{~cost(sum)}{:model.unit}</b><br>

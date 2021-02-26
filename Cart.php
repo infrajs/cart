@@ -366,7 +366,10 @@ class Cart
 	public static function getActiveOrderId($user_id)
 	{
 		return static::once('getActiveOrderId', $user_id, function ($user_id) {
-			$sql = 'SELECT uo.order_id FROM cart_userorders uo WHERE uo.user_id = :user_id and uo.active = 1';
+			$sql = 'SELECT uo.order_id FROM cart_userorders uo, cart_orders o WHERE 
+				o.order_id = uo.order_id 
+				and o.status = "wait"
+				and uo.user_id = :user_id and uo.active = 1';
 			$order_id = Db::col($sql, [
 				':user_id' => $user_id
 			]);

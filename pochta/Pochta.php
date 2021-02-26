@@ -44,6 +44,8 @@ class Pochta {
 			$ans['cost'] = $data['paynds'] ?? false;
 			if ($ans['cost']) $ans['cost'] = $ans['cost'] / 100;
 
+			if ($ans['cost'] >= Cart::$conf['transportcostlimit']) return false;
+
 			$ans['min'] = $data['delivery']['min'] ?? false;
 			$ans['max'] = $data['delivery']['max'] ?? false;
 

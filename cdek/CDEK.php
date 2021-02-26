@@ -22,11 +22,13 @@ class CDEK {
 		];
 		
 		$src = '-cart/cdek/service.php?'.http_build_query($get);
+
 		$res = Load::loadJSON($src);
 		$res['get'] = $get;
 
 		if (!empty($res['result']['price'])) {
 			$cost = $res['result']['price'] ?? false;
+			if ($cost >= Cart::$conf['transportcostlimit']) return false;
 			$min = $res['result']['deliveryPeriodMin'] ?? false;
 			$max = $res['result']['deliveryPeriodMax'] ?? false;
 			return [

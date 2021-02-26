@@ -14,7 +14,9 @@ ISDEKservice::setTarifPriority(
     array(234, 136, 138, 62, 15, 17, 10, 12, 5, 63)
 );
 
+
 $action = $_REQUEST['isdek_action'];
-if (method_exists('akiyatkin\cdek\ISDEKservice', $action)) {
+
+if (method_exists('infrajs\cart\cdek\ISDEKservice', $action)) {
 	return ISDEKservice::$action($_REQUEST);
 }
