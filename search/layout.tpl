@@ -3,11 +3,39 @@
 
 	<h1>Добавить в корзину</h1>
 	<!--<p><a href="/cart/{config.place}/{config.id|:my}/list">Оформление заказа {config.id}</a></p>-->
-	<p>
-		<input value='' min="0" max="999" autosave="0" type="text" class="form-control input" style="width:100%">
-	</p>
+	<form style="padding-bottom: 20px">
+		<input value='' min="0" max="999" autosave="0" type="search" name="search" class="form-control input" style="width:100%">
+		<script type="module" async>
+			import { Live } from "/vendor/infrajs/catalog/live/Live.js"
+			import { Popup } from '/vendor/infrajs/popup/Popup.js'
+			import { Cart } from '/vendor/infrajs/cart/Cart.js'
+			const cls = (div, cls) => div.getElementsByClassName(cls)
+			const tag = (div, tag) => div.getElementsByTagName(tag)
+			const form = document.getElementById('{div}').getElementsByTagName('form')[0]
+			
+			Live.getState(form).select = true
+			Live.fire('init', form)
+			Live.hand('select', (form) => {
+				const pos = Live.getState(form).item
+				let place = '{config.place}'
+				let order_id = {config.order_id}
+				let mic = {	
+					article_nick: pos.article_nick,
+					producer_nick: pos.producer_nick,
+					item_num: pos.item_num,
+					catkit: pos.catkit || ''
+				}
+				Popup.confirm('Количество: <input class="form-control" name="count" type="number">', async div => {
+					div = $(div)
+					const count = div.find('[name=count]').val()
+					const ans = await Cart.post('addtoorder', { ...mic, place, order_id, count })
+					if (!ans.result) Popup.alert(ans.msg)
+				}, pos['producer'] + ' ' + pos['article'])
+			})
+		</script>
+	</form>
 	<!--<span class="btn btn-secondary button">Добавить</span>-->
-	<script type="module">
+	<!-- <script type="module">
 		import { DOM } from '/vendor/akiyatkin/load/DOM.js'
 		import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 		import { Cart } from '/vendor/infrajs/cart/Cart.js'
@@ -87,7 +115,7 @@
 			    }
 			});
 		});
-	</script>
+	</script> -->
 </div>
 <style>
 	.autocomplete-suggestions { border: 1px solid #999; background: #FFF; overflow: auto; }
