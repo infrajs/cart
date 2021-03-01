@@ -22,6 +22,7 @@
 		<style>
 			#{div} .between .cart-basket .form-inline {
 				display: flex;
+				align-items: center;
 				justify-content: space-between;
 			}
 		</style>

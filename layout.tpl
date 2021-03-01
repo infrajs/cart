@@ -1109,6 +1109,7 @@
 			<div>city.country: {city.country}</div>
 			<div>city.zip: {city.zip}</div>
 			<div>coupon: HELLO</div>
+			<div>{~print(coupondata)}</div>
 			{basket::techbasket}
 			
 			{techbasket:}
@@ -1117,16 +1118,18 @@
 				<div>costclear: {costclear}</div>
 				<div>sumclear: {sumclear}</div>
 				<div>sum: {sum}</div>
-				<div>cost: {sum}</div>
+				<div>cost: {cost}</div>
 				<div>dateedit: {~date(:d.m.Y H:i,dateedit)}</div>
 				<div>dateadd: {~date(:d.m.Y H:i,dateadd)}</div>
+				<div>discount: {discount:percent}</div>
+				<div>model.discount: {model.discount:percent}</div>
 				<div>model.change: {model.change?:да?:нет}</div>
-				<div>model.discount: {model.discount}%</div>
 				<div>model.Прайс: {model.Прайс}</div>
 				<div>model.Цена: {model.Цена}</div>
 				<div>model.Старая цена: {model.Старая цена}</div>
 				<div>model.Наличие: {model.Наличие}</div>
 	{disabled:}disabled
+	{percent:}{.}%
 	{myactions:}
 		<div class="text-right actionsbtn">
 			{buttons::mybtns}

@@ -910,6 +910,8 @@ class Cart
 			$discount = (100 - $pos['discount']) / 100;
 			$sum += $model['Цена'] * $discount * $pos['count'];
 		}
+		//$sum = round($sum);
+
 		Cart::clearTransportCost($order_id);
 		//order: city_id, basket - размеры, вес, 
 
@@ -1248,7 +1250,9 @@ class Cart
 				$order['basket'][$i]['sumclear'] = $costclear * $pos['count'];
 				$discount = (100 - $pos['discount']) / 100;
 				$cost = $costclear * $discount;
+				if ($cost > 10) $cost = round($cost);
 				$sum = $cost * $pos['count'];
+				if ($sum > 10) $sum = round($sum);
 
 				$order['basket'][$i]['sum'] = $sum;
 				$order['basket'][$i]['cost'] = $cost;
