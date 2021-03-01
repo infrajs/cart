@@ -47,12 +47,8 @@ $context->args = [
 	"start" => function (&$start) {
 		if (!$start) $start = strtotime('first day of this month 0:0');
 	},
-	"statuses" => function (&$statuses) {
-		$statuses = explode(',',$statuses);
-		foreach ($statuses as $i => $status) {
-			if (!in_array($status,['wait','complete','pay','check'])) continue;
-			$statuses[$i] = trim($status);
-		}
+	"status" => function (&$status, $pname) {
+		if (!in_array($status,['', 'wait','complete','pay','check','cancel'])) return $this->fail('required', $pname);
 	},
 	"position_ids" => function (&$position_ids) {
 		extract($this->gets(['user_id']));

@@ -39,6 +39,7 @@
 						"email": "secondary",
 						"wait": "secondary",
 						"complete": "info",
+						"cancel": "primary",
 						"delete": "danger"
 					}
 				}
@@ -58,6 +59,7 @@
 					"buttons": {
 						"email": "secondary",
 						"tocheck": "secondary",
+						"cancel": "primary",
 						"delete": "danger"
 					}
 				}
@@ -76,25 +78,41 @@
 				},
 				"admin": {
 					"buttons": {
-						"wait": "secondary",
 						"email": "secondary",
 						"complete": "success",
+						"cancel": "primary",
+						"delete": "danger"
+					}
+				}
+			}
+		},
+		"cancel": {
+			"notice": "default",
+			"short": "Отменён",
+			"caption": "Отменённые заказы",
+			"title": "Заказ отменён",
+			"actions": {
+				"orders": {
+					"buttons": {}
+				},
+				"admin": {
+					"buttons": {
+						"email": "secondary",
+						"tocheck": "secondary",
+						"complete": "info",
 						"delete": "danger"
 					}
 				}
 			}
 		}
 	},
-	
-
-
 	"args":{
 		"coupon":[],
 		"commentmanager":["notempty"],
 		"position_ids":["intarray"],
 		"start":["int"],
 		"end":["int"],
-		"statuses":[],
+		"status":[],
 		"lang":[],
 		"count":["int", "notempty"],
 		"coupon":[],
@@ -126,7 +144,7 @@
 		"city", "model", "basket", "user_id","rule",
 		"order", "order?",
 		"order_id","order_id#",
-		"status","meta"
+		"meta"
 	],
 	"handlers":["post","admin","paid"],	
 
@@ -147,8 +165,7 @@
 			"address":["order_id"],
 			"phone":["order_id"],
 			"pvz":["order_id"],
-			"status":["order_id"],
-			"rule":["status"],
+			"rule":["order_id#"],
 			"order_id": ["user", "place"],
 			"active_id#create":["city_id", "timezone","user"],
 			"order_nick": ["user", "place"],
@@ -175,7 +192,7 @@
 
 		},
 		"orders": {
-			"required": ["user","statuses","start"],
+			"required": ["user","status","start"],
 			"handlers": ["admin"]
 		},
 		"refreezeall": {
@@ -289,15 +306,21 @@
 		"tocheck": {
 			"required": ["order_id"],
 			"title": "CR049b#m1",
-			"statuses": ["complete"],
+			"statuses": ["complete","cancel"],
 			"handlers": ["post", "admin", "checkstatus", "paid"]
 		},
 		"complete": {
 			"required": ["order_id"],
 			"handlers": ["post", "admin", "checkstatus"],
-			"statuses": ["check", "wait", "pay"],
+			"statuses": ["check", "wait", "pay", "cancel"],
 			"title": "CR038#m1",
 			"confirm": "CR039#m1"
+		},
+		"cancel": {
+			"required": ["order_id"],
+			"handlers": ["post", "admin"],
+			"statuses": ["check", "pay", "complete"],
+			"title": "cancelt#m1"
 		},
 		"wait": {
 			"required": ["order_id"],

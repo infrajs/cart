@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     `phone` TINYTEXT NULL,
     `name` TINYTEXT NULL,
     `callback` ENUM('yes','no','') NOT NULL DEFAULT '',
-    `status` ENUM('wait','pay','check','complete') NOT NULL DEFAULT 'wait' COMMENT 'Доступные статусы',
+    `status` ENUM('wait','pay','check','complete','cancel') NOT NULL DEFAULT 'wait' COMMENT 'Доступные статусы',
     `lang` ENUM('ru','en') NOT NULL COMMENT 'Определёный язык интерфейса посетителя',
     `user_id` MEDIUMINT unsigned NOT NULL COMMENT 'Автор кто непосредственно создал заказ',
     `freeze` int(1) unsigned NULL COMMENT 'Метка заморожены ли позиции',

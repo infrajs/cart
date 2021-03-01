@@ -132,13 +132,13 @@ class Cart
 	// 		return $list;
 	// 	});
 	// }
-	public static function getOrders($fuser, $status, $start, $end)
+	public static function getOrders($fuser, $status, $start, $end, &$counts = false)
 	{
 		//$fuser = [];
-		$status = false;
-		return static::once('getOrders', [$fuser, $status, $start, $end], function ($fuser, $status, $start, $end) {
-			$fields = 'o.order_nick, o.order_id, o.status, o.sum, o.name, o.email, o.coupon, o.paid';
-			$fields = 'o.order_id';
+		//$status = false;
+		$list = static::once('getOrders', [$fuser, $start, $end], function ($fuser, $start, $end) {
+			//$fields = 'o.order_nick, o.order_id, o.status, o.sum, o.name, o.email, o.coupon, o.paid';
+			$fields = 'o.order_id, o.status';
 			$param = [];
 			if ($start) {
 				$param[":start"] = $start;
@@ -156,7 +156,7 @@ class Cart
 					WHERE $time
 				";
 			} else {
-				if ($status) {
+				/*if ($status) {
 					$param[':status'] = $status;
 					if ($fuser) {
 						$param[':user_id'] = $fuser['user_id'];
@@ -172,7 +172,7 @@ class Cart
 							WHERE $time and o.status = :status
 						";
 					}
-				} else {
+				} else {*/
 					// $sql = "SELECT DISTINCT $fields
 					// 	FROM cart_orders o
 					// 	WHERE $time AND o.status != 'wait' AND o.status != ''
@@ -181,18 +181,34 @@ class Cart
 						FROM cart_orders o
 						WHERE $time
 					";
-				}
+				//}
 			}
 			$sql .= 'ORDER BY o.dateedit DESC';
 
-			$list = Db::colAll($sql, $param);
-
-			foreach ($list as $k => $order_id) {
-				$list[$k] = Cart::getById($order_id, true);
-			}
+			$list = Db::all($sql, $param);
 			return $list;
 		});
+		
+		$counts = [];
+		$res = [];
+		foreach ($list as $k => $row) {
+			$mystatus = $row['status'];
+			$order_id = $row['order_id'];
+			if (empty($counts[$mystatus])) $counts[$mystatus] = [];
+			$counts[$mystatus][] = $order_id;
+			if ($status) continue;
+			$res[] = Cart::getById($order_id, true);
+		}
 
+		if ($status && !empty($counts[$status])) {
+			foreach ($counts[$status] as $k => $order_id) {
+				$res[] = Cart::getById($order_id, true);		
+			}
+		}
+		foreach($counts as $s => $l) {
+			$counts[$s] = sizeof($l);
+		}
+		return $res;
 	}
 	public static function isActive($order, $user)
 	{

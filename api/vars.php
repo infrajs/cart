@@ -89,15 +89,11 @@ $context->vars = [
 		$user = User::fromToken($token);
 		$user_id = $user['user_id'] ?? false;
 	},
-	
-	'status' => function (&$status) {
+	'rule' => function (&$rule) {
 		extract($this->gets(['order_id#']));
 		$status = Db::col('SELECT status FROM cart_orders WHERE order_id = :order_id', [
 			':order_id' => $order_id
 		]);
-	},		
-	'rule' => function (&$rule) {
-		extract($this->gets(['status']));
 		if (!$status || !isset($this->meta['rules'][$status])) return $this->fail('CR018');
 		$rule = $this->meta['rules'][$status];
 	},

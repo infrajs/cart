@@ -1179,6 +1179,13 @@
 					return Popup.alert(ans.msg)
 				}
 			})
+			for (const btn of cls('act-cancel')) btn.addEventListener('click', async () => {
+				if (Cart.dis(form)) return
+				const ans = await Cart.post('cancel', { place, order_id })
+				if (!ans.result) {
+					return Popup.alert(ans.msg)
+				}
+			})
 			for (const btn of cls('act-pay')) btn.addEventListener('click', async () => {	
 				if (Cart.dis(form)) return
 				const status = "{data.order.status}"
@@ -1238,7 +1245,7 @@
 			})
 		</script>
 		{mybtns:}
-			<div class="act-{~key} btn btn-{cls}">
+			<div class="act-{~key} btn btn-{cls}" style="margin-bottom: 4px">
 				{title}
 			</div>
 		{actprint:}
@@ -1485,18 +1492,50 @@
 			<div>
 				{~key} &mdash; {::month}
 			</div>
-		{month:}<a href="/{crumb}{now??:startarg}">{F}</a>{~last()??:comma}
-		{startarg:}?start={start}
+		{month:}<a data-anchor="#YEARS" href="/{crumb}{now?(Crumb.get.status?:quest)?:quest}{now??:startarg}{now??(Crumb.get.status?:amp)}{Crumb.get.status?:statusget}">{F}</a>{~last()??:comma}
+		{quest:}?
+		{amp:}&
+		{startarg:}start={start}
+		{startget:}start={Crumb.get.start}
+		{statusget:}status={Crumb.get.status}
+	{STATUSES:}
+		
 	{ADMIN:}
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item"><a class="text-danger" href="/cart">Личный кабинет</a></li>
 			<li class="breadcrumb-item active">Все заказы</li>
 		</ol>
 		<h1>Все заказы</h1>
-		<p>Дата когда заказ поступил на проверку или дата последних изменений.</p>
+		<p>Заказы сортируются по дате последних изменений посетителя.</p>
 		<div id="YEARS"></div>
 		<div id="ADMINLIST"></div>
 		{ADMINLIST:}
+			<div style="margin-bottom: 15px">
+				<style>
+					#{div} .active {
+						background-color: var(--warning);
+						border-color: var(--warning);
+						font-weight: inherit;
+					}
+					#{div} :focus {
+						box-shadow: none;
+					}
+					#{div} a:active {
+						background-color: var(--orange);
+						border-color: var(--orange);
+					}
+				</style>
+				<a data-anchor="#YEARS" class="btn btn-secondary" href="/{crumb}{:quest}{Crumb.get.start?:startget}{Crumb.get.start?:amp}status=wait">Активные <span class="circle">{data.counts.wait|:0}</span></a>
+				<a data-anchor="#YEARS" class="btn btn-secondary" href="/{crumb}{:quest}{Crumb.get.start?:startget}{Crumb.get.start?:amp}status=pay">Ожидают оплату <span class="circle">{data.counts.pay|:0}</span></a>
+				<a data-anchor="#YEARS" class="btn btn-secondary" href="/{crumb}{Crumb.get.start?:quest}{Crumb.get.start?:startget}">На проверке <span class="circle">{data.counts.check|:0}</span></a>
+				<a data-anchor="#YEARS" class="btn btn-secondary" href="/{crumb}{:quest}{Crumb.get.start?:startget}{Crumb.get.start?:amp}status=complete">Выполненные <span class="circle">{data.counts.complete|:0}</span></a>
+				<a data-anchor="#YEARS" class="btn btn-secondary" href="/{crumb}{:quest}{Crumb.get.start?:startget}{Crumb.get.start?:amp}status=cancel">Отменённые <span class="circle">{data.counts.cancel|:0}</span></a>
+			</div>
+			<script type="module" async>
+				import { Activelink } from "/vendor/infrajs/activelink/Activelink.js"
+				const div = document.getElementById('{div}')
+				Activelink(div)
+			</script>
 			{data.result?:adm_listPage?:adm_message}
 		{adm_listPage:}
 			<h2>{data.Y}, {data.F} <span title="Отправленных заказов" class="float-right">{data.count} на {~cost(data.total)}{:model.unit}</span></h2>
@@ -1519,6 +1558,12 @@
 					const ans = await Cart.post('complete', { place, order_id })
 					if (!ans.result) await Popup.alert(ans.msg)
 				})
+				btns = cls('act-cancel')
+				for (const btn of btns) btn.addEventListener('click', async () => {
+					const order_id = btn.dataset.order_id
+					const ans = await Cart.post('cancel', { place, order_id })
+					if (!ans.result) await Popup.alert(ans.msg)
+				})
 
 				btns = cls('act-tocheck')
 				for (const btn of btns) {
@@ -1533,12 +1578,12 @@
 			{orderpaidb:}, <b>оплачен, {~cost(total)}{:model.unit}</b>
 			{bgwait:}opacity:0.5;
 			{adm_row:}
-				<div class="border mb-2 p-2" style="{(status=:wait|status=:pay)?:bgwait}">
+				<div class="border mb-2 p-2">
 					<style>
 						#{div} .circle {
 							border-radius:50%;
 							display:inline-block;
-							border: solid 1px gray;
+							border: solid 1px var(--gray);
 							min-width:20px;
 							text-align:center;
 							padding:0 2px;
@@ -1546,7 +1591,7 @@
 					</style>
 					<b><a href="/cart/admin/{order_nick}">{order_nick}</a></b>
 					<a href="/cart/admin/{order_nick}/list" class="circle">{~length(basket)}</a> 
-					<nobr style="color:{status=:check?:red}">{(status=:wait&active)?data.meta.rules[status]shortactive?data.meta.rules[status]short}</nobr>{status=:check?:acomplete}{status=:complete?(paid??:atocheck)}{paid?:orderpaidb}
+					<nobr>{data.meta.rules[status]shortactive|data.meta.rules[status]short}</nobr>{paid?:orderpaidb}
 
 					<div class="float-right text-right">
 						<span title="Дата редактирования">{~date(:d.m.Y H:i,dateedit)}</span><br>

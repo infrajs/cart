@@ -88,7 +88,7 @@ let Cart = {
 		
 		if (~['add','email','addtoactive','addtoactiveifnot',
 			'setcity',
-			'setcdek','setpvz','setzip', 'pay', 'check','wait','complete','delete','tocheck'].indexOf(type)) {
+			'setcdek','setpvz','setzip', 'pay', 'check','wait','cancel','complete','delete','tocheck'].indexOf(type)) {
 			Global.set('cart-order')
 		}
 		Global.set('cart')

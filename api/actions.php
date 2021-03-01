@@ -105,32 +105,34 @@ $context->actions = [
 		$ans['meta'] = Cart::getJsMeta($meta, $lang);
 	}, 	
 	'orders' => function () {
-		extract($this->gets(['ans','user','meta', 'lang', 'statuses','start']), EXTR_REFS);
-		$ans['statuses'] = $statuses;
+
+		extract($this->gets(['ans','user','meta', 'lang', 'status','start']), EXTR_REFS);
+
+		$ans['status'] = $status;
+		$ans['check'] = ($status == 'check' || !$status);
 		$end = strtotime('first day of next month 0:0', $start);
 		$ans['start'] = $start;
 		$ans['Y'] = date('Y', $start);
 
 		$ans['F'] = Cart::lang($lang, date('F', $start));
 		$ans['startstr'] = date('d.m.Y H:i:s', $start);		
-		$list = Cart::getOrders(false, $statuses, $start, $end);
-		if (!$list) return $this->err('CR006');
+		$counts = null;
+		$list = Cart::getOrders(false, $status, $start, $end, $counts);
+		
 		$total = 0;
-		$count = 0;
+		$count = sizeof($list);
 		foreach ($list as $k => $order) {
-			/*
-				Если в заказе не мой email, то изменения города в шапке на заказ не повлияют, так как не будут менять город у пользователя по email. При freeze нужно фиксировать город.
-			*/
 			$list[$k]['city'] = Cart::getCity($order['city_id'], $order['email'], $order['order_id'], $lang);
-			if ($order['status'] == 'wait') continue;
-			if ($order['status'] == 'pay') continue;
 			$total += $order['total'];
-			$count++;
 		}
+		$ans['counts'] = $counts;
 		$ans['list'] = $list;
 		$ans['count'] = $count;
+
+
 		$ans['total'] = $total;
 		$ans['meta'] = Cart::getJsMeta($meta, $lang);
+		if (!$list) return $this->err('CR006');
 	},	
 	'years' => function () {
 		extract($this->gets(['ans']), EXTR_REFS);
@@ -202,7 +204,14 @@ $context->actions = [
 		if (!$r) return $this->fail('CR018');
 		return $this->ret('CR040');
 
-	}, 
+	},
+	'cancel' => function () {
+		extract($this->gets(['order_id','order']), EXTR_REFS);
+		if (!Cart::setStatus($order_id, 'cancel', true)) return $this->fail('CR018');
+		$r = Cart::resetActive($order['order_id']);
+		if (!$r) return $this->fail('CR018');
+		return $this->ret('canceled');
+	},
 	'setcommentmanager' => function () {
 		extract($this->gets(['commentmanager','order_id']), EXTR_REFS);
 		$r = Cart::setCommentManager($order_id, $commentmanager);
