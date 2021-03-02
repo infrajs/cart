@@ -29,14 +29,14 @@
 			<span class="bold_basket">{data.user.email?:user?:reg}</span>
 			<div>
 				{data.user.email?:umenu}
-				<nobr>В <a href="/cart/orders/my/list">корзине</a> <b><span>{data.order.count|:str0}</span>&nbsp;{~words(data.order.count,:позиция,:позиции,:позиций)}</b></nobr>
+				<nobr>В <a href="/cart/orders/active/list">корзине</a> <b><span>{data.order.count|:str0}</span>&nbsp;{~words(data.order.count,:позиция,:позиции,:позиций)}</b></nobr>
 			</div>
 			<div style="clear:both"></div>
 		</div>
 	</div>
 	{str0:}0
 	{umenu:}
-		<a onclick="Cart.goTop()" href="/cart/orders/my">{Cart.lang(:Заказ)}</a> |
+		<a onclick="Cart.goTop()" href="/cart/orders/active">{Cart.lang(:Заказ)}</a> |
 		<a data-crumb="false" onclick="Cart.logout(); return false;" href="/user/logout?back=ref">{Cart.lang(:Выход)}</a><br>
 	{reg:}<a href="/user/signin?back=ref">{Cart.lang(:Гость)}</a>
 	{user:} <b><a href="/user">{data.user.email}</a></b>

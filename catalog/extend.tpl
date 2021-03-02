@@ -56,7 +56,7 @@
 		</div>
 	</div>
 	{basket:}
-		<a class="abasket" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}{catkit:ampval}" href="/cart/orders/my/list"><span class="pe-7s-cart flash"></span></a>
+		<a class="abasket" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}{catkit:ampval}" href="/cart/orders/active/list"><span class="pe-7s-cart flash"></span></a>
 {cat::}-catalog/cat.tpl
 {ampval:}&{.}
 {print_more_descr:}
