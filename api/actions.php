@@ -154,13 +154,13 @@ $context->actions = [
 		return $this->ret('pay3');
 	},
 	'check' => function () {
+		$this->handler('create_order_user');
 		extract($this->gets(['place', 'ouser', 'order', 'order_id', 'lang']), EXTR_REFS);
 		
-		$this->handler('create_order_user');
 		if (!Cart::setStatus($order_id, 'check')) return $this->fail('CR018');
 		//$ouser = $order['user'];
 		$ouser['order'] = Cart::getById($order_id);
-		
+
 		
 		Cart::mailtoadmin($ouser, $lang, 'AdmOrderToCheck');
 		Cart::mail($ouser, $lang, 'orderToCheck');
