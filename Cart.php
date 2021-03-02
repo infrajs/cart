@@ -517,7 +517,9 @@ class Cart
 			}
 			if (isset($row['Группы'])) {
 				$rg = false;
-				foreach ($model['path'] as $g) {
+				
+				$path = Showcase::getPath($model['group_id']);
+				foreach ($path as $g) {
 					if (in_array($g, $row['Группы'])) {
 						$rg = true;
 						break;
