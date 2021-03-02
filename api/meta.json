@@ -8,7 +8,10 @@
 			"title": "4#m1",
 			"actions": {
 				"admin": {
+					"edit": true,
 					"buttons": {
+						"check": "success",
+						"tocheck": "success",
 						"delete": "danger"
 					}
 				},
@@ -306,7 +309,7 @@
 		"tocheck": {
 			"required": ["order_id"],
 			"title": "CR049b#m1",
-			"statuses": ["complete","cancel"],
+			"statuses": ["complete","cancel","wait"],
 			"handlers": ["post", "admin", "checkstatus", "paid"]
 		},
 		"complete": {

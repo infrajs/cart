@@ -232,7 +232,7 @@
 							{model.Наименование}</a>
 						</b>
 					</div>
-					<div class="d-flex flex-column flex-lg-row">
+					<div class="d-flex flex-column flex-lg-row" style="clear:both">
 						{model.images.0?model:cartposimgm}
 						<div class="my-2 flex-grow-1">
 							{model:model.CART-props}
@@ -262,8 +262,7 @@
 				<a href="/{:cat.pospath}" class="my-2 mr-3 d-bock d-sm-none">
 					<img class="img-thumbnail" src="/-imager/?h=100&src={images.0}&or=-imager/empty.png">
 				</a>
-	{pay::}-pay/cartapi/layout.tpl
-	{PAYLAYOUT:}{:pay.INFO}
+	{PAYLAYOUT:}{:*pay.INFO}
 	{ORDER:}
 		{:ordercrumb}
 		{data.result??(data.msg?:ordermessage)}
