@@ -1249,8 +1249,12 @@ class Cart
 				$order['basket'][$i]['costclear'] = $costclear;
 				$order['basket'][$i]['sumclear'] = $costclear * $pos['count'];
 				$discount = (100 - $pos['discount']) / 100;
-				$cost = $costclear * $discount;
-				if ($cost > 10) $cost = round($cost);
+				if ($discount == 1) {
+					$cost = $costclear;
+				} else {
+					$cost = $costclear * $discount;
+					if ($cost > 10) $cost = round($cost);
+				}
 				$sum = $cost * $pos['count'];
 				if ($sum > 10) $sum = round($sum);
 
