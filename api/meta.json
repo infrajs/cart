@@ -11,7 +11,6 @@
 					"edit": true,
 					"buttons": {
 						"check": "success",
-						"tocheck": "success",
 						"delete": "danger"
 					}
 				},
