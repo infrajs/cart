@@ -121,7 +121,7 @@
 		"coupon":[],
 		"comment":["text"],
 		"name":[],
-		"zip":["int"],
+		"zip":[],
 		"address":[],
 		"phone":[],
 		"pvz":[],

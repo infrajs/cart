@@ -537,14 +537,40 @@
 							const place = "{:place}"
 							const order_id = {:order_id}
 							for (const block of blocks) {
-								const select = cls('zip', block)[0]
+								//const select = cls('zip', block)[0]
+								// const change = async () => {
+								// 	const n = select.options.selectedIndex
+								// 	const zip = select.options[n].value
+								// 	for (const block of blocks) {
+								// 		const select = cls('zip', block)[0]
+								// 		select.options.selectedIndex = n
+								// 	}
+								// 	const transport = form.elements.transport.value
+								// 	const data = {
+								// 		"city":{
+								// 			"city":"{data.order.city.city}"
+								// 		},
+								// 		"address":cls('address',form)[0].value,
+								// 		"zip":cls('zip',form)[0].value,
+								// 		"pvz":"{data.order.pvz}"
+								// 	}
+								// 	cls('transresume')[0].innerHTML = transport ? Template.parse("{tpl}", data, "info_" + transport) : ''
+								// 	const ans = await Cart.posts('setzip', { place, order_id, zip })
+								// 	if (!ans.result) Popup.alert(ans.msg)
+									
+								// }
+								// select.addEventListener('change', change)
+								const input = cls('zip', block)[0]
 								const change = async () => {
-									const n = select.options.selectedIndex
-									const zip = select.options[n].value
+									const zip = input.value
 									for (const block of blocks) {
-										const select = cls('zip', block)[0]
-										select.options.selectedIndex = n
+										const input = cls('zip', block)[0]
+										const msg = cls('msg', block)[0]
+										msg.innerHTML = '...'
+										msg.style.color = "black"
+										input.value = zip
 									}
+									
 									const transport = form.elements.transport.value
 									const data = {
 										"city":{
@@ -556,10 +582,16 @@
 									}
 									cls('transresume')[0].innerHTML = transport ? Template.parse("{tpl}", data, "info_" + transport) : ''
 									const ans = await Cart.posts('setzip', { place, order_id, zip })
-									if (!ans.result) Popup.alert(ans.msg)
-									
+									//if (!ans.result) Popup.alert(ans.msg)
+									for (const block of blocks) {
+										const input = cls('zip', block)[0]
+										const msg = cls('msg', block)[0]
+										msg.innerHTML = ans.msg
+										if (ans.result) msg.style.color = "green"
+										else msg.style.color = "red"
+									}
 								}
-								select.addEventListener('change', change)
+								input.addEventListener('keyup', change)
 							}
 						</script>
 						<script type="module" async>
@@ -1818,13 +1850,14 @@
 		</div>
 	{inpzip:}
 		<div class="input-zip">
-			<label class="w-100">Почтовый индекс<!--  (<span class="{:isedit?:a?:text-danger} citychoice">{data.order.city.city|:citynone}</span>)  -->
-				<i class="msg float-right"></i>
-			</label>
-			<select name="zip" {:isdisabled} class="zip form-control" type="text" list="zips" autocomplete="off">
+			<label class="w-100">Почтовый индекс<i class="msg float-right"></i></label>
+			<!-- <p><span class="a">указать</span> или <b>выбрать из списка</b></p> -->
+			<input {:isdisabled} type="text" name="zip" value="{data.order.zip}" class="form-control zip" placeholder="Индекс">
+			<!-- <select name="zip" {:isdisabled} class="zip form-control" type="text" list="zips" autocomplete="off">
 				<option></option>
 				{data.order.city.zips::zipopt}
-			</select>
+			</select> -->
+
 		</div>
 		
 {MAP:}

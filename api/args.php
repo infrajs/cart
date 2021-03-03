@@ -41,6 +41,17 @@ $context->args = [
 		]);
 		if (!$city_id) return $this->fail('CR059');
 	},
+	"zip" => function ($zip) {
+		if ($zip != "") {
+			$t = preg_replace('/[^0-9a-z_\-]/u','', $zip);
+			//echo $t;
+			//echo $zip;
+			if ($t != $zip) return $this->err('zip');
+			if (strlen($zip) < 6) return $this->err('zip');
+			//if (strlen($t) > 9) return $this->err('zip');
+			if (strlen($zip) > 10) return $this->err('zip');
+		}
+	},
 	"item_num" => function (&$item_num, $pname) {
 		if (!$item_num) $item_num = 1;
 	},

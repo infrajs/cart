@@ -79,7 +79,7 @@ $context->actions = [
 		if (!$order) return $this->err('empty');
 		$ans['rule'] = Cart::getJsMetaRule($this->meta, $order['status'], $lang);
 		$order['city'] = Cart::getCity($order['city_id'], $order['email'], $order['order_id'], $lang);
-		$order['city']['zips'] = City::getIndexes($order['city_id']);
+		//$order['city']['zips'] = City::getIndexes($order['city_id']);
 		$ans['order'] = $order;
 		$ans['active'] = Cart::isActive($order, $user);
 		if (!sizeof($order['basket'])) return $this->ret('empty');
@@ -323,8 +323,8 @@ $context->actions = [
 	}, 
 	'setzip' => function () {
 		extract($this->gets(['order_id', 'zip']), EXTR_REFS);
-		$zip = (int) $zip;
-		if ($zip && strlen($zip) != 6) return $this->err('zip');
+
+		
 		$r = Db::exec('UPDATE cart_orders
 			SET zip = :zip, dateedit = now()
 			WHERE order_id = :order_id
