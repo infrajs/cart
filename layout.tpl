@@ -1139,8 +1139,7 @@
 			<div>datecomplete: {~date(:d.m.Y H:i,datecomplete)}</div>
 			<div>city.country: {city.country}</div>
 			<div>city.zip: {city.zip}</div>
-			<div>coupon: HELLO</div>
-			<div>{~print(coupondata)}</div>
+			<div>coupon: {coupon}</div>
 			{basket::techbasket}
 			
 			{techbasket:}
