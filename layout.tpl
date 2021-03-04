@@ -1540,7 +1540,7 @@
 			<li class="breadcrumb-item active">Все заказы</li>
 		</ol>
 		<h1>Все заказы</h1>
-		<p>Заказы сортируются по дате последних изменений посетителя.</p>
+		<p>Заказы сортируются по дате последних изменений посетителем.</p>
 		<div id="YEARS"></div>
 		<div id="ADMINLIST"></div>
 		{ADMINLIST:}
@@ -1554,6 +1554,10 @@
 					#{div} :focus {
 						box-shadow: none;
 					}
+					#{div} a {
+						margin: 2px 0;
+					}
+
 					#{div} a:active {
 						background-color: var(--orange);
 						border-color: var(--orange);
