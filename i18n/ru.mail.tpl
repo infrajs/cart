@@ -36,7 +36,7 @@
 		<a href="{site}">{host}</a>
 	</p>
 {payorrec:}{order.paid?:paid?:rec}
-{cart::}-cart/layout.tpl
+{cart::}-cart/layout.tpl?v={~conf.index.v}
 {paid:}<b>оплачен</b>
 {rec:}принят
 {2:}2

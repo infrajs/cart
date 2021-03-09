@@ -1,4 +1,4 @@
-{model::}-catalog/model.tpl
+{model::}-catalog/model.tpl?v={~conf.index.v}
 {root:}
 	<div class="cartbasket">
 		<style scoped>
@@ -42,7 +42,7 @@
 	{user:} <b><a href="/user">{data.user.email}</a></b>
 
 {pr:} {.}
-{fields::}-cart/fields.tpl?v=4
+{fields::}-cart/fields.tpl?v={~conf.index.v}
 
 {*:}
 	{~obj(:title,:Корзина,:content,:showcartlist,:num,:1):accordCard}

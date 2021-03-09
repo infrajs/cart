@@ -1,4 +1,4 @@
-{::}vendor/infrajs/catalog/model.tpl
+{::}vendor/infrajs/catalog/model.tpl?v={~conf.index.v}
 {CART-props:}
 	<div class="d-none d-sm-block">
 		<table class="props">

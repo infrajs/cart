@@ -1,4 +1,4 @@
-{orig::}vendor/infrajs/catalog/extend.tpl
+{orig::}vendor/infrajs/catalog/extend.tpl?v={~conf.index.v}
 {pos-page:}{:orig.pos-page}
 {nds:}{:orig.nds}
 {pos-sign:}{:orig.pos-sign}
@@ -11,7 +11,7 @@
 	{itemnocost:}<a href="/contacts">Уточнить</a>
 	{nalichie:}{:orig.nalichie}
 	{badgenalichie:}{:orig.badgenalichie}
-{model::}-catalog/model.tpl
+{model::}-catalog/model.tpl?v={~conf.index.v}
 {orig.priceblockbig:}
 	{:model.basket}
 
@@ -57,7 +57,7 @@
 	</div>
 	{basket:}
 		<a class="abasket" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}{catkit:ampval}" href="/cart/orders/active/list"><span class="pe-7s-cart flash"></span></a>
-{cat::}-catalog/cat.tpl
+{cat::}-catalog/cat.tpl?v={~conf.index.v}
 {ampval:}&{.}
 {print_more_descr:}
 	<div>{~cut(:200,Описание)}</div>

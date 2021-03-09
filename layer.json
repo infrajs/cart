@@ -1,6 +1,6 @@
 {
 	"activelink":true,
-	"tpl":"-cart/layout.tpl",
+	"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 	"tplroot":"CART",
 	"showanimatefastreparse":true,
 	"jsontpl":"-cart/api/cart?lang={Cart.lang()}&place=orders&token={User.token()}",
@@ -8,14 +8,14 @@
 	"conf":"cart",
 	"childs":{
 		"orders":{
-			"tpl":"-cart/layout.tpl",
+			"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 			"tplroot":"ORDERS",
 			"jsontpl":"-cart/api/cart?lang={Cart.lang()}&place={crumb.name}&token={User.token()}",
 			"global":["user", "cart"],
 			"child":{
 				"jsontpl":"-cart/api/getorder?lang={Cart.lang()}&order_nick={crumb.name}&place={crumb.parent.name}&token={User.token()}",
 				"autosavenametpl":"orders.{crumb.name}",
-				"tpl":"-cart/layout.tpl",
+				"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 				"global":["user", "cart-order"],
 				"globaljson":["cart"],
 				"tplroot":"ORDER",
@@ -25,7 +25,7 @@
 						"external":"-pay/cartapi/layer.json"
 					},
 					"list":{
-						"tpl":"-cart/layout.tpl",
+						"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 						"tplroot":"LIST",
 						"global":["user","cart-list"],
 						"globaljson":["cart", "cart-sum"],
@@ -33,7 +33,7 @@
 					},
 					"print":{
 						"jsontpl":"-cart/api/getorder?lang={Cart.lang()}&order_nick={crumb.parent.name}&place={crumb.parent.parent.name}&token={User.token()}",
-						"tpl":"-cart/layout.tpl",
+						"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 						"global":["user", "cart"],
 						"tplroot":"PRINT"
 					}
@@ -42,18 +42,18 @@
 		},
 		"admin":{
 			"layers":{
-				"tpl":"-cart/layout.tpl",
+				"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 				"tplroot":"ADMIN",
 				"divs":{
 					"YEARS":{
-						"tpl":"-cart/layout.tpl",
+						"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 						"parsedtpl":"{Crumb.get.status}",
 						"tplroot":"YEARS",
 						"jsontpl":"-cart/api/years?lang={Cart.lang()}&token={User.token()}"
 					},
 					"ADMINLIST":{
 						"tplroot":"ADMINLIST",
-						"tpl":"-cart/layout.tpl",
+						"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 						"global":["user", "cart"],
 						"jsontpl":"-cart/api/orders?lang={Cart.lang()}&token={User.token()}&start={Crumb.get.start}&status={Crumb.get.status|:check}"
 					}
@@ -63,19 +63,19 @@
 				"istpl":"{crumb.name!:all?:yes}",
 				"jsontpl":"-cart/api/getorder?lang={Cart.lang()}&order_nick={crumb.name}&order_nick={crumb.name}&place={crumb.parent.name}&token={User.token()}",
 				"autosavenametpl":"admin.{crumb.name}",
-				"tpl":"-cart/layout.tpl",
+				"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 				"global":["user", "cart"],
 				"tplroot":"ORDER",
 				"childs":{
 					"print":{
 						"jsontpl":"-cart/api/getorder?lang={Cart.lang()}&order_nick={crumb.parent.name}&place={crumb.parent.parent.name}&token={User.token()}",
-						"tpl":"-cart/layout.tpl",
+						"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 						"global":["user", "cart"],
 						"tplroot":"PRINT",
 						"dataroot":"data.order"
 					},
 					"list":{
-						"tpl":"-cart/layout.tpl",
+						"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 						"tplroot":"LIST",
 						"global":["user","cart-list"],
 						"globaljson":["cart"],
@@ -85,18 +85,18 @@
 			},
 			"childs":{
 				"wait":{
-					"tpl":"-cart/layout.tpl",
+					"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 					"tplroot":"ADMIN",
 					"divs":{
 						"YEARS":{
 							"activelink":true,
-							"tpl":"-cart/layout.tpl",
+							"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 							"tplroot":"YEARS",
 							"jsontpl":"-cart/api/years?lang={Cart.lang()}&token={User.token()}"
 						},
 						"ADMINLIST":{
 							"tplroot":"ADMINLIST",
-							"tpl":"-cart/layout.tpl",
+							"tpltpl":"-cart/layout.tpl?v={~conf.index.v}",
 							"global":["user", "cart"],
 							"jsontpl":"-cart/api/orders?lang={Cart.lang()}&wait=1&token={User.token()}&start={Crumb.get.start}"
 						}

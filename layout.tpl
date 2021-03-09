@@ -1663,9 +1663,9 @@
 					<nobr>{count} <a href="/catalog/{model.producer_nick}/{model.article_nick}{model:cat.idsl}">{model.article}</a>{~last()|:comma}</nobr><wbr>
 
 				{adm_paidorder:}<b>{~cost(manage.paid)}{:model.unit}</b> {manage.paidtype=:bank?:банк?:менеджер} {~date(:d.m.Y H:i,manage.paidtime)}
-	{cat::}-catalog/cat.tpl
-	{extend::}-catalog/extend.tpl
-	{model::}-catalog/model.tpl
+	{cat::}-catalog/cat.tpl?v={~conf.index.v}
+	{extend::}-catalog/extend.tpl?v={~conf.index.v}
+	{model::}-catalog/model.tpl?v={~conf.index.v}
 	{totalwarn:} <i title="установлено менеджером">*</i>
 	{noemail:}<b>ещё не отправлялось</b>{wasemail:}было <b>{~date(:j F H:i,order.dateemail)}</b>
 	{mngdelivery:}

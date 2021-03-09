@@ -152,7 +152,7 @@
 	.autocomplete-group { padding: 2px 5px; }
 	.autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
 </style>
-{extend::}-catalog/extend.tpl
+{extend::}-catalog/extend.tpl?v={~conf.index.v}
 
 {SUGGESTION:}
 	<div style="display: grid;">

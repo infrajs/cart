@@ -1,4 +1,4 @@
-{::}vendor/infrajs/catalog/position.tpl
+{::}vendor/infrajs/catalog/position.tpl?v={~conf.index.v}
 {model.showitemonecost:}{:model.showonecost}
 {props:}
 	<div class="mb-3">

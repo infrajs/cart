@@ -236,7 +236,7 @@
 			<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-info" role="alert"><b>Сообщение менеджера</b>
 					<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{manage.comment}</pre>
 			</div>
-		{paylayout::}-cart/sbrfpay/layout.tpl
+		{paylayout::}-cart/sbrfpay/layout.tpl?v={~conf.index.v}
 		{checked:}checked
 		{orderPageContent:}
 			<div class="float-right" title="Последние измения">{~date(:j F H:i,order.time)}</div>
@@ -788,9 +788,9 @@ cd
 				{product:} <nobr>{count} <a href="/catalog/{producer_nick}/{article_nick}{:cat.idsl}">{article}</a>{~last()|:comma}</nobr><wbr>
 
 				{adm_paidorder:}<b>{~cost(manage.paid)} руб.</b> {manage.paidtype=:bank?:банк?:менеджер} {~date(:d.m.Y H:i,manage.paidtime)}
-	{cat::}-catalog/cat.tpl
-	{extend::}-catalog/extend.tpl
-	{model::}-catalog/model.tpl
+	{cat::}-catalog/cat.tpl?v={~conf.index.v}
+	{extend::}-catalog/extend.tpl?v={~conf.index.v}
+	{model::}-catalog/model.tpl?v={~conf.index.v}
 	{totalwarn:} <i title="установлено менеджером">*</i>
 	{noemail:}<b>ещё не отправлялось</b>{wasemail:}было <b>{~date(:j F H:i,order.emailtime)}</b>
 	{mngdelivery:}
