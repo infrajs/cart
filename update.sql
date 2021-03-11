@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
 
     `datecreate` DATETIME NULL COMMENT 'Дата создания заказа, в момент добавления первой позиции',
     `datefreeze` DATETIME NULL COMMENT 'Дата последней заморозки заказа, если такая была',
+    `datecancel` DATETIME NULL COMMENT 'Дата отмены',
     `datewait` DATETIME NULL COMMENT 'Дата изменения статуса ожидание, активные заказы в этом статусе',
     `datepay` DATETIME NULL COMMENT 'Дата изменения статуса ожидает оплаты',
     `datepaid` DATETIME NULL COMMENT 'Дата подтверждения оплаты',

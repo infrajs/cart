@@ -1077,6 +1077,15 @@ class Cart
 		]) === false) return false;
 		return true;
 	}
+	public static function setEdit($order_id) {
+		$sql = "UPDATE cart_orders
+			SET dateedit = now()
+			WHERE order_id = :order_id
+		";
+		return Db::exec($sql, [
+			':order_id' => $order_id
+		]);
+	}
 	public static function setStatus($order_id, $status, $noedit = false)
 	{
 		if ($noedit) {
@@ -1086,8 +1095,7 @@ class Cart
 			';	
 		} else {
 			$sql = "UPDATE cart_orders
-				SET status = :status, 
-				dateedit = now(),
+				SET status = :status,
 				date$status = now()
 				WHERE order_id = :order_id
 			";	
@@ -1153,6 +1161,7 @@ class Cart
 					UNIX_TIMESTAMP(datewait) as datewait,
 					UNIX_TIMESTAMP(dateedit) as dateedit,
 					UNIX_TIMESTAMP(datecheck) as datecheck,
+					UNIX_TIMESTAMP(datecancel) as datecancel,
 					UNIX_TIMESTAMP(datecomplete) as datecomplete,
 					UNIX_TIMESTAMP(datepay) as datepay,
 					UNIX_TIMESTAMP(datepaid) as datepaid,

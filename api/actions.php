@@ -148,6 +148,7 @@ $context->actions = [
 		extract($this->gets(['order_id']), EXTR_REFS);
 		$this->handler('create_order_user'); //Как знать или помнить, в какой момент у заказа точно есть созданный аккаунт пользователя по email
 		if (!Cart::setStatus($order_id, 'pay')) return $this->fail('CR018');
+		if (!Cart::setEdit($order_id)) return $this->fail('CR018');
 		//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
 		$r = Cart::resetActive($order_id);
 		if (!$r) return $this->fail('CR018');
@@ -182,7 +183,7 @@ $context->actions = [
 		extract($this->gets(['order','order_id']), EXTR_REFS);
 		$email = $order['email'];
 		$ouser = User::getByEmail($email);
-		if (!Cart::setStatus($order_id, 'check', 'noedit')) return $this->fail('CR018');
+		if (!Cart::setStatus($order_id, 'check', 'noedit datecheck')) return $this->fail('CR018');
 		return $this->ret('CR025s');
 	},
 	'settransport' => function () {
@@ -199,7 +200,7 @@ $context->actions = [
 	}, 
 	'complete' => function () {
 		extract($this->gets(['order_id','order']), EXTR_REFS);
-		if (!Cart::setStatus($order_id, 'complete', true)) return $this->fail('CR018');
+		if (!Cart::setStatus($order_id, 'complete')) return $this->fail('CR018');
 		$r = Cart::resetActive($order['order_id']);//После того как заказ отправляется на проверку, он у всех перестаёт быть активным.
 		if (!$r) return $this->fail('CR018');
 		return $this->ret('CR040');
@@ -207,7 +208,7 @@ $context->actions = [
 	},
 	'cancel' => function () {
 		extract($this->gets(['order_id','order']), EXTR_REFS);
-		if (!Cart::setStatus($order_id, 'cancel', true)) return $this->fail('CR018');
+		if (!Cart::setStatus($order_id, 'cancel')) return $this->fail('CR018');
 		$r = Cart::resetActive($order['order_id']);
 		if (!$r) return $this->fail('CR018');
 		return $this->ret('canceled');

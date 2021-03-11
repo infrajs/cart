@@ -1131,12 +1131,15 @@
 			<div>sum: {sum}</div>
 			<div>sumtrans: {sumtrans}</div>
 			<div>total: {total}</div>
-			<div>datefreeze: {~date(:d.m.Y H:i,datefreeze)}</div>
 			<div>datecreate: {~date(:d.m.Y H:i,datecreate)}</div>
-			<div>dateedit: {~date(:d.m.Y H:i,dateedit)}</div>
 			<div>datewait: {~date(:d.m.Y H:i,datewait)}</div>
+			<div>dateedit: {~date(:d.m.Y H:i,dateedit)}</div>
+			<div>datefreeze: {~date(:d.m.Y H:i,datefreeze)}</div>
+			<div>datecheck: {~date(:d.m.Y H:i,datecheck)}</div>
 			<div>datepaid: {~date(:d.m.Y H:i,datepaid)}</div>
 			<div>datecomplete: {~date(:d.m.Y H:i,datecomplete)}</div>
+			<div>dateemail: {~date(:d.m.Y H:i,dateemail)}</div>
+			<div>datecancel: {~date(:d.m.Y H:i,datecancel)}</div>
 			<div>city.country: {city.country}</div>
 			<div>city.zip: {city.zip}</div>
 			<div>coupon: {coupon}</div>
