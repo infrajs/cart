@@ -110,7 +110,7 @@
 	},
 	"args":{
 		"coupon":[],
-		"commentmanager":["notempty"],
+		"commentmanager":[],
 		"position_ids":["intarray"],
 		"start":["int"],
 		"end":["int"],
