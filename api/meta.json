@@ -121,6 +121,7 @@
 		"comment":["text"],
 		"name":[],
 		"zip":[],
+		"tk":[],
 		"address":[],
 		"phone":[],
 		"pvz":[],
@@ -162,6 +163,7 @@
 			"name":["order_id"],
 			"transport":["order_id"],
 			"zip":["order_id"],
+			"tk":["order_id"],
 			"pay":["order_id"],
 			"callback":["order_id"],
 			"address":["order_id"],
@@ -248,6 +250,10 @@
 		},
 		"setzip": {
 			"required": ["zip", "order_id"],
+			"handlers": ["post", "edit", "paid"]
+		},
+		"settk": {
+			"required": ["tk", "order_id"],
 			"handlers": ["post", "edit", "paid"]
 		},
 		"setname": {

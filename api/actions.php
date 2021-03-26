@@ -81,8 +81,10 @@ $context->actions = [
 		$order['city'] = Cart::getCity($order['city_id'], $order['email'], $order['order_id'], $lang);
 		//$order['city']['zips'] = City::getIndexes($order['city_id']);
 		$ans['order'] = $order;
+		$ans['order']['tks'] = Cart::$conf['tks'];
 		$ans['active'] = Cart::isActive($order, $user);
 		if (!sizeof($order['basket'])) return $this->ret('empty');
+		
 	},	
 	
 	'cart' => function () {
@@ -319,6 +321,17 @@ $context->actions = [
 		', [
 			':order_id' => $order_id,
 			':comment' => $comment
+		]) !== false;
+		return $r ? $this->ret('saved') : $this->fail('CR018');
+	}, 
+	'settk' => function () {
+		extract($this->gets(['order_id', 'tk']), EXTR_REFS);
+		$r = Db::exec('UPDATE cart_orders
+			SET tk = :tk, dateedit = now()
+			WHERE order_id = :order_id
+		', [
+			':order_id' => $order_id,
+			':tk' => $tk
 		]) !== false;
 		return $r ? $this->ret('saved') : $this->fail('CR018');
 	}, 

@@ -1,5 +1,5 @@
 {
-	"pub":["yandexapikey", "payselfcost", "coupon","transports","city_from_id","city_from","pay"],
+	"pub":["paycheck","yandexapikey", "payselfcost", "coupon","transports","city_from_id","city_from","pay"],
 	"paramsrc":"~auto/pages/Параметры.xlsx",
 	"coupon":true,
 	"conf":"infrajs\\cart\\Cart",
@@ -7,7 +7,14 @@
 	"js":["Cart.js","infra.js"],
 	"require":"infra.php",
 	"update":"update.php",
-
+	"tks":[
+		"ЖелДорЭкспедиция",
+		"Деловые Линии",
+		"Энергия",
+		"ГлавДоставка",
+		"Байкал-Сервис",
+		"Первая Экспедиционная Компания"
+	],
 	"transports":["city","self","cdek_pvz","cdek_courier","pochta_simple","pochta_1","pochta_courier","any"],
 	"pays":["self","card","corp","perevod"],
 	
@@ -26,6 +33,7 @@
 		"def":"ru",
 		"list":["ru","en"]
 	},
+	"paycheck":false,
 	"pay":"paykeeper",
 	
 	"clutch":{

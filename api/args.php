@@ -41,6 +41,11 @@ $context->args = [
 		]);
 		if (!$city_id) return $this->fail('CR059');
 	},
+	"tk" => function ($tk) {
+		$tk = strip_tags($tk);
+		$tk = preg_replace('/[\"\']/u','', $tk);
+		return $tk;
+	},
 	"zip" => function ($zip) {
 		if ($zip != "") {
 			$t = preg_replace('/[^0-9a-z_\-]/u','', $zip);

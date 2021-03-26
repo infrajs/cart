@@ -339,7 +339,7 @@ class Cart
 			':user_id' => $user_id
 		]);
 
-		$fields = ['name','phone','address','zip','transport','city_id','pay','pvz'];
+		$fields = ['name','phone','address','tk','zip','transport','city_id','pay','pvz'];
 		$fieldsstr = implode(',', $fields);
 		$row = Db::fetch("SELECT $fieldsstr from cart_orders where email = :email order by dateedit DESC", [
 			':email'=> $user['email']
@@ -1153,6 +1153,7 @@ class Cart
 					email, 
 					address,
 					zip,
+					tk,
 					pvz,
 					comment,
 					commentmanager,

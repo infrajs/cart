@@ -475,7 +475,7 @@
 					<h2><span class="transportreset" style="cursor: default">Населённый пункт</span> <span class="{:isedit?:a?:text-danger} citychoice">{data.order.city.city|:citynone}</span></h2>
 					{:raschetniives}
 					
-					<div class="borderblock" style="color:#444; padding-top:0; padding-bottom:15px">
+					<div class="borderblock" style="color:#444; padding-top:10px; padding-bottom:15px">
 						<div style="max-width:350px">
 							<style>
 								.transblock input,
@@ -537,29 +537,6 @@
 							const place = "{:place}"
 							const order_id = {:order_id}
 							for (const block of blocks) {
-								//const select = cls('zip', block)[0]
-								// const change = async () => {
-								// 	const n = select.options.selectedIndex
-								// 	const zip = select.options[n].value
-								// 	for (const block of blocks) {
-								// 		const select = cls('zip', block)[0]
-								// 		select.options.selectedIndex = n
-								// 	}
-								// 	const transport = form.elements.transport.value
-								// 	const data = {
-								// 		"city":{
-								// 			"city":"{data.order.city.city}"
-								// 		},
-								// 		"address":cls('address',form)[0].value,
-								// 		"zip":cls('zip',form)[0].value,
-								// 		"pvz":"{data.order.pvz}"
-								// 	}
-								// 	cls('transresume')[0].innerHTML = transport ? Template.parse("{tpl}", data, "info_" + transport) : ''
-								// 	const ans = await Cart.posts('setzip', { place, order_id, zip })
-								// 	if (!ans.result) Popup.alert(ans.msg)
-									
-								// }
-								// select.addEventListener('change', change)
 								const input = cls('zip', block)[0]
 								const change = async () => {
 									const zip = input.value
@@ -651,14 +628,15 @@
 									const address_value = address;
 
 									const zip = cls('zip',form)[0]
-									const zip_value = zip ? zip.value : '';
-
+									const zip_value = zip ? zip.value : ''
+									
+									
 									const data = {
 										"city":{
 											"city":"{data.order.city.city}"
 										},
+										"tk":tk_value,
 										"address":address_value,
-										"zip":zip_value,
 										"pvz":"{data.order.pvz}"
 									}
 									cls('transresume')[0].innerHTML = transport ? Template.parse("{tpl}", data, "info_" + transport) : ''
@@ -679,6 +657,7 @@
 						</script>
 						<script type="module" async>
 							import { Cart } from '/vendor/infrajs/cart/Cart.js'
+							import { Config } from '/vendor/infrajs/config/Config.js'
 							import { Popup } from '/vendor/infrajs/popup/Popup.js'
 							import { Global } from '/vendor/infrajs/layer-global/Global.js'
 							import { Template } from '/vendor/infrajs/template/Template.js'
@@ -727,7 +706,7 @@
 								
 								const pay = form.elements.pay.value
 
-								const online = (pay == 'card' && transport != 'any' && transport)
+								const online = (pay == 'card' && (Config.conf.cart.paycheck || (transport != 'any' && transport)))
 								for (const img of cls('visalogo')) img.style.display = online ? '' : 'none'
 								for (const btn of cls('act-check')) btn.style.display = online ? 'none' : 'inline-block'
 								for (const btn of cls('act-pay')) btn.style.display = online ? 'inline-block' : 'none'
@@ -763,10 +742,14 @@
 								const address = cls('address',form)[0]
 								const address_value = address ? address.value : '';
 
+								const tkselect = cls('select-tk')[0]
+								const tkindex = tkselect.options.selectedIndex
+								const tk_value = tkselect.options[tkindex].value
 								let data = {
 									"city":{
 										"city":"{data.order.city.city}"
 									},
+									"tk":tk_value,
 									"address":address_value,
 									"zip":"{data.order.zip}",
 									"pvz":"{data.order.pvz}"
@@ -923,7 +906,8 @@
 							}
 
 
-							const online = (pay == 'card' && transport != 'any' && transport)
+							//const online = (pay == 'card' && transport != 'any' && transport)
+							const online = (pay == 'card' && (Config.conf.cart.paycheck || (transport != 'any' && transport)))
 							for (const img of cls('visalogo')) img.style.display = online ? '' : 'none'
 							for (const btn of cls('act-check')) btn.style.display = online ? 'none' : 'inline-block'
 							for (const btn of cls('act-pay')) btn.style.display = online ? 'inline-block' : 'none'
@@ -1026,7 +1010,9 @@
 					</script>
 				</div>
 			</div>
-			{online:}{((pay=:card)&(transport!:any))&transport?:yes}
+			{online*:}{((pay=:card)&(transport!:any))&transport?:yes}
+			{online:}{(pay=:card)&(~conf.cart.paycheck|((transport!:any)&transport))?:yes)}
+			
 			{zipopt:}<option {.=data.order.zip?:selected}>{.}</option>
 			{payradio:}
 				<div class="mt-1 line" style="color: {data.order.pay=.?:black}; font-weight:{data.order.pay=.?:600}">
@@ -1822,8 +1808,44 @@
 	{label_self:}Самовывоз из магазина в Тольятти
 	{label_self_short:}{:label_self}
 
-	{descr_any:}<div style="font-size:13px; color:#888; margin-top:-4px;">Почта России, СДЕК, Деловые Линии, DPD, КИТ, Байкал Сервис, Энергия, ПЭК ...</div>
-	{info_any:}
+	
+	{optiontk:}
+		<option {.=data.order.tk?:selected}>{.}</option>
+	{descr_any:}
+		<div style="font-size:13px; color:#888; margin-top:-4px;">
+			<p>Стоимость услуг транспортной компании по доставке до города получателя оплачивается самим получателем в транспортной компании при получении заказа.
+			</p>
+			Укажите предпочтительную ТК
+			<select name="tk" {:isdisabled} class="form-control select-tk" style="margin-top: 5px">
+				<option value=""></option>
+				{...tks::optiontk}
+			</select>
+			<script type="module" async>
+				import { Cart } from '/vendor/infrajs/cart/Cart.js'
+				const form = document.forms.cart
+				const cls = (cls, div = form) => div.getElementsByClassName(cls)
+				const place = "{:place}"
+				const order_id = {:order_id}
+				const select = cls('select-tk')[0]
+				const change = async () => {
+					const n = select.options.selectedIndex
+					const tk = select.options[n].value
+					const transport = form.elements.transport.value
+					const data = {
+						"city":{
+							"city":"{data.order.city.city}"
+						},
+						"tk":tk
+					}
+					const ans = await Cart.posts('settk', { place, order_id, tk })
+					cls('transresume')[0].innerHTML = transport ? Template.parse("{tpl}", data, "info_" + transport) : ''
+					if (!ans.result) Popup.alert(ans.msg)
+				}
+				select.addEventListener('change', change)
+			</script>
+		</div>
+	{info_any:}{tk?:rectk}
+	{rectk:}Предпочтительная ТК {tk}
 	{label_any:}Способ и стоимость доставки, согласовываются отдельно. {city.city|:citynone}.
 	{label_any_short:}Согласовать оптимальную ТК с менеджером
 

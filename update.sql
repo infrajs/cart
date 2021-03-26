@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `cart_orders` (
     ) NULL COMMENT 'Выбор пользователя',
     `pvz` TEXT NULL COMMENT 'Адрес в городе',
     `address` TEXT NULL COMMENT 'Адрес в городе',
+    `tk` TINYTEXT NULL COMMENT 'Рекомендуемая ТК',
     `zip` TEXT NULL COMMENT 'Индекс',
     `count` SMALLINT unsigned NOT NULL COMMENT 'Кэш количества позиций в корзине',
     `weight` MEDIUMINT unsigned NOT NULL COMMENT 'Кэш - расчётный вес',

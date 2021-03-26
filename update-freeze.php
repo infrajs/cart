@@ -2,6 +2,10 @@
 
 use infrajs\db\Db;
 
+
+$sql = "ALTER TABLE `cart_orders` ADD `tk` TINYTEXT NULL COMMENT 'Рекомендуемая ТК' AFTER `dateedit`";
+Db::exec($sql);
+
 $sql = "ALTER TABLE `cart_orders` ADD `datecancel` DATETIME NULL COMMENT 'Дата отмены' AFTER `dateedit`";
 Db::exec($sql);
 
