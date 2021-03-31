@@ -532,6 +532,7 @@ class Cart
 			}
 			if ($rr) break;
 		}
+
 		if ($rr) {
 			$res = $row; //Когда пройена предварительная проверка
 		} else {
@@ -541,6 +542,7 @@ class Cart
 			$r = Event::fire('Cart.coupon', $model);
 			if (!$r) $res = false;
 		}
+		
 		return $res;
 	}
 	
@@ -817,8 +819,8 @@ class Cart
 		$coupondata = json_decode($coupondata, true);
 		if (!$coupondata) return 0;
 		$res = Cart::couponCheck($model, $coupondata);
-		if (!$res) return 0;
-		return $coupondata['Скидка'];
+		if (!$res) return 0;		
+		return $res['Скидка'];
 	}
 	public static function getWeight($model) {
 		return $model['Вес, кг'] ?? $model['more']['Вес, кг'] ?? false;
