@@ -742,9 +742,13 @@
 								const address = cls('address',form)[0]
 								const address_value = address ? address.value : '';
 
+								
+								let tk_value = '';
 								const tkselect = cls('select-tk')[0]
-								const tkindex = tkselect.options.selectedIndex
-								const tk_value = tkselect.options[tkindex].value
+								if (tkselect) {
+									const tkindex = tkselect.options.selectedIndex
+									tk_value = tkselect.options[tkindex].value
+								}
 								let data = {
 									"city":{
 										"city":"{data.order.city.city}"
