@@ -630,6 +630,12 @@
 									const zip = cls('zip',form)[0]
 									const zip_value = zip ? zip.value : ''
 									
+									let tk_value = '';
+									const tkselect = cls('select-tk')[0]
+									if (tkselect) {
+										const tkindex = tkselect.options.selectedIndex
+										tk_value = tkselect.options[tkindex].value
+									}
 									
 									const data = {
 										"city":{
