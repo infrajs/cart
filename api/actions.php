@@ -25,6 +25,7 @@ $context->actions = [
 		if ($basket) foreach ($basket as $pos) {
 			$model = Cart::getModel($pos['position_id']);
 			if (!$model) continue;
+			if (empty($model['Цена'])) continue;
 			$count++;
 			$discount = 1 - $pos['discount'] / 100;
 			$sum += $model['Цена'] * $discount * $pos['count'];
