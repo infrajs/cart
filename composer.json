@@ -17,7 +17,6 @@
     	"infrajs/doc":"~1",
     	"infrajs/excel":"~1",
         "infrajs/imager":"~1",
-        "infrajs/session":"~1",
         "infrajs/path":"~1",
         "infrajs/activelink":"~1",
         "infrajs/ascroll":"~1",
