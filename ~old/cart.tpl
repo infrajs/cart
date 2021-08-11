@@ -425,7 +425,7 @@ cd
 						let value = await Autosave.get("{autosavename}", 'transport.choice');
 						pcard.find('.item').css('display','');
 						if (!value) return;
-						let data = await Load.on('json','{json}');
+						let data = await Load.fire('json','{json}');
 						if (!data) return;
 						
 						if (!data.fields.transport[value] || !data.fields.transport[value].hide) return;

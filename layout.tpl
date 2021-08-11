@@ -444,7 +444,8 @@
 							<input reaqired {:isdisabled} type="email" name="email" value="{data.order.email}" class="form-control" placeholder="...@...">
 							<script type="module" async>
 								import { Cart } from '/vendor/infrajs/cart/Cart.js'
-								import { Session } from '/vendor/infrajs/session/Session.js'
+								//import { Session } from '/vendor/infrajs/session/Session.js'
+								import { Ses } from '/vendor/akiyatkin/form/Ses.js'
 								const form = document.forms.cart
 								const cls = (cls, div = form) => div.getElementsByClassName(cls)[0]
 								const block = cls('input-email')
@@ -457,7 +458,7 @@
 									msg.innerHTML = '...'
 									msg.style.color = "black"
 									const email = Cart.strip_tags(input.value)
-									Session.set('user.email', email)
+									Ses.set('user.email', email)
 									cls('emailresume').innerHTML = email ? ', '+email : ''
 									const ans = await Cart.posts('setemail', { place, order_id }, { email })
 									msg.innerHTML = ans.msg
