@@ -12,7 +12,7 @@
 		{:emptylist}
 	{LIST:}
 		{:listcrumb}
-		<div style="max-width:700px">
+		<div style="max-width:800px">
 			
 			<!-- 
 				Корзина есть комбинация шапок. Как это всё выбрать в шаблоне. Когда каждый вариант может ещё дополнительно параметризироваться или лучше нет.
@@ -77,25 +77,47 @@
 			{:cartlistborder}
 			{:couponinfolist}
 		{couponinfolist:}
-			<div class="d-flex flex-column flex-sm-row justify-content-between mt-3">
-				<div class="mr-sm-3 mx-auto mx-sm-0">{:couponinp}</div>
-				<div class="flex-grow-1">
-					<p class="text-center text-sm-right {sumclear!sum??:d-none}">
+			<div class="couponinfolist">
+				<style>
+					#{div} .couponinfolist {
+						display: grid;
+						grid-template-columns: 1fr max-content;
+						grid-gap: 10px;
+						justify-content: space-between;
+					}
+					#{div} .couponinfolist .label {
+						 flex-grow: 1;
+						 text-align: right;
+					}
+					#{div} .couponinfolist .input {
+					}
+					@media(max-width: 991px) {
+						#{div} .couponinfolist .input {
+							/*margin-left: auto;
+							margin-right: auto;*/
+							text-align: center;
+						}
+						#{div} .couponinfolist .label {
+							text-align: center;
+							
+						}
+						#{div} .couponinfolist {
+							grid-template-columns: 1fr;
+						}
+					}
+				</style>
+				<div class="input">
+					{:couponinp}
+				</div>
+				<div class="label">
+					<p style="display: {sumclear!sum??:none}">
 						Сумма со скидкой: <b class="cartsum" style="font-size:140%">{sum:itemcostrub}</b> 
 					</p>
-					<div class="d-flex text-center text-sm-right flex-column">
-						<div class="mb-2"><a href="/{crumb.parent}" style="text-decoration:none; white-space: nowrap;" class="btn btn-success">Перейти к {data.order.status!:wait?:заказу?:оформлению заказа}</a></div>
-						<div>Займёт не&nbsp;более 3&nbsp;минут</div>
-					</div>
-				</div>
-			</div>
-		{couponinfoorder:}
-			<div class="d-flex flex-column flex-sm-row justify-content-between mt-3">
-				<div class="mr-sm-3 mx-auto mx-sm-0">{data.order:couponinp}</div>
-				<div class="flex-grow-1">
-					<p class="text-center text-sm-right {data.order.coupondata.result??:d-none}">
-						Сумма со скидкой: <b class="cartsum" style="font-size:140%">{data.order.total:itemcostrub}</b>
-					</p>
+					<a style="white-space: nowrap; text-decoration: underline;" href="/{crumb.parent}">
+						Перейти к {data.order.status!:wait?:заказу?:оформлению заказа}
+					</a>
+					<br>
+					Займёт не&nbsp;более 3&nbsp;минут.
 				</div>
 			</div>
 		{showcartlist:}
@@ -156,8 +178,15 @@
 				</style>
 				{basket::cartpos}
 			</form>
-			<div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-				<div class="mr-2">Сумма{sumclear!sum?:nodiscount}: </div><div style="font-size:120%; font-weight:bold" class="cartsumclear">{sumclear:itemcostrub}</div>
+			<div style="margin-bottom: 10px; text-align: var(--align)">
+				<style>
+					:root { --align: right }
+					@media (max-width: 991px) {
+					    :root { --align: center }
+					}
+				</style>
+				Сумма{sumclear!sum?:nodiscount}: 
+				<span style="font-size:120%; font-weight:bold" class="cartsumclear">{sumclear:itemcostrub}</span>
 			</div>
 			<script type="module">
 				import { Cart } from '/vendor/infrajs/cart/Cart.js'
@@ -1338,12 +1367,10 @@
 	{100:}100
 	{d-none:}d-none
 	{couponinp:}
-		<div style="max-width: 300px;" class="input-group">
-			<input name="coupon" data-autosave="false" {:isdisabled} value="{data.order.coupon}" type="text" class="form-control" id="coupon" placeholder="Укажите купон">
-			<div class="input-group-append">
-			    <button class="couponbtn btn btn-secondary" type="button">Активировать</button>
-			</div>
-		</div>
+		
+		<input id="coupon" name="coupon" {:isdisabled} value="{data.order.coupon}" type="text" placeholder="Укажите купон">
+		<button class="couponbtn" type="button">Активировать</button>	
+		
 		<script type="module">
 			import { Cart } from '/vendor/infrajs/cart/Cart.js'
 			import { DOM } from '/vendor/akiyatkin/load/DOM.js'
