@@ -23,40 +23,41 @@
 	<div class="d-flex justify-content-between"><div>Цена:&nbsp;</div><div>{:itemcost}</div></div>
 {basketrow:}
 	<div class="cart-basket">
-			<style>
-				.between .cart-basket .input-group {
-					width:100%;
-				}
-			</style>
-			<div class="form-inline has-success">
-				<div class="input-group input-group-sm" title="Купить {producer} {article} {item}">
-					<input type="number" value="1" min="0" max="999" class="form-control" style="width:60px;">
-					<div class="input-group-append">
-						<span data-model_id="{model_id}" data-item_num="{item_num}" data-catkit="{catkit:ampval}" class="add btn input-group-addon">{~conf.cart.textadd}</span>
-					</div>
+		<style>
+			.between .cart-basket .input-group {
+				width:100%;
+			}
+		</style>
+		<div class="form-inline has-success">
+			<div class="input-group input-group-sm" title="Купить {producer} {article} {item}">
+				<input type="number" value="1" min="0" max="999" class="form-control" style="width:60px;">
+				<div class="input-group-append">
+					<span data-order_id="active" data-article_nick="{article_nick}" data-producer_nick="{producer_nick}" data-item_num="{item_num}" data-catkit="{catkit}" class="add btn input-group-addon">Добавить в корзину</span>
 				</div>
 			</div>
-			<div class="bbasket" style="display:none; font-size:1rem">
-				{~conf.cart.textin}
-			</div>
 		</div>
+		<div class="bbasket" style="display:none; font-size:1rem">
+			Позиция добавлена в <a href='/cart/orders/my'>заказ</a>
+		</div>
+	</div>
+
 {priceold:}<div class="d-flex justify-content-between"><div>Цена:&nbsp;</div><div>{:itemcost}</div></div>
 {price:}
 		<div class="cart text-left basketfont" style="padding:6px">
 			{:basket}&nbsp;{(Цена|...Цена)?:itemcost}
 			<div class="bbasket" style="display:none; font-size:1rem">
-				{~conf.cart.textin}
+				Позиция добавлена в <a href='/cart/orders/my'>заказ</a>
 			</div>
 		</div>
 {orig.priceblock:}
 	<div class="cart alert alert-success text-right basketfont" style="padding:6px">
 		{(Цена|...Цена)?:itemcost}{:basket}
 		<div class="bbasket" style="display:none; font-size:1rem">
-			<small>{~conf.cart.textin}</small>
+			<small>Позиция добавлена в <a href='/cart/orders/my'>заказ</a></small>
 		</div>
 	</div>
 	{basket:}
-		<a class="abasket" data-producer="{producer_nick}" data-article="{article_nick}" data-id="{item_nick}{catkit:ampval}" href="/cart/orders/active/list"><span class="pe-7s-cart flash"></span></a>
+		<a class="abasket" data-producer="{producer_nick}" data-article="{article_nick}" data-item_num="{item_num}" data-catkit="{catkit}" href="/cart/orders/active/list"><span class="pe-7s-cart flash"></span></a>
 {cat::}-catalog/cat.tpl?v={~conf.index.v}
 {ampval:}&{.}
 {print_more_descr:}

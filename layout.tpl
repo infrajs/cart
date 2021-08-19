@@ -742,7 +742,8 @@
 								
 								const pay = form.elements.pay.value
 
-								const online = (pay == 'card' && (Config.conf.cart.paycheck || (transport != 'any' && transport)))
+								//const online = (pay == 'card' && (Config.conf.cart.paycheck || (transport != 'any' && transport)))
+								const online = (pay == 'card' && (Config.conf.cart.paycheck && (transport != 'any' && transport)))
 								for (const img of cls('visalogo')) img.style.display = online ? '' : 'none'
 								for (const btn of cls('act-check')) btn.style.display = online ? 'none' : 'inline-block'
 								for (const btn of cls('act-pay')) btn.style.display = online ? 'inline-block' : 'none'
@@ -947,7 +948,8 @@
 
 
 							//const online = (pay == 'card' && transport != 'any' && transport)
-							const online = (pay == 'card' && (Config.conf.cart.paycheck || (transport != 'any' && transport)))
+							//const online = (pay == 'card' && (Config.conf.cart.paycheck || (transport != 'any' && transport)))
+							const online = (pay == 'card' && (Config.conf.cart.paycheck && (transport != 'any' && transport)))
 							for (const img of cls('visalogo')) img.style.display = online ? '' : 'none'
 							for (const btn of cls('act-check')) btn.style.display = online ? 'none' : 'inline-block'
 							for (const btn of cls('act-pay')) btn.style.display = online ? 'inline-block' : 'none'
@@ -1051,7 +1053,8 @@
 				</div>
 			</div>
 			{online*:}{((pay=:card)&(transport!:any))&transport?:yes}
-			{online:}{(pay=:card)&(~conf.cart.paycheck|((transport!:any)&transport))?:yes)}
+			{online*:}{(pay=:card)&(~conf.cart.paycheck|((transport!:any)&transport))?:yes)}
+			{online:}{(pay=:card)&(~conf.cart.paycheck&((transport!:any)&transport))?:yes)}
 			
 			{zipopt:}<option {.=data.order.zip?:selected}>{.}</option>
 			{payradio:}
@@ -1460,14 +1463,12 @@
 			</p>
 		{account:}
 			<p>
-				<div class="logout float-right btn btn-sm btn-secondary">Выход</div>
+				<button style="float: right" class="logout">Выход</button>
 				<script type="module" async>
 					import { User } from "/vendor/infrajs/user/User.js"
 					const div = document.getElementById('{div}');
 					const btn = div.getElementsByClassName('logout')[0]
-					btn.addEventListener('click', () => {
-						User.logout()
-					})
+					btn.addEventListener('click', () => User.logout())
 				</script>
 				Пользователь <a href="/user"><b>{data.user.email}.</b></a> 
 			</p>

@@ -79,6 +79,7 @@ $context->args = [
 		if (!in_array($callback, ['yes', 'no', ''])) return $this->fail('callback');
 	},
 	"catkit" => function (&$catkit, $pname) {
+
 		if (!$catkit) $catkit = '';
 	},
 	"article_nick" => function ($article_nick, $pname) {

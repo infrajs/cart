@@ -33,6 +33,8 @@
 		{min?(show?:showonecost?:showitemscost)?(~length(items)?(data.pos?:showonecost?:showitemonecost)?:showonecost)}
 		{~length(kit)?:compolect}
 	</div>
+	{:basket-script}
+{basket-script:}
 	<script type="module" async id="scriptadd{~key}">
 		import { Cart } from '/vendor/infrajs/cart/Cart.js'
 		import { Global } from '/vendor/infrajs/layer-global/Global.js'
@@ -130,5 +132,5 @@
 	{showitemscost:}
 		<div class="form-inline has-success">
 			<div>{:cost-two}</div>
-			<a class="ml-2 my-1 btn btn-sm {~conf.cart.clsadd}" href="{:link-pos}">Выбрать</a>
+			<a class="ml-2 my-1 btn btn-sm btn-outline-warning" href="{:link-pos}">Выбрать</a>
 		</div>

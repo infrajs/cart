@@ -420,7 +420,7 @@ class Cart
 			':article_nick' => $model['article_nick'],
 			':producer_nick' => $model['producer_nick'],
 			':item_num' => $model['item_num'],
-			':catkit' => !empty($model['kit']) ? $model['catkit'] : ''
+			':catkit' => !empty($model['catkit']) ? $model['catkit'] : ''
 		]);
 		if ($count === true) {
 			if (!empty($pos['count'])) return true;
@@ -436,7 +436,7 @@ class Cart
 				':article_nick' => $model['article_nick'],
 				':producer_nick' => $model['producer_nick'],
 				':item_num' => $model['item_num'],
-				':catkit' => !empty($model['kit']) ? $model['catkit'] : '',
+				':catkit' => !empty($model['catkit']) ? $model['catkit'] : '',
 				':count' => 0
 			]);
 		} else {
@@ -1229,7 +1229,7 @@ class Cart
 					if ($order['freeze']) {
 						$costclear = $pos['costclear'];
 					} else {
-						$costclear = Showcase::getCost($pos['producer_nick'], $pos['article_nick'], $pos['item_num']);
+						$costclear = Showcase::getCost($pos);
 						if (!$costclear) {
 							unset($order['basket'][$i]);
 							continue; //Модель не заморожена и не найдена в каталоге
@@ -1395,7 +1395,7 @@ class Cart
 	public static function getFromShowcase($pos)
 	{
 		//return Showcase::getModel($pos['producer_nick'], $pos['article_nick'], $pos['item_num'], $pos['catkit']);
-		return Showcase::getModelEasy($pos['producer_nick'], $pos['article_nick'], $pos['item_num']);
+		return Showcase::getModelEasy($pos['producer_nick'], $pos['article_nick'], $pos['item_num'], $pos['catkit']);
 	}
 	public static function freeze($order_id)
 	{
