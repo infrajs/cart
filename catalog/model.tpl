@@ -57,7 +57,7 @@
 			let btnoff = () => {
 				btn.classList.add('btn-success')
 				btn.classList.remove('btn-danger')
-				btn.innerHTML = 'В корзину'
+				btn.innerHTML = 'В&nbsp;корзину'
 			}
 			let btnon = () => {
 				btn.classList.remove('btn-success')
@@ -119,7 +119,7 @@
 				<input type="number" value="" min="0" max="999" class="form-control" 
 				style="width: 3.3em; padding-left: 6px; padding-right: 6px;">
 				<div class="input-group-append">
-					<span data-order_id="active"  style="padding-left: 10px; padding-right: 10px; min-width:97px" data-producer_nick="{producer_nick}" data-article_nick="{article_nick}" data-item_num="{item_num}" data-catkit="{catkit:ampval}" class="add btn input-group-addon"></span>
+					<span data-order_id="active"  style="padding-left: 10px; padding-right: 10px; min-width:97px" data-producer_nick="{producer_nick}" data-article_nick="{article_nick}" data-item_num="{item_num}" data-catkit="{catkit}" class="add btn input-group-addon"></span>
 				</div>
 			</div>
 		</div>

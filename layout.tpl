@@ -84,6 +84,8 @@
 						grid-template-columns: 1fr max-content;
 						grid-gap: 10px;
 						justify-content: space-between;
+						align-items: center;
+						margin-top:15px;
 					}
 					#{div} .couponinfolist .label {
 						 flex-grow: 1;
@@ -1370,9 +1372,12 @@
 	{100:}100
 	{d-none:}d-none
 	{couponinp:}
+		{~conf.cart.coupon?:couponinpshow}
+	{couponinpshow:}
 		
 		<input id="coupon" name="coupon" {:isdisabled} value="{data.order.coupon}" type="text" placeholder="Укажите купон">
-		<button class="couponbtn" type="button">Активировать</button>	
+		<button class="couponbtn" type="button">Активировать</button>
+
 		
 		<script type="module">
 			import { Cart } from '/vendor/infrajs/cart/Cart.js'
@@ -1391,7 +1396,7 @@
 				await Cart.post('setcoupon', { place, order_id, coupon })
 			})
 		</script>
-		<div class="py-2">
+		<div>
 			{coupondata:coupinfo}
 		</div>
 		{prodart:}{producer_nick} {article_nick}{:cat.idsp}
