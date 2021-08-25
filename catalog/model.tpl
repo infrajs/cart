@@ -1,6 +1,6 @@
 {::}vendor/infrajs/catalog/model.tpl?v={~conf.index.v}
 {CART-props:}
-	<div class="d-none d-sm-block">
+	<div class="d-none d-md-block">
 		<table class="props">
 			<tr>
 				<td class="d-flex"><nobr>Производитель:</nobr><div class="line"></div></td><td>{producer}</td>
@@ -10,7 +10,7 @@
 			</tr>
 		</table>
 	</div>
-	<div class="d-block d-sm-none">
+	<div class="d-block d-md-none">
 		{producer} {article}{item:pr}
 	</div>
 {CARDS-basket:}

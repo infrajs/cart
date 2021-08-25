@@ -126,12 +126,19 @@
 			{order:cartlist}
 		{cartlist:}
 			{:model.css}
+			<style>
+				#{div} hr {
+					margin-top: 1rem;
+	    			margin-bottom: 1rem;
+	    			background-color: #dee2e6;
+				}
+			</style>
 			<div style="{:ishidedisabled}">
-				<div class="d-flex justify-content-between">
+				<div style="display: flex; justify-content: space-between;">
 					<div>
-						<div class="custom-control custom-checkbox">
-							<input type="checkbox" class="custom-control-input" name="checkall" id="checkall">
-							<label class="custom-control-label" for="checkall">Выделенное: </label>
+						<div>
+							<input type="checkbox" name="checkall" id="checkall">
+							<label for="checkall">Выделенное: </label>
 							<span class="act-clear a">Удалить</span>
 							<script type="module" async>
 								import { Cart } from '/vendor/infrajs/cart/Cart.js'
@@ -177,16 +184,18 @@
 					#{div} del {
 						color: gray;
 					}
+					#{div} .sumitogdis {
+						text-align: right;
+					}
+					@media (max-width: 991px) {
+					  	#{div} .sumitogdis {
+							text-align: center;
+						}
+					}
 				</style>
 				{basket::cartpos}
 			</form>
-			<div style="margin-bottom: 10px; text-align: var(--align)">
-				<style>
-					:root { --align: right }
-					@media (max-width: 991px) {
-					    :root { --align: center }
-					}
-				</style>
+			<div class="sumitogdis" style="margin-bottom: 10px;">
 				Сумма{sumclear!sum?:nodiscount}: 
 				<span style="font-size:120%; font-weight:bold" class="cartsumclear">{sumclear:itemcostrub}</span>
 			</div>
@@ -241,42 +250,70 @@
 			{false:}0
 			{true:}1
 		{cartlistborder:}
-			<div class="border rounded p-3">
+			<div style="padding: 1rem; border: 1px solid #dee2e6; border-radius: .25rem;">
 				{:cartlist}
 			</div>
 		{badgecoupon:}&nbsp;<span title="Скидка по купону {data.order.coupon}" class="badge badge-pill badge-danger">-{.}%</span>
 		{cartpos:}
-			<div class="d-flex cartpos">
+			<div style="display: flex;" class="cartpos">
+				<style>
+					#{div} .mobile {
+						display: none;
+					}
+					#{div} .pc {
+						display: block;
+					}
+					@media (max-width: 767px) {
+						#{div} .mobile {
+							display: block;
+						}
+						#{div} .pc {
+							display: none;
+						}
+					}
+				</style>
 				<div style="{:ishidedisabled}">
-					<div class="custom-control custom-checkbox">
-						<input data-position_id="{position_id}" type="checkbox" class="del custom-control-input" id="check{~key}" name="del{position_id}">
-						<label class="custom-control-label" for="check{~key}">&nbsp;</label>
-					</div>
+					<input style="margin-right: 0.5rem;" data-position_id="{position_id}" type="checkbox" class="del" id="check{~key}" name="del{position_id}">
 				</div>
-				<div class="mr-3 d-none d-lg-block" style="min-width:70px">
+				<div class="pc" style="min-width:70px; margin-right: 1rem">
 					{model.images.0?model:cartposimg}
 				</div>
-				<div class="flex-grow-1">
+				<div style="flex-grow: 1">
 					<div>
-						<div class="float-right">{model:model.badgenalichie}{discount:badgecoupon}</div>
+						<div style="float: right">{model:model.badgenalichie}{discount:badgecoupon}</div>
 						<b>{model.changed?:star} <a href="/catalog/{model.producer_nick}/{model.article_nick}{model:cat.idsl}">
 							{model.Наименование}</a>
 						</b>
 					</div>
-					<div class="d-flex flex-column flex-lg-row" style="clear:both">
+					<div style="display:flex" class="{~sid}1">
+						<style media="(max-width: 991px)">
+							.{~sid}1 { 
+								flex-direction: column 
+							}
+						</style>
 						{model.images.0?model:cartposimgm}
-						<div class="my-2 flex-grow-1">
+						<div style="margin: 0.5rem 0; flex-grow:1">
 							{model:model.CART-props}
 						</div>
-						<div class="my-2 d-flex flex-column ml-lg-3 costblock">
-							<div style="min-width:70px;" class="text-lg-right">
+						<div class="{~sid}2 costblock" style="margin-bottom: 0.5rem; margin-top: 0.5rem; display:flex; flex-direction: column">
+							<style media="(min-width: 992)">
+								.{~sid}2 { 
+									margin-left: 1rem 
+								}
+							</style>	
+							<div style="min-width:70px;" class="{~sid}3">
+								<style media="(min-width: 992)">
+									.{~sid}3 { 
+										text-align:right 
+									}
+								</style>	
 								<div><del>{cost!model.Цена?model.Цена:itemcostrub?model.Старая цена:itemcostrub}</del></div>
 								{cost:itemcostrub}
 							</div>
-							<div class="my-2">
+							<div style="margin: 0.5rem 0;">
 								<input data-autosave="false" {:isdisabled} data-position_id="{position_id}" data-cost="{cost}" data-costclear="{model.Цена}" style="width:5em" value="{count}" type="number" min="0" max="999" class="count form-control" type="number">
 							</div>
-							<div style="min-width:70px;" class="text-lg-right">
+							<div style="min-width:70px;" class="l{id}5">
 								<b class="sum">{sum:itemcostrub}</b>
 							</div>
 						</div>
@@ -286,12 +323,12 @@
 			<hr>
 			{nodiscount:} <nobr>без скидки</nobr>
 			{cartposimg:}
-				<a href="/{:cat.pospath}">
-					<img class="img-thumbnail" src="/-imager/?w=60&crop=1&h=60&src={images.0}&or=-imager/empty.png">
+				<a href="{:model.link-pos}">
+					<img style="max-width:100%" src="/-imager/?w=60&crop=1&h=60&src={images.0}&or=-imager/empty.png">
 				</a>
 			{cartposimgm:}
-				<a href="/{:cat.pospath}" class="my-2 mr-3 d-bock d-sm-none">
-					<img class="img-thumbnail" src="/-imager/?h=100&src={images.0}&or=-imager/empty.png">
+				<a href="{:model.link-pos}" class="mobile" style="margin:0.5rem 1rem 0.5rem 0">
+					<img style="max-width:100%" src="/-imager/?h=100&src={images.0}&or=-imager/empty.png">
 				</a>
 	{PAYLAYOUT:}{:*pay.INFO}
 	{ORDER:}
@@ -317,9 +354,9 @@
 					
 		{transportradio:}
 			<div class="mt-1 line" style="color: {...transport=type?:black}; font-weight:{...transport=type?:600}">
-				<div class="d-flex">
-					<div class="form-check flex-grow-1" style2="max-width:200px">
-						<input {:isdisabled} class="radio form-check-input" type="radio" name="transport" {...transport=type?:checked} id="transport_{type}" 
+				<div style="display: flex">
+					<div class="flex-grow-1" style="position: relative; padding-left: 1.25rem;" style2="max-width:200px">
+						<input {:isdisabled} style="position: absolute; margin-top: .334rem; margin-left: -1.25rem;" class="radio" type="radio" name="transport" {...transport=type?:checked} id="transport_{type}" 
 						data-cost="{cost}" value="{type}">
 						<label class="ml-1 form-check-label" for="transport_{type}">
 							{:label_{type}_short}
@@ -348,8 +385,12 @@
 				#{div} form {
 					display: grid; 
 					grid-row-gap: 20px;
-					grid-column-gap: 30px;
-					grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));		
+					grid-column-gap: 31px; /*до 768 контейнер 720 - padding 15x2 для контена 690 и в контенте 330*2 + 30 и +1 для переноса в одну колонку*/
+					grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));		
+				}
+				#{div} label {
+				    display: inline-block;
+				    margin-bottom: .5rem;
 				}
 				@media(min-width: 1191px) {
 					#{div} form  {
@@ -357,12 +398,12 @@
 					}
 				}
 			</style>
+			<h1 title="Последние измения {~date(:j F H:i,data.order.dateedit)}">
+				{data.rule.title} 
+				{:ordernick}
+			</h1>
 			<form name="cart">
 				<div>
-					<h1 class="mb-0">{data.rule.title} <span style="margin-left: 5px" title="Последние измения {~date(:j F H:i,data.order.dateedit)}" class="float-right">{:ordernick}</span></h1>
-				</div>
-				<div class="d-none d-md-block"></div>
-				<div style="">
 					{commentmanager?:showManageComment}
 					{data.order.paydata:PAYLAYOUT}
 					{:ordercontentbody}
@@ -398,6 +439,9 @@
 		{ordercontentbody:}			
 			
 				<style>
+					#{div} .form-group {
+						 margin-bottom: 1rem;
+					}
 					#{div} .borderblock {
 						border: solid 1px #ddd;
 						margin: 15px 0 20px;
@@ -414,7 +458,7 @@
 						}
 					}
 				</style>
-				<div class="borderblock mt-0">
+				<div class="borderblock" style="margin-top:0">
 					<div style="max-width:350px">
 						<div class="form-group input-name">
 							<label class="w-100">Имя получателя{:req} <i class="msg float-right"></i></label>
@@ -504,12 +548,13 @@
 					</div>
 				</div>
 				<div id="transblock" class="transblock">
-					<h2><span class="transportreset" style="cursor: default">Населённый пункт</span> <span class="{:isedit?:a?:text-danger} citychoice">{data.order.city.city|:citynone}</span></h2>
+					<h2><span class="transportreset" style="cursor: default">Населённый пункт</span> <nobr class="{:isedit?:a?:text-danger} citychoice">{data.order.city.city|:citynone}</nobr></h2>
 					{:raschetniives}
 					
 					<div class="borderblock" style="color:#444; padding-top:10px; padding-bottom:15px">
 						<div style="max-width:350px">
 							<style>
+								.transblock select,
 								.transblock input,
 								.transblock label,
 								.transblock .line {
@@ -521,24 +566,25 @@
 								.transblock .descr {
 									max-height: 0;
 									opacity: 0;
-									padding-left: 21px;
+									position: relative; 
+									padding-left: 1.25rem;
 									font-weight: normal;
 									overflow: hidden;
 									transition-property: margin-top, opacity, max-height;
 									transition-duration: 0.2s;
 								}
-							.transblock .descr.show {
-								display: block;
-								opacity: 1;
-								max-height: 200px;
-								margin-top:5px;
-							}
-							.transblock .input-address, 
-							.transblock .input-zip {
-								margin-top:5px;
-								margin-bottom:5px;
-							}
-						</style>
+								.transblock .descr.show {
+									display: block;
+									opacity: 1;
+									max-height: 200px;
+									margin-top:5px;
+								}
+								.transblock .input-address, 
+								.transblock .input-zip {
+									margin-top:5px;
+									margin-bottom:5px;
+								}
+							</style>
 						
 						
 						{(transports.cdek_pvz|transports.cdek_courier)?:cdeklogo}
@@ -839,6 +885,8 @@
 									//const zip = ''
 									//await Cart.post('setzip', { order_id }, { zip })
 									await Cart.post('setcity', { place, order_id }, { city_id })
+								} else if (city_id === 0) {
+									await Cart.post('setcity', { place, order_id }, { city_id: '' })
 								} else {
 									Cart.dis(form, false)
 								}
@@ -847,134 +895,12 @@
 					}
 				</script>
 			</div>
-			<div class="payblock">
-				<h2 class="payreset" style="cursor: default">Способ оплаты <span class="float-right"><span class="total">{~cost(data.order.total)}{:model.unit}</span></span></h2>
-				<div class="borderblock" style="color:#444; padding-bottom:15px">
-					<style>
-						.payblock input,
-						.payblock label,
-						.payblock .line {
-							cursor: {:isedit?:pointer?:default};
-						}
-						.payblock .descr {
-							padding-bottom:1px;
-						}
-						.payblock .descr {
-							max-height: 0;
-							opacity: 0;
-							overflow: hidden;
-							transition-property: margin-top, opacity, max-height;
-							transition-duration: 0.2s;
-						}
-						.payblock .descr.show {
-							display: block;
-							opacity: 1;
-							max-height: 100px;
-						}
-					</style>
-					
-							{payments.card?(:card):payradio}
-							{payments.perevod?(:perevod):payradio}
-							<!-- <img src="/-imager?src=-cart/images/cards.png"> -->
-					
-							{payments.self?(:self):payradio}
-							{payments.corp?(:corp):payradio}
-					
-					<script type="module" async>
-						import { Cart } from '/vendor/infrajs/cart/Cart.js'
-						import { Popup } from '/vendor/infrajs/popup/Popup.js'
-						import { Global } from '/vendor/infrajs/layer-global/Global.js'
-						import { Template } from '/vendor/infrajs/template/Template.js'
-						import { Layer } from '/vendor/infrajs/controller/src/Layer.js'
+			{~conf.cart.pays.0?:payblock}
 
-						/*
-							Выбор radio - способ оплаты. 
-							Показываем нужные действия снизу
-							Для варианта self - оплата при получении. Добавляется процент.
-						*/
-						const form = document.forms.cart
-						const cls = (cls, div = form) => div.getElementsByClassName(cls)
-						const tag = (tag, div = form) => div.getElementsByTagName(tag)
-						const payblock = cls('payblock')[0]
-						
-						const radios = form.elements.pay || []
-						const order_id = {:order_id}
-						const place = "{:place}"
-						const lines = cls('line', payblock)
-						const isedit = {:isedit?:true?:false}
-						const descrs = cls('descr', payblock)
-						const payreset = cls('payreset')[0]
-						payreset.addEventListener('click', () => {
-							for (const radio of radios) radio.checked = false
-							change(true)
-						})
-								
-						let last = "{data.order.pay}"
-						const change = async (r) => {
-							if (!isedit) return
-							const pay = r === true ? '' : radios.value
-							const tplcost = val => {
-								let cost = Template.scope['~cost'](val, false, true) + '{:model.unit}'
-								return cost
-							}
-							if (last == pay) return
-							last = pay
-							for (const line of lines) {
-								line.style.color = ''
-								line.style.fontWeight = ''
-							}
-							for (const descr of descrs) descr.classList.remove('show')
-							if (pay) {
-								const radio = form.elements['pay_' + pay]
-								const line = radio.closest('.line')
-								const descr = cls('descr', line)[0]
-								if (descr) descr.classList.add('show')
-								if (line) {
-									line.style.color = 'black'
-									line.style.fontWeight = '600'
-								}
-								
-							}
-							const sum = {data.order.sum}
-							const transport = form.elements.transport.value
-							const radio = form.elements['transport_' + transport]
-							const sumtrans = radio ? Number(radio.dataset.cost) : 0
-
-							const payselfcost = pay == 'self' && (!transport || ~['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier'].indexOf(transport));
-							if (payselfcost) {
-								//for (const span of cls('total')) span.innerHTML = tplcost(Math.round((sum + sumtrans) * 104)/100)
-								for (const span of cls('total')) span.innerHTML = tplcost(Math.round((sum + sumtrans) * (100 + Config.conf.cart.payselfcost))/100)
-							} else {
-								for (const span of cls('total')) span.innerHTML = tplcost(sum + sumtrans)
-							}
-
-
-							//const online = (pay == 'card' && transport != 'any' && transport)
-							//const online = (pay == 'card' && (Config.conf.cart.paycheck || (transport != 'any' && transport)))
-							const online = (pay == 'card' && (Config.conf.cart.paycheck && (transport != 'any' && transport)))
-							for (const img of cls('visalogo')) img.style.display = online ? '' : 'none'
-							for (const btn of cls('act-check')) btn.style.display = online ? 'none' : 'inline-block'
-							for (const btn of cls('act-pay')) btn.style.display = online ? 'inline-block' : 'none'
-
-							cls('payresume')[0].innerHTML = pay ? Template.parse("{tpl}", true, "pay_label_" + pay) : ''
-							
-							const ans = await Cart.posts('setpay', { place, order_id }, { pay })
-							if (!ans.result) await Popup.alert(ans.msg)
-						}
-						for (const radio of radios) radio.addEventListener('change', change)
-						for (const line of lines) line.addEventListener('click', () => {
-							if (!isedit) return
-							let radio = tag('input', line)[0]
-							radio.checked = true
-							change()
-						})
-					</script>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-12 flex-grow-1 input-comment mb-2">
+			<div style="display: flex; gap: 15px; flex-wrap: wrap;">
+				<div style="margin-bottom: 0.5rem; flex-grow:1" class="col-sm-12 input-comment">
 					<div class="mb-2">Комментарий к&nbsp;заказу <i class="msg float-right"></i></div>
-					<textarea {:isdisabled} name="comment" class="form-control" rows="3">{data.order.comment}</textarea>
+					<textarea {:isdisabled} name="comment" style="height:auto" class="form-control" rows="3">{data.order.comment}</textarea>
 					<script type="module" async>
 						import { Cart } from '/vendor/infrajs/cart/Cart.js'
 						const form = document.forms.cart
@@ -1000,16 +926,23 @@
 					</script>
 				</div>
 				<div class="col-sm-12 callblock">
+					<style>
+						.callblock input,
+						.callblock label,
+						.callblock .line {
+							cursor: {:isedit?:pointer?:default};
+						}
+					</style>
 					<div class="mb-1 callback-title" style="cursor: default">Звонок менеджера</div>
-					<div class="form-check mt-1 line" style="font-weight:{callback=:yes?:600}">
-						<input data-autosave="false" {:isdisabled} class="form-check-input" type="radio" name="callback" {callback=:yes?:checked} id="exampleRadios1" value="yes">
-						<label class="ml-1 form-check-label" for="exampleRadios1">
+					<div class="line" style="margin-top: 0.25rem ;padding-left: 1.25rem; font-weight:{callback=:yes?:600}">
+						<input style="margin-left: -1.25rem; margin-top: 0.334rem; position:absolute;" data-autosave="false" {:isdisabled} type="radio" name="callback" {callback=:yes?:checked} id="exampleRadios1" value="yes">
+						<label for="exampleRadios1">
 							Нужен для уточнения деталей.
 						</label>
 					</div>
-					<div class="form-check mt-1 line" style="font-weight:{callback=:no?:600}">
-						<input data-autosave="false" {:isdisabled} class="form-check-input" type="radio" name="callback" {callback=:no?:checked} id="exampleRadios2" value="no">
-						<label class="ml-1 form-check-label" for="exampleRadios2">
+					<div class="line" style="margin-top: 0.25rem ;padding-left: 1.25rem; font-weight:{callback=:no?:600}">
+						<input style="margin-left: -1.25rem; margin-top: 0.334rem; position:absolute;" data-autosave="false" {:isdisabled} class="form-check-input" type="radio" name="callback" {callback=:no?:checked} id="exampleRadios2" value="no">
+						<label for="exampleRadios2">
 							Не нужен, информация<br>по заказу понятна.
 						</label>
 					</div>
@@ -1054,6 +987,134 @@
 					</script>
 				</div>
 			</div>
+			{payblock:}
+				<div class="payblock">
+					<h2 class="payreset" style="cursor: default; display:flex; justify-content:space-between; flex-wrap: wrap;">
+						<span>Способ оплаты</span>
+						<span class="total">{~cost(data.order.total)}{:model.unit}</span>
+					</h2>
+					<div class="borderblock" style="color:#444; padding-bottom:15px">
+						<style>
+							.payblock input,
+							.payblock label,
+							.payblock .line {
+								cursor: {:isedit?:pointer?:default};
+							}
+							.payblock .descr {
+								padding-bottom:1px;
+							}
+							.payblock .descr {
+								max-height: 0;
+								opacity: 0;
+								overflow: hidden;
+								transition-property: margin-top, opacity, max-height;
+								transition-duration: 0.2s;
+							}
+							.payblock .descr.show {
+								display: block;
+								opacity: 1;
+								max-height: 100px;
+							}
+						</style>
+						
+								{payments.card?(:card):payradio}
+								{payments.perevod?(:perevod):payradio}
+								<!-- <img src="/-imager?src=-cart/images/cards.png"> -->
+						
+								{payments.self?(:self):payradio}
+								{payments.corp?(:corp):payradio}
+						
+						<script type="module" async>
+							import { Cart } from '/vendor/infrajs/cart/Cart.js'
+							import { Popup } from '/vendor/infrajs/popup/Popup.js'
+							import { Global } from '/vendor/infrajs/layer-global/Global.js'
+							import { Template } from '/vendor/infrajs/template/Template.js'
+							import { Layer } from '/vendor/infrajs/controller/src/Layer.js'
+
+							/*
+								Выбор radio - способ оплаты. 
+								Показываем нужные действия снизу
+								Для варианта self - оплата при получении. Добавляется процент.
+							*/
+							const form = document.forms.cart
+							const cls = (cls, div = form) => div.getElementsByClassName(cls)
+							const tag = (tag, div = form) => div.getElementsByTagName(tag)
+							const payblock = cls('payblock')[0]
+							
+							const radios = form.elements.pay || []
+							const order_id = {:order_id}
+							const place = "{:place}"
+							const lines = cls('line', payblock)
+							const isedit = {:isedit?:true?:false}
+							const descrs = cls('descr', payblock)
+							const payreset = cls('payreset')[0]
+							payreset.addEventListener('click', () => {
+								for (const radio of radios) radio.checked = false
+								change(true)
+							})
+									
+							let last = "{data.order.pay}"
+							const change = async (r) => {
+								if (!isedit) return
+								const pay = r === true ? '' : radios.value
+								const tplcost = val => {
+									let cost = Template.scope['~cost'](val, false, true) + '{:model.unit}'
+									return cost
+								}
+								if (last == pay) return
+								last = pay
+								for (const line of lines) {
+									line.style.color = ''
+									line.style.fontWeight = ''
+								}
+								for (const descr of descrs) descr.classList.remove('show')
+								if (pay) {
+									const radio = form.elements['pay_' + pay]
+									const line = radio.closest('.line')
+									const descr = cls('descr', line)[0]
+									if (descr) descr.classList.add('show')
+									if (line) {
+										line.style.color = 'black'
+										line.style.fontWeight = '600'
+									}
+									
+								}
+								const sum = {data.order.sum}
+								const transport = form.elements.transport.value
+								const radio = form.elements['transport_' + transport]
+								const sumtrans = radio ? Number(radio.dataset.cost) : 0
+
+								const payselfcost = pay == 'self' && (!transport || ~['cdek_pvz', 'any', 'cdek_courier','pochta_simple','pochta_1','pochta_courier'].indexOf(transport));
+								if (payselfcost) {
+									//for (const span of cls('total')) span.innerHTML = tplcost(Math.round((sum + sumtrans) * 104)/100)
+									for (const span of cls('total')) span.innerHTML = tplcost(Math.round((sum + sumtrans) * (100 + Config.conf.cart.payselfcost))/100)
+								} else {
+									for (const span of cls('total')) span.innerHTML = tplcost(sum + sumtrans)
+								}
+
+
+								//const online = (pay == 'card' && transport != 'any' && transport)
+								//const online = (pay == 'card' && (Config.conf.cart.paycheck || (transport != 'any' && transport)))
+								const online = (pay == 'card' && (Config.conf.cart.paycheck && (transport != 'any' && transport)))
+								for (const img of cls('visalogo')) img.style.display = online ? '' : 'none'
+								for (const btn of cls('act-check')) btn.style.display = online ? 'none' : 'inline-block'
+								for (const btn of cls('act-pay')) btn.style.display = online ? 'inline-block' : 'none'
+
+								cls('payresume')[0].innerHTML = pay ? Template.parse("{tpl}", true, "pay_label_" + pay) : ''
+								
+								const ans = await Cart.posts('setpay', { place, order_id }, { pay })
+								if (!ans.result) await Popup.alert(ans.msg)
+							}
+							for (const radio of radios) radio.addEventListener('change', change)
+							for (const line of lines) line.addEventListener('click', () => {
+								if (!isedit) return
+								let radio = tag('input', line)[0]
+								radio.checked = true
+								change()
+							})
+						</script>
+					</div>
+				</div>
 			{online*:}{((pay=:card)&(transport!:any))&transport?:yes}
 			{online*:}{(pay=:card)&(~conf.cart.paycheck|((transport!:any)&transport))?:yes)}
 			{online:}{(pay=:card)&(~conf.cart.paycheck&((transport!:any)&transport))?:yes)}
@@ -1062,10 +1123,10 @@
 			{payradio:}
 				<div class="mt-1 line" style="color: {data.order.pay=.?:black}; font-weight:{data.order.pay=.?:600}">
 					<div class="d-flex">
-						<div class="form-check flex-grow-1">
-							<input {:isdisabled} class="radio form-check-input" type="radio" name="pay" {data.order.pay=.?:checked} id="pay_{.}" 
+						<div style="flex-grow:1; padding-left: 1.25rem">
+							<input style="position: absolute; margin-top: 0.334rem; margin-left: -1.25rem" {:isdisabled} class="radio" type="radio" name="pay" {data.order.pay=.?:checked} id="pay_{.}" 
 							data-cost="{cost}" value="{.}">
-							<label class="ml-1 form-check-label" for="pay_{.}">
+							<label for="pay_{.}">
 								{:pay_label_{.}}
 							</label>
 						</div>
@@ -1099,13 +1160,13 @@
 			{callnoneed:}вопросов нет
 		{PAYINFO:}<img src="/-cart/images/cards.png">
 		{useractions:}
-				<div class="d-flex mt-4">
-					<div style="margin-right: 5px">
+				<div style="display: flex; margin-top:1.5rem">
+					<div>
 						<div style="display:{:online??:none}" class="visalogo">
 							{:PAYINFO}
 						</div>
 					</div>
-					<div class="myactions flex-grow-1" data-place="orders">	
+					<div style="flex-grow:1" class="myactions" data-place="orders">	
 						{data.rule.actions[:place]:myactions}
 					</div>
 				</div>
@@ -1578,11 +1639,12 @@
 		{ADMINLIST:}
 			<div style="margin-bottom: 15px">
 				<style>
-					#{div} .active {
+					/*#{div} .active {
 						background-color: var(--warning);
 						border-color: var(--warning);
 						font-weight: inherit;
-					}
+					}*/
+
 					#{div} :focus {
 						box-shadow: none;
 					}
@@ -1590,10 +1652,10 @@
 						margin: 2px 0;
 					}
 
-					#{div} a:active {
+					/*#{div} a:active {
 						background-color: var(--orange);
 						border-color: var(--orange);
-					}
+					}*/
 				</style>
 				<a data-anchor="#YEARS" class="btn btn-secondary" href="/{crumb}{:quest}{Crumb.get.start?:startget}{Crumb.get.start?:amp}status=wait">Активные <span class="circle">{data.counts.wait|:0}</span></a>
 				<a data-anchor="#YEARS" class="btn btn-secondary" href="/{crumb}{:quest}{Crumb.get.start?:startget}{Crumb.get.start?:amp}status=pay">Ожидают оплату <span class="circle">{data.counts.pay|:0}</span></a>
@@ -1648,7 +1710,7 @@
 			{orderpaidb:}, <b>оплачен, {~cost(total)}{:model.unit}</b>
 			{bgwait:}opacity:0.5;
 			{adm_row:}
-				<div class="border mb-2 p-2">
+				<div style="margin-bottom: 0.5rem; padding: 0.5rem; border:1px solid #dee2e6">
 					<style>
 						#{div} .circle {
 							border-radius:50%;
@@ -1663,7 +1725,7 @@
 					<a href="/cart/admin/{order_nick}/list" class="circle">{~length(basket)}</a> 
 					<nobr>{data.meta.rules[status]shortactive|data.meta.rules[status]short}</nobr>{paid?:orderpaidb}
 
-					<div class="float-right text-right">
+					<div style="text-align: right; float: right">
 						<span title="Дата редактирования">{~date(:d.m.Y H:i,dateedit)}</span><br>
 						{email}<br><b>{sum:itemcostrub}</b>
 					</div>
@@ -1673,7 +1735,7 @@
 						{transport?:adminlisttrans}
 						{pay?:adminlistpay}
 					</div>
-					<div class="clearfix">
+					<div style="clear:both">
 						{comment:usercomment}
 						{commentmanager:admincomment}
 					</div>

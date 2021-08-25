@@ -5,6 +5,7 @@
 	"conf":"infrajs\\cart\\Cart",
 	"payselfcost":4,
 	"js":["Cart.js","infra.js"],
+	"css":["style.css"],
 	"require":"infra.php",
 	"update":"update.php",
 	"tks":[
@@ -17,7 +18,9 @@
 	],
 	"transports":["city","self","cdek_pvz","cdek_courier","pochta_simple","pochta_1","pochta_courier","any"],
 	"pays":["self","card","corp","perevod"],
-	
+	"paycheck":false,
+	"pay":"paykeeper",
+
 	"zip_from":"123123",
 	"city_from_id":431,
 	"city_from":"Тольятти",
@@ -33,8 +36,7 @@
 		"def":"ru",
 		"list":["ru","en"]
 	},
-	"paycheck":false,
-	"pay":"paykeeper",
+	
 	
 	"clutch":{
 		"catalog":"vendor/infrajs/cart/",

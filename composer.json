@@ -22,6 +22,7 @@
         "infrajs/ascroll":"~1",
         "infrajs/layer-global":"~1",
         "akiyatkin/form":"~1",
+        "akiyatkin/emptybootstrap":"~1",
         "infrajs/rubrics":"~1"
     },
     "autoload":{
