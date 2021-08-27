@@ -340,7 +340,7 @@
 			<h1>Ошибка</h1>
 			{data.msg}
 		{emptyorder:}
-			<h1>{data.rule.title} <span class="float-right">{:ordernick}</span></h1>
+			<h1>{data.rule.title} <span style="float:right">{:ordernick}</span></h1>
 			{:emptylist}
 		{showManageComment:}
 			<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-success" role="alert"><b>Сообщение менеджера</b>
@@ -353,9 +353,9 @@
 		
 					
 		{transportradio:}
-			<div class="mt-1 line" style="color: {...transport=type?:black}; font-weight:{...transport=type?:600}">
+			<div class="line" style="margin-top: 0.25rem; color: {...transport=type?:black}; font-weight:{...transport=type?:600}">
 				<div style="display: flex">
-					<div class="flex-grow-1" style="position: relative; padding-left: 1.25rem;" style2="max-width:200px">
+					<div style="flex-grow: 1; position: relative; padding-left: 1.25rem;" style2="max-width:200px">
 						<input {:isdisabled} style="position: absolute; margin-top: .334rem; margin-left: -1.25rem;" class="radio" type="radio" name="transport" {...transport=type?:checked} id="transport_{type}" 
 						data-cost="{cost}" value="{type}">
 						<label class="ml-1 form-check-label" for="transport_{type}">
