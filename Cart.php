@@ -222,7 +222,7 @@ class Cart
 	{
 		$orig = $meta['rules'][$status];
 		$new = [];
-		
+		$new['notice'] = $orig['notice'];
 		$new['title'] = Cart::code($lang, $orig['title']);
 		$new['caption'] = Cart::code($lang, $orig['caption']);
 		$new['short'] = Cart::code($lang, $orig['short']);

@@ -110,24 +110,41 @@
 			<span title="{iscatkit?:m?:mdef}">Комплектация:</span> {kit::kitlig}
 		</div>
 		{kitlig:}{::kitli}{~last()|:comma}
-		{kitli:}<a style="white-space: nowrap" href="{:link-pos}">{article}</a>{~last()|:comma}
+		{kitli:}<a href="{:link-pos}">{article}</a>{~last()|:comma}
 		{m:}Нестандартная комплектация
 		{mdef:}Стандартная комплектация
 		{comma:}, 
 	{showitemonecost:}
-		<div class="form-inline has-success">
-			<div>{:cost-one}</div>
-			<a style="margin: 0.25rem 0 0.25rem 0.5rem" class="btn btn-sm btn-success" href="{:link-pos}">Выбрать</a>
+		<div style="display: flex; align-items: center; gap: 10px; justify-content: space-between;">
+			<div>{:cost-one}</div>			
+			<a href="{:link-pos}">Выбрать</a>
 		</div>
 	{showonecost:}
-		<div class="form-inline has-success">
-			<div style="margin-right: 0.5rem">{:cost-one}</div>
-			<div class="input-group" title="Купить {producer|...producer} {article|...article}">
-				<input type="number" value="" min="0" max="999" class="form-control" 
-				style="width: 3.3em; padding-left: 6px; padding-right: 6px;">
-				<div class="input-group-append">
-					<span data-order_id="active"  style="padding-left: 10px; padding-right: 10px; min-width:97px" data-producer_nick="{producer_nick}" data-article_nick="{article_nick}" data-item_num="{item_num}" data-catkit="{catkit}" class="add btn input-group-addon"></span>
-				</div>
+		<div class="{~sid}" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-betwee">
+			<style>
+				.{~sid} input { 
+					width: 3.3em;
+				}
+				@media (max-width:767px) {
+					.{~sid} span { 
+						margin-left: auto;
+						margin-bottom: 0.25rem;
+					}
+					.{~sid} input { 
+						width: 100%;
+					}
+				}
+			</style>
+			<span>{:cost-one}</span>
+			<div title="Купить {producer|...producer} {article|...article}"
+				style="margin-left: auto; display: flex;position: relative; align-items: stretch;">
+				<input type="number" value="" min="0" max="999"  
+					style="flex-grow: 1; border-top-right-radius: 0;
+    					border-bottom-right-radius: 0;
+    					padding-left: 6px; padding-right: 6px;">
+				
+					<button data-order_id="active" data-producer_nick="{producer_nick}" data-article_nick="{article_nick}" data-item_num="{item_num}" data-catkit="{catkit}" class="add btn"></button>
+				
 			</div>
 		</div>
 		<div class="bbasket" style="display:none; position: absolute; border-bottom: 1px solid var(--gray);
@@ -137,7 +154,7 @@
 			Оформить
 		</div>
 	{showitemscost:}
-		<div class="form-inline has-success">
+		<div style="display: flex; align-items: center; gap: 10px; justify-content: space-between;">
 			<div>{:cost-two}</div>
-			<a style="margin: 0.25rem 0 0.25rem 0.5rem" class="btn btn-sm btn-outline-warning" href="{:link-pos}">Выбрать</a>
+			<a href="{:link-pos}">Выбрать</a>
 		</div>
