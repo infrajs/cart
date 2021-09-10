@@ -5,7 +5,6 @@ import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Fire } from '/vendor/akiyatkin/load/Fire.js'
 import { Goal } from '/vendor/akiyatkin/goal/Goal.js'
 import { User } from '/vendor/infrajs/user/User.js'
-import { City } from '/vendor/akiyatkin/city/City.js'
 import { View } from '/vendor/infrajs/view/View.js'
 
 import { Load } from '/vendor/akiyatkin/load/Load.js'
@@ -64,6 +63,7 @@ let Cart = {
 	posts: async (type, param, opt) => {
 		let token = User.token()
 		let lang = Cart.lang()
+		const { City } = await import('/vendor/akiyatkin/city/City.js')
 		let city_id = City.id()
 		let timezone = Intl.DateTimeFormat ? Intl.DateTimeFormat().resolvedOptions().timeZone : ''
 		let submit = 1
