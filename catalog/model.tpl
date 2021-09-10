@@ -39,8 +39,6 @@
 {basket-script:}
 	<script type="module" async id="scriptadd{~key}">
 		import { Cart } from '/vendor/infrajs/cart/Cart.js'
-		import { Global } from '/vendor/infrajs/layer-global/Global.js'
-		import { Popup } from '/vendor/infrajs/popup/Popup.js'
 		import { DOM } from '/vendor/akiyatkin/load/DOM.js'
 
 		let script = document.getElementById('scriptadd{~key}')
@@ -87,19 +85,25 @@
 				if (count) btnon() 
 				else btnoff()
 				let ans = await Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
-				if (!ans.result) return Popup.alert(ans.msg)
+				if (!ans.result) {
+					const { Popup } = await import('/vendor/infrajs/popup/Popup.js')
+					return Popup.alert(ans.msg)
+				}
 			})
 			btn.addEventListener('click', async () => {
 				let count = Number(input.value)
-				
 				if (!count) {
 					count = 1
 					input.value = 1;
 					btnon();
-					let ans = Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
-					if (!(await ans).result) return Popup.alert(ans.msg)
+					let ans = await Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
+					if (!ans.result) {
+						const { Popup } = await import('/vendor/infrajs/popup/Popup.js')
+						return Popup.alert(ans.msg)
+					}
 				} else {
 					let ans = Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
+					const { Crumb } = await import('/vendor/infrajs/controller/src/Crumb.js')
 					Crumb.go('/cart/orders/active/list')
 				}
 			});
