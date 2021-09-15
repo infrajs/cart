@@ -343,7 +343,7 @@
 			<h1>{data.rule.title} <span style="float:right">{:ordernick}</span></h1>
 			{:emptylist}
 		{showManageComment:}
-			<div style="margin-top:10px; margin-bottom:10px;" class="alert alert-success" role="alert"><b>Сообщение менеджера</b>
+			<div style="margin-bottom:10px;" class="alert alert-success" role="alert"><b>Сообщение менеджера</b>
 				<pre style="margin:0; padding:0; font-family: inherit; background:none; border:none; white-space: pre-wrap">{commentmanager}</pre>
 			</div>		
 		{checked:}checked
