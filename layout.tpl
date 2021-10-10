@@ -444,7 +444,7 @@
 					#{div} .borderblock {
 						border: solid 1px #ddd;
 						margin: 15px 0 20px;
-						background-color:rgba(253,234,181,0.25);
+						/*background-color:rgba(253,234,181,0.25);*/
 	    				padding: 10px 15px;
 					}
 					@media (max-width: 575px) {

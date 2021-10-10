@@ -1,7 +1,7 @@
 {::}vendor/infrajs/catalog/position.tpl?v={~conf.index.v}
 {model.showitemonecost:}{:model.showonecost}
 {props:}
-	<div class="mb-3">
+	<div style="margin-bottom:1rem">
 		{:model.POS-props}
 	</div>
 	{items?:showitems}
