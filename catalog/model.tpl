@@ -124,15 +124,19 @@
 			<a href="{:link-pos}">Выбрать</a>
 		</div>
 	{showonecost:}
-		<div class="{~sid}" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-betwee">
+		<div class="{~sid}" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between">
 			<style>
 				.{~sid} input { 
 					width: 3.3em;
+				}
+				.{~sid} span { 
+					margin-right: 0.5rem;
 				}
 				@media (max-width:767px) {
 					.{~sid} span { 
 						margin-left: auto;
 						margin-bottom: 0.25rem;
+
 					}
 					.{~sid} input { 
 						width: 100%;
