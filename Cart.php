@@ -1388,6 +1388,10 @@ class Cart
 			}
 
 			$model = Cart::getFromJson($position_id);
+			if (!empty($model['Цена'])) {
+				$r = explode(',', $model['Цена']);
+				if (sizeof($r) > 1) $model['Цена'] = $r[0];
+			}
 			$model['changed'] = $changed;
 			return $model;
 		});
