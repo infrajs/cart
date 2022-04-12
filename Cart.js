@@ -1,5 +1,4 @@
 //import { Crumb } from '/vendor/infrajs/controller/src/Crumb.js'
-//import { Ascroll } from '/vendor/infrajs/ascroll/Ascroll.js'
 //import { Popup } from '/vendor/infrajs/popup/Popup.js'
 import { CDN } from '/vendor/akiyatkin/load/CDN.js'
 import { Fire } from '/vendor/akiyatkin/load/Fire.js'
