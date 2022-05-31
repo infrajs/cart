@@ -54,19 +54,41 @@
 			const article_nick = btn.dataset.article_nick
 			let catkit = btn.dataset.catkit
 			let item_num = btn.dataset.item_num
-			let btnoff = () => {
-				btn.classList.add('btn-success')
-				btn.classList.remove('btn-danger')
-				btn.innerHTML = 'В&nbsp;корзину'
+			let readyGoToCart = false
+			const btnclear = () => {
+				btn.classList.remove('btn-danger', 'btn-success','btn-info','btn-secondary')
 			}
-			let btnon = () => {
-				btn.classList.remove('btn-success')
+			const btnoff = () => {
+				readyGoToCart = false
+				btnclear()
+				btn.classList.add('btn-success')
+				btn.innerHTML = 'Добавить'
+			}
+			const btnon = () => {
+				readyGoToCart = true
+				btnclear()
 				btn.classList.add('btn-danger')
 				btn.innerHTML = 'Оформить'
 			}
+			let timer
+			const btnadded = (r) => {
+				btnclear()
+				if (r) {
+					btn.innerHTML = 'Добавлено'
+					btn.classList.add('btn-info')
+				} else {
+					btn.innerHTML = 'Удалено'
+					btn.classList.add('btn-secondary')
+				}
+				clearTimeout(timer)
+				timer = setTimeout(() => {
+					if (r) btnon()
+					else btnoff()
+				}, 2000)
+			}
 			
 			Cart.get('orderfast', { order_id, place }).then( ans => {
-				input.value = 0
+				input.value = 1
 				btnoff()
 				if (!ans.result) return //Нет заказа ну чтож
 				const list = ans.order.basket ?? []
@@ -84,15 +106,18 @@
 				let count = Number(input.value)
 				if (count) btnon() 
 				else btnoff()
+				btnadded(count)
 				let ans = await Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
 				if (!ans.result) {
 					const { Popup } = await import('/vendor/infrajs/popup/Popup.js')
 					return Popup.alert(ans.msg)
 				}
+				
+				
 			})
 			btn.addEventListener('click', async () => {
 				let count = Number(input.value)
-				if (!count) {
+				if (!readyGoToCart || !count) {
 					count = 1
 					input.value = 1;
 					btnon();
