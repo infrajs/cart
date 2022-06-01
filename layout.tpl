@@ -115,11 +115,11 @@
 					<p style="display: {sumclear!sum??:none}">
 						Сумма со скидкой: <b class="cartsum" style="font-size:140%">{sum:itemcostrub}</b> 
 					</p>
-					<a style="white-space: nowrap; text-decoration: underline;" href="/{crumb.parent}">
+					<a style="white-space: nowrap;" href="/{crumb.parent}">
 						Перейти к {data.order.status!:wait?:заказу?:оформлению заказа}
 					</a>
 					<br>
-					Займёт не&nbsp;более 3&nbsp;минут.
+					<i>Займёт не&nbsp;более 3&nbsp;минут.</i>
 				</div>
 			</div>
 		{showcartlist:}
