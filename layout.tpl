@@ -793,7 +793,8 @@
 									
 
 									//const online = (pay == 'card' && (Config.conf.cart.paycheck || (transport != 'any' && transport)))
-									const online = (pay == 'card' && (Config.conf.cart.paycheck && (transport != 'any' && transport)))
+									//const online = (pay == 'card' && (Config.conf.cart.paycheck && (transport != 'any' && transport)))
+									const online = (pay == 'card' && (Config.conf.cart.paycheck))
 									for (const img of cls('visalogo')) img.style.display = online ? '' : 'none'
 									for (const btn of cls('act-check')) btn.style.display = online ? 'none' : 'inline-block'
 									for (const btn of cls('act-pay')) btn.style.display = online ? 'inline-block' : 'none'
@@ -1097,7 +1098,9 @@
 
 								//const online = (pay == 'card' && transport != 'any' && transport)
 								//const online = (pay == 'card' && (Config.conf.cart.paycheck || (transport != 'any' && transport)))
-								const online = (pay == 'card' && (Config.conf.cart.paycheck && (transport != 'any' && transport)))
+								//const online = (pay == 'card' && (Config.conf.cart.paycheck && (transport != 'any' && transport)))
+								const online = (pay == 'card' && (Config.conf.cart.paycheck))
+								
 								for (const img of cls('visalogo')) img.style.display = online ? '' : 'none'
 								for (const btn of cls('act-check')) btn.style.display = online ? 'none' : 'inline-block'
 								for (const btn of cls('act-pay')) btn.style.display = online ? 'inline-block' : 'none'
@@ -1119,7 +1122,8 @@
 				</div>
 			{online*:}{((pay=:card)&(transport!:any))&transport?:yes}
 			{online*:}{(pay=:card)&(~conf.cart.paycheck|((transport!:any)&transport))?:yes)}
-			{online:}{(pay=:card)&(~conf.cart.paycheck&((transport!:any)&transport))?:yes)}
+			{online*:}{(pay=:card)&(~conf.cart.paycheck&((transport!:any)&transport))?:yes)}
+			{online:}{(pay=:card)&(~conf.cart.paycheck)?:yes)}
 			
 			{zipopt:}<option {.=data.order.zip?:selected}>{.}</option>
 			{payradio:}
