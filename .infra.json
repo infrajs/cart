@@ -1,5 +1,5 @@
 {
-	"pub":["paycheck","yandexapikey", "payselfcost", "coupon","transports","city_from_id","city_from","pay"],
+	"pub":["paycheck","yandexapikey", "payselfcost", "coupon","transports","city_from_id","city_from","pay","pays"],
 	"paramsrc":"~auto/pages/Параметры.xlsx",
 	"coupon":true,
 	"conf":"infrajs\\cart\\Cart",
