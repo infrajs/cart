@@ -323,11 +323,11 @@
 			<hr>
 			{nodiscount:} <nobr>без скидки</nobr>
 			{cartposimg:}
-				<a href="{:model.link-pos}">
+				<a style="border: none; padding: 0" href="{:model.link-pos}">
 					<img style="max-width:100%" src="/-imager/?w=60&crop=1&h=60&src={images.0}&or=-imager/empty.png">
 				</a>
 			{cartposimgm:}
-				<a href="{:model.link-pos}" class="mobile" style="margin:0.5rem 1rem 0.5rem 0">
+				<a style="border: none; padding: 0" href="{:model.link-pos}" class="mobile" style="margin:0.5rem 1rem 0.5rem 0">
 					<img style="max-width:100%" src="/-imager/?h=100&src={images.0}&or=-imager/empty.png">
 				</a>
 	{PAYLAYOUT:}{:*pay.INFO}
