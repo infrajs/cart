@@ -54,12 +54,12 @@ let Cart = {
 		return tmp.textContent || tmp.innerText || ""
 	},
 
-	post: async (type, param, opt) => {
-		const ans = await Cart.posts(type, param, opt)
+	post: async (type, param, opt, descr = {}) => {
+		const ans = await Cart.posts(type, param, opt, descr)
 		await DOM.puff('check')
 		return ans
 	},
-	posts: async (type, param, opt) => {
+	posts: async (type, param, opt, descr = {}) => {
 		let token = User.token()
 		let lang = Cart.lang()
 		const { City } = await import('/vendor/akiyatkin/city/City.js')
@@ -102,8 +102,77 @@ let Cart = {
 			View.setCOOKIE('infra_session_pass')
 			Global.set('user')
 		}
-		if (ans.actionmeta && ans.actionmeta.goal && ans.result) Goal.reach(ans.actionmeta.goal)
-		
+		if (window.dataLayer && ~['pay', 'check'].indexOf(type)) {
+			const products = descr.basket.map( ({ model }) => {
+				return {
+					"id": model.article,
+					"price": model.Цена,
+					"brand": model.producer,
+					"category": model.group,
+					"variant": model.item_num + (model.catkit?'&':'') + model.catkit,
+					"quantity": 1
+				}
+			})
+			const ecom = {
+				"ecommerce": {
+					"currencyCode": "RUB",
+					"purchase": {
+						"actionField": {
+							"id" : descr.order_nick
+						},
+						"products": products
+					}
+				}
+			}
+			console.log(ecom.ecommerce)
+			dataLayer.push(ecom)
+		}
+		if (window.dataLayer && ~['addtoactive'].indexOf(type)) {
+			const pos = {...opt, ...param}
+			//{ place, producer_nick, article_nick, catkit, item_num }, { count }
+			const dif = descr.dif
+			if (dif > 0) {
+				const ecom = {
+					"ecommerce": {
+						"currencyCode": "RUB",    
+						"add": {
+							"products": [
+								{
+									"id": descr.article,
+									"price": descr.cost,
+									"brand": descr.producer,
+									"category": descr.group,
+									"variant": pos.item_num + (pos.catkit?'&':'') + pos.catkit,
+									"quantity": dif
+								}
+							]
+						}
+					}
+				}
+				console.log(ecom.ecommerce)
+				window.dataLayer.push(ecom)
+			} else if (dif < 0) {
+				const ecom = {
+					"ecommerce": {
+						"currencyCode": "RUB",    
+						"remove": {
+							"products": [
+								{
+									"id": descr.article,
+									"price": descr.cost,
+									"brand": descr.producer,
+									"category": descr.group,
+									"variant": pos.item_num + (pos.catkit?'&':'') + pos.catkit,
+									"quantity": -dif
+								}
+							]
+						}
+					}
+				}
+				console.log(ecom.ecommerce)
+				window.dataLayer.push(ecom)
+			}
+		}
 		return ans
 	},
 	maplayer: {

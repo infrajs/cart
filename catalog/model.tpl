@@ -52,6 +52,15 @@
 			const order_id = btn.dataset.order_id
 			const producer_nick = btn.dataset.producer_nick
 			const article_nick = btn.dataset.article_nick
+
+			const name = btn.dataset.name
+			const producer = btn.dataset.producer
+			const cost = btn.dataset.cost
+			const group = btn.dataset.group
+			const article = btn.dataset.article
+			const descr = { name, producer, cost, group, article }
+
+
 			let catkit = btn.dataset.catkit
 			let item_num = btn.dataset.item_num
 			let readyGoToCart = false
@@ -86,7 +95,7 @@
 					else btnoff()
 				}, 2000)
 			}
-			
+			let quantity = 0
 			Cart.get('orderfast', { order_id, place }).then( ans => {
 				input.value = 1
 				btnoff()
@@ -98,36 +107,40 @@
 					if (pos.catkit != catkit) continue
 					if (pos.item_num != item_num) continue
 					input.value = pos.count
+					quantity = pos.count
 					btnon()
 				}
 			})
 			
 			input.addEventListener('change', async () => {
 				let count = Number(input.value)
+				descr.dif = count - quantity
+				quantity = count
 				if (count) btnon() 
 				else btnoff()
 				btnadded(count)
-				let ans = await Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
+
+				let ans = await Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count }, descr)
 				if (!ans.result) {
 					const { Popup } = await import('/vendor/infrajs/popup/Popup.js')
 					return Popup.alert(ans.msg)
 				}
-				
-				
 			})
 			btn.addEventListener('click', async () => {
 				let count = Number(input.value)
+				descr.dif = quantity - count
+				quantity = count
 				if (!readyGoToCart || !count) {
 					count = 1
 					input.value = 1;
 					btnon();
-					let ans = await Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
+					let ans = await Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count }, descr)
 					if (!ans.result) {
 						const { Popup } = await import('/vendor/infrajs/popup/Popup.js')
 						return Popup.alert(ans.msg)
 					}
 				} else {
-					let ans = Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count })
+					let ans = Cart.post('addtoactive', { place, producer_nick, article_nick, catkit, item_num }, { count }, descr)
 					const { Crumb } = await import('/vendor/infrajs/controller/src/Crumb.js')
 					Crumb.go('/cart/orders/active/list')
 				}
@@ -176,7 +189,20 @@
     					border-bottom-right-radius: 0;
     					padding-left: 6px; padding-right: 6px;">
 				
-					<button data-order_id="active" data-producer_nick="{producer_nick}" data-article_nick="{article_nick}" data-item_num="{item_num}" data-catkit="{catkit}" class="add btn"></button>
+					<button 
+						data-order_id="active" 
+						data-producer_nick="{producer_nick}" 
+						data-article_nick="{article_nick}" 
+						data-item_num="{item_num}" 
+						data-catkit="{catkit}" 
+
+						data-cost="{Цена}" 
+						data-producer="{producer}" 
+						data-article="{article}" 
+						data-name="{Наименование}" 
+						data-group="{group}" 
+
+						class="add btn"></button>
 				
 			</div>
 		</div>

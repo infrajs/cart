@@ -1268,6 +1268,37 @@
 			{buttons::mybtns}
 		</div>
 		<script type="module">
+			import { inViewport } from '/vendor/akiyatkin/load/inViewport.js'
+			inViewport(document.body, ()=> {
+				if (!window.dataLayer) return
+				if ('{crumb.name}' != 'active') return
+				const descr = {~json(data.order)}
+				const products = descr.basket.map( ({ model }) => {
+					return {
+						"id": model.article,
+						"price": model.Цена,
+						"brand": model.producer,
+						"category": model.group,
+						"variant": model.item_num + (model.catkit?'&':'') + model.catkit,
+						"quantity": 1
+					}
+				})
+				const ecom = {
+					"ecommerce": {
+						"currencyCode": "RUB",
+						"checkout": {
+							"actionField": {
+								"id" : descr.order_nick
+							},
+							"products": products
+						}
+					}
+				}
+				console.log(ecom.ecommerce)
+				dataLayer.push(ecom)
+			})
+		</script>
+		<script type="module">
 			import { Cart } from '/vendor/infrajs/cart/Cart.js'
 			import { Popup } from '/vendor/infrajs/popup/Popup.js'
 			import { DOM } from '/vendor/akiyatkin/load/DOM.js'
@@ -1284,10 +1315,11 @@
 			const place = "{:place}"
 			const isedit = {:isedit?:true?:false}
 			
+			const descr = {~json(data.order)}
 			
 			for (const btn of cls('act-check')) btn.addEventListener('click', async () => {
 				if (Cart.dis(form)) return
-				let ans = await Cart.posts('check', { place, order_id })
+				let ans = await Cart.posts('check', { place, order_id }, { }, descr)
 				if (!ans.result) {
 					await Popup.alert(ans.msg)
 				} else {
@@ -1326,7 +1358,7 @@
 				if (Cart.dis(form)) return
 				const status = "{data.order.status}"
 				if (status != 'pay') {
-					const ans = await Cart.post('pay', { place, order_id })
+					const ans = await Cart.post('pay', { place, order_id }, { }, descr)
 					if (!ans.result) {
 						return Popup.alert(ans.msg)
 					}
@@ -1468,7 +1500,6 @@
 		<div>
 			{coupondata:coupinfo}
 		</div>
-		{prodart:}{producer_nick} {article_nick}{:cat.idsp}
 		{mybasket:}Ваша корзина
 		{justbasket:}Корзина
 		{numbasket:}Корзина <span class="float-right">{:ordernick}</span>
